@@ -1,1 +1,1 @@
-from . import persona, res_partner
+from . import agent, persona, questionnaire, res_partner

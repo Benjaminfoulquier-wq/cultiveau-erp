@@ -6,10 +6,12 @@ Le réseau Cultiveau dans Odoo
 =============================
 
 - chaque **adhérent** (entreprise d'irrigation) est une société Odoo : ses devis, factures, stocks
+
 et comptabilité sont les siens ; l'équipe Cultiveau voit toutes les sociétés ;
 - chaque **agriculteur** est un contact de la société de l'adhérent qui le suit ;
 - le **département** est déduit du code postal (frise culturale, statistiques) ;
 - les **outils du réseau** (assistant téléphonique, DTe, DISC, Académie) sont à un clic depuis le menu Cultiveau.
+
 """,
     "version": "18.0.1.0.0",
     "category": "Cultiveau",

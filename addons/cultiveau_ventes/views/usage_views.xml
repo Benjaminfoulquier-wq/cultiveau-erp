@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_usage_form" model="ir.ui.view">
+        <field name="name">cultiveau.usage.form</field>
+        <field name="model">cultiveau.usage</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_pitch" type="object" string="Poser l'accroche dans le fil du client" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <p class="text-muted">Du CAPEX à l'OPEX : l'agriculteur ne paie plus pour posséder le matériel, mais pour l'eau qu'il utilise, maintenance et SAV compris. Le volume cible vient de l'agronomie (ETP × Kc × frise × sol), borné par le volume autorisé.</p>
+                    <group>
+                        <group string="Le projet">
+                            <field name="partner_id"/>
+                            <field name="installation_id"/>
+                            <field name="sale_order_id"/>
+                            <field name="culture_id"/>
+                            <field name="surface_ha"/>
+                        </group>
+                        <group string="Les hypothèses">
+                            <field name="investissement"/>
+                            <field name="taux_pct"/>
+                            <field name="duree_ans"/>
+                            <field name="entretien_an"/>
+                            <field name="marge_pct"/>
+                            <field name="volume_m3_an"/>
+                            <field name="volume_source"/>
+                        </group>
+                    </group>
+                    <group>
+                        <group string="Le prix de l'eau">
+                            <field name="prix_m3"/>
+                            <field name="prix_m3_marge"/>
+                            <field name="mensualite"/>
+                            <field name="mensualite_capex"/>
+                        </group>
+                        <group string="Sur la durée">
+                            <field name="interets"/>
+                            <field name="cout_total"/>
+                            <field name="volume_total"/>
+                            <field name="volume_min"/>
+                            <field name="volume_max"/>
+                        </group>
+                    </group>
+                    <field name="comparatif_html" nolabel="1" readonly="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_usage_list" model="ir.ui.view">
+        <field name="name">cultiveau.usage.list</field>
+        <field name="model">cultiveau.usage</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="surface_ha"/>
+                <field name="investissement"/>
+                <field name="volume_m3_an"/>
+                <field name="prix_m3_marge"/>
+                <field name="mensualite"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_usages" model="ir.actions.act_window">
+        <field name="name">Irrigation à l'usage</field>
+        <field name="res_model">cultiveau.usage</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">« Et si vous ne payiez que l'eau que vous utilisez vraiment ? »</p>
+            <p>Simulez le prix au m³ et la mensualité lissée d'une installation, depuis sa fiche (bouton « Simuler à l'usage ») ou ici.</p>
+        </field>
+    </record>
+</odoo>

@@ -12,10 +12,17 @@ stades, coefficients culturaux (Kc), besoins en eau, irrigation recommandée, et
 « achat » (il commande). Chaque mois, les clients qui entrent dans une fenêtre remontent dans la
 liste « À contacter ce mois-ci » et une activité est créée pour leur commercial.
 
+Chaque stade porte aussi la **posture** que l'agriculteur attend de nous, les quatre saisons
+émotionnelles des Journées Cultiveau 2025 : écoute (hiver), support (printemps), discrétion (été et
+périodes critiques : semis, floraison, récolte, vendanges), proposition (automne, après récolte).
+Chaque culture porte la tendance de ses **cours** (hausse, stable, baisse), qui change le ton :
+sécurité et retour sur investissement quand les cours baissent, innovation et ambition quand ils
+montent. La fiche de l'agriculteur affiche sa posture du mois, toutes cultures confondues.
+
 Les stades et fenêtres sont renseignés par département (valeurs du Gard fournies) avec un repli
 sur des valeurs générales.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.2.0.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",

@@ -11,14 +11,14 @@ class PersonaWizard(models.TransientModel):
     _description = "Questionnaire de persona"
 
     partner_id = fields.Many2one("res.partner", "Agriculteur", required=True)
-    surface = fields.Selection(selection=lambda self: selection("surface"), string="Taille de l'exploitation")
-    relation = fields.Selection(selection=lambda self: selection("relation"), string="Ancienneté de la relation")
-    priorite = fields.Selection(selection=lambda self: selection("priorite"), string="Ce qui compte d'abord quand il achète")
-    materiel = fields.Selection(selection=lambda self: selection("materiel"), string="Son matériel aujourd'hui")
-    horizon = fields.Selection(selection=lambda self: selection("horizon"), string="Son horizon")
-    decision = fields.Selection(selection=lambda self: selection("decision"), string="Comment il décide")
-    canal = fields.Selection(selection=lambda self: selection("canal"), string="Comment il préfère qu'on le contacte")
-    pilotage = fields.Selection(selection=lambda self: selection("pilotage"), string="Son rapport au pilotage de l'irrigation")
+    probleme = fields.Selection(selection=lambda self: selection("probleme"), string="Face à un problème technique, la première chose qu'il fait")
+    achat = fields.Selection(selection=lambda self: selection("achat"), string="Pour un achat courant")
+    relation = fields.Selection(selection=lambda self: selection("relation"), string="La relation qu'il attend de son fournisseur")
+    strategie = fields.Selection(selection=lambda self: selection("strategie"), string="S'il devait choisir")
+    moral = fields.Selection(selection=lambda self: selection("moral"), string="Son état d'esprit face à l'avenir")
+    engagement = fields.Selection(selection=lambda self: selection("engagement"), string="L'exploitation")
+    techno = fields.Selection(selection=lambda self: selection("techno"), string="Face aux nouvelles technologies")
+    info = fields.Selection(selection=lambda self: selection("info"), string="Où il s'informe avant d'investir")
     persona_id = fields.Many2one("cultiveau.persona", "Persona", compute="_compute_persona")
     apercu = fields.Char("Aperçu", compute="_compute_persona")
 
@@ -61,5 +61,5 @@ class PersonaWizard(models.TransientModel):
             raise UserError(f"Persona « {code} » introuvable : les données du module ne sont pas chargées.")
         evaluation = self.env["cultiveau.persona.evaluation"].create({
             "partner_id": self.partner_id.id, "persona_id": persona.id, "reponses": reponses, "scores": scores})
-        self.partner_id.message_post(body=f"Persona évalué : <b>{persona.name}</b> — {persona.resume} ({evaluation.repartition}).")
+        self.partner_id.message_post(body=f"Persona évalué : <b>{persona.animal or ''} {persona.name}</b>, {persona.surnom or ''} — {persona.resume} ({evaluation.repartition}).")
         return {"type": "ir.actions.act_window", "res_model": "res.partner", "res_id": self.partner_id.id, "view_mode": "form"}

@@ -1,58 +1,68 @@
-"""Le questionnaire du persona : huit questions, quatre personas (voir cultiveau.persona).
+"""Le questionnaire du persona : huit questions, cinq personas (voir cultiveau.persona).
 
-Chaque réponse donne des points ; le plus haut l'emporte (ordre de priorité en cas d'égalité).
+Les cinq personas sont ceux de l'étude PRISM 2023 (BVA, Réussir, Agriconomie ; 1 766 chefs
+d'exploitation) retenus par les Journées Cultiveau 2025 : Lion, Jaguar, Chat, Tortue, Abeille.
+Les questions reprennent celles qui, dans l'étude, discriminent le mieux les cinq groupes :
+le réflexe face à un problème technique (« question très discriminante »), le comportement
+d'achat courant, la relation attendue avec le fournisseur, productivité ou charges, l'état
+d'esprit, l'engagement et la diversification, le rapport à la technologie, les sources
+d'information inspirantes.
+
+Chaque réponse donne des points ; le plus haut l'emporte. En cas d'égalité l'ordre de priorité
+tranche, et il commence par les profils prudents : une approche rassurante ne coûte rien, une
+approche ambitieuse mal placée coûte le client.
 """
 
-ORDRE = ['batisseur', 'pilote', 'fidele', 'pragmatique']
+ORDRE = ['chat', 'tortue', 'abeille', 'jaguar', 'lion']
 
 QUESTIONS = [
-    {"code": 'surface', "texte": "Taille de l'exploitation", "options": [
-        ('petite', 'Moins de 20 ha', {'fidele': 2, 'pragmatique': 1}),
-        ('moyenne', '20 à 80 ha', {'pragmatique': 1, 'fidele': 1}),
-        ('grande', '80 à 200 ha', {'batisseur': 1, 'pilote': 1}),
-        ('tres_grande', 'Plus de 200 ha', {'batisseur': 2, 'pilote': 1}),
+    {"code": 'probleme', "texte": "Face à un problème technique, la première chose qu'il fait", "options": [
+        ('dialogue', "Il appelle quelqu'un : technicien, conseiller, collègue", {'tortue': 2, 'abeille': 2}),
+        ('seul', "Il se débrouille seul, par essais, quitte à y passer du temps", {'chat': 3}),
+        ('recherche', "Il cherche l'information : web, documentation, vidéos", {'jaguar': 3}),
+        ('sait', "Il sait déjà ; ce sont ses collègues qui l'appellent, lui", {'lion': 3}),
     ]},
-    {"code": 'relation', "texte": 'Ancienneté de la relation', "options": [
-        ('nouveau', 'Nouveau contact ou prospect', {'pragmatique': 1}),
-        ('occasionnel', 'Achète de temps en temps', {'pragmatique': 2}),
-        ('regulier', 'Client régulier', {'fidele': 2}),
-        ('historique', "Client historique, recommande l'entreprise", {'fidele': 3}),
+    {"code": 'achat', "texte": "Pour un achat courant (pièces, consommables)", "options": [
+        ('memes', "Il reprend ce qui a fait ses preuves", {'chat': 3, 'tortue': 1}),
+        ('meilleur', "Il cherche le meilleur produit du marché, sans rien exclure", {'jaguar': 3, 'lion': 1}),
+        ('liste', "Il choisit dans la liste conseillée par son technicien", {'tortue': 3, 'abeille': 1}),
+        ('pointe', "Il veut la nouveauté, la pointe de la technologie", {'lion': 3}),
     ]},
-    {"code": 'priorite', "texte": "Ce qui compte d'abord quand il achète", "options": [
-        ('prix', 'Le prix', {'pragmatique': 3}),
-        ('delai', 'La disponibilité et la rapidité', {'pragmatique': 2, 'fidele': 1}),
-        ('technique', 'La performance technique', {'pilote': 3, 'batisseur': 1}),
-        ('conseil', 'Le conseil et la confiance', {'fidele': 3, 'batisseur': 1}),
+    {"code": 'relation', "texte": "La relation qu'il attend de son fournisseur", "options": [
+        ('suivi', "Importante : il aime un suivi régulier, un interlocuteur attitré", {'tortue': 2, 'abeille': 2}),
+        ('rythme', "C'est lui qui fixe le rythme : peu d'échanges, au bon moment", {'jaguar': 2, 'chat': 1}),
+        ('efficace', "Ce qui compte, c'est l'efficacité et le temps gagné", {'lion': 2, 'chat': 1}),
+        ('partenaire', "Un partenariat : il échange, il apprend, il partage", {'abeille': 3}),
     ]},
-    {"code": 'materiel', "texte": "Son matériel aujourd'hui", "options": [
-        ('ancien', 'Ancien, à remplacer', {'batisseur': 2, 'pragmatique': 1}),
-        ('entretenu', 'Fonctionnel, on entretient', {'fidele': 2, 'pragmatique': 1}),
-        ('recent', 'Récent', {'fidele': 1, 'pilote': 1}),
-        ('automatise', 'Automatisé, piloté', {'pilote': 3}),
+    {"code": 'strategie', "texte": "S'il devait choisir", "options": [
+        ('productivite', "Maximiser la productivité, quitte à augmenter les charges", {'lion': 3}),
+        ('charges', "Réduire les charges, quitte à perdre en productivité", {'chat': 1, 'tortue': 1, 'jaguar': 1}),
+        ('autonomie', "Gagner en autonomie : dépendre moins de l'extérieur", {'jaguar': 3}),
+        ('transmettre', "Sécuriser l'existant et transmettre", {'tortue': 2, 'abeille': 1}),
     ]},
-    {"code": 'horizon', "texte": 'Son horizon', "options": [
-        ('saison', 'Passer la saison, dépanner', {'pragmatique': 3}),
-        ('renouveler', 'Renouveler dans un à deux ans', {'fidele': 1, 'batisseur': 1, 'pragmatique': 1}),
-        ('structurant', 'Un projet structurant (forage, réseau, pivot, bassin)', {'batisseur': 3}),
-        ('veille', 'Veille technologique, essais', {'pilote': 3}),
+    {"code": 'moral', "texte": "Son état d'esprit face à l'avenir", "options": [
+        ('optimiste', "Optimiste : il a des projets", {'lion': 2, 'jaguar': 1, 'abeille': 1}),
+        ('prudent', "Prudent : il attend de voir", {'tortue': 2}),
+        ('inquiet', "Inquiet, voire désabusé", {'chat': 3}),
+        ('entoure', "Confiant parce qu'entouré : groupe, réseau, filière", {'abeille': 3}),
     ]},
-    {"code": 'decision', "texte": 'Comment il décide', "options": [
-        ('seul_vite', 'Seul, vite', {'pragmatique': 2}),
-        ('devis', 'Après comparaison de plusieurs devis', {'batisseur': 2, 'pragmatique': 1}),
-        ('conseiller', 'Avec son conseiller, sa coopérative, sa chambre', {'batisseur': 2, 'fidele': 1}),
-        ('demo', 'Après une démonstration ou un essai', {'pilote': 2, 'fidele': 1}),
+    {"code": 'engagement', "texte": "L'exploitation", "options": [
+        ('base', "L'exploitation de base, sans démarche particulière", {'chat': 2, 'tortue': 2}),
+        ('label', "Engagée dans une démarche qualité ou environnementale (HVE, bio, label)", {'abeille': 2, 'jaguar': 1}),
+        ('diversifiee', "Diversifiée : vente directe, transformation, énergie", {'jaguar': 2, 'lion': 2}),
+        ('societaire', "Plusieurs associés, des salariés, en croissance", {'lion': 3}),
     ]},
-    {"code": 'canal', "texte": "Comment il préfère qu'on le contacte", "options": [
-        ('telephone', 'Téléphone', {'pragmatique': 1, 'fidele': 1}),
-        ('sms', 'SMS ou WhatsApp', {'pragmatique': 2}),
-        ('mail', 'E-mail, avec les documents', {'pilote': 2, 'batisseur': 1}),
-        ('visite', 'Une visite sur place', {'fidele': 2, 'batisseur': 1}),
+    {"code": 'techno', "texte": "Face aux nouvelles technologies (sondes, pilotage, connecté)", "options": [
+        ('avance', "Il veut être en avance : il essaie en premier", {'lion': 3}),
+        ('roi', "Si le retour sur investissement est démontré", {'jaguar': 3}),
+        ('prouve', "Quand c'est éprouvé et que d'autres l'utilisent", {'abeille': 2, 'tortue': 1}),
+        ('maitrise', "Pas convaincu : il préfère ce qu'il maîtrise", {'chat': 3}),
     ]},
-    {"code": 'pilotage', "texte": "Son rapport au pilotage de l'irrigation", "options": [
-        ('non', 'Pas intéressé', {'pragmatique': 2, 'fidele': 1}),
-        ('curieux', 'Curieux, pas encore équipé', {'pilote': 1, 'batisseur': 1}),
-        ('equipe', 'Déjà équipé (sondes, programmateur)', {'pilote': 2}),
-        ('connecte', 'Veut tout connecter et suivre à distance', {'pilote': 3}),
+    {"code": 'info', "texte": "Où il s'informe avant d'investir", "options": [
+        ('internet', "Internet, vidéos, comparateurs, sites marchands", {'jaguar': 2, 'chat': 1}),
+        ('presse', "Presse spécialisée, salons", {'lion': 2, 'abeille': 1}),
+        ('pairs', "Son groupe, sa chambre, ses pairs, les rencontres", {'abeille': 3}),
+        ('technicien', "Son technicien, son fournisseur habituel", {'tortue': 3}),
     ]},
 ]
 

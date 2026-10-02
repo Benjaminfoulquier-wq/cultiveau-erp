@@ -9,6 +9,7 @@
                 <field name="name"/>
                 <field name="categorie"/>
                 <field name="couleur" widget="color"/>
+                <field name="cours_tendance"/>
                 <field name="nb_clients"/>
             </list>
         </field>
@@ -22,12 +23,21 @@
                 <sheet>
                     <div class="oe_title"><h1><field name="name" placeholder="Vigne, Pommier, Maïs…"/></h1></div>
                     <group>
-                        <field name="categorie"/>
-                        <field name="couleur" widget="color"/>
-                        <field name="actif"/>
+                        <group>
+                            <field name="categorie"/>
+                            <field name="couleur" widget="color"/>
+                            <field name="actif"/>
+                        </group>
+                        <group string="Cours agricoles (le contexte économique)">
+                            <field name="cours_tendance"/>
+                            <field name="cours_note" placeholder="Vin IGP Gard : −8 % sur un an"/>
+                            <field name="cours_date"/>
+                            <field name="cours_ton"/>
+                        </group>
                     </group>
                     <notebook>
                         <page string="Stades et besoins en eau" name="stades">
+                            <p class="text-muted">Pour chaque stade : les besoins en eau, et la <b>posture</b> que l'agriculteur attend de nous (écoute l'hiver, support au printemps, discrétion l'été et pendant les périodes critiques, proposition après récolte). Les stades critiques (semis, floraison, récolte, vendanges) sont détectés d'après leur nom : on ne dérange pas.</p>
                             <field name="stade_ids">
                                 <list editable="bottom">
                                     <field name="sequence" widget="handle"/>
@@ -42,6 +52,8 @@
                                     <field name="etp_min"/>
                                     <field name="etp_max"/>
                                     <field name="irrigation"/>
+                                    <field name="posture"/>
+                                    <field name="critique"/>
                                 </list>
                             </field>
                         </page>

@@ -5,5 +5,6 @@
     <menuitem id="menu_devis" name="Devis" parent="menu_ventes" action="sale.action_quotations_with_onboarding" sequence="20"/>
     <menuitem id="menu_commandes" name="Commandes" parent="menu_ventes" action="sale.action_orders" sequence="30"/>
     <menuitem id="menu_factures" name="Factures clients" parent="menu_ventes" action="account.action_move_out_invoice_type" sequence="40"/>
+    <menuitem id="menu_usages" name="Irrigation à l'usage (€/m³)" parent="menu_ventes" action="action_usages" sequence="45"/>
     <menuitem id="menu_modeles_devis" name="Modèles de devis par lots" parent="menu_ventes" action="sale_management.sale_order_template_action" sequence="50" groups="cultiveau_base.group_equipe"/>
 </odoo>

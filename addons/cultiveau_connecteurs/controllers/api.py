@@ -47,6 +47,8 @@ def _fiche_client(partner):
         "departement": partner.departement or "", "email": partner.email or "", "telephone": partner.mobile or partner.phone or "",
         "commercial": partner.user_id.name if partner.user_id else "",
         "persona": partner.cultiveau_persona_pour_api(),
+        "frise": partner.cultiveau_frise_pour_api(mois),
+        "agent": partner.cultiveau_agent_pour_api(),
         "cultures": [{"culture": cc.culture_id.name, "surface_ha": cc.surface_ha, "projet": cc.projet_mois, "achat": cc.achat_mois} for cc in partner.cultiveau_culture_ids],
         "fenetres_du_mois": fenetres, "mois": MOIS[mois - 1][1],
         "installations": partner.cultiveau_installation_ids.resume_pour_api(),

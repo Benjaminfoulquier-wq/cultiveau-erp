@@ -1,1 +1,1 @@
-from . import crm_lead, installation, sale_order
+from . import crm_lead, installation, sale_order, usage

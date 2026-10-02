@@ -16,6 +16,12 @@
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Frise culturale" name="cultiveau_frise" invisible="cultiveau_type not in ('agriculteur', False)">
+                    <div class="alert alert-info" role="status" invisible="not cultiveau_culture_ids" style="margin-bottom:8px">
+                        <b>Ce mois-ci : <field name="cultiveau_posture" readonly="1" class="oe_inline"/></b>
+                        <span invisible="not cultiveau_periode_critique" class="badge text-bg-danger ms-2">période critique</span>
+                        <span> — </span><field name="cultiveau_posture_detail" readonly="1" class="oe_inline"/>
+                        <br/><b>Cours : <field name="cultiveau_cours" readonly="1" class="oe_inline"/></b><span> — </span><field name="cultiveau_cours_ton" readonly="1" class="oe_inline"/>
+                    </div>
                     <field name="cultiveau_culture_ids" context="{'default_partner_id': id}">
                         <list editable="bottom">
                             <field name="culture_id"/>

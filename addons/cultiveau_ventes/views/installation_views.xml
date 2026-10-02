@@ -10,8 +10,14 @@
                     <div class="o_stat_info"><span class="o_stat_value"><field name="nb_devis"/></span><span class="o_stat_text">Devis</span></div>
                 </button>
             </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_simuler_usage" type="object" class="oe_stat_button" icon="fa-tint">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="nb_usages"/></span><span class="o_stat_text">À l'usage</span></div>
+                </button>
+            </xpath>
             <xpath expr="//header" position="inside">
                 <button name="action_nouveau_devis" type="object" string="Nouveau devis (modèle par lots)" invisible="etat == 'arretee'"/>
+                <button name="action_simuler_usage" type="object" string="Simuler à l'usage (€/m³)"/>
             </xpath>
         </field>
     </record>

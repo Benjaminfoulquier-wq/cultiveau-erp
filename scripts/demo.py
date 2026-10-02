@@ -8,9 +8,15 @@ agri = Partner.search([("name", "=", "Jean Martin")], limit=1) or Partner.create
     "cultiveau_culture_ids": [(0, 0, {"culture_id": env.ref("cultiveau_frise.culture_vigne").id, "surface_ha": 12}),
                               (0, 0, {"culture_id": env.ref("cultiveau_frise.culture_pommier").id, "surface_ha": 4.5}),
                               (0, 0, {"culture_id": env.ref("cultiveau_frise.culture_melon").id, "surface_ha": 3})]})
-env["cultiveau.persona.evaluation"].create({"partner_id": agri.id, "persona_id": env.ref("cultiveau_persona.persona_fidele").id,
-    "reponses": {"surface": "petite", "relation": "historique", "priorite": "conseil", "materiel": "entretenu", "horizon": "renouveler",
-                 "decision": "conseiller", "canal": "visite", "pilotage": "non"}, "scores": {"batisseur": 3, "pilote": 1, "fidele": 14, "pragmatique": 3}})
+if not agri.cultiveau_persona_evaluation_ids:
+    reponses = {"probleme": "dialogue", "achat": "liste", "relation": "suivi", "strategie": "transmettre", "moral": "prudent",
+                "engagement": "base", "techno": "prouve", "info": "technicien"}
+    code, scores = env["cultiveau.persona"].scorer(reponses)
+    env["cultiveau.persona.evaluation"].create({"partner_id": agri.id, "persona_id": env.ref(f"cultiveau_persona.persona_{code}").id,
+                                                "reponses": reponses, "scores": scores})
+# Les cours : le vin baisse, la pomme tient ; l'Agent en tient compte dans son ton.
+env.ref("cultiveau_frise.culture_vigne").write({"cours_tendance": "baisse", "cours_note": "Vin IGP Gard : −8 % sur un an", "cours_date": "2026-09-15"})
+env.ref("cultiveau_frise.culture_pommier").write({"cours_tendance": "stable", "cours_note": "Pomme : marché stable", "cours_date": "2026-09-15"})
 Inst = env["cultiveau.installation"]
 inst = Inst.search([("name", "=", "Goutte à goutte vigne — Mas Neuf")], limit=1) or Inst.create({
     "name": "Goutte à goutte vigne — Mas Neuf", "partner_id": agri.id, "type_systeme": "goutte_surface", "surface_ha": 12,

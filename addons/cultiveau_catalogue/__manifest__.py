@@ -13,8 +13,10 @@ et le fournisseur avec son prix et son délai.
 Deux imports :
 
 - la **matrice d'import** Excel du référencement Cultiveau (Référence, Nom, Fournisseur, Catégorie,
+
 Description, Prix HT, Unité, Conditionnement, Poids, URL image) ;
 - le **catalogue 3D** (27 000 références de raccords, vannes, pompes, filtration… avec familles,
+
 sous-familles, matières, cotes et fiches techniques), par le menu ou par le script
 ``scripts/importer_catalogue_3d.py``.
 """,

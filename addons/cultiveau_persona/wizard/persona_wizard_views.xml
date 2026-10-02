@@ -5,22 +5,22 @@
         <field name="model">cultiveau.persona.wizard</field>
         <field name="arch" type="xml">
             <form>
-                <p class="text-muted">Huit questions sur l'agriculteur, telles qu'on les connaît aujourd'hui. Le résultat est un point de départ pour la relation, à refaire quand il change (reprise, nouvelle installation, projet).</p>
+                <p class="text-muted">Huit questions sur l'agriculteur, telles qu'on le connaît aujourd'hui : ce sont celles qui, dans l'étude PRISM 2023, distinguent le mieux les cinq profils (Lion, Jaguar, Chat, Tortue, Abeille). Le résultat est un point de départ pour la relation, à refaire quand il change (reprise, nouvelle installation, projet).</p>
                 <group>
                     <field name="partner_id" readonly="1"/>
                 </group>
                 <group>
                     <group>
-                        <field name="surface" widget="radio"/>
+                        <field name="probleme" widget="radio"/>
+                        <field name="achat" widget="radio"/>
                         <field name="relation" widget="radio"/>
-                        <field name="priorite" widget="radio"/>
-                        <field name="materiel" widget="radio"/>
+                        <field name="strategie" widget="radio"/>
                     </group>
                     <group>
-                        <field name="horizon" widget="radio"/>
-                        <field name="decision" widget="radio"/>
-                        <field name="canal" widget="radio"/>
-                        <field name="pilotage" widget="radio"/>
+                        <field name="moral" widget="radio"/>
+                        <field name="engagement" widget="radio"/>
+                        <field name="techno" widget="radio"/>
+                        <field name="info" widget="radio"/>
                     </group>
                 </group>
                 <group>

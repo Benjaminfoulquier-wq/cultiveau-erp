@@ -7,6 +7,56 @@ MOIS_COURTS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep
 CATEGORIES = [("vigne", "Vigne"), ("arbo", "Arboriculture"), ("grandes_cultures", "Grandes cultures"),
               ("maraichage", "Maraîchage"), ("prairies", "Prairies et fourrages"), ("sous_abri", "Sous abri"), ("autre", "Autre")]
 
+# Les quatre saisons émotionnelles de la frise (Journées Cultiveau 2025, atelier 1, pilier 2) : ce que l'agriculteur
+# attend de nous selon le moment de sa culture, et non selon notre calendrier commercial.
+POSTURES = [("ecoute", "Écoute"), ("support", "Support"), ("discret", "Discret"), ("proposition", "Proposition")]
+POSTURE_INFOS = {
+    "ecoute": {"saison": "Hiver", "icone": "❄", "couleur": "#dceef1",
+               "consigne": "Il a le temps et il réfléchit : écouter, comprendre, étudier (analyse des besoins, bilan, visite)."},
+    "support": {"saison": "Printemps", "icone": "🌱", "couleur": "#e3f1d9",
+                "consigne": "Il met en route : être là, remettre en service, régler, livrer ; pas de nouveau projet."},
+    "discret": {"saison": "Été", "icone": "☀", "couleur": "#fde8c8",
+                "consigne": "Plein travail, stress : ne pas solliciter, répondre vite à l'urgence qu'il signale lui-même."},
+    "proposition": {"saison": "Automne", "icone": "🍂", "couleur": "#f3dcd0",
+                    "consigne": "Après récolte, bilan de campagne : le moment de proposer, chiffrer, planifier la saison prochaine."},
+}
+# Posture de référence d'un mois sans information plus précise (le calendrier, à défaut du stade).
+POSTURE_CALENDRIER = {11: "ecoute", 12: "ecoute", 1: "ecoute", 2: "ecoute", 3: "support", 4: "support", 5: "support", 6: "support",
+                      7: "discret", 8: "discret", 9: "proposition", 10: "proposition"}
+# Les stades où l'on ne dérange pas (semis, plantation, floraison, récolte, vendanges, fauche) : « éviter les périodes de stress ».
+MOTS_CRITIQUES = ("semis", "plantation", "floraison", "récolte", "recolte", "vendange", "fauche", "cueillette", "moisson")
+
+# Les cours agricoles (pilier 3) : le contexte économique change la psychologie du client, et donc le ton.
+COURS = [("hausse", "En hausse"), ("stable", "Stables"), ("baisse", "En baisse")]
+TON_COURS = {
+    "baisse": "Cours en baisse : parler sécurité et retour sur investissement. Rassurer sur la rentabilité à long terme, "
+              "insister sur les économies d'eau et d'énergie, proposer un financement adapté, mettre en avant fiabilité et durabilité.",
+    "hausse": "Cours en hausse : parler innovation et ambition. Performance, rendement, optimisation ; les solutions premium et "
+              "les technologies de pointe ont leur place ; encourager l'investissement.",
+    "stable": "Cours stables : parler équilibre. Fiabilité, coût complet sur la durée, confort de travail, eau économisée.",
+}
+
+
+def posture_calendrier(mois_liste):
+    """La posture majoritaire du calendrier sur ces mois (le premier mois tranche les égalités)."""
+    if not mois_liste:
+        return "ecoute"
+    compte = {}
+    for m in mois_liste:
+        compte[POSTURE_CALENDRIER[m]] = compte.get(POSTURE_CALENDRIER[m], 0) + 1
+    return max(compte, key=lambda p: (compte[p], -mois_liste.index(next(m for m in mois_liste if POSTURE_CALENDRIER[m] == p))))
+
+
+def combiner_postures(postures, critique=False):
+    """La posture d'un client qui a plusieurs cultures : une période critique l'emporte (discret) ;
+    sinon une fenêtre qui s'ouvre (proposition), puis le temps d'écouter, puis le support."""
+    if critique:
+        return "discret"
+    for p in ("proposition", "ecoute", "support", "discret"):
+        if p in postures:
+            return p
+    return "ecoute"
+
 
 def mois_couverts(debut, fin):
     """De `debut` à `fin` inclus, en passant l'hiver si besoin : (11, 2) → [11, 12, 1, 2]."""
@@ -37,8 +87,18 @@ class Culture(models.Model):
     stade_ids = fields.One2many("cultiveau.culture.stade", "culture_id", string="Stades")
     fenetre_ids = fields.One2many("cultiveau.culture.fenetre", "culture_id", string="Fenêtres commerciales")
     nb_clients = fields.Integer("Clients", compute="_compute_nb_clients")
+    cours_tendance = fields.Selection(COURS, "Cours agricoles", default="stable", required=True,
+                                      help="La tendance du marché de cette culture : elle change le ton à adopter avec ses producteurs.")
+    cours_note = fields.Char("Repère", help="Exemple : « Vin IGP Gard : −8 % sur un an (FranceAgriMer) ».")
+    cours_date = fields.Date("Relevé le")
+    cours_ton = fields.Char("Le ton", compute="_compute_cours_ton")
 
     _sql_constraints = [("nom_unique", "unique(name)", "Cette culture existe déjà.")]
+
+    @api.depends("cours_tendance")
+    def _compute_cours_ton(self):
+        for c in self:
+            c.cours_ton = TON_COURS[c.cours_tendance or "stable"]
 
     def _compute_nb_clients(self):
         groupes = self.env["cultiveau.culture.client"]._read_group([("culture_id", "in", self.ids)], ["culture_id"], ["__count"])
@@ -62,12 +122,17 @@ class Culture(models.Model):
     def ligne_frise(self, departement=""):
         """Douze cases (stade, intensité, fenêtres) pour cette culture dans ce département."""
         self.ensure_one()
-        cases = [{"mois": m, "stade": None, "intensite": 0, "projet": False, "achat": False} for m in range(1, 13)]
+        cases = [{"mois": m, "stade": None, "intensite": 0, "projet": False, "achat": False,
+                  "posture": POSTURE_CALENDRIER[m], "critique": False} for m in range(1, 13)]
         for s in self.stades_pour(departement):
             for m in s.mois():
                 case = cases[m - 1]
                 if case["stade"] is None or s.intensite > case["intensite"]:
-                    case.update(stade=s, intensite=s.intensite)
+                    case.update(stade=s, intensite=s.intensite, posture=s.posture or POSTURE_CALENDRIER[m])
+                case["critique"] = case["critique"] or s.critique
+        for case in cases:
+            if case["critique"]:
+                case["posture"] = "discret"
         projet, achat = set(), set()
         for f in self.fenetres_pour(departement):
             for m in f.mois():
@@ -97,12 +162,33 @@ class CultureStade(models.Model):
     sequence = fields.Integer(default=1)
     intensite = fields.Integer("Intensité", compute="_compute_intensite", help="0 (repos) à 4 (besoin de pointe), d'après le Kc max.")
     periode = fields.Char("Période", compute="_compute_periode")
+    critique = fields.Boolean("Période critique", compute="_compute_critique", store=True, readonly=False,
+                              help="Semis, plantation, floraison, récolte, vendanges : on ne dérange pas.")
+    posture = fields.Selection(POSTURES, "Posture", compute="_compute_posture", store=True, readonly=False,
+                               help="Ce que l'agriculteur attend de nous pendant ce stade : écoute (hiver), support (printemps), "
+                                    "discrétion (été, périodes critiques), proposition (automne, après récolte).")
 
     @api.depends("kc_max", "kc_min")
     def _compute_intensite(self):
         for s in self:
             kc = s.kc_max or s.kc_min or 0.0
             s.intensite = 0 if kc < 0.35 else 1 if kc < 0.6 else 2 if kc < 0.85 else 3 if kc < 1.05 else 4
+
+    @api.depends("name")
+    def _compute_critique(self):
+        for s in self:
+            nom = (s.name or "").lower()
+            s.critique = any(mot in nom for mot in MOTS_CRITIQUES)
+
+    @api.depends("mois_debut", "mois_fin", "kc_max", "kc_min", "critique")
+    def _compute_posture(self):
+        for s in self:
+            if not (s.mois_debut and s.mois_fin):
+                s.posture = "ecoute"
+            elif s.critique or s.intensite >= 3:
+                s.posture = "discret"
+            else:
+                s.posture = posture_calendrier(s.mois())
 
     @api.depends("mois_debut", "mois_fin")
     def _compute_periode(self):
@@ -182,6 +268,12 @@ class CultureClient(models.Model):
         self.ensure_one()
         return {f.genre for f in self.culture_id.fenetres_pour(self.departement) if mois in f.mois()}
 
+    def posture_du_mois(self, mois):
+        """(posture, critique, stade) de cette culture-client le mois donné."""
+        self.ensure_one()
+        case = self.culture_id.ligne_frise(self.departement)["cases"][mois - 1]
+        return case["posture"], case["critique"], case["stade"]
+
     @api.model
     def partenaires_a_contacter(self, mois=None, company=None):
         """{partner: [(culture, genre)]} pour un mois (celui d'aujourd'hui par défaut)."""
@@ -204,11 +296,14 @@ class CultureClient(models.Model):
             deja = partner.activity_ids.filtered(lambda a: a.summary and a.summary.startswith("Fenêtre ") and a.date_deadline.month == mois)
             if deja:
                 continue
+            critiques = [cc.culture_id.name for cc in partner.cultiveau_culture_ids if cc.posture_du_mois(mois)[1]]
+            garde = (f"<p><b>Attention</b> : {', '.join(critiques)} en période critique ce mois-ci. Attendre la fin du stade avant d'appeler.</p>"
+                     if critiques else "")
             partner.activity_schedule(
                 act_type_xmlid="mail.mail_activity_data_call" if type_appel else None,
                 summary=f"Fenêtre {MOIS[mois - 1][1]} : {resume}",
                 note="<p>La frise culturale ouvre une fenêtre commerciale ce mois-ci. Projet : proposer l'analyse des besoins. "
-                     "Achat : proposer la commande, la livraison, la visite de pré-saison.</p>",
+                     "Achat : proposer la commande, la livraison, la visite de pré-saison.</p>" + garde,
                 user_id=(partner.user_id or self.env.user).id)
             n += 1
         return n

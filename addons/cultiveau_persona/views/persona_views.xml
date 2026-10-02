@@ -6,9 +6,11 @@
         <field name="arch" type="xml">
             <list>
                 <field name="sequence" widget="handle"/>
+                <field name="animal"/>
                 <field name="name"/>
+                <field name="surnom"/>
                 <field name="resume"/>
-                <field name="canal"/>
+                <field name="maslow"/>
                 <field name="nb_clients"/>
             </list>
         </field>
@@ -25,19 +27,26 @@
                             <field name="nb_clients" widget="statinfo" string="Clients"/>
                         </button>
                     </div>
-                    <div class="oe_title"><h1><field name="name"/></h1><field name="resume" placeholder="En une phrase"/></div>
+                    <div class="oe_title">
+                        <h1><field name="animal" class="oe_inline" placeholder="🦁"/> <field name="name" class="oe_inline"/></h1>
+                        <h3><field name="surnom" placeholder="Le leader, l'opportuniste…"/></h3>
+                        <field name="resume" placeholder="En une phrase"/>
+                    </div>
                     <group>
                         <group>
                             <field name="code"/>
                             <field name="couleur" widget="color"/>
+                            <field name="maslow"/>
                         </group>
                         <group>
                             <field name="canal"/>
                             <field name="moment"/>
+                            <field name="source"/>
                         </group>
                     </group>
                     <notebook>
                         <page string="Comment on le reconnaît" name="signes"><field name="signes" nolabel="1"/></page>
+                        <page string="Le profil dans l'étude" name="profil"><field name="profil" nolabel="1"/></page>
                         <page string="Comment l'aborder" name="approche"><field name="approche" nolabel="1"/></page>
                         <page string="Les arguments qui portent" name="arguments"><field name="arguments" nolabel="1"/></page>
                         <page string="Les pièges" name="pieges"><field name="pieges" nolabel="1"/></page>

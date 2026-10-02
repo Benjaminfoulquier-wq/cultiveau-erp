@@ -9,19 +9,24 @@
                 <button name="action_evaluer_persona" type="object" class="oe_stat_button" icon="fa-user-circle-o"
                         invisible="cultiveau_type not in ('agriculteur', False)">
                     <div class="o_stat_info">
-                        <span class="o_stat_value"><field name="cultiveau_persona_id" nolabel="1" readonly="1" options="{'no_open': True}"/></span>
+                        <span class="o_stat_value"><field name="cultiveau_persona_animal" nolabel="1" readonly="1" class="oe_inline"/> <field name="cultiveau_persona_id" nolabel="1" readonly="1" options="{'no_open': True}" class="oe_inline"/></span>
                         <span class="o_stat_text">Persona</span>
                     </div>
                 </button>
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Persona" name="cultiveau_persona" invisible="cultiveau_type not in ('agriculteur', False)">
+                    <div class="alert alert-light border" role="status" style="margin-bottom:12px">
+                        <h4 style="margin-bottom:6px">L'Agent — ce mois-ci</h4>
+                        <field name="cultiveau_agent_html" nolabel="1" readonly="1"/>
+                    </div>
                     <div invisible="cultiveau_persona_id">
-                        <p class="text-muted">Pas encore de persona : huit questions suffisent.</p>
+                        <p class="text-muted">Pas encore de persona : huit questions suffisent (Lion, Jaguar, Chat, Tortue ou Abeille, d'après l'étude PRISM 2023).</p>
                         <button name="action_evaluer_persona" type="object" string="Évaluer le persona" class="btn btn-primary"/>
                     </div>
                     <div invisible="not cultiveau_persona_id">
-                        <h3><field name="cultiveau_persona_id" readonly="1" options="{'no_open': True}" class="oe_inline"/> — <field name="cultiveau_persona_resume" class="oe_inline"/></h3>
+                        <h3><field name="cultiveau_persona_animal" readonly="1" class="oe_inline"/> <field name="cultiveau_persona_id" readonly="1" options="{'no_open': True}" class="oe_inline"/>, <field name="cultiveau_persona_surnom" readonly="1" class="oe_inline"/> — <field name="cultiveau_persona_resume" class="oe_inline"/></h3>
+                        <p><b>Besoin dominant : </b><field name="cultiveau_persona_maslow" readonly="1" class="oe_inline"/></p>
                         <group>
                             <group string="Comment l'aborder"><field name="cultiveau_persona_approche" nolabel="1"/></group>
                             <group string="Les arguments qui portent"><field name="cultiveau_persona_arguments" nolabel="1"/></group>

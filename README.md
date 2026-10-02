@@ -7,15 +7,17 @@ CRM, stocks, achats, e-mailing, projets, contacts et portail client. Les modules
 | Module | Ce qu'il apporte |
 |---|---|
 | `cultiveau_base` | Le réseau : adhérents (une société Odoo chacun), agriculteurs, département, outils du réseau dans le menu, réglages |
-| `cultiveau_frise` | La frise culturale : cultures de chaque client, stades et besoins en eau par département, fenêtres « projet » et « achat », « À contacter ce mois-ci » |
-| `cultiveau_persona` | Le persona du client (huit questions, quatre profils) et comment lui parler |
+| `cultiveau_frise` | La frise culturale : cultures de chaque client, stades et besoins en eau par département, fenêtres « projet » et « achat », les quatre saisons émotionnelles (écoute, support, discret, proposition), les périodes critiques, les cours agricoles, « À contacter ce mois-ci » |
+| `cultiveau_persona` | Les cinq personas de l'étude PRISM (🦁 Lion, 🐆 Jaguar, 🐈 Chat, 🐢 Tortue, 🐝 Abeille), huit questions pour les reconnaître, leur besoin sur la pyramide de Maslow, et **l'Agent** qui croise persona × frise × cours pour dire quand appeler et sur quel ton |
 | `cultiveau_catalogue` | Le catalogue technique (DN, PN, matière, raccordement, fiches) ; import de la matrice Cultiveau et du catalogue 3D |
 | `cultiveau_installation` | Le parc installé selon le référentiel : A1.1 analyse des besoins, A1.2 dimensionnement, A1.3 PV, A1.4 certificat, A1.5 réglage, équipements et renouvellement, A1.8 registre, rappels saisonniers, dossier technique imprimable |
-| `cultiveau_ventes` | Les six phases du projet dans le CRM, devis par lots reliés à l'installation, modèles par type d'installation |
+| `cultiveau_ventes` | Les six phases du projet dans le CRM, devis par lots reliés à l'installation, modèles par type d'installation, simulateur d'irrigation à l'usage (€/m³, mensualité lissée) |
 | `cultiveau_interventions` | Dépannage et entretien : urgence, pièces → devis, registre tenu automatiquement, kanban et calendrier |
-| `cultiveau_connecteurs` | L'API pour l'assistant téléphonique (standard IA) : fiche du client qui appelle, dépôt de l'intervention ou de l'opportunité |
+| `cultiveau_connecteurs` | L'API pour l'assistant téléphonique (standard IA) : fiche du client qui appelle avec persona, frise du mois et conseil de l'Agent ; dépôt de l'intervention ou de l'opportunité |
 
 Pourquoi ces modules et pas d'autres : [docs/ANALYSE-ODOO-IRRIGATION.md](docs/ANALYSE-ODOO-IRRIGATION.md).
+D'où viennent les frises, les personas et l'Agent (Journées Cultiveau 2025, étude PRISM 2023, pyramides de Maslow, VoxAgri) :
+[docs/HISTOIRE-FRISES-PERSONAS.md](docs/HISTOIRE-FRISES-PERSONAS.md).
 
 ## Le code d'Odoo
 
