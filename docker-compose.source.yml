@@ -1,0 +1,14 @@
+# Surcouche : construire Odoo depuis les sources du sous-module ./odoo au lieu de l'image officielle.
+#   docker compose -f docker-compose.yml -f docker-compose.source.yml up -d --build
+services:
+  odoo:
+    image: cultiveau/erp
+    build: .
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: ${POSTGRES_PASSWORD}
+      ODOO_RC: /etc/odoo/odoo.conf
+    volumes:
+      - ./odoo-source.conf:/etc/odoo/odoo.conf:ro
+      - ./data/odoo:/var/lib/odoo

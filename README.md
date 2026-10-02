@@ -17,6 +17,14 @@ CRM, stocks, achats, e-mailing, projets, contacts et portail client. Les modules
 
 Pourquoi ces modules et pas d'autres : [docs/ANALYSE-ODOO-IRRIGATION.md](docs/ANALYSE-ODOO-IRRIGATION.md).
 
+## Le code d'Odoo
+
+Le code open source d'Odoo 18 (licence LGPL-3, https://github.com/odoo/odoo, branche `18.0`) est le sous-module `odoo/`
+de ce dépôt : `git submodule update --init --depth 1 odoo` le récupère (environ 600 Mo). C'est exactement le code que
+contient l'image Docker officielle `odoo:18` utilisée par `docker-compose.yml`. Pour construire l'ERP depuis ces sources
+(lire, corriger ou figer Odoo lui-même) : `docker compose -f docker-compose.yml -f docker-compose.source.yml up -d --build`
+(voir `Dockerfile`). Les modules Cultiveau ne modifient jamais le code d'Odoo : ils l'étendent depuis `addons/`.
+
 ## Mettre en route
 
 Sur le serveur du réseau (même VPS et même frontal Caddy que l'assistant, le DTe, le DISC et l'Académie) :
