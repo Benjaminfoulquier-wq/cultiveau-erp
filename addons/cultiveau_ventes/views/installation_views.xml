@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_installation_form_ventes" model="ir.ui.view">
+        <field name="name">cultiveau.installation.form.ventes</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="inherit_id" ref="cultiveau_installation.view_installation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_devis" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="nb_devis"/></span><span class="o_stat_text">Devis</span></div>
+                </button>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_nouveau_devis" type="object" string="Nouveau devis (modèle par lots)" invisible="etat == 'arretee'"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_cultiveau" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="cultiveau_installation_id" context="{'default_partner_id': partner_id}"/>
+                <field name="cultiveau_type_systeme"/>
+                <field name="cultiveau_surface_ha" invisible="not cultiveau_installation_id"/>
+                <field name="cultiveau_dimensionnement" invisible="not cultiveau_dimensionnement"/>
+                <field name="cultiveau_analyse_validee" invisible="not cultiveau_installation_id"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning" role="alert" invisible="not cultiveau_installation_id or cultiveau_analyse_validee">
+                    Analyse des besoins (A1.1) non validée avec l'exploitant : le référentiel la demande avant tout dimensionnement (§ 3.2).
+                </div>
+            </xpath>
+            <xpath expr="//header" position="inside">
+                <button name="action_creer_installation" type="object" string="Créer l'installation" invisible="cultiveau_installation_id or not partner_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sale_order_template_form_cultiveau" model="ir.ui.view">
+        <field name="name">sale.order.template.form.cultiveau</field>
+        <field name="model">sale.order.template</field>
+        <field name="inherit_id" ref="sale_management.sale_order_template_view_form"/>
+        <field name="arch" type="xml">
+            <field name="number_of_days" position="after">
+                <field name="cultiveau_type_systeme"/>
+            </field>
+        </field>
+    </record>
+</odoo>

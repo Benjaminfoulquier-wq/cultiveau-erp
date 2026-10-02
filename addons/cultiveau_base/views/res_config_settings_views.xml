@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_cultiveau" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Cultiveau" string="Cultiveau" name="cultiveau_base" groups="cultiveau_base.group_equipe">
+                    <block title="Les outils du réseau" name="cultiveau_outils">
+                        <setting string="Adresses des outils" help="Les sites qui restent à côté de l'ERP : l'assistant téléphonique (standard IA), le DTe, le Management, l'Académie. Ils apparaissent dans le menu Cultiveau → Outils du réseau.">
+                            <div class="row mt16">
+                                <label for="cultiveau_url_assistant" class="col-lg-4 o_light_label"/>
+                                <field name="cultiveau_url_assistant"/>
+                            </div>
+                            <div class="row">
+                                <label for="cultiveau_url_dte" class="col-lg-4 o_light_label"/>
+                                <field name="cultiveau_url_dte"/>
+                            </div>
+                            <div class="row">
+                                <label for="cultiveau_url_disc" class="col-lg-4 o_light_label"/>
+                                <field name="cultiveau_url_disc"/>
+                            </div>
+                            <div class="row">
+                                <label for="cultiveau_url_academie" class="col-lg-4 o_light_label"/>
+                                <field name="cultiveau_url_academie"/>
+                            </div>
+                        </setting>
+                        <setting string="Clé d'accès des outils" help="Avec cette clé, l'assistant téléphonique écrit dans l'ERP (appels → opportunités et activités) et lit la fiche d'un client qui appelle (persona, cultures).">
+                            <field name="cultiveau_cle_api" password="True"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_cultiveau_config_settings" model="ir.actions.act_window">
+        <field name="name">Réglages Cultiveau</field>
+        <field name="res_model">res.config.settings</field>
+        <field name="view_mode">form</field>
+        <field name="target">inline</field>
+        <field name="context">{'module': 'cultiveau_base', 'bin_size': False}</field>
+    </record>
+</odoo>

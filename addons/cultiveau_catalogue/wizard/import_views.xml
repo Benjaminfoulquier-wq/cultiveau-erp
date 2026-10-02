@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_import_matrice_form" model="ir.ui.view">
+        <field name="name">cultiveau.catalogue.import.matrice.form</field>
+        <field name="model">cultiveau.catalogue.import.matrice</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>La matrice d'import du référencement Cultiveau : une ligne par produit (Référence, Nom, Fournisseur, Catégorie, Description, Prix HT, Unité, Conditionnement, Poids, URL image, et si vous les avez : fiche technique, délai, DN, PN, matière, raccordement). Un produit déjà présent (même référence) est mis à jour.</p>
+                <group>
+                    <field name="fichier" filename="nom_fichier"/>
+                    <field name="nom_fichier" invisible="1"/>
+                    <field name="fournisseur_id"/>
+                </group>
+                <field name="resultat" invisible="not resultat" readonly="1"/>
+                <footer>
+                    <button name="action_importer" type="object" string="Importer" class="btn-primary"/>
+                    <button name="action_modele" type="object" string="Télécharger le modèle vide"/>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_import_matrice" model="ir.actions.act_window">
+        <field name="name">Importer la matrice de produits</field>
+        <field name="res_model">cultiveau.catalogue.import.matrice</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <record id="view_import_3d_form" model="ir.ui.view">
+        <field name="name">cultiveau.catalogue.import.3d.form</field>
+        <field name="model">cultiveau.catalogue.import.3d</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>Le fichier <code>reseau-3d/catalogue.json</code> du dépôt cultiveau-3d (27 000 références : familles, sous-familles, matières, cotes, fiches techniques). Comptez plusieurs minutes ; pour un import en tâche de fond, utilisez <code>scripts/importer_catalogue_3d.py</code>.</p>
+                <group>
+                    <field name="fichier" filename="nom_fichier"/>
+                    <field name="nom_fichier" invisible="1"/>
+                </group>
+                <field name="resultat" invisible="not resultat" readonly="1"/>
+                <footer>
+                    <button name="action_importer" type="object" string="Importer" class="btn-primary"/>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_import_3d" model="ir.actions.act_window">
+        <field name="name">Importer le catalogue 3D</field>
+        <field name="res_model">cultiveau.catalogue.import.3d</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

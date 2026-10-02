@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_equipement_list" model="ir.ui.view">
+        <field name="name">cultiveau.equipement.list</field>
+        <field name="model">cultiveau.equipement</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="a_renouveler">
+                <field name="partner_id"/>
+                <field name="installation_id"/>
+                <field name="categorie"/>
+                <field name="name"/>
+                <field name="annee_pose"/>
+                <field name="duree_vie_ans"/>
+                <field name="fin_vie_estimee"/>
+                <field name="a_renouveler"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_equipement_form" model="ir.ui.view">
+        <field name="name">cultiveau.equipement.form</field>
+        <field name="model">cultiveau.equipement</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="installation_id"/>
+                            <field name="categorie"/>
+                            <field name="name"/>
+                            <field name="product_id"/>
+                            <field name="caracteristiques"/>
+                        </group>
+                        <group>
+                            <field name="marque"/>
+                            <field name="modele"/>
+                            <field name="numero_serie"/>
+                            <field name="annee_pose"/>
+                            <field name="duree_vie_ans"/>
+                            <field name="fin_vie_estimee"/>
+                            <field name="notice_url" widget="url"/>
+                            <field name="actif"/>
+                        </group>
+                    </group>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_equipement_search" model="ir.ui.view">
+        <field name="name">cultiveau.equipement.search</field>
+        <field name="model">cultiveau.equipement</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="installation_id"/>
+                <filter name="a_renouveler" string="À renouveler sous 2 ans" domain="[('a_renouveler', '=', True)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_categorie" string="Catégorie" context="{'group_by': 'categorie'}"/>
+                    <filter name="group_fin" string="Année de renouvellement" context="{'group_by': 'fin_vie_estimee'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_equipements_a_renouveler" model="ir.actions.act_window">
+        <field name="name">Équipements à renouveler</field>
+        <field name="res_model">cultiveau.equipement</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_a_renouveler': 1, 'search_default_group_fin': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Rien à renouveler sous deux ans</p>
+            <p>Les durées de vie du référentiel (§ 3.9) donnent, pour chaque équipement posé, l'année de renouvellement probable : de quoi proposer avant la panne.</p>
+        </field>
+    </record>
+
+    <record id="view_registre_list" model="ir.ui.view">
+        <field name="name">cultiveau.registre.list</field>
+        <field name="model">cultiveau.registre</field>
+        <field name="arch" type="xml">
+            <list editable="top">
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="installation_id"/>
+                <field name="genre"/>
+                <field name="description"/>
+                <field name="releves"/>
+                <field name="intervenant"/>
+                <field name="reference" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_registre_form" model="ir.ui.view">
+        <field name="name">cultiveau.registre.form</field>
+        <field name="model">cultiveau.registre</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="installation_id"/>
+                        <field name="date"/>
+                        <field name="genre"/>
+                        <field name="description"/>
+                        <field name="releves"/>
+                        <field name="intervenant"/>
+                        <field name="reference"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_registre" model="ir.actions.act_window">
+        <field name="name">Registre de maintenance (A1.8)</field>
+        <field name="res_model">cultiveau.registre</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

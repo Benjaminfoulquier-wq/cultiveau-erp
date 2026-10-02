@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_installation_user,cultiveau.installation utilisateur,model_cultiveau_installation,base.group_user,1,1,1,1
+access_equipement_user,cultiveau.equipement utilisateur,model_cultiveau_equipement,base.group_user,1,1,1,1
+access_registre_user,cultiveau.registre utilisateur,model_cultiveau_registre,base.group_user,1,1,1,1

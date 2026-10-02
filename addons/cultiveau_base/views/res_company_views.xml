@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_cultiveau" model="ir.ui.view">
+        <field name="name">res.company.form.cultiveau</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Réseau Cultiveau" name="cultiveau">
+                    <group>
+                        <group string="Adhésion">
+                            <field name="cultiveau_adherent"/>
+                            <field name="cultiveau_numero_dedie"/>
+                        </group>
+                        <group string="Dans les outils du réseau">
+                            <field name="cultiveau_assistant_id"/>
+                            <field name="cultiveau_dte_slug"/>
+                            <field name="cultiveau_disc_slug"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

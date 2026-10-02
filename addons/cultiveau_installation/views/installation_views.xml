@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_installation_form" model="ir.ui.view">
+        <field name="name">cultiveau.installation.form</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_valider_analyse" type="object" string="Valider l'analyse des besoins (A1.1)" class="btn-primary"
+                            invisible="analyse_validee_le"/>
+                    <button name="action_mettre_en_service" type="object" string="Mettre en service (PV A1.3)" class="btn-primary"
+                            invisible="etat in ('en_service', 'arretee')"/>
+                    <field name="etat" widget="statusbar" options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_voir_equipements" type="object" class="oe_stat_button" icon="fa-cogs">
+                            <div class="o_stat_info"><span class="o_stat_value"><field name="nb_equipements"/></span><span class="o_stat_text">Équipements</span></div>
+                        </button>
+                        <button name="action_voir_equipements" type="object" class="oe_stat_button" icon="fa-refresh" invisible="not nb_a_renouveler">
+                            <div class="o_stat_info"><span class="o_stat_value text-danger"><field name="nb_a_renouveler"/></span><span class="o_stat_text">À renouveler</span></div>
+                        </button>
+                        <button name="action_voir_registre" type="object" class="oe_stat_button" icon="fa-book">
+                            <div class="o_stat_info"><span class="o_stat_value"><field name="nb_registre"/></span><span class="o_stat_text">Registre</span></div>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Pivot des Grandes Terres, goutte à goutte vigne Mas Neuf…"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="type_systeme"/>
+                            <field name="surface_ha"/>
+                            <field name="culture_ids" widget="many2many_tags"/>
+                            <field name="culture_pointe_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="user_id"/>
+                            <field name="parcelle"/>
+                            <field name="commune"/>
+                            <field name="dossier_completude"/>
+                        </group>
+                    </group>
+                    <field name="alerte_dimensionnement" nolabel="1" readonly="1"/>
+                    <notebook>
+                        <page string="A1.1 Analyse des besoins" name="analyse">
+                            <div class="alert alert-info" role="status">Conseil d'abord (C1) : les huit données d'entrée, restituées à l'exploitant et validées avec lui avant tout dimensionnement (§ 3.2).</div>
+                            <group>
+                                <group string="Parcellaire et sol">
+                                    <field name="pente_moyenne_pct"/>
+                                    <field name="pente_max_pct"/>
+                                    <field name="distance_ressource_m"/>
+                                    <field name="obstacles"/>
+                                    <field name="sol_texture"/>
+                                    <field name="ru_mm"/>
+                                    <field name="profondeur_sol_cm"/>
+                                </group>
+                                <group string="Ressource en eau">
+                                    <field name="ressource"/>
+                                    <field name="debit_mobilisable_m3h"/>
+                                    <field name="volume_autorise_m3"/>
+                                    <field name="titre_prelevement"/>
+                                    <field name="titre_organisme"/>
+                                    <field name="analyse_eau_date"/>
+                                    <field name="analyse_eau_resume"/>
+                                </group>
+                                <group string="Énergie et contraintes">
+                                    <field name="energie"/>
+                                    <field name="puissance_souscrite_kva"/>
+                                    <field name="tarif_energie"/>
+                                    <field name="main_d_oeuvre"/>
+                                    <field name="horaires"/>
+                                    <field name="acces"/>
+                                    <field name="niveau_automatisme"/>
+                                </group>
+                                <group string="Assolement et enjeux">
+                                    <field name="assolement"/>
+                                    <field name="hierarchie"/>
+                                    <field name="analyse_validee_le"/>
+                                    <field name="analyse_completude"/>
+                                </group>
+                            </group>
+                            <field name="analyse_html" nolabel="1" readonly="1"/>
+                        </page>
+                        <page string="A1.2 Dimensionnement" name="dimensionnement">
+                            <div class="alert alert-info" role="status">Les neuf étapes de la note (§ 3.3) : besoin de pointe → DFC et débit d'équipement → secteurs → organes → diamètres → bilan de pression → HMT et pompe → filtration → uniformité. « La cohérence besoin ↔ dose ↔ débit ↔ tour d'eau est LA vérification finale. »</div>
+                            <group>
+                                <group string="Besoin et débit">
+                                    <field name="besoin_pointe_mm_j"/>
+                                    <field name="dfc_l_s_ha"/>
+                                    <field name="dfc_calc"/>
+                                    <field name="temps_fonctionnement_h_j"/>
+                                    <field name="debit_equipement_m3_h"/>
+                                    <field name="debit_calc"/>
+                                    <button name="action_reprendre_calculs" type="object" string="Reprendre les valeurs calculées" class="btn btn-link"/>
+                                    <field name="secteurs"/>
+                                    <field name="simultaneite"/>
+                                </group>
+                                <group string="Réseau, pompe, filtration">
+                                    <field name="technique_organes"/>
+                                    <field name="pression_service_bar"/>
+                                    <field name="diametres_vitesses"/>
+                                    <field name="pertes_charge_m"/>
+                                    <field name="hmt_m"/>
+                                    <field name="pompe"/>
+                                    <field name="filtration"/>
+                                    <field name="uniformite_visee_pct"/>
+                                    <field name="energie_specifique_kwh_m3"/>
+                                </group>
+                                <group string="Repères du référentiel">
+                                    <field name="efficience_typique"/>
+                                    <field name="uniformite_cible"/>
+                                    <field name="chiffrage_indicatif"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="A1.3 Mise en service · A1.4 Certificat" name="pv">
+                            <group>
+                                <group string="PV de mise en service (valeurs de référence)">
+                                    <field name="pv_date"/>
+                                    <field name="pv_intervenant"/>
+                                    <field name="pv_rincage"/>
+                                    <field name="pv_essai_pression_bar"/>
+                                    <field name="pv_essai_resultat"/>
+                                    <field name="pv_pression_sortie_pompe_bar"/>
+                                    <field name="pv_pression_point_defavorable_bar"/>
+                                    <field name="pv_uniformite_pct"/>
+                                    <field name="pv_kwh_m3"/>
+                                </group>
+                                <group string="Sécurités et conformité">
+                                    <field name="pv_securites_testees"/>
+                                    <field name="pv_antiretour"/>
+                                    <field name="pv_debits_secteurs"/>
+                                    <field name="pv_reserves"/>
+                                    <field name="certificat_date"/>
+                                    <field name="certificat_reserves"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="A1.5 Fiche de réglage" name="reglage">
+                            <group>
+                                <group>
+                                    <field name="reglage_sequencement"/>
+                                    <field name="reglage_durees"/>
+                                    <field name="reglage_pressions"/>
+                                    <field name="reglage_contre_lavage"/>
+                                </group>
+                                <group>
+                                    <field name="reglage_pilotage"/>
+                                    <field name="reglage_surveillance"/>
+                                    <field name="reglage_contacts"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Équipements" name="equipements">
+                            <field name="equipement_ids" context="{'default_installation_id': id}">
+                                <list editable="bottom" decoration-danger="a_renouveler">
+                                    <field name="categorie"/>
+                                    <field name="name"/>
+                                    <field name="product_id" optional="show"/>
+                                    <field name="marque" optional="hide"/>
+                                    <field name="modele" optional="hide"/>
+                                    <field name="numero_serie" optional="hide"/>
+                                    <field name="caracteristiques" optional="show"/>
+                                    <field name="annee_pose"/>
+                                    <field name="duree_vie_ans"/>
+                                    <field name="fin_vie_estimee"/>
+                                    <field name="a_renouveler"/>
+                                    <field name="notice_url" widget="url" optional="hide"/>
+                                    <field name="actif" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Suivi et registre" name="suivi">
+                            <group>
+                                <group string="Saisons (ch. 18)">
+                                    <field name="remise_en_service_le"/>
+                                    <field name="hivernage_le"/>
+                                    <field name="prochaine_visite"/>
+                                    <field name="contrat_maintenance"/>
+                                </group>
+                                <group string="Dossier technique (§ 3.10)">
+                                    <field name="dossier_html" nolabel="1" readonly="1"/>
+                                </group>
+                            </group>
+                            <field name="registre_ids" context="{'default_installation_id': id}">
+                                <list editable="top">
+                                    <field name="date"/>
+                                    <field name="genre"/>
+                                    <field name="description"/>
+                                    <field name="releves"/>
+                                    <field name="intervenant"/>
+                                    <field name="reference" optional="hide"/>
+                                </list>
+                            </field>
+                            <field name="notes" placeholder="Notes libres…"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_installation_list" model="ir.ui.view">
+        <field name="name">cultiveau.installation.list</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="nb_a_renouveler > 0">
+                <field name="partner_id"/>
+                <field name="name"/>
+                <field name="type_systeme"/>
+                <field name="surface_ha" sum="Total"/>
+                <field name="etat" widget="badge" decoration-success="etat == 'en_service'" decoration-info="etat in ('projet', 'etude')"/>
+                <field name="pv_date" optional="show"/>
+                <field name="nb_a_renouveler" optional="show"/>
+                <field name="dossier_completude" optional="show"/>
+                <field name="user_id" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_installation_search" model="ir.ui.view">
+        <field name="name">cultiveau.installation.search</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="commune"/>
+                <filter name="en_service" string="En service" domain="[('etat', '=', 'en_service')]"/>
+                <filter name="projets" string="Projets et études" domain="[('etat', 'in', ('projet', 'etude', 'realisation'))]"/>
+                <filter name="a_renouveler" string="Équipements à renouveler" domain="[('equipement_ids.a_renouveler', '=', True)]"/>
+                <filter name="sans_pv" string="Sans PV de mise en service" domain="[('etat', '=', 'en_service'), ('pv_date', '=', False)]"/>
+                <filter name="sans_antiretour" string="Protection sanitaire non cochée" domain="[('etat', '=', 'en_service'), ('pv_antiretour', '=', False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_type" string="Type" context="{'group_by': 'type_systeme'}"/>
+                    <filter name="group_etat" string="Phase" context="{'group_by': 'etat'}"/>
+                    <filter name="group_partner" string="Agriculteur" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_installations" model="ir.actions.act_window">
+        <field name="name">Parc installé</field>
+        <field name="res_model">cultiveau.installation</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_en_service': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Le parc installé chez vos clients</p>
+            <p>Une installation = un site d'irrigation chez un agriculteur : son analyse des besoins, son dimensionnement, son PV de mise en service, ses équipements et leur renouvellement, son registre.</p>
+        </field>
+    </record>
+</odoo>

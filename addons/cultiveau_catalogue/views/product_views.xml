@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_cultiveau" model="ir.ui.view">
+        <field name="name">product.template.form.cultiveau</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Technique (irrigation)" name="cultiveau_technique">
+                    <group>
+                        <group string="Cotes">
+                            <field name="cultiveau_dn"/>
+                            <field name="cultiveau_pn"/>
+                            <field name="cultiveau_pouces"/>
+                            <field name="cultiveau_d_ext"/>
+                            <field name="cultiveau_epaisseur"/>
+                        </group>
+                        <group string="Matière, raccordement, conditionnement">
+                            <field name="cultiveau_matiere"/>
+                            <field name="cultiveau_raccordement"/>
+                            <field name="cultiveau_conditionnement"/>
+                            <field name="cultiveau_fiche_url" widget="url"/>
+                            <field name="cultiveau_fiche_notes"/>
+                            <field name="cultiveau_source"/>
+                        </group>
+                    </group>
+                    <field name="cultiveau_caracteristiques_html" nolabel="1" readonly="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="product_template_tree_cultiveau" model="ir.ui.view">
+        <field name="name">product.template.list.cultiveau</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="list_price" position="before">
+                <field name="cultiveau_dn" optional="show"/>
+                <field name="cultiveau_pn" optional="show"/>
+                <field name="cultiveau_matiere" optional="show"/>
+                <field name="cultiveau_raccordement" optional="hide"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_template_search_cultiveau" model="ir.ui.view">
+        <field name="name">product.template.search.cultiveau</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="cultiveau_dn" filter_domain="[('cultiveau_dn', '=', self)]"/>
+                <field name="cultiveau_pn" filter_domain="[('cultiveau_pn', '>=', self)]" string="PN ≥"/>
+                <field name="cultiveau_matiere"/>
+                <field name="cultiveau_raccordement"/>
+            </field>
+            <filter name="services" position="after">
+                <separator/>
+                <filter name="cultiveau_3d" string="Catalogue 3D" domain="[('cultiveau_source', '=', 'catalogue3d')]"/>
+                <filter name="cultiveau_matrice" string="Référencement (matrice)" domain="[('cultiveau_source', '=', 'matrice')]"/>
+                <filter name="cultiveau_fiche" string="Avec fiche technique" domain="[('cultiveau_fiche_url', '!=', False)]"/>
+            </filter>
+            <xpath expr="//group" position="inside">
+                <filter name="group_matiere" string="Matière" context="{'group_by': 'cultiveau_matiere'}"/>
+                <filter name="group_raccordement" string="Raccordement" context="{'group_by': 'cultiveau_raccordement'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_fournisseurs" model="ir.actions.act_window">
+        <field name="name">Fournisseurs</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('supplier_rank', '>', 0)]</field>
+        <field name="context">{'default_is_company': True, 'default_supplier_rank': 1, 'default_cultiveau_type': 'fournisseur', 'search_default_type_company': 1}</field>
+    </record>
+
+    <record id="action_catalogue" model="ir.actions.act_window">
+        <field name="name">Catalogue</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'search_default_filter_to_sell': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Le catalogue du réseau</p>
+            <p>Cherchez par DN, PN, matière ou raccordement. Importez la matrice de référencement ou le catalogue 3D depuis le menu Catalogue.</p>
+        </field>
+    </record>
+</odoo>

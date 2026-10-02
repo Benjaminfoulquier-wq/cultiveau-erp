@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_dossier" model="ir.actions.report">
+        <field name="name">Dossier technique (§ 3.10)</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cultiveau_installation.report_dossier</field>
+        <field name="report_file">cultiveau_installation.report_dossier</field>
+        <field name="print_report_name">'Dossier technique - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_cultiveau_installation"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_dossier">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Dossier technique — <t t-out="o.name"/></h2>
+                        <p>
+                            <strong t-out="o.partner_id.display_name"/><t t-if="o.commune"> · <t t-out="o.commune"/></t><t t-if="o.parcelle"> · <t t-out="o.parcelle"/></t><br/>
+                            <t t-out="dict(o._fields['type_systeme'].selection).get(o.type_systeme)"/> · <t t-out="o.surface_ha"/> ha ·
+                            cultures : <t t-out="', '.join(o.culture_ids.mapped('name')) or '—'"/> · phase : <t t-out="dict(o._fields['etat'].selection).get(o.etat)"/>
+                        </p>
+                        <p class="text-muted">Dossier établi selon le référentiel technique Cultiveau V4 (§ 3.10 : huit pièces). Pièces présentes : <t t-out="o.dossier_completude"/> / 8.</p>
+
+                        <h3>A1.1 — Analyse des besoins</h3>
+                        <table class="table table-sm">
+                            <tr><th>Parcellaire</th><td><t t-out="o.surface_ha"/> ha ; pente moyenne <t t-out="o.pente_moyenne_pct or '—'"/> %, maximale <t t-out="o.pente_max_pct or '—'"/> % ; distance à la ressource <t t-out="o.distance_ressource_m or '—'"/> m ; obstacles : <t t-out="o.obstacles or '—'"/></td></tr>
+                            <tr><th>Assolement et culture de pointe</th><td><t t-out="o.assolement or '—'"/> — culture la plus exigeante : <t t-out="o.culture_pointe_id.name or 'non renseignée'"/></td></tr>
+                            <tr><th>Sol</th><td><t t-out="dict(o._fields['sol_texture'].selection).get(o.sol_texture) or '—'"/> ; RU <t t-out="o.ru_mm or '—'"/> mm ; profondeur <t t-out="o.profondeur_sol_cm or '—'"/> cm</td></tr>
+                            <tr><th>Ressource</th><td><t t-out="dict(o._fields['ressource'].selection).get(o.ressource) or '—'"/> ; débit mobilisable en pointe <t t-out="o.debit_mobilisable_m3h or '—'"/> m³/h ; volume autorisé <t t-out="o.volume_autorise_m3 or '—'"/> m³/an ; analyse d'eau : <t t-out="o.analyse_eau_date or 'non renseignée'"/> <t t-out="o.analyse_eau_resume or ''"/></td></tr>
+                            <tr><th>Titre de prélèvement</th><td><t t-out="dict(o._fields['titre_prelevement'].selection).get(o.titre_prelevement) or 'non renseigné'"/> <t t-out="o.titre_organisme or ''"/></td></tr>
+                            <tr><th>Énergie</th><td><t t-out="dict(o._fields['energie'].selection).get(o.energie) or '—'"/> ; puissance <t t-out="o.puissance_souscrite_kva or '—'"/> kVA ; <t t-out="o.tarif_energie or ''"/></td></tr>
+                            <tr><th>Contraintes</th><td>main-d'œuvre : <t t-out="o.main_d_oeuvre or '—'"/> ; horaires : <t t-out="o.horaires or '—'"/> ; accès : <t t-out="o.acces or '—'"/> ; automatisme : <t t-out="dict(o._fields['niveau_automatisme'].selection).get(o.niveau_automatisme) or '—'"/></td></tr>
+                            <tr><th>Hiérarchie des enjeux</th><td><t t-out="dict(o._fields['hierarchie'].selection).get(o.hierarchie) or 'non validée'"/></td></tr>
+                            <tr><th>Validation</th><td><t t-if="o.analyse_validee_le">Validée avec l'exploitant le <t t-out="o.analyse_validee_le"/></t><t t-else="">Non validée</t></td></tr>
+                        </table>
+
+                        <h3>A1.2 — Note de dimensionnement</h3>
+                        <table class="table table-sm">
+                            <tr><th>Besoin de pointe</th><td><t t-out="o.besoin_pointe_mm_j or '—'"/> mm/j</td><th>DFC</th><td><t t-out="o.dfc_l_s_ha or '—'"/> l/s/ha</td></tr>
+                            <tr><th>Temps de fonctionnement</th><td><t t-out="o.temps_fonctionnement_h_j or '—'"/> h/j</td><th>Débit d'équipement</th><td><t t-out="o.debit_equipement_m3_h or '—'"/> m³/h</td></tr>
+                            <tr><th>Secteurs / simultanéité</th><td><t t-out="o.secteurs or '—'"/> / <t t-out="o.simultaneite or '—'"/></td><th>Technique et organes</th><td><t t-out="o.technique_organes or '—'"/></td></tr>
+                            <tr><th>Pression de service</th><td><t t-out="o.pression_service_bar or '—'"/> bar</td><th>Diamètres et vitesses</th><td><t t-out="o.diametres_vitesses or '—'"/></td></tr>
+                            <tr><th>Pertes de charge / HMT</th><td><t t-out="o.pertes_charge_m or '—'"/> m / <t t-out="o.hmt_m or '—'"/> m</td><th>Pompe retenue</th><td><t t-out="o.pompe or '—'"/></td></tr>
+                            <tr><th>Filtration</th><td><t t-out="o.filtration or '—'"/></td><th>Uniformité visée</th><td><t t-out="o.uniformite_visee_pct or '—'"/> % (cible : <t t-out="o.uniformite_cible or '—'"/>)</td></tr>
+                        </table>
+                        <p class="text-muted" t-if="o.chiffrage_indicatif"><t t-out="o.chiffrage_indicatif"/></p>
+
+                        <h3>A1.3 — PV de mise en service · A1.4 — Certificat</h3>
+                        <t t-if="o.pv_date">
+                            <p>Mise en service le <t t-out="o.pv_date"/> par <t t-out="o.pv_intervenant or '—'"/>. Rinçage : <t t-out="'oui' if o.pv_rincage else 'non'"/> ; essai de pression <t t-out="o.pv_essai_pression_bar or '—'"/> bar (<t t-out="o.pv_essai_resultat or '—'"/>).</p>
+                            <p><strong>Références :</strong> <t t-out="o.pv_pression_sortie_pompe_bar"/> bar en sortie de pompe ; <t t-out="o.pv_pression_point_defavorable_bar"/> bar au point défavorable ; uniformité <t t-out="o.pv_uniformite_pct or '—'"/> % ; <t t-out="o.pv_kwh_m3 or '—'"/> kWh/m³.</p>
+                            <p>Sécurités testées : <t t-out="'oui' if o.pv_securites_testees else 'non'"/> ; protection sanitaire (anti-retour) : <t t-out="'présente' if o.pv_antiretour else 'ABSENTE — non-conformité bloquante'"/>.</p>
+                            <p t-if="o.pv_debits_secteurs">Débits par secteur : <t t-out="o.pv_debits_secteurs"/></p>
+                            <p t-if="o.pv_reserves">Réserves : <t t-out="o.pv_reserves"/></p>
+                            <p t-if="o.certificat_date">Certificat de conformité délivré le <t t-out="o.certificat_date"/><t t-if="o.certificat_reserves"> — réserves : <t t-out="o.certificat_reserves"/></t>.</p>
+                        </t>
+                        <p t-else="" class="text-muted">Pas encore de PV.</p>
+
+                        <h3>A1.5 — Fiche de réglage</h3>
+                        <table class="table table-sm">
+                            <tr><th>Séquencement des secteurs</th><td><t t-out="o.reglage_sequencement or '—'"/></td></tr>
+                            <tr><th>Durées et fréquences par culture</th><td><t t-out="o.reglage_durees or '—'"/></td></tr>
+                            <tr><th>Pressions de consigne</th><td><t t-out="o.reglage_pressions or '—'"/></td></tr>
+                            <tr><th>Seuils de contre-lavage</th><td><t t-out="o.reglage_contre_lavage or '—'"/></td></tr>
+                            <tr><th>Outils de pilotage</th><td><t t-out="o.reglage_pilotage or '—'"/></td></tr>
+                            <tr><th>Surveillance</th><td><t t-out="o.reglage_surveillance or '—'"/></td></tr>
+                            <tr><th>Contacts et dépannage</th><td><t t-out="o.reglage_contacts or '—'"/></td></tr>
+                        </table>
+
+                        <h3>Équipements posés et renouvellement (§ 3.9)</h3>
+                        <table class="table table-sm">
+                            <thead><tr><th>Catégorie</th><th>Désignation</th><th>Caractéristiques</th><th>Posé en</th><th>Durée de vie</th><th>Renouvellement vers</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.equipement_ids" t-as="e">
+                                    <td><t t-out="dict(e._fields['categorie'].selection).get(e.categorie)"/></td><td><t t-out="e.name"/></td><td><t t-out="e.caracteristiques or ''"/></td>
+                                    <td><t t-out="e.annee_pose or '—'"/></td><td><t t-out="e.duree_vie_ans"/> ans</td><td><t t-out="e.fin_vie_estimee or '—'"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>A1.8 — Registre de maintenance</h3>
+                        <table class="table table-sm">
+                            <thead><tr><th>Date</th><th>Nature</th><th>Intervention / relevé</th><th>Valeurs</th><th>Intervenant</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.registre_ids" t-as="r">
+                                    <td><t t-out="r.date"/></td><td><t t-out="dict(r._fields['genre'].selection).get(r.genre)"/></td><td><t t-out="r.description"/></td><td><t t-out="r.releves or ''"/></td><td><t t-out="r.intervenant or ''"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>A1.6 — Fiches saisonnières</h3>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Remise en service (§ 18.3)</strong>
+                                <ol>
+                                    <li>Contrôle visuel</li><li>Amorçage, démarrage, point de fonctionnement (P, Q)</li><li>Test des sécurités (marche à sec, pressostats, niveau)</li>
+                                    <li>Filtration (éléments, contre-lavage, différentiel)</li><li>Pressions aux points clés (sortie pompe, têtes de secteur, point défavorable)</li>
+                                    <li>Débit des buses ou goutteurs sur échantillon</li><li>Électrovannes, programmateur, reports d'alarme</li><li>Purge de l'air, remise en eau progressive</li>
+                                </ol>
+                            </div>
+                            <div class="col-6">
+                                <strong>Hivernage (§ 18.5)</strong>
+                                <ol>
+                                    <li>Vidange des canalisations et points bas</li><li>Mise hors gel ou démontage des organes exposés (compteurs, filtres, manomètres)</li>
+                                    <li>Hivernage de la pompe</li><li>Rinçage de la micro-irrigation (0,4-0,5 m/s en bout de rampe), traitement anti-colmatage</li>
+                                    <li>Obturation des extrémités</li><li>Relevés de fin de saison au registre</li>
+                                </ol>
+                            </div>
+                        </div>
+                        <p class="text-muted">Dépannage : comparer au PV de mise en service — « sans référence, on ne dépanne pas, on tâtonne » (§ 18.9).</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

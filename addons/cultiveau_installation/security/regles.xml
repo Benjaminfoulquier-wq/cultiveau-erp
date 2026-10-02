@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Chaque adhérent (société) ne voit que ses installations ; l'équipe Cultiveau, avec toutes les sociétés, voit tout. -->
+    <record id="regle_installation_societe" model="ir.rule">
+        <field name="name">Installation : société de l'adhérent</field>
+        <field name="model_id" ref="model_cultiveau_installation"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="regle_equipement_societe" model="ir.rule">
+        <field name="name">Équipement : société de l'adhérent</field>
+        <field name="model_id" ref="model_cultiveau_equipement"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="regle_registre_societe" model="ir.rule">
+        <field name="name">Registre : société de l'adhérent</field>
+        <field name="model_id" ref="model_cultiveau_registre"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_cultiveau" model="ir.ui.view">
+        <field name="name">res.partner.form.cultiveau</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="before">
+                <field name="cultiveau_type"/>
+                <field name="exploitation" invisible="cultiveau_type != 'agriculteur'"/>
+                <field name="departement"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_tree_cultiveau" model="ir.ui.view">
+        <field name="name">res.partner.list.cultiveau</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="email" position="after">
+                <field name="departement" optional="show"/>
+                <field name="cultiveau_type" optional="show"/>
+            </field>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_cultiveau" model="ir.ui.view">
+        <field name="name">res.partner.search.cultiveau</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <filter name="type_company" position="after">
+                <separator/>
+                <filter name="cultiveau_agriculteurs" string="Agriculteurs" domain="[('cultiveau_type', '=', 'agriculteur')]"/>
+                <filter name="cultiveau_adherents" string="Adhérents" domain="[('cultiveau_type', '=', 'adherent')]"/>
+                <filter name="cultiveau_fournisseurs" string="Fournisseurs Cultiveau" domain="[('cultiveau_type', '=', 'fournisseur')]"/>
+            </filter>
+            <filter name="group_country" position="after">
+                <filter name="group_departement" string="Département" context="{'group_by': 'departement'}"/>
+                <filter name="group_cultiveau_type" string="Type Cultiveau" context="{'group_by': 'cultiveau_type'}"/>
+            </filter>
+        </field>
+    </record>
+
+    <record id="action_agriculteurs" model="ir.actions.act_window">
+        <field name="name">Agriculteurs</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="domain">[('cultiveau_type', '=', 'agriculteur')]</field>
+        <field name="context">{'default_cultiveau_type': 'agriculteur', 'default_is_company': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Vos clients agriculteurs</p>
+            <p>Chaque agriculteur a sa fiche : cultures et frise culturale, persona, devis, factures, appels.</p>
+        </field>
+    </record>
+</odoo>

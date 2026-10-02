@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_frise" model="ir.ui.view">
+        <field name="name">res.partner.form.frise</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_frise_cultures" type="object" class="oe_stat_button" icon="fa-leaf"
+                        invisible="not cultiveau_culture_ids">
+                    <div class="o_stat_info">
+                        <span class="o_stat_value"><field name="cultiveau_surface_ha"/> ha</span>
+                        <span class="o_stat_text">Cultures</span>
+                    </div>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Frise culturale" name="cultiveau_frise" invisible="cultiveau_type not in ('agriculteur', False)">
+                    <field name="cultiveau_culture_ids" context="{'default_partner_id': id}">
+                        <list editable="bottom">
+                            <field name="culture_id"/>
+                            <field name="surface_ha" sum="Total"/>
+                            <field name="departement"/>
+                            <field name="projet_mois"/>
+                            <field name="achat_mois"/>
+                            <field name="notes"/>
+                        </list>
+                    </field>
+                    <field name="cultiveau_frise_html" nolabel="1" readonly="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_frise" model="ir.ui.view">
+        <field name="name">res.partner.search.frise</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="cultiveau_base.view_res_partner_filter_cultiveau"/>
+        <field name="arch" type="xml">
+            <filter name="cultiveau_fournisseurs" position="after">
+                <filter name="cultiveau_a_contacter" string="À contacter ce mois-ci" domain="[('cultiveau_a_contacter', '=', True)]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

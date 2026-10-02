@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_a_contacter" name="À contacter ce mois-ci" parent="cultiveau_base.menu_cultiveau_root" action="action_a_contacter" sequence="15"/>
+    <menuitem id="menu_frise" name="Frise culturale" parent="cultiveau_base.menu_cultiveau_root" sequence="60"/>
+    <menuitem id="menu_cultures_clients" name="Cultures des agriculteurs" parent="menu_frise" action="action_cultures_clients" sequence="10"/>
+    <menuitem id="menu_cultures" name="Cultures et frise de référence" parent="menu_frise" action="action_cultures" sequence="20"/>
+</odoo>

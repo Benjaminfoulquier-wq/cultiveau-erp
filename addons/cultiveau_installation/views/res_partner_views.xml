@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_installation" model="ir.ui.view">
+        <field name="name">res.partner.form.installation</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_installations" type="object" class="oe_stat_button" icon="fa-tint"
+                        invisible="cultiveau_type not in ('agriculteur', False)">
+                    <field name="cultiveau_nb_installations" widget="statinfo" string="Installations"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

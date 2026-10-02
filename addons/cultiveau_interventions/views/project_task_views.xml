@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_form_cultiveau" model="ir.ui.view">
+        <field name="name">project.task.form.cultiveau</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Intervention irrigation" name="cultiveau" invisible="not cultiveau_intervention">
+                    <group>
+                        <group>
+                            <field name="cultiveau_intervention" invisible="1"/>
+                            <field name="cultiveau_nature"/>
+                            <field name="cultiveau_urgence"/>
+                            <field name="cultiveau_installation_id" context="{'default_partner_id': partner_id}"/>
+                            <field name="cultiveau_equipement_id"/>
+                            <field name="cultiveau_reference_pressions"/>
+                        </group>
+                        <group>
+                            <field name="cultiveau_symptome"/>
+                            <field name="cultiveau_releves"/>
+                            <field name="cultiveau_origine"/>
+                            <field name="cultiveau_reference_appel"/>
+                            <field name="cultiveau_sale_order_id"/>
+                            <field name="cultiveau_registre_id"/>
+                        </group>
+                    </group>
+                    <separator string="Pièces et prestations"/>
+                    <field name="cultiveau_piece_ids">
+                        <list editable="bottom">
+                            <field name="product_id"/>
+                            <field name="quantite"/>
+                            <field name="note"/>
+                            <field name="sale_line_id"/>
+                        </list>
+                    </field>
+                    <button name="action_creer_devis" type="object" string="Créer le devis / la facture des pièces" class="btn btn-primary"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_task_search_cultiveau" model="ir.ui.view">
+        <field name="name">project.task.search.cultiveau</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_search_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <filter name="cultiveau_urgentes" string="Urgentes (immédiate, journée)" domain="[('cultiveau_urgence', 'in', ('immediate', 'journee'))]"/>
+                <filter name="cultiveau_assistant" string="Venues de l'assistant" domain="[('cultiveau_origine', '=', 'assistant')]"/>
+                <filter name="group_cultiveau_nature" string="Nature" context="{'group_by': 'cultiveau_nature'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_task_list_cultiveau" model="ir.ui.view">
+        <field name="name">project.task.list.cultiveau</field>
+        <field name="model">project.task</field>
+        <field name="priority">40</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="cultiveau_urgence in ('immediate', 'journee') and state not in ('1_done', '1_canceled')">
+                <field name="priority" widget="priority"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="cultiveau_installation_id"/>
+                <field name="cultiveau_nature"/>
+                <field name="cultiveau_urgence"/>
+                <field name="user_ids" widget="many2many_avatar_user"/>
+                <field name="date_deadline"/>
+                <field name="stage_id"/>
+                <field name="state" widget="project_task_state_selection"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_interventions" model="ir.actions.act_window">
+        <field name="name">Interventions</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
+        <field name="domain">[('project_id.cultiveau_interventions', '=', True)]</field>
+        <field name="context">{'search_default_open_tasks': 1, 'cultiveau_interventions': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucune intervention en cours</p>
+            <p>Les dépannages, entretiens, remises en service et hivernages de vos clients. L'assistant téléphonique y dépose les demandes qu'il reçoit.</p>
+        </field>
+    </record>
+
+    <record id="action_interventions_list" model="ir.actions.act_window.view">
+        <field name="sequence">2</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_task_list_cultiveau"/>
+        <field name="act_window_id" ref="action_interventions"/>
+    </record>
+
+    <record id="action_nouvelle_intervention" model="ir.actions.server">
+        <field name="name">Nouvelle intervention</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="state">code</field>
+        <field name="code">
+projet = env["project.project"].cultiveau_projet_interventions()
+action = {"type": "ir.actions.act_window", "res_model": "project.task", "view_mode": "form", "target": "current",
+          "context": {"default_project_id": projet.id, "default_cultiveau_nature": "depannage"}}
+        </field>
+    </record>
+</odoo>

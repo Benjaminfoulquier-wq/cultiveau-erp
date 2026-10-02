@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="module_category_cultiveau" model="ir.module.category">
+        <field name="name">Cultiveau</field>
+        <field name="description">Le réseau Cultiveau : équipe d'animation et adhérents.</field>
+        <field name="sequence">5</field>
+    </record>
+
+    <record id="group_adherent" model="res.groups">
+        <field name="name">Adhérent</field>
+        <field name="category_id" ref="module_category_cultiveau"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        <field name="comment">Un dirigeant ou un salarié d'une entreprise adhérente : il travaille dans sa société.</field>
+    </record>
+
+    <record id="group_equipe" model="res.groups">
+        <field name="name">Équipe Cultiveau</field>
+        <field name="category_id" ref="module_category_cultiveau"/>
+        <field name="implied_ids" eval="[(4, ref('group_adherent')), (4, ref('base.group_multi_company'))]"/>
+        <field name="comment">L'équipe d'animation du réseau : voit toutes les sociétés, règle les outils, importe le catalogue.</field>
+        <field name="users" eval="[(4, ref('base.user_admin'))]"/>
+    </record>
+</odoo>

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_import_matrice,cultiveau.catalogue.import.matrice,model_cultiveau_catalogue_import_matrice,cultiveau_base.group_equipe,1,1,1,1
+access_import_3d,cultiveau.catalogue.import.3d,model_cultiveau_catalogue_import_3d,cultiveau_base.group_equipe,1,1,1,1

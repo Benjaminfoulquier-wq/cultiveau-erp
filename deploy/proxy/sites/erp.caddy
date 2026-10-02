@@ -1,0 +1,7 @@
+erp.cultiveau.fr {
+	encode gzip
+	# Les connexions longues d'Odoo (chat, notifications) passent par /websocket sur le port 8072.
+	@websocket path /websocket*
+	reverse_proxy @websocket erp:8072
+	reverse_proxy erp:8069
+}

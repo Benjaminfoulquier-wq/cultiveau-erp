@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_persona_wizard_form" model="ir.ui.view">
+        <field name="name">cultiveau.persona.wizard.form</field>
+        <field name="model">cultiveau.persona.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="text-muted">Huit questions sur l'agriculteur, telles qu'on les connaît aujourd'hui. Le résultat est un point de départ pour la relation, à refaire quand il change (reprise, nouvelle installation, projet).</p>
+                <group>
+                    <field name="partner_id" readonly="1"/>
+                </group>
+                <group>
+                    <group>
+                        <field name="surface" widget="radio"/>
+                        <field name="relation" widget="radio"/>
+                        <field name="priorite" widget="radio"/>
+                        <field name="materiel" widget="radio"/>
+                    </group>
+                    <group>
+                        <field name="horizon" widget="radio"/>
+                        <field name="decision" widget="radio"/>
+                        <field name="canal" widget="radio"/>
+                        <field name="pilotage" widget="radio"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="persona_id" readonly="1"/>
+                    <field name="apercu" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_valider" type="object" string="Enregistrer le persona" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

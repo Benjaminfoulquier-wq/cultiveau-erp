@@ -1,0 +1,28 @@
+#!/bin/sh
+# Crée la base de production et y installe l'ERP de l'irrigation : les modules Odoo utiles au
+# réseau (ventes, factures, comptabilité française, CRM, stocks, achats, projet, e-mailing, contacts)
+# et les modules Cultiveau. À lancer une fois, depuis /srv/erp/app (ou en local depuis la racine).
+#   sh scripts/installer.sh            # base $ODOO_DB (défaut : cultiveau)
+set -eu
+. ./.env 2>/dev/null || true
+BASE=${ODOO_DB:-cultiveau}
+NATIFS=contacts,sale_management,account,l10n_fr,crm,stock,purchase,project,mass_mailing,calendar
+CULTIVEAU=cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs
+
+docker compose up -d db
+sleep 5
+docker compose run --rm odoo odoo -d "$BASE" -i "$NATIFS,$CULTIVEAU" --without-demo=all --load-language=fr_FR --stop-after-init
+# Langue, pays et réglages par défaut : français, France, euro.
+docker compose run --rm odoo odoo shell -d "$BASE" --no-http <<'EOF'
+env["res.lang"]._activate_lang("fr_FR")
+env.ref("base.user_admin").write({"lang": "fr_FR", "tz": "Europe/Paris"})
+env.ref("base.main_company").write({"country_id": env.ref("base.fr").id, "currency_id": env.ref("base.EUR").id})
+env["ir.config_parameter"].sudo().set_param("cultiveau.url_assistant", "https://assistant.cultiveau.fr")
+env["ir.config_parameter"].sudo().set_param("cultiveau.url_dte", "https://dte.cultiveau.fr")
+env["ir.config_parameter"].sudo().set_param("cultiveau.url_disc", "https://disc.cultiveau.fr")
+env["ir.config_parameter"].sudo().set_param("cultiveau.url_academie", "https://formations.lesjourneesdecultiveau.fr")
+env.cr.commit()
+print("Réglages posés. Clé de l'API des outils : à saisir dans Cultiveau → Réglages (et dans la page Clés de l'assistant).")
+EOF
+docker compose up -d
+echo "Base « $BASE » prête. Première connexion : admin / admin — changer le mot de passe tout de suite."

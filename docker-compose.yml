@@ -1,0 +1,35 @@
+# Cultiveau ERP : Odoo 18 Community (code open source, image officielle) + PostgreSQL 16,
+# et les modules Cultiveau montés depuis ./addons. Même organisation que les autres outils du
+# réseau : /srv/erp/app (ce dépôt), /srv/erp/data (base, fichiers), /srv/erp/.env (secrets).
+services:
+  db:
+    image: postgres:16
+    container_name: erp-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?définir POSTGRES_PASSWORD dans .env}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks: [erp]
+
+  odoo:
+    image: odoo:18
+    container_name: erp
+    restart: unless-stopped
+    depends_on: [db]
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./addons:/mnt/extra-addons:ro
+      - ./odoo.conf:/etc/odoo/odoo.conf:ro
+      - ./data/odoo:/var/lib/odoo
+    networks: [erp, web]
+
+networks:
+  erp:
+  web:
+    external: true  # le réseau du frontal Caddy partagé avec les autres outils du réseau

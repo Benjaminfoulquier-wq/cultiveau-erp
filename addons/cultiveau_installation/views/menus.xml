@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_parc" name="Parc installé" parent="cultiveau_base.menu_cultiveau_root" sequence="20"/>
+    <menuitem id="menu_installations" name="Installations" parent="menu_parc" action="action_installations" sequence="10"/>
+    <menuitem id="menu_equipements" name="Équipements à renouveler" parent="menu_parc" action="action_equipements_a_renouveler" sequence="20"/>
+    <menuitem id="menu_registre" name="Registre de maintenance" parent="menu_parc" action="action_registre" sequence="30"/>
+</odoo>

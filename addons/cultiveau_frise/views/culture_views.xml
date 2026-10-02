@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_culture_list" model="ir.ui.view">
+        <field name="name">cultiveau.culture.list</field>
+        <field name="model">cultiveau.culture</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="categorie"/>
+                <field name="couleur" widget="color"/>
+                <field name="nb_clients"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_culture_form" model="ir.ui.view">
+        <field name="name">cultiveau.culture.form</field>
+        <field name="model">cultiveau.culture</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="Vigne, Pommier, Maïs…"/></h1></div>
+                    <group>
+                        <field name="categorie"/>
+                        <field name="couleur" widget="color"/>
+                        <field name="actif"/>
+                    </group>
+                    <notebook>
+                        <page string="Stades et besoins en eau" name="stades">
+                            <field name="stade_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="departement"/>
+                                    <field name="name"/>
+                                    <field name="mois_debut"/>
+                                    <field name="mois_fin"/>
+                                    <field name="kc_min"/>
+                                    <field name="kc_max"/>
+                                    <field name="besoin_min"/>
+                                    <field name="besoin_max"/>
+                                    <field name="etp_min"/>
+                                    <field name="etp_max"/>
+                                    <field name="irrigation"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Fenêtres commerciales" name="fenetres">
+                            <p class="text-muted">Quand l'agriculteur a le temps de parler projet, et quand il achète. Par département ; vide = partout.</p>
+                            <field name="fenetre_ids">
+                                <list editable="bottom">
+                                    <field name="departement"/>
+                                    <field name="genre"/>
+                                    <field name="mois_debut"/>
+                                    <field name="mois_fin"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cultures" model="ir.actions.act_window">
+        <field name="name">Cultures et frise de référence</field>
+        <field name="res_model">cultiveau.culture</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="view_culture_client_list" model="ir.ui.view">
+        <field name="name">cultiveau.culture.client.list</field>
+        <field name="model">cultiveau.culture.client</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="partner_id"/>
+                <field name="culture_id"/>
+                <field name="surface_ha" sum="Total"/>
+                <field name="departement"/>
+                <field name="projet_mois"/>
+                <field name="achat_mois"/>
+                <field name="notes" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_culture_client_form" model="ir.ui.view">
+        <field name="name">cultiveau.culture.client.form</field>
+        <field name="model">cultiveau.culture.client</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="culture_id"/>
+                        <field name="surface_ha"/>
+                        <field name="departement"/>
+                        <field name="fenetres"/>
+                        <field name="notes"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_culture_client_search" model="ir.ui.view">
+        <field name="name">cultiveau.culture.client.search</field>
+        <field name="model">cultiveau.culture.client</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="culture_id"/>
+                <field name="departement"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_culture" string="Culture" context="{'group_by': 'culture_id'}"/>
+                    <filter name="group_departement" string="Département" context="{'group_by': 'departement'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cultures_clients" model="ir.actions.act_window">
+        <field name="name">Cultures des agriculteurs</field>
+        <field name="res_model">cultiveau.culture.client</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_group_culture': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Qui cultive quoi, et sur combien d'hectares</p>
+            <p>Renseignez les cultures depuis la fiche de chaque agriculteur : la frise et les fenêtres commerciales en découlent.</p>
+        </field>
+    </record>
+
+    <record id="action_a_contacter" model="ir.actions.act_window">
+        <field name="name">À contacter ce mois-ci</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="domain">[('cultiveau_a_contacter', '=', True)]</field>
+        <field name="context">{'default_cultiveau_type': 'agriculteur'}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Personne à appeler ce mois-ci</p>
+            <p>Les agriculteurs dont une culture ouvre une fenêtre « projet » ou « achat » ce mois-ci apparaissent ici, d'après leur frise culturale.</p>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_culture_user,cultiveau.culture utilisateur,model_cultiveau_culture,base.group_user,1,0,0,0
+access_culture_equipe,cultiveau.culture équipe,model_cultiveau_culture,cultiveau_base.group_equipe,1,1,1,1
+access_culture_stade_user,cultiveau.culture.stade utilisateur,model_cultiveau_culture_stade,base.group_user,1,0,0,0
+access_culture_stade_equipe,cultiveau.culture.stade équipe,model_cultiveau_culture_stade,cultiveau_base.group_equipe,1,1,1,1
+access_culture_fenetre_user,cultiveau.culture.fenetre utilisateur,model_cultiveau_culture_fenetre,base.group_user,1,0,0,0
+access_culture_fenetre_equipe,cultiveau.culture.fenetre équipe,model_cultiveau_culture_fenetre,cultiveau_base.group_equipe,1,1,1,1
+access_culture_client_user,cultiveau.culture.client utilisateur,model_cultiveau_culture_client,base.group_user,1,1,1,1

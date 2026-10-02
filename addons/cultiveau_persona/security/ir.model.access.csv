@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_persona_user,cultiveau.persona utilisateur,model_cultiveau_persona,base.group_user,1,0,0,0
+access_persona_equipe,cultiveau.persona équipe,model_cultiveau_persona,cultiveau_base.group_equipe,1,1,1,1
+access_persona_evaluation_user,cultiveau.persona.evaluation utilisateur,model_cultiveau_persona_evaluation,base.group_user,1,1,1,1
+access_persona_wizard_user,cultiveau.persona.wizard utilisateur,model_cultiveau_persona_wizard,base.group_user,1,1,1,1

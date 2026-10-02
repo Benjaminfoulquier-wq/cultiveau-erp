@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_persona" name="Personas" parent="cultiveau_base.menu_cultiveau_root" sequence="65"/>
+    <menuitem id="menu_personas_guide" name="Le guide des personas" parent="menu_persona" action="action_personas" sequence="10"/>
+    <menuitem id="menu_persona_evaluations" name="Évaluations" parent="menu_persona" action="action_persona_evaluations" sequence="20"/>
+</odoo>

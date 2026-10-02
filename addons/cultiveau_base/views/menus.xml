@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_cultiveau_root" name="Cultiveau" sequence="5" web_icon="cultiveau_base,static/description/icon.png"/>
+    <menuitem id="menu_cultiveau_agriculteurs" name="Agriculteurs" parent="menu_cultiveau_root" action="action_agriculteurs" sequence="10"/>
+    <menuitem id="menu_cultiveau_outils" name="Outils du réseau" parent="menu_cultiveau_root" sequence="80"/>
+    <menuitem id="menu_cultiveau_reglages" name="Réglages" parent="menu_cultiveau_root" sequence="100" groups="cultiveau_base.group_equipe"/>
+    <menuitem id="menu_cultiveau_config" name="Réglages Cultiveau" parent="menu_cultiveau_reglages" action="action_cultiveau_config_settings" sequence="100"/>
+
+    <!-- Les outils qui restent à côté de l'ERP : un clic, et l'adresse vient des réglages. -->
+    <record id="action_outil_assistant" model="ir.actions.server">
+        <field name="name">Assistant téléphonique et CRM</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="state">code</field>
+        <field name="code">action = {"type": "ir.actions.act_url", "target": "new", "url": env["ir.config_parameter"].sudo().get_param("cultiveau.url_assistant") or "/odoo/settings"}</field>
+    </record>
+    <record id="action_outil_dte" model="ir.actions.server">
+        <field name="name">DTe — diagnostic d'entreprise</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="state">code</field>
+        <field name="code">action = {"type": "ir.actions.act_url", "target": "new", "url": env["ir.config_parameter"].sudo().get_param("cultiveau.url_dte") or "/odoo/settings"}</field>
+    </record>
+    <record id="action_outil_disc" model="ir.actions.server">
+        <field name="name">Management — DISC, one-to-one</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="state">code</field>
+        <field name="code">action = {"type": "ir.actions.act_url", "target": "new", "url": env["ir.config_parameter"].sudo().get_param("cultiveau.url_disc") or "/odoo/settings"}</field>
+    </record>
+    <record id="action_outil_academie" model="ir.actions.server">
+        <field name="name">Académie — e-learning</field>
+        <field name="model_id" ref="base.model_res_company"/>
+        <field name="state">code</field>
+        <field name="code">action = {"type": "ir.actions.act_url", "target": "new", "url": env["ir.config_parameter"].sudo().get_param("cultiveau.url_academie") or "/odoo/settings"}</field>
+    </record>
+    <menuitem id="menu_outil_assistant" name="Assistant téléphonique et CRM" parent="menu_cultiveau_outils" action="action_outil_assistant" sequence="10"/>
+    <menuitem id="menu_outil_dte" name="DTe — diagnostic d'entreprise" parent="menu_cultiveau_outils" action="action_outil_dte" sequence="20"/>
+    <menuitem id="menu_outil_disc" name="Management — DISC" parent="menu_cultiveau_outils" action="action_outil_disc" sequence="30"/>
+    <menuitem id="menu_outil_academie" name="Académie — e-learning" parent="menu_cultiveau_outils" action="action_outil_academie" sequence="40"/>
+</odoo>
