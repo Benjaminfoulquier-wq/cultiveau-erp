@@ -5,3 +5,4 @@ __pycache__/
 .DS_Store
 *.tmp
 node_modules/
+docker-compose.local.yml

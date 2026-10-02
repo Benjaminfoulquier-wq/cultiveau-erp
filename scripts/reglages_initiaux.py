@@ -1,0 +1,11 @@
+# Réglages posés une fois la base créée : français, France, euro, adresses des outils du réseau.
+env["res.lang"]._activate_lang("fr_FR")
+env.ref("base.user_admin").write({"lang": "fr_FR", "tz": "Europe/Paris"})
+env.ref("base.main_company").write({"name": "Cultiveau", "country_id": env.ref("base.fr").id, "currency_id": env.ref("base.EUR").id})
+params = env["ir.config_parameter"].sudo()
+params.set_param("cultiveau.url_assistant", "https://assistant.cultiveau.fr")
+params.set_param("cultiveau.url_dte", "https://dte.cultiveau.fr")
+params.set_param("cultiveau.url_disc", "https://disc.cultiveau.fr")
+params.set_param("cultiveau.url_academie", "https://formations.lesjourneesdecultiveau.fr")
+env.cr.commit()
+print("Réglages posés : français, France, euro, outils du réseau.")

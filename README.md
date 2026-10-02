@@ -25,6 +25,18 @@ contient l'image Docker officielle `odoo:18` utilisée par `docker-compose.yml`.
 (lire, corriger ou figer Odoo lui-même) : `docker compose -f docker-compose.yml -f docker-compose.source.yml up -d --build`
 (voir `Dockerfile`). Les modules Cultiveau ne modifient jamais le code d'Odoo : ils l'étendent depuis `addons/`.
 
+## L'essayer sur son ordinateur (localhost)
+
+Avec Docker Desktop installé, depuis le dossier du projet :
+
+```sh
+sh scripts/local.sh demo       # crée la base, installe Odoo et les modules Cultiveau, ajoute des données de démonstration
+```
+
+Puis http://localhost:8069, identifiant `admin`, mot de passe `admin`, menu **Cultiveau**. La première exécution prend
+quelques minutes (téléchargement de l'image Odoo, installation des modules). `sh scripts/local.sh stop` arrête,
+`sh scripts/local.sh reset` efface tout. Sous Windows, lancer la commande dans Git Bash ou WSL.
+
 ## Mettre en route
 
 Sur le serveur du réseau (même VPS et même frontal Caddy que l'assistant, le DTe, le DISC et l'Académie) :
