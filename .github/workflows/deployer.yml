@@ -1,0 +1,45 @@
+# Met l'ERP en ligne sur le serveur du réseau (erp.cultiveau.fr) depuis GitHub, sans poste de travail.
+#
+# Une fois : dans le dépôt GitHub, Settings → Secrets and variables → Actions → New repository secret,
+# nom CULTIVEAU_VPS_CLE, valeur = le contenu de la clé privée SSH du serveur (le fichier ~/.ssh/cultiveau_vps
+# du poste qui déploie déjà l'assistant). Puis Actions → « Déployer l'ERP » → Run workflow → « premiere-installation ».
+# Ensuite, chaque push sur la branche met l'ERP à jour (modules Cultiveau compris).
+name: Déployer l'ERP
+
+on:
+  push:
+    branches: [main, erp]
+    paths-ignore: ["docs/**", "README.md"]
+  workflow_dispatch:
+    inputs:
+      etape:
+        description: "premiere-installation (crée la base et le site) ou mise-a-jour"
+        type: choice
+        default: mise-a-jour
+        options: [mise-a-jour, premiere-installation]
+
+concurrency: deploiement-erp
+
+jobs:
+  deployer:
+    runs-on: ubuntu-latest
+    env:
+      SERVEUR: root@82.25.116.36
+      CLE: /home/runner/.ssh/cultiveau_vps
+    steps:
+      - uses: actions/checkout@v4
+      - name: Clé SSH du serveur
+        run: |
+          if [ -z "${{ secrets.CULTIVEAU_VPS_CLE }}" ]; then
+            echo "::error::Le secret CULTIVEAU_VPS_CLE manque : l'ajouter dans Settings → Secrets → Actions (clé privée SSH du serveur)."; exit 1
+          fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CULTIVEAU_VPS_CLE }}" > "$CLE" && chmod 600 "$CLE"
+          ssh-keyscan -H 82.25.116.36 >> ~/.ssh/known_hosts 2>/dev/null
+      - name: Code et conteneurs sur le serveur
+        run: sh deploy/deployer.sh
+      - name: Première installation (base, modules, réglages)
+        if: ${{ github.event.inputs.etape == 'premiere-installation' }}
+        run: ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" 'cd /srv/erp/app && sh scripts/installer.sh'
+      - name: Site erp.cultiveau.fr (Caddy)
+        run: sh deploy/deployer.sh domaine

@@ -41,7 +41,12 @@ quelques minutes (téléchargement de l'image Odoo, installation des modules). `
 
 ## Mettre en route
 
-Sur le serveur du réseau (même VPS et même frontal Caddy que l'assistant, le DTe, le DISC et l'Académie) :
+**Depuis GitHub, sans poste de travail** : le workflow « Déployer l'ERP » (`.github/workflows/deployer.yml`) met le serveur à
+jour à chaque push. Une fois, ajouter le secret `CULTIVEAU_VPS_CLE` (la clé privée SSH du serveur, celle du poste qui déploie
+l'assistant) dans Settings → Secrets → Actions, puis lancer le workflow à la main avec « premiere-installation ». Le DNS
+`erp.cultiveau.fr` doit pointer sur le serveur (82.25.116.36) pour que le site HTTPS s'active.
+
+**Depuis un poste qui a la clé SSH**, sur le serveur du réseau (même VPS et même frontal Caddy que l'assistant, le DTe, le DISC et l'Académie) :
 
 ```sh
 sh deploy/deployer.sh            # copie le projet dans /srv/erp, crée .env, lance Odoo + PostgreSQL
