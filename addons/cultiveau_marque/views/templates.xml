@@ -35,4 +35,26 @@
             <div class="o_brand_promotion"><a href="https://cultiveau.fr" target="_blank">Cultiveau</a></div>
         </xpath>
     </template>
+
+    <!-- Les e-mails envoyés par l'ERP : pied de page Cultiveau, sans promotion de l'éditeur. -->
+    <template id="mail_notification_layout_cultiveau" inherit_id="mail.mail_notification_layout" name="Cultiveau : pied des e-mails">
+        <xpath expr="//div[@t-if='show_footer']" position="replace">
+            <div t-if="show_footer" style="color: #555555; font-size:11px;">
+                Envoyé par <a target="_blank" href="https://cultiveau.fr" style="color: #0b8aa3;">Cultiveau</a>
+                <span id="mail_unfollow">
+                    | <a href="/mail/unfollow" style="text-decoration:none; color:#555555;">Ne plus suivre</a>
+                </span>
+            </div>
+        </xpath>
+    </template>
+    <template id="mail_notification_light_cultiveau" inherit_id="mail.mail_notification_light" name="Cultiveau : pied des e-mails (léger)">
+        <xpath expr="//td[contains(text(), 'Powered by')]" position="replace">
+            <td align="center" style="min-width: 590px;">
+                Envoyé par <a target="_blank" href="https://cultiveau.fr" style="color: #0b8aa3;">Cultiveau</a>
+                <span id="mail_unfollow">
+                    | <a href="/mail/unfollow" style="text-decoration:none; color:#555555;">Ne plus suivre</a>
+                </span>
+            </td>
+        </xpath>
+    </template>
 </odoo>

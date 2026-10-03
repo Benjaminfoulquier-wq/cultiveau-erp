@@ -14,7 +14,7 @@ l'éditeur ni lien d'inscription publique, menu utilisateur sans les liens vers 
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
-    "depends": ["web", "auth_signup", "cultiveau_base"],
+    "depends": ["web", "auth_signup", "mail", "cultiveau_base"],
     "data": [
         "data/marque.xml",
         "views/templates.xml",
