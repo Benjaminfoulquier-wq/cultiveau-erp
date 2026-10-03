@@ -34,7 +34,13 @@ jobs:
             echo "::error::Le secret CULTIVEAU_VPS_CLE manque : l'ajouter dans Settings → Secrets → Actions (clé privée SSH du serveur)."; exit 1
           fi
           mkdir -p ~/.ssh && chmod 700 ~/.ssh
-          printf '%s\n' "${{ secrets.CULTIVEAU_VPS_CLE }}" > "$CLE" && chmod 600 "$CLE"
+          printf '%s\n' "${{ secrets.CULTIVEAU_VPS_CLE }}" | sed 's/\r$//' > "$CLE" && chmod 600 "$CLE"
+          lignes=$(wc -l < "$CLE")
+          if ! ssh-keygen -y -P "" -f "$CLE" > /dev/null 2>&1; then
+            echo "::error::Le secret CULTIVEAU_VPS_CLE ($lignes ligne(s)) n'est pas une clé privée SSH lisible : il doit contenir tout le fichier de clé privée, de la ligne BEGIN à la ligne END incluses, sans mot de passe. Sur le Mac : cat ~/.ssh/cultiveau_vps | pbcopy, puis recoller la valeur du secret."
+            exit 1
+          fi
+          echo "Clé lue : $lignes lignes, empreinte $(ssh-keygen -l -f "$CLE" | cut -d' ' -f1-2)"
           ssh-keyscan -H 82.25.116.36 >> ~/.ssh/known_hosts 2>/dev/null
       - name: Code et conteneurs sur le serveur
         run: sh deploy/deployer.sh
