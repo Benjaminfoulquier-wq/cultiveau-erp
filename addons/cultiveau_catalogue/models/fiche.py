@@ -60,9 +60,10 @@ class Fiche(models.Model):
 
     def cultiveau_joindre(self, contenu, nom, vignette=None, propager=True):
         """Joint le fichier rapatrié (octets) au document, avec sa première page en image ; l'image devient aussi
-        celle des articles reliés qui n'en ont pas. Renvoie le nombre d'articles illustrés."""
+        celle des articles reliés qui n'en ont pas. Renvoie le nombre d'articles illustrés. Sans contenu (fichier
+        trop gros pour la base), seuls le nom et l'image sont gardés : le document reste ouvert depuis le Drive."""
         self.ensure_one()
-        vals = {"fichier": base64.b64encode(contenu), "fichier_nom": nom}
+        vals = {"fichier": base64.b64encode(contenu) if contenu else False, "fichier_nom": nom}
         if vignette:
             vals["vignette"] = base64.b64encode(vignette)
         self.write(vals)
