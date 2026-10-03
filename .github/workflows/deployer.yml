@@ -18,11 +18,7 @@ on:
         default: mise-a-jour
         options: [mise-a-jour, premiere-installation]
       admin_email:
-        description: "Créer ou mettre à jour un compte administrateur : son e-mail (facultatif)"
-        type: string
-        default: ""
-      admin_mdp:
-        description: "… et son mot de passe (facultatif, masqué dans le journal)"
+        description: "Créer ou mettre à jour un compte administrateur : son e-mail (facultatif ; le mot de passe est le secret CULTIVEAU_ADMIN_MDP)"
         type: string
         default: ""
       admin_nom:
@@ -61,12 +57,14 @@ jobs:
         run: ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" 'cd /srv/erp/app && sh scripts/installer.sh'
       - name: Site erp.cultiveau.fr (Caddy)
         run: sh deploy/deployer.sh domaine
+      # Le mot de passe ne passe jamais par un paramètre (GitHub les affiche dans le journal) : il vient du secret
+      # CULTIVEAU_ADMIN_MDP, que GitHub masque partout. À changer dans l'ERP après la première connexion.
       - name: Compte administrateur
-        if: ${{ github.event.inputs.admin_email != '' && github.event.inputs.admin_mdp != '' }}
+        if: ${{ github.event.inputs.admin_email != '' }}
         env:
           ADMIN_EMAIL: ${{ github.event.inputs.admin_email }}
-          ADMIN_MDP: ${{ github.event.inputs.admin_mdp }}
+          ADMIN_MDP: ${{ secrets.CULTIVEAU_ADMIN_MDP }}
           ADMIN_NOM: ${{ github.event.inputs.admin_nom }}
         run: |
-          echo "::add-mask::$ADMIN_MDP"
+          if [ -z "$ADMIN_MDP" ]; then echo "::error::Le secret CULTIVEAU_ADMIN_MDP manque (Settings → Secrets → Actions)."; exit 1; fi
           ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" "cd /srv/erp/app && . /srv/erp/.env && docker compose run --rm -T -e ADMIN_EMAIL='$ADMIN_EMAIL' -e ADMIN_MDP='$ADMIN_MDP' -e ADMIN_NOM='$ADMIN_NOM' odoo odoo shell -d \$ODOO_DB --no-http < scripts/admin.py 2>&1 | grep -v '^$' | tail -3 | grep 'Compte administrateur'"
