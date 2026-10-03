@@ -38,7 +38,7 @@ $SSH "$SERVEUR" '
   docker compose pull -q
   # Les droits du dossier de fichiers d Odoo sont posés depuis l intérieur du conteneur : c est le seul point de vue
   # qui vaut quelle que soit la façon dont le serveur mappe les utilisateurs des conteneurs.
-  docker compose run --rm --user root --entrypoint sh odoo -c 'mkdir -p /var/lib/odoo/filestore /var/lib/odoo/sessions && chown -R odoo:odoo /var/lib/odoo && ls -ld /var/lib/odoo /var/lib/odoo/filestore'
+  docker compose run --rm --user root --entrypoint sh odoo -c "mkdir -p /var/lib/odoo/filestore /var/lib/odoo/sessions && chown -R odoo:odoo /var/lib/odoo"
   docker compose up -d
   # Les modules Cultiveau sont mis à jour sur la base de production, seulement si elle existe et est installée.
   . /srv/erp/.env

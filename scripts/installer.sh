@@ -17,15 +17,21 @@ docker compose run --rm --user root --entrypoint sh odoo -c 'mkdir -p /var/lib/o
 # Une base laissée à moitié créée par un essai raté (module base absent) est repartie de zéro ; une base installée est gardée.
 existe=$(docker compose exec -T db psql -U odoo -d postgres -tAc "select 1 from pg_database where datname='$BASE'" 2>/dev/null || true)
 if [ "$existe" = "1" ]; then
-  etat=$(docker compose exec -T db psql -U odoo -d "$BASE" -tAc "select state from ir_module_module where name='base'" 2>/dev/null || true)
-  if [ "$etat" = "installed" ]; then
-    echo "La base « $BASE » est déjà installée : rien à créer. Pour mettre à jour les modules : sh deploy/deployer.sh"
+  base=$(docker compose exec -T db psql -U odoo -d "$BASE" -tAc "select state from ir_module_module where name='base'" 2>/dev/null || true)
+  dernier=$(docker compose exec -T db psql -U odoo -d "$BASE" -tAc "select state from ir_module_module where name='cultiveau_connecteurs'" 2>/dev/null || true)
+  if [ "$dernier" = "installed" ]; then
+    echo "La base « $BASE » est déjà installée (modules Cultiveau compris) : rien à créer. Pour mettre à jour : sh deploy/deployer.sh"
     exit 0
   fi
-  echo "Base « $BASE » incomplète (essai précédent interrompu) : on la recrée."
-  docker compose stop odoo >/dev/null 2>&1 || true
-  docker compose exec -T db psql -U odoo -d postgres -c "drop database \"$BASE\"" >/dev/null
+  if [ "$base" = "installed" ]; then
+    echo "Base « $BASE » : Odoo est posé, les modules manquants vont être installés."
+  else
+    echo "Base « $BASE » incomplète (essai précédent interrompu) : on la recrée."
+    docker compose stop odoo >/dev/null 2>&1 || true
+    docker compose exec -T db psql -U odoo -d postgres -c "drop database \"$BASE\"" >/dev/null
+  fi
 fi
+docker compose stop odoo >/dev/null 2>&1 || true
 docker compose run --rm odoo odoo -d "$BASE" -i "$NATIFS,$CULTIVEAU" --without-demo=all --load-language=fr_FR --stop-after-init
 # Langue, pays et réglages par défaut : français, France, euro.
 docker compose run --rm odoo odoo shell -d "$BASE" --no-http <<'EOF'
