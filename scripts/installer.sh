@@ -11,6 +11,9 @@ CULTIVEAU=cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,c
 
 docker compose up -d db
 sleep 5
+# Les droits du dossier de fichiers d Odoo sont posés depuis l intérieur du conteneur : c est le seul point de vue
+# qui vaut quelle que soit la façon dont le serveur mappe les utilisateurs des conteneurs.
+docker compose run --rm --user root --entrypoint sh odoo -c 'mkdir -p /var/lib/odoo/filestore /var/lib/odoo/sessions && chown -R odoo:odoo /var/lib/odoo && ls -ld /var/lib/odoo /var/lib/odoo/filestore'
 # Une base laissée à moitié créée par un essai raté (module base absent) est repartie de zéro ; une base installée est gardée.
 existe=$(docker compose exec -T db psql -U odoo -d postgres -tAc "select 1 from pg_database where datname='$BASE'" 2>/dev/null || true)
 if [ "$existe" = "1" ]; then
