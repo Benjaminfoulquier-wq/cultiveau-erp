@@ -1,0 +1,1141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Frise culturale de référence du Gard (30) : source « exemple frise culturale 30 », Cultiveau, février 2025. -->
+        <record id="culture_vigne" model="cultiveau.culture">
+            <field name="name">Vigne</field>
+            <field name="categorie">vigne</field>
+            <field name="couleur">#6b2d5c</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="stade_vigne_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_vigne"/>
+            <field name="departement">30</field>
+            <field name="name">Débourrement</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.3</field>
+            <field name="kc_max">0.5</field>
+            <field name="besoin_min">30</field>
+            <field name="besoin_max">50</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, sauf si sécheresse prolongée</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_vigne_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_vigne"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, si stress hydrique</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_vigne_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_vigne"/>
+            <field name="departement">30</field>
+            <field name="name">Véraison</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">8</field>
+            <field name="kc_min">0.6</field>
+            <field name="kc_max">0.8</field>
+            <field name="besoin_min">60</field>
+            <field name="besoin_max">80</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, irrigation modérée et contrôlée</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_vigne_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_vigne"/>
+            <field name="departement">30</field>
+            <field name="name">Maturation</field>
+            <field name="mois_debut">9</field>
+            <field name="mois_fin">10</field>
+            <field name="kc_min">0.4</field>
+            <field name="kc_max">0.6</field>
+            <field name="besoin_min">40</field>
+            <field name="besoin_max">60</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Non, sauf si stress hydrique sévère</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_vigne_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_vigne"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">11</field>
+            <field name="mois_fin">12</field>
+        </record>
+        <record id="fenetre_vigne_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_vigne"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">1</field>
+            <field name="mois_fin">2</field>
+        </record>
+        <record id="culture_ble_dur" model="cultiveau.culture">
+            <field name="name">Blé dur</field>
+            <field name="categorie">grandes_cultures</field>
+            <field name="couleur">#b8860b</field>
+            <field name="sequence">20</field>
+        </record>
+        <record id="stade_ble_dur_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_ble_dur"/>
+            <field name="departement">30</field>
+            <field name="name">Levée</field>
+            <field name="mois_debut">10</field>
+            <field name="mois_fin">11</field>
+            <field name="kc_min">0.3</field>
+            <field name="kc_max">0.4</field>
+            <field name="besoin_min">30</field>
+            <field name="besoin_max">40</field>
+            <field name="etp_min">1</field>
+            <field name="etp_max">2</field>
+            <field name="irrigation">Non, sauf si sol très sec</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_ble_dur_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_ble_dur"/>
+            <field name="departement">30</field>
+            <field name="name">Tallage</field>
+            <field name="mois_debut">12</field>
+            <field name="mois_fin">2</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, généralement</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_ble_dur_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_ble_dur"/>
+            <field name="departement">30</field>
+            <field name="name">Montaison</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.2</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">120</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Oui, si sol superficiel</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_ble_dur_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_ble_dur"/>
+            <field name="departement">30</field>
+            <field name="name">Maturation</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">0.6</field>
+            <field name="kc_max">0.8</field>
+            <field name="besoin_min">60</field>
+            <field name="besoin_max">80</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, 1 à 4 passages selon la région</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_ble_dur_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_ble_dur"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">8</field>
+        </record>
+        <record id="fenetre_ble_dur_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_ble_dur"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">9</field>
+            <field name="mois_fin">10</field>
+        </record>
+        <record id="culture_pecher" model="cultiveau.culture">
+            <field name="name">Pêcher</field>
+            <field name="categorie">arbo</field>
+            <field name="couleur">#e07a5f</field>
+            <field name="sequence">30</field>
+        </record>
+        <record id="stade_pecher_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_pecher"/>
+            <field name="departement">30</field>
+            <field name="name">Débourrement</field>
+            <field name="mois_debut">2</field>
+            <field name="mois_fin">3</field>
+            <field name="kc_min">0.4</field>
+            <field name="kc_max">0.6</field>
+            <field name="besoin_min">40</field>
+            <field name="besoin_max">60</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, généralement</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_pecher_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_pecher"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Oui, si sol sec</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_pecher_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_pecher"/>
+            <field name="departement">30</field>
+            <field name="name">Grossissement</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">7</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.2</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">120</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, nécessaire selon la région</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_pecher_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_pecher"/>
+            <field name="departement">30</field>
+            <field name="name">Récolte</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">8</field>
+            <field name="kc_min">0.8</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">80</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Réduire progressivement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_pecher_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_pecher"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">10</field>
+            <field name="mois_fin">11</field>
+        </record>
+        <record id="fenetre_pecher_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_pecher"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">12</field>
+            <field name="mois_fin">1</field>
+        </record>
+        <record id="culture_olivier" model="cultiveau.culture">
+            <field name="name">Olivier</field>
+            <field name="categorie">arbo</field>
+            <field name="couleur">#6b8e23</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="stade_olivier_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_olivier"/>
+            <field name="departement">30</field>
+            <field name="name">Reprise végétative</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.4</field>
+            <field name="kc_max">0.6</field>
+            <field name="besoin_min">40</field>
+            <field name="besoin_max">60</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, sauf si très sec</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_olivier_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_olivier"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">0.6</field>
+            <field name="kc_max">0.8</field>
+            <field name="besoin_min">60</field>
+            <field name="besoin_max">80</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, si stress hydrique</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_olivier_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_olivier"/>
+            <field name="departement">30</field>
+            <field name="name">Grossissement</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">9</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, régulièrement</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_olivier_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_olivier"/>
+            <field name="departement">30</field>
+            <field name="name">Maturation</field>
+            <field name="mois_debut">10</field>
+            <field name="mois_fin">11</field>
+            <field name="kc_min">0.5</field>
+            <field name="kc_max">0.7</field>
+            <field name="besoin_min">50</field>
+            <field name="besoin_max">70</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Réduire progressivement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_olivier_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_olivier"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">11</field>
+            <field name="mois_fin">12</field>
+        </record>
+        <record id="fenetre_olivier_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_olivier"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">1</field>
+            <field name="mois_fin">2</field>
+        </record>
+        <record id="culture_riz" model="cultiveau.culture">
+            <field name="name">Riz</field>
+            <field name="categorie">grandes_cultures</field>
+            <field name="couleur">#3d5a80</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="stade_riz_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_riz"/>
+            <field name="departement">30</field>
+            <field name="name">Semis</field>
+            <field name="mois_debut">4</field>
+            <field name="mois_fin">5</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.2</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">120</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, irrigation nécessaire</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_riz_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_riz"/>
+            <field name="departement">30</field>
+            <field name="name">Tallage</field>
+            <field name="mois_debut">6</field>
+            <field name="mois_fin">7</field>
+            <field name="kc_min">1.1</field>
+            <field name="kc_max">1.2</field>
+            <field name="besoin_min">110</field>
+            <field name="besoin_max">120</field>
+            <field name="etp_min">6</field>
+            <field name="etp_max">7</field>
+            <field name="irrigation">Oui, irrigation nécessaire</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_riz_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_riz"/>
+            <field name="departement">30</field>
+            <field name="name">Montaison</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">8</field>
+            <field name="kc_min">1.2</field>
+            <field name="kc_max">1.2</field>
+            <field name="besoin_min">120</field>
+            <field name="besoin_max">120</field>
+            <field name="etp_min">7</field>
+            <field name="etp_max">7</field>
+            <field name="irrigation">Oui, irrigation nécessaire</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_riz_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_riz"/>
+            <field name="departement">30</field>
+            <field name="name">Maturation</field>
+            <field name="mois_debut">9</field>
+            <field name="mois_fin">9</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.1</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">110</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, irrigation nécessaire</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_riz_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_riz"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">1</field>
+            <field name="mois_fin">2</field>
+        </record>
+        <record id="fenetre_riz_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_riz"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+        </record>
+        <record id="culture_tournesol" model="cultiveau.culture">
+            <field name="name">Tournesol</field>
+            <field name="categorie">grandes_cultures</field>
+            <field name="couleur">#e9c46a</field>
+            <field name="sequence">60</field>
+        </record>
+        <record id="stade_tournesol_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_tournesol"/>
+            <field name="departement">30</field>
+            <field name="name">Levée</field>
+            <field name="mois_debut">4</field>
+            <field name="mois_fin">5</field>
+            <field name="kc_min">0.3</field>
+            <field name="kc_max">0.5</field>
+            <field name="besoin_min">30</field>
+            <field name="besoin_max">50</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, sauf si sol très sec</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_tournesol_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_tournesol"/>
+            <field name="departement">30</field>
+            <field name="name">Croissance</field>
+            <field name="mois_debut">6</field>
+            <field name="mois_fin">7</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, si stress hydrique</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_tournesol_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_tournesol"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">8</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.1</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">110</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, période critique</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_tournesol_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_tournesol"/>
+            <field name="departement">30</field>
+            <field name="name">Maturation</field>
+            <field name="mois_debut">8</field>
+            <field name="mois_fin">9</field>
+            <field name="kc_min">0.6</field>
+            <field name="kc_max">0.8</field>
+            <field name="besoin_min">60</field>
+            <field name="besoin_max">80</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Réduire progressivement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_tournesol_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_tournesol"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">1</field>
+            <field name="mois_fin">2</field>
+        </record>
+        <record id="fenetre_tournesol_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_tournesol"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+        </record>
+        <record id="culture_abricotier" model="cultiveau.culture">
+            <field name="name">Abricotier</field>
+            <field name="categorie">arbo</field>
+            <field name="couleur">#f4a261</field>
+            <field name="sequence">70</field>
+        </record>
+        <record id="stade_abricotier_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_abricotier"/>
+            <field name="departement">30</field>
+            <field name="name">Débourrement</field>
+            <field name="mois_debut">2</field>
+            <field name="mois_fin">3</field>
+            <field name="kc_min">0.4</field>
+            <field name="kc_max">0.6</field>
+            <field name="besoin_min">40</field>
+            <field name="besoin_max">60</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, généralement</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_abricotier_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_abricotier"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Oui, si sol sec</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_abricotier_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_abricotier"/>
+            <field name="departement">30</field>
+            <field name="name">Grossissement</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.1</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">110</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, régulièrement</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_abricotier_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_abricotier"/>
+            <field name="departement">30</field>
+            <field name="name">Récolte</field>
+            <field name="mois_debut">6</field>
+            <field name="mois_fin">7</field>
+            <field name="kc_min">0.8</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">80</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Réduire progressivement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_abricotier_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_abricotier"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">10</field>
+            <field name="mois_fin">11</field>
+        </record>
+        <record id="fenetre_abricotier_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_abricotier"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">12</field>
+            <field name="mois_fin">1</field>
+        </record>
+        <record id="culture_melon" model="cultiveau.culture">
+            <field name="name">Melon</field>
+            <field name="categorie">maraichage</field>
+            <field name="couleur">#f6bd60</field>
+            <field name="sequence">80</field>
+        </record>
+        <record id="stade_melon_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_melon"/>
+            <field name="departement">30</field>
+            <field name="name">Plantation</field>
+            <field name="mois_debut">4</field>
+            <field name="mois_fin">5</field>
+            <field name="kc_min">0.4</field>
+            <field name="kc_max">0.6</field>
+            <field name="besoin_min">40</field>
+            <field name="besoin_max">60</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Oui, si stress hydrique</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_melon_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_melon"/>
+            <field name="departement">30</field>
+            <field name="name">Croissance</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, régulièrement</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_melon_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_melon"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">6</field>
+            <field name="mois_fin">7</field>
+            <field name="kc_min">0.9</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">90</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, période critique</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_melon_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_melon"/>
+            <field name="departement">30</field>
+            <field name="name">Récolte</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">9</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Réduire progressivement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_melon_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_melon"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">1</field>
+            <field name="mois_fin">2</field>
+        </record>
+        <record id="fenetre_melon_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_melon"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+        </record>
+        <record id="culture_tomate" model="cultiveau.culture">
+            <field name="name">Tomate</field>
+            <field name="categorie">maraichage</field>
+            <field name="couleur">#c1121f</field>
+            <field name="sequence">90</field>
+        </record>
+        <record id="stade_tomate_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_tomate"/>
+            <field name="departement">30</field>
+            <field name="name">Plantation</field>
+            <field name="mois_debut">4</field>
+            <field name="mois_fin">5</field>
+            <field name="kc_min">0.5</field>
+            <field name="kc_max">0.7</field>
+            <field name="besoin_min">50</field>
+            <field name="besoin_max">70</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Oui, si stress hydrique</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_tomate_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_tomate"/>
+            <field name="departement">30</field>
+            <field name="name">Croissance</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">0.8</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">80</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, régulièrement</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_tomate_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_tomate"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">6</field>
+            <field name="mois_fin">7</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.2</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">120</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, période critique</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_tomate_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_tomate"/>
+            <field name="departement">30</field>
+            <field name="name">Récolte</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">10</field>
+            <field name="kc_min">0.8</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">80</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">7</field>
+            <field name="irrigation">Maintenir l'irrigation, réduire en fin de cycle</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_tomate_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_tomate"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">1</field>
+            <field name="mois_fin">2</field>
+        </record>
+        <record id="fenetre_tomate_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_tomate"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+        </record>
+        <record id="culture_prairies" model="cultiveau.culture">
+            <field name="name">Prairies</field>
+            <field name="categorie">prairies</field>
+            <field name="couleur">#4f772d</field>
+            <field name="sequence">100</field>
+        </record>
+        <record id="stade_prairies_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_prairies"/>
+            <field name="departement">30</field>
+            <field name="name">Reprise</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.4</field>
+            <field name="kc_max">0.6</field>
+            <field name="besoin_min">40</field>
+            <field name="besoin_max">60</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Oui, si stress hydrique</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_prairies_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_prairies"/>
+            <field name="departement">30</field>
+            <field name="name">Croissance</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">0.8</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">80</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, régulièrement</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_prairies_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_prairies"/>
+            <field name="departement">30</field>
+            <field name="name">Fauche / pâturage</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">9</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, selon besoins</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_prairies_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_prairies"/>
+            <field name="departement">30</field>
+            <field name="name">Repos hivernal</field>
+            <field name="mois_debut">10</field>
+            <field name="mois_fin">2</field>
+            <field name="kc_min">0.3</field>
+            <field name="kc_max">0.5</field>
+            <field name="besoin_min">30</field>
+            <field name="besoin_max">50</field>
+            <field name="etp_min">1</field>
+            <field name="etp_max">2</field>
+            <field name="irrigation">Non, sauf si très sec</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_prairies_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_prairies"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">11</field>
+            <field name="mois_fin">12</field>
+        </record>
+        <record id="fenetre_prairies_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_prairies"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">1</field>
+            <field name="mois_fin">2</field>
+        </record>
+        <record id="culture_pommier" model="cultiveau.culture">
+            <field name="name">Pommier</field>
+            <field name="categorie">arbo</field>
+            <field name="couleur">#d62828</field>
+            <field name="sequence">110</field>
+        </record>
+        <record id="stade_pommier_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_pommier"/>
+            <field name="departement">30</field>
+            <field name="name">Débourrement</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.4</field>
+            <field name="kc_max">0.6</field>
+            <field name="besoin_min">40</field>
+            <field name="besoin_max">60</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, généralement</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_pommier_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_pommier"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">4</field>
+            <field name="mois_fin">5</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Oui, si sol sec</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_pommier_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_pommier"/>
+            <field name="departement">30</field>
+            <field name="name">Grossissement</field>
+            <field name="mois_debut">6</field>
+            <field name="mois_fin">8</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.1</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">110</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, régulièrement</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_pommier_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_pommier"/>
+            <field name="departement">30</field>
+            <field name="name">Récolte</field>
+            <field name="mois_debut">9</field>
+            <field name="mois_fin">10</field>
+            <field name="kc_min">0.8</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">80</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Réduire progressivement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_pommier_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_pommier"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">11</field>
+            <field name="mois_fin">12</field>
+        </record>
+        <record id="fenetre_pommier_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_pommier"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">1</field>
+            <field name="mois_fin">2</field>
+        </record>
+        <record id="culture_colza" model="cultiveau.culture">
+            <field name="name">Colza</field>
+            <field name="categorie">grandes_cultures</field>
+            <field name="couleur">#ffd60a</field>
+            <field name="sequence">120</field>
+        </record>
+        <record id="stade_colza_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_colza"/>
+            <field name="departement">30</field>
+            <field name="name">Levée</field>
+            <field name="mois_debut">9</field>
+            <field name="mois_fin">10</field>
+            <field name="kc_min">0.3</field>
+            <field name="kc_max">0.5</field>
+            <field name="besoin_min">30</field>
+            <field name="besoin_max">50</field>
+            <field name="etp_min">1</field>
+            <field name="etp_max">2</field>
+            <field name="irrigation">Non, sauf si sol très sec</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_colza_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_colza"/>
+            <field name="departement">30</field>
+            <field name="name">Rosette</field>
+            <field name="mois_debut">11</field>
+            <field name="mois_fin">2</field>
+            <field name="kc_min">0.5</field>
+            <field name="kc_max">0.7</field>
+            <field name="besoin_min">50</field>
+            <field name="besoin_max">70</field>
+            <field name="etp_min">1</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, généralement</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_colza_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_colza"/>
+            <field name="departement">30</field>
+            <field name="name">Montaison</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.9</field>
+            <field name="kc_max">1.1</field>
+            <field name="besoin_min">90</field>
+            <field name="besoin_max">110</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Oui, si stress hydrique</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_colza_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_colza"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">4</field>
+            <field name="mois_fin">5</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.1</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">110</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, période critique</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="stade_colza_5" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_colza"/>
+            <field name="departement">30</field>
+            <field name="name">Maturation</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Réduire progressivement</field>
+            <field name="sequence">5</field>
+        </record>
+        <record id="fenetre_colza_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_colza"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">6</field>
+            <field name="mois_fin">7</field>
+        </record>
+        <record id="fenetre_colza_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_colza"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">8</field>
+            <field name="mois_fin">9</field>
+        </record>
+        <record id="culture_asperge" model="cultiveau.culture">
+            <field name="name">Asperge</field>
+            <field name="categorie">maraichage</field>
+            <field name="couleur">#90a955</field>
+            <field name="sequence">130</field>
+        </record>
+        <record id="stade_asperge_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_asperge"/>
+            <field name="departement">30</field>
+            <field name="name">Débourrement</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.2</field>
+            <field name="kc_max">0.3</field>
+            <field name="besoin_min">20</field>
+            <field name="besoin_max">30</field>
+            <field name="etp_min">1</field>
+            <field name="etp_max">2</field>
+            <field name="irrigation">Non, sauf si très sec</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_asperge_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_asperge"/>
+            <field name="departement">30</field>
+            <field name="name">Croissance</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">4</field>
+            <field name="etp_max">5</field>
+            <field name="irrigation">Oui, régulièrement</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_asperge_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_asperge"/>
+            <field name="departement">30</field>
+            <field name="name">Maturation</field>
+            <field name="mois_debut">7</field>
+            <field name="mois_fin">9</field>
+            <field name="kc_min">0.8</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">80</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, selon besoins</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_asperge_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_asperge"/>
+            <field name="departement">30</field>
+            <field name="name">Repos</field>
+            <field name="mois_debut">10</field>
+            <field name="mois_fin">2</field>
+            <field name="kc_min">0.2</field>
+            <field name="kc_max">0.3</field>
+            <field name="besoin_min">20</field>
+            <field name="besoin_max">30</field>
+            <field name="etp_min">1</field>
+            <field name="etp_max">2</field>
+            <field name="irrigation">Non, généralement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_asperge_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_asperge"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">10</field>
+            <field name="mois_fin">11</field>
+        </record>
+        <record id="fenetre_asperge_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_asperge"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">12</field>
+            <field name="mois_fin">1</field>
+        </record>
+        <record id="culture_cerisier" model="cultiveau.culture">
+            <field name="name">Cerisier</field>
+            <field name="categorie">arbo</field>
+            <field name="couleur">#9d0208</field>
+            <field name="sequence">140</field>
+        </record>
+        <record id="stade_cerisier_1" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_cerisier"/>
+            <field name="departement">30</field>
+            <field name="name">Débourrement</field>
+            <field name="mois_debut">2</field>
+            <field name="mois_fin">3</field>
+            <field name="kc_min">0.4</field>
+            <field name="kc_max">0.6</field>
+            <field name="besoin_min">40</field>
+            <field name="besoin_max">60</field>
+            <field name="etp_min">2</field>
+            <field name="etp_max">3</field>
+            <field name="irrigation">Non, généralement</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="stade_cerisier_2" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_cerisier"/>
+            <field name="departement">30</field>
+            <field name="name">Floraison</field>
+            <field name="mois_debut">3</field>
+            <field name="mois_fin">4</field>
+            <field name="kc_min">0.7</field>
+            <field name="kc_max">0.9</field>
+            <field name="besoin_min">70</field>
+            <field name="besoin_max">90</field>
+            <field name="etp_min">3</field>
+            <field name="etp_max">4</field>
+            <field name="irrigation">Oui, si sol sec</field>
+            <field name="sequence">2</field>
+        </record>
+        <record id="stade_cerisier_3" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_cerisier"/>
+            <field name="departement">30</field>
+            <field name="name">Grossissement</field>
+            <field name="mois_debut">5</field>
+            <field name="mois_fin">6</field>
+            <field name="kc_min">1.0</field>
+            <field name="kc_max">1.2</field>
+            <field name="besoin_min">100</field>
+            <field name="besoin_max">120</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Oui, régulièrement</field>
+            <field name="sequence">3</field>
+        </record>
+        <record id="stade_cerisier_4" model="cultiveau.culture.stade">
+            <field name="culture_id" ref="culture_cerisier"/>
+            <field name="departement">30</field>
+            <field name="name">Récolte</field>
+            <field name="mois_debut">6</field>
+            <field name="mois_fin">7</field>
+            <field name="kc_min">0.8</field>
+            <field name="kc_max">1.0</field>
+            <field name="besoin_min">80</field>
+            <field name="besoin_max">100</field>
+            <field name="etp_min">5</field>
+            <field name="etp_max">6</field>
+            <field name="irrigation">Réduire progressivement</field>
+            <field name="sequence">4</field>
+        </record>
+        <record id="fenetre_cerisier_projet" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_cerisier"/>
+            <field name="departement">30</field>
+            <field name="genre">projet</field>
+            <field name="mois_debut">10</field>
+            <field name="mois_fin">11</field>
+        </record>
+        <record id="fenetre_cerisier_achat" model="cultiveau.culture.fenetre">
+            <field name="culture_id" ref="culture_cerisier"/>
+            <field name="departement">30</field>
+            <field name="genre">achat</field>
+            <field name="mois_debut">12</field>
+            <field name="mois_fin">1</field>
+        </record>
+    </data>
+</odoo>

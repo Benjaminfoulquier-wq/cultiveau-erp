@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Un devis d'irrigation par lots. Les lignes de section structurent le devis ; les notes rappellent ce que le référentiel attend. -->
+        <record id="modele_goutte" model="sale.order.template">
+            <field name="name">Projet goutte à goutte (par lots)</field>
+            <field name="cultiveau_type_systeme">goutte_surface</field>
+            <field name="number_of_days">30</field>
+            <field name="note">Devis établi d'après l'analyse des besoins validée avec l'exploitant et la note de dimensionnement (référentiel technique Cultiveau V4, § 3.2-3.3). Les abaques du fabricant priment pour les longueurs de rampe ; le degré de filtration est une donnée du goutteur.</field>
+            <field name="sale_order_template_line_ids" eval="[(5, 0, 0),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 1 — Station de pompage et énergie', 'sequence': 10}),
+                (0, 0, {'display_type': 'line_note', 'name': 'Pompe au point de fonctionnement (Q, HMT), protection marche à sec, pressostat, anti-bélier, armoire / variateur.', 'sequence': 11}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 2 — Filtration et protection sanitaire', 'sequence': 20}),
+                (0, 0, {'display_type': 'line_note', 'name': 'Filtration adaptée au goutteur et à l\'analyse d\'eau ; anti-retour / disconnexion (point d\'arrêt à la réception).', 'sequence': 21}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 3 — Réseau principal et secondaire', 'sequence': 30}),
+                (0, 0, {'display_type': 'line_note', 'name': 'Conduites PEHD / PVC (PN > pression maximale de service, transitoires compris), ventouses, vannes, butées, tranchées hors gel.', 'sequence': 31}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 4 — Secteurs : rampes, goutteurs, régulation', 'sequence': 40}),
+                (0, 0, {'display_type': 'line_note', 'name': 'Gaine ou tube PE (diamètre intérieur réel, pression admissible, plage d\'autorégulation), régulateurs de pression par secteur.', 'sequence': 41}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 5 — Automatisme, pilotage, fertigation', 'sequence': 50}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 6 — Pose, mise en service, réception et formation', 'sequence': 60}),
+                (0, 0, {'display_type': 'line_note', 'name': 'Rinçage, essais de pression, PV de mise en service (A1.3) avec pressions de référence, certificat (A1.4), fiche de réglage (A1.5), formation de l\'exploitant.', 'sequence': 61}),
+            ]"/>
+        </record>
+
+        <record id="modele_aspersion" model="sale.order.template">
+            <field name="name">Projet aspersion — couverture intégrale (par lots)</field>
+            <field name="cultiveau_type_systeme">couverture_integrale</field>
+            <field name="number_of_days">30</field>
+            <field name="note">Cohérence besoin ↔ dose ↔ débit ↔ tour d'eau vérifiée (§ 7.1) ; pluviométrie des asperseurs inférieure à l'infiltration du sol (§ 5.2).</field>
+            <field name="sale_order_template_line_ids" eval="[(5, 0, 0),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 1 — Station de pompage et énergie', 'sequence': 10}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 2 — Filtration et protection sanitaire', 'sequence': 20}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 3 — Réseau enterré, vannes, ventouses, butées', 'sequence': 30}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 4 — Postes d\'arrosage : conduites, asperseurs, buses de bord', 'sequence': 40}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 5 — Automatisme et pilotage', 'sequence': 50}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 6 — Pose, mise en service, réception et formation', 'sequence': 60}),
+                (0, 0, {'display_type': 'line_note', 'name': 'Essais de pression avant remblaiement, PV A1.3, uniformité mesurée au champ (CU / DU), certificat A1.4, fiche de réglage A1.5.', 'sequence': 61}),
+            ]"/>
+        </record>
+
+        <record id="modele_enrouleur" model="sale.order.template">
+            <field name="name">Enrouleur et alimentation (par lots)</field>
+            <field name="cultiveau_type_systeme">enrouleur</field>
+            <field name="number_of_days">30</field>
+            <field name="note">Débit recommandé selon le diamètre du tuyau PE (§ 7.3) ; pertes de charge du tuyau enroulé majorées de 15 à 25 %.</field>
+            <field name="sale_order_template_line_ids" eval="[(5, 0, 0),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 1 — Enrouleur, canon ou rampe', 'sequence': 10}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 2 — Pompage et énergie', 'sequence': 20}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 3 — Alimentation : conduites, bornes, raccords', 'sequence': 30}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 4 — Livraison, mise en service, formation', 'sequence': 40}),
+            ]"/>
+        </record>
+
+        <record id="modele_pivot" model="sale.order.template">
+            <field name="name">Pivot / rampe frontale (par lots)</field>
+            <field name="cultiveau_type_systeme">pivot</field>
+            <field name="number_of_days">45</field>
+            <field name="note">Pluviométrie instantanée de bout contre l'infiltration (§ 7.4) : tours plus rapides à dose réduite, jamais l'augmentation de dose.</field>
+            <field name="sale_order_template_line_ids" eval="[(5, 0, 0),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 1 — Pivot : travées, tours, porte-à-faux, organes d\'arrosage', 'sequence': 10}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 2 — Station de pompage et énergie', 'sequence': 20}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 3 — Alimentation et génie civil (massif central, tranchées)', 'sequence': 30}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 4 — Automatisme, pilotage à distance', 'sequence': 40}),
+                (0, 0, {'display_type': 'line_section', 'name': 'Lot 5 — Montage, mise en service, réception et formation', 'sequence': 50}),
+            ]"/>
+        </record>
+    </data>
+</odoo>

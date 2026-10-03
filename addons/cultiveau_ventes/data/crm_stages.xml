@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Les six phases du projet d'irrigation (référentiel § 3.1), comme étapes du pipeline. -->
+        <record id="stage_demande" model="crm.stage">
+            <field name="name">Demande</field>
+            <field name="sequence">10</field>
+        </record>
+        <record id="stage_analyse" model="crm.stage">
+            <field name="name">Analyse des besoins (A1.1)</field>
+            <field name="sequence">20</field>
+            <field name="requirements">Les huit données d'entrée restituées et validées avec l'exploitant, avant tout chiffrage.</field>
+        </record>
+        <record id="stage_etude" model="crm.stage">
+            <field name="name">Étude et dimensionnement (A1.2)</field>
+            <field name="sequence">30</field>
+            <field name="requirements">Note de dimensionnement en douze lignes ; cohérence besoin ↔ dose ↔ débit ↔ tour d'eau.</field>
+        </record>
+        <record id="stage_devis" model="crm.stage">
+            <field name="name">Devis envoyé</field>
+            <field name="sequence">40</field>
+        </record>
+        <record id="stage_commande" model="crm.stage">
+            <field name="name">Commande et réalisation</field>
+            <field name="sequence">50</field>
+        </record>
+        <record id="stage_mise_en_service" model="crm.stage">
+            <field name="name">Mise en service (A1.3) et réception</field>
+            <field name="sequence">60</field>
+            <field name="requirements">PV avec les pressions de référence ; protection sanitaire = point d'arrêt ; certificat A1.4 ; fiche de réglage A1.5.</field>
+        </record>
+        <record id="stage_suivi" model="crm.stage">
+            <field name="name">Suivi et maintenance</field>
+            <field name="sequence">70</field>
+            <field name="is_won">True</field>
+        </record>
+    </data>
+</odoo>

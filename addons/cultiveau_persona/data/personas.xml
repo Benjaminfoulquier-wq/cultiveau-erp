@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Les cinq personas agricoles de l'étude PRISM 2023 (BVA, Réussir, Agriconomie — 1 766 chefs d'exploitation),
+             tels que les Journées Cultiveau 2025 les ont retenus, et le besoin dominant de chacun sur la pyramide de Maslow de l'agriculteur. -->
+        <record id="persona_lion" model="cultiveau.persona">
+            <field name="code">lion</field>
+            <field name="name">Le Lion</field>
+            <field name="animal">🦁</field>
+            <field name="surnom">Le leader</field>
+            <field name="couleur">#b8860b</field>
+            <field name="resume">Innovant, il décide vite et aime être en avance. Il veut des résultats, pas des détails.</field>
+            <field name="maslow">4</field>
+            <field name="approche">Parler résultats et innovation. Être direct et efficace : une proposition claire, un planning tenu, un interlocuteur qui décide. Proposer ce qui le démarque (pilotage, précision, premium) et lui laisser le premier rôle. Éviter les détails techniques inutiles : le dossier existe (A1.2), on le remet, on ne le lit pas en réunion.</field>
+            <field name="canal">Rendez-vous court sur place ou au bureau ; e-mail de synthèse d'une page ; salons et journées du réseau.</field>
+            <field name="moment">La fenêtre « projet » de ses cultures ; il accepte d'en parler tôt. En hausse des cours, il investit.</field>
+            <field name="sequence">10</field>
+            <field name="profil">&lt;ul&gt;&lt;li&gt;Les plus grandes exploitations de l'étude : 188 ha en moyenne, plusieurs associés, des salariés, un chiffre d'affaires élevé ; 40-49 ans, les plus diplômés avec les Jaguars.&lt;/li&gt;&lt;li&gt;Grandes cultures d'abord, puis la vigne (25 % du groupe) ; diversifiés (vente directe, énergie).&lt;/li&gt;&lt;li&gt;Les plus optimistes : projets d'agrandissement, de modernisation (matériel, bâtiments, pilotage connecté), de sécurisation de la main-d'œuvre.&lt;/li&gt;&lt;li&gt;Seul groupe à préférer maximiser la productivité quitte à augmenter les charges ; 66 % prêts à payer plus cher pour la qualité.&lt;/li&gt;&lt;li&gt;Leaders : 60 % disent que leurs collègues leur demandent conseil ; 40 % estiment ne pas manquer de connaissances.&lt;/li&gt;&lt;li&gt;S'informent par la presse spécialisée et les salons ; travaillent avec plus de distributeurs que la moyenne.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="signes">&lt;ul&gt;&lt;li&gt;Parle de performance, de rendement, d'hectares en plus ; a déjà un projet en tête quand il appelle.&lt;/li&gt;&lt;li&gt;Décide vite, compare peu les fournisseurs mais les met en concurrence sur la capacité à livrer.&lt;/li&gt;&lt;li&gt;Connaît les nouveautés avant vous ; demande ce que vous avez de mieux, pas de moins cher.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="arguments">&lt;ul&gt;&lt;li&gt;La solution qui le met en avance : automatisme, pilotage, uniformité mesurée (§ 3.3).&lt;/li&gt;&lt;li&gt;Un projet dimensionné pour la croissance qu'il prévoit, pas pour l'exploitation d'aujourd'hui.&lt;/li&gt;&lt;li&gt;Réactivité et capacité : du stock, des équipes, une date.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="pieges">&lt;ul&gt;&lt;li&gt;Le noyer sous la technique ou le faire attendre.&lt;/li&gt;&lt;li&gt;Lui vendre « moins cher » : il entend « moins bien ».&lt;/li&gt;&lt;li&gt;Arriver sans proposition : il veut qu'on lui apporte quelque chose.&lt;/li&gt;&lt;/ul&gt;</field>
+        </record>
+        <record id="persona_jaguar" model="cultiveau.persona">
+            <field name="code">jaguar</field>
+            <field name="name">Le Jaguar</field>
+            <field name="animal">🐆</field>
+            <field name="surnom">L'opportuniste</field>
+            <field name="couleur">#2a7f8f</field>
+            <field name="resume">Il calcule le retour sur investissement et cherche le meilleur deal. Autonome, informé, il se fait sa propre opinion.</field>
+            <field name="maslow">5</field>
+            <field name="approche">Donner les chiffres avant qu'il les demande : eau et énergie économisées, coût sur dix ans (§ 3.9 durées de vie), échelonnement, options. Être transparent sur ce que l'on ne sait pas. Il achète un bon calcul et un fournisseur qui tient ses engagements ; la relation vient ensuite, par la preuve.</field>
+            <field name="canal">E-mail avec fiches techniques, comparatif et liens ; vidéos ; l'Académie. Téléphone pour conclure.</field>
+            <field name="moment">Il étudie tout l'hiver (fenêtre « projet ») et décide quand le calcul est bon, pas quand on le relance.</field>
+            <field name="sequence">20</field>
+            <field name="profil">&lt;ul&gt;&lt;li&gt;Plus jeunes (28 % ont moins de 39 ans) et plus diplômés que la moyenne ; 142 ha ; élevage bovin, porcs et volailles, arboriculture.&lt;/li&gt;&lt;li&gt;La recherche d'autonomie sous-tend leurs comportements : réduire les charges extérieures, aller vers l'agroécologie.&lt;/li&gt;&lt;li&gt;Les plus engagés (63 %) dans une démarche qualité ou environnementale : 31 % HVE, 26 % bio ; les plus diversifiés (vente directe, transformation, agroforesterie).&lt;/li&gt;&lt;li&gt;9 sur 10 ont suivi une formation dans les deux ans ; 81 % ont le sentiment d'avoir appris de nouvelles techniques.&lt;/li&gt;&lt;li&gt;Même pour un achat courant, ils cherchent le meilleur produit du marché, quitte à y passer du temps ; 71 % jugent Internet (tutos, vidéos) la source la plus inspirante.&lt;/li&gt;&lt;li&gt;Optimistes (39 % voient leur situation s'améliorer) ; premiers consommateurs de pièces et d'équipements sur le site de l'étude.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="signes">&lt;ul&gt;&lt;li&gt;Arrive avec des comparatifs, des captures d'écran, des prix vus ailleurs.&lt;/li&gt;&lt;li&gt;Demande le coût complet : énergie, entretien, durée de vie, valeur de revente.&lt;/li&gt;&lt;li&gt;Préfère un e-mail documenté à un rendez-vous ; répond quand il a tout lu.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="arguments">&lt;ul&gt;&lt;li&gt;Le retour sur investissement chiffré, pièce A1.2 à l'appui.&lt;/li&gt;&lt;li&gt;Le matériel ouvert et compatible : il ne veut pas dépendre d'un fournisseur.&lt;/li&gt;&lt;li&gt;L'irrigation à l'usage ou le financement étalé : payer ce qu'il consomme, garder sa trésorerie.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="pieges">&lt;ul&gt;&lt;li&gt;L'arrondi, l'à-peu-près, la promesse non chiffrée.&lt;/li&gt;&lt;li&gt;Le relancer sans rien de nouveau à lui apprendre.&lt;/li&gt;&lt;li&gt;Lui cacher une option moins chère : il la trouvera.&lt;/li&gt;&lt;/ul&gt;</field>
+        </record>
+        <record id="persona_chat" model="cultiveau.persona">
+            <field name="code">chat</field>
+            <field name="name">Le Chat</field>
+            <field name="animal">🐈</field>
+            <field name="surnom">Le routinier</field>
+            <field name="couleur">#8a5e3c</field>
+            <field name="resume">Prudent, méfiant, il préfère ce qu'il connaît et change peu. Il faut lui redonner envie d'avoir envie.</field>
+            <field name="maslow">1</field>
+            <field name="approche">Insister sur la fiabilité : du matériel connu, des marques qu'il a déjà, des voisins qui l'utilisent. Donner des preuves et des témoignages plutôt que des arguments. Être patient, ne pas forcer : proposer un essai, une garantie, un petit pas (une pièce d'usure, une fiche de réglage A1.5) avant un projet. Le premier objectif est qu'il paie ses factures sans mauvaise surprise : prix net, délai tenu.</field>
+            <field name="canal">Téléphone, court ; SMS pour confirmer ; une visite quand il y a une raison concrète. Pas de campagne de masse.</field>
+            <field name="moment">La fenêtre « achat » juste avant la saison, ou après une panne résolue ; jamais pendant le stress de la saison.</field>
+            <field name="sequence">30</field>
+            <field name="profil">&lt;ul&gt;&lt;li&gt;50-59 ans, 128 ha, exploitations individuelles sans salarié, chiffre d'affaires inférieur à la moyenne, peu diversifiées ; une majorité d'éleveurs (54 %), bovins viande, ovins, caprins.&lt;/li&gt;&lt;li&gt;Une situation économique vécue comme plus difficile et une vision pessimiste de l'avenir : les plus nombreux à ne pas avoir confiance.&lt;/li&gt;&lt;li&gt;Aucune démarche qualité ou environnementale ; les moins satisfaits de l'accompagnement proposé ; 39 % jugent les avis extérieurs secondaires.&lt;/li&gt;&lt;li&gt;Ne comptent que sur eux-mêmes : face à un problème, ils tâtonnent et se débrouillent, ou cherchent sur le web.&lt;/li&gt;&lt;li&gt;60 % ont le sentiment de n'avoir rien appris de nouveau en deux ans ; pas de formation suivie.&lt;/li&gt;&lt;li&gt;Pour les achats courants, ils reprennent ce qui a fait ses preuves ; les plus nombreux à s'inspirer des sites de vente en ligne et des forums.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="signes">&lt;ul&gt;&lt;li&gt;Appelle quand quelque chose est en panne ; demande « la même chose que la dernière fois ».&lt;/li&gt;&lt;li&gt;Se méfie des nouveautés et des commerciaux ; répond court.&lt;/li&gt;&lt;li&gt;Parle de ce que ça coûte, rarement de ce que ça rapporte.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="arguments">&lt;ul&gt;&lt;li&gt;Ça marche depuis dix ans chez votre voisin ; voici son numéro.&lt;/li&gt;&lt;li&gt;Un prix net, sans surprise, et une garantie écrite.&lt;/li&gt;&lt;li&gt;On passe avant la saison : pas de panne en juillet.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="pieges">&lt;ul&gt;&lt;li&gt;Pousser une nouveauté ou un projet « structurant » sans qu'il l'ait demandé.&lt;/li&gt;&lt;li&gt;Parler prix tout de suite quand les cours baissent : parler sécurité d'abord.&lt;/li&gt;&lt;li&gt;Changer d'interlocuteur ou de marque sans prévenir.&lt;/li&gt;&lt;/ul&gt;</field>
+        </record>
+        <record id="persona_tortue" model="cultiveau.persona">
+            <field name="code">tortue</field>
+            <field name="name">La Tortue</field>
+            <field name="animal">🐢</field>
+            <field name="surnom">Le fidèle</field>
+            <field name="couleur">#2f7d4f</field>
+            <field name="resume">Loyal, en relation longue, il s'appuie sur son technicien et attend d'être accompagné. La confiance est son critère.</field>
+            <field name="maslow">2</field>
+            <field name="approche">Soigner la continuité : même interlocuteur, visite régulière, mémoire de son installation (registre A1.8, parc dans l'ERP). Conseiller franchement, même quand ce n'est pas le plus cher, et expliquer chaque étape : il délègue, il ne doit jamais se sentir lâché. Réduire son incertitude : des délais annoncés et tenus, un devis détaillé, un appel de suivi après l'intervention.</field>
+            <field name="canal">La visite et le téléphone de son technicien ; une carte ou un message aux moments-clés de la saison. Il lit peu les e-mails.</field>
+            <field name="moment">Un passage avant la saison (fenêtre « achat ») et un bilan après (fin de campagne) : le rituel compte plus que la date.</field>
+            <field name="sequence">40</field>
+            <field name="profil">&lt;ul&gt;&lt;li&gt;Plus de 50 ans, 120 ha, exploitations plutôt individuelles, sans diversification ni démarche particulière ; grandes cultures majoritaires.&lt;/li&gt;&lt;li&gt;Faible confiance en l'avenir et forte attente d'accompagnement par les organismes agricoles et les fournisseurs.&lt;/li&gt;&lt;li&gt;Traditionnels et délégateurs : à l'opposé des Chats, ils s'appuient avant tout sur leur écosystème, en particulier les techniciens des distributeurs.&lt;/li&gt;&lt;li&gt;Se qualifient eux-mêmes de fidèles ; jugent importante la relation humaine avec le fournisseur et souhaitent un suivi régulier.&lt;/li&gt;&lt;li&gt;Choisissent leurs produits dans la liste proposée par le technicien ; 48 % jugent important l'avis des conseillers ; les moins nombreux à s'informer sur Internet.&lt;/li&gt;&lt;li&gt;73 % préfèrent réduire leurs charges quitte à perdre en productivité ; limiter les phytos est leur seule priorité distinctive.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="signes">&lt;ul&gt;&lt;li&gt;Client de longue date, ou venu par recommandation ; demande « ce que vous me conseillez ».&lt;/li&gt;&lt;li&gt;Préfère un interlocuteur attitré ; sensible à la visite, au geste, au mot de la saison.&lt;/li&gt;&lt;li&gt;N'achète pas sur catalogue : il attend qu'on lui dise quoi.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="arguments">&lt;ul&gt;&lt;li&gt;On connaît votre installation, on anticipe pour vous.&lt;/li&gt;&lt;li&gt;Un conseil avant une vente, et le même technicien d'une année sur l'autre.&lt;/li&gt;&lt;li&gt;La proximité : on vient, on dépanne, on forme votre salarié.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="pieges">&lt;ul&gt;&lt;li&gt;Changer d'interlocuteur sans prévenir ou le renvoyer vers un formulaire.&lt;/li&gt;&lt;li&gt;Le traiter comme un numéro dans une campagne de masse.&lt;/li&gt;&lt;li&gt;Lui demander de choisir seul entre trois options techniques.&lt;/li&gt;&lt;/ul&gt;</field>
+        </record>
+        <record id="persona_abeille" model="cultiveau.persona">
+            <field name="code">abeille</field>
+            <field name="name">L'Abeille</field>
+            <field name="animal">🐝</field>
+            <field name="surnom">Le collaboratif</field>
+            <field name="couleur">#e9a23b</field>
+            <field name="resume">Engagé, aux valeurs fortes, il partage et aime le collectif. Il apprend avec les autres et achète du sens autant qu'un produit.</field>
+            <field name="maslow">3</field>
+            <field name="approche">Parler sens et impact : l'eau et l'énergie économisées, la durabilité du matériel, la conformité (plan Eau, volumes autorisés). Montrer sa transparence : expliquer la démarche (A1.1 → A1.5), pas seulement le produit. L'associer : visite d'une installation voisine, retour d'expérience, formation de son équipe à l'Académie. Il est le meilleur ambassadeur du réseau.</field>
+            <field name="canal">Rencontres, journées du réseau, démonstrations ; e-mail documenté ; téléphone avec son interlocuteur habituel.</field>
+            <field name="moment">Fenêtre « projet » en hiver, et chaque occasion collective (journées, bilans de groupe). Il aime être consulté tôt.</field>
+            <field name="sequence">50</field>
+            <field name="profil">&lt;ul&gt;&lt;li&gt;50-59 ans, 172 ha, exploitations à associés avec des salariés, diversifiées ; grandes cultures (65 %) et cultures spécialisées (32 %), vigne 22 %.&lt;/li&gt;&lt;li&gt;80 % engagés dans au moins une démarche qualité ou environnementale : 47 % HVE, Global Gap, filières, Agriconfiance.&lt;/li&gt;&lt;li&gt;Ouverts aux conseils extérieurs, dans une relation partenariale plutôt que délégataire : ils aiment apprendre, toujours avec les autres.&lt;/li&gt;&lt;li&gt;87 % ont suivi une formation dans les deux ans ; les plus nombreux à adhérer à un groupe ou club de leur chambre d'agriculture et à lire la presse professionnelle ; salons et rencontres sont leurs sources inspirantes.&lt;/li&gt;&lt;li&gt;Attachés à la relation humaine avec les fournisseurs, ils apprécient un suivi régulier ; 47 % aiment acheter des produits à la pointe.&lt;/li&gt;&lt;li&gt;Plutôt optimistes ; priorités : limiter les phytos, fidéliser la main-d'œuvre, s'équiper de technologies adaptées. Le groupe qui contribue le plus au chiffre d'affaires du site de l'étude.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="signes">&lt;ul&gt;&lt;li&gt;Parle de son groupe, de sa cave, de son GIEE, de ce que font les autres.&lt;/li&gt;&lt;li&gt;Pose des questions sur la démarche, l'eau économisée, l'impact ; veut comprendre, pas seulement acheter.&lt;/li&gt;&lt;li&gt;Vient aux journées, aux démonstrations, aux formations ; recommande volontiers.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="arguments">&lt;ul&gt;&lt;li&gt;Ce que l'installation économise, mesuré et partagé (compteur, PV A1.3).&lt;/li&gt;&lt;li&gt;Une démarche expliquée de bout en bout, avec les preuves.&lt;/li&gt;&lt;li&gt;La communauté : les autres membres, les journées, les retours d'expérience.&lt;/li&gt;&lt;/ul&gt;</field>
+            <field name="pieges">&lt;ul&gt;&lt;li&gt;Vendre une « boîte » sans expliquer la démarche ni l'impact.&lt;/li&gt;&lt;li&gt;Oublier de le remercier ou de partager les résultats après la pose.&lt;/li&gt;&lt;li&gt;Le mettre en concurrence avec ses pairs plutôt qu'en coopération.&lt;/li&gt;&lt;/ul&gt;</field>
+        </record>
+    </data>
+</odoo>
