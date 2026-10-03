@@ -1,6 +1,7 @@
 # Joint aux documents de la bibliothèque les fichiers rapatriés du Drive (scripts/rapatrier_fiches.sh, montés dans
 # /mnt/fiches) et leur première page en image, qui illustre aussi les articles reliés sans photo.
 # À lancer dans un shell Odoo (voir scripts/donnees.sh fiches). Relançable : un document déjà joint est laissé.
+import gc
 import os
 
 dossier = os.environ.get("FICHES", "/mnt/fiches")
@@ -31,6 +32,10 @@ for n, fiche in enumerate(fiches, 1):
         nom += os.path.splitext(chemin)[1]
     illustres += fiche.cultiveau_joindre(contenu, nom[:255], vignette)
     joints += 1
+    # Le cache de l'ORM garderait sinon chaque fichier en mémoire : 2 000 PDF, et le processus serait tué.
+    contenu = vignette = None
+    env.invalidate_all()
+    gc.collect()
     # Une image nommée « logo » dans le dossier d'un fournisseur devient le logo de sa fiche partenaire.
     if not chemin.endswith(".pdf") and "logo" in nom.lower() and fiche.fournisseur_id and not fiche.fournisseur_id.image_1920:
         fiche.fournisseur_id.image_1920 = fiche.vignette
@@ -38,6 +43,8 @@ for n, fiche in enumerate(fiches, 1):
     if joints % 25 == 0:
         env.cr.commit()
         print(f"  {joints} documents joints…", flush=True)
+    elif joints % 5 == 0:
+        env.cr.commit()
 env.cr.commit()
 print(f"Fichiers joints : {joints} ({sans_vignette} sans vignette) ; articles illustrés par la première page de leur fiche : {illustres} ; logos de fournisseurs : {logos}.")
 print(f"Bibliothèque : {Fiche.search_count([('fichier', '!=', False)])} documents avec fichier sur {Fiche.search_count([])}.")

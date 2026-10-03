@@ -9,7 +9,13 @@ set -eu
 . ./.env 2>/dev/null || true
 BASE=${ODOO_DB:-cultiveau}
 QUOI=${1:-tout}
-shell() { docker compose run --rm -T odoo odoo shell -d "$BASE" --no-http < "$1" 2>&1 | grep -v "^$" | grep -v "^\s*File \|Traceback\|^\s*\^" ; }
+# Le journal passe par un fichier : un chargement interrompu (mémoire, erreur) fait échouer l'étape au lieu de passer inaperçu.
+shell() {
+  docker compose run --rm -T odoo odoo shell -d "$BASE" --no-http < "$1" > /tmp/erp-donnees.log 2>&1
+  code=$?
+  grep -v "^$" /tmp/erp-donnees.log | grep -v "^\s*File \|^\s*\^"
+  [ "$code" -eq 0 ] || { echo "Chargement interrompu ($1, code $code)." >&2; return "$code"; }
+}
 case "$QUOI" in
   demo) shell scripts/demo.py ;;
   catalogue) shell scripts/charger_catalogue.py ;;
