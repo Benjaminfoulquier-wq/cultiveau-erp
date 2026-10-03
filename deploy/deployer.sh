@@ -23,7 +23,7 @@ $SSH "$SERVEUR" "
     } > /srv/erp/.env
   fi
 "
-rsync -az --delete -e "$SSH" --exclude=.git --exclude=data --exclude=.env --exclude=__pycache__ ./ "$SERVEUR:/srv/erp/app/"
+rsync -az --delete -e "$SSH" --exclude=/.git --exclude=/data --exclude=/.env --exclude=__pycache__ ./ "$SERVEUR:/srv/erp/app/"
 $SSH "$SERVEUR" '
   set -e
   cd /srv/erp/app
