@@ -45,8 +45,14 @@ $SSH "$SERVEUR" '
   sleep 5
   etat=$(docker compose exec -T db psql -U odoo -d "$ODOO_DB" -tAc "select state from ir_module_module where name='"'"'base'"'"'" 2>/dev/null || true)
   if [ "$etat" = "installed" ]; then
-    docker compose exec -T odoo odoo -d "$ODOO_DB" -i cultiveau_marque -u cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque --stop-after-init 2>&1 | tail -3
-    docker compose restart odoo
+    # « run » passe par le point d entrée de l image, qui donne à Odoo l adresse de la base ; « exec » ne le ferait pas.
+    docker compose stop odoo >/dev/null 2>&1 || true
+    if docker compose run --rm odoo odoo -d "$ODOO_DB" -i cultiveau_marque -u cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque --stop-after-init > /tmp/erp-maj.log 2>&1; then
+      echo "Modules Cultiveau à jour."
+    else
+      tail -25 /tmp/erp-maj.log; docker compose up -d odoo; echo "ÉCHEC de la mise à jour des modules (journal ci-dessus)."; exit 1
+    fi
+    docker compose up -d odoo
   else
     echo "Base « $ODOO_DB » pas encore installée : lancer scripts/installer.sh (première installation)."
   fi

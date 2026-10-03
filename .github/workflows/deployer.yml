@@ -69,4 +69,4 @@ jobs:
           ADMIN_NOM: ${{ github.event.inputs.admin_nom }}
         run: |
           echo "::add-mask::$ADMIN_MDP"
-          ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" "cd /srv/erp/app && . /srv/erp/.env && ADMIN_EMAIL='$ADMIN_EMAIL' ADMIN_MDP='$ADMIN_MDP' ADMIN_NOM='$ADMIN_NOM' docker compose exec -T -e ADMIN_EMAIL -e ADMIN_MDP -e ADMIN_NOM odoo odoo shell -d \$ODOO_DB --no-http < scripts/admin.py" | grep -v "^$" | tail -3
+          ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" "cd /srv/erp/app && . /srv/erp/.env && docker compose run --rm -T -e ADMIN_EMAIL='$ADMIN_EMAIL' -e ADMIN_MDP='$ADMIN_MDP' -e ADMIN_NOM='$ADMIN_NOM' odoo odoo shell -d \$ODOO_DB --no-http < scripts/admin.py 2>&1 | grep -v '^$' | tail -3 | grep 'Compte administrateur'"

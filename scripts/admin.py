@@ -1,5 +1,5 @@
 # Crée (ou met à jour) un compte administrateur de l'ERP, depuis les variables ADMIN_EMAIL, ADMIN_MDP et ADMIN_NOM.
-#   ADMIN_EMAIL=... ADMIN_MDP=... docker compose exec -T -e ADMIN_EMAIL -e ADMIN_MDP -e ADMIN_NOM odoo odoo shell -d cultiveau --no-http < scripts/admin.py
+#   ADMIN_EMAIL=... ADMIN_MDP=... docker compose run --rm -T -e ADMIN_EMAIL -e ADMIN_MDP -e ADMIN_NOM odoo odoo shell -d cultiveau --no-http < scripts/admin.py
 import os
 
 email = (os.environ.get("ADMIN_EMAIL") or "").strip().lower()
