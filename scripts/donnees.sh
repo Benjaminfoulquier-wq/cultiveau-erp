@@ -3,7 +3,8 @@
 #   sh scripts/donnees.sh demo        # Jean Martin, ses cultures, son persona, son installation, un dépannage, un devis, des opportunités
 #   sh scripts/donnees.sh catalogue   # le catalogue 3D (24 000 articles, quelques minutes) ; relançable
 #   sh scripts/donnees.sh bibliotheque  # la bibliothèque technique (2 300 documents du Drive) et le lien article ↔ fiche
-#   sh scripts/donnees.sh tout        # les trois
+#   sh scripts/donnees.sh fiches      # rapatrie les PDF du Drive (3 Go, une heure) et les joint aux fiches, première page en image
+#   sh scripts/donnees.sh tout        # les quatre
 set -eu
 . ./.env 2>/dev/null || true
 BASE=${ODOO_DB:-cultiveau}
@@ -13,6 +14,7 @@ case "$QUOI" in
   demo) shell scripts/demo.py ;;
   catalogue) shell scripts/charger_catalogue.py ;;
   bibliotheque) shell scripts/charger_bibliotheque.py ;;
-  tout) shell scripts/charger_catalogue.py; shell scripts/charger_bibliotheque.py; shell scripts/demo.py ;;
-  *) echo "usage : sh scripts/donnees.sh demo|catalogue|bibliotheque|tout"; exit 1 ;;
+  fiches) sh scripts/rapatrier_fiches.sh; shell scripts/charger_fiches.py ;;
+  tout) shell scripts/charger_catalogue.py; shell scripts/charger_bibliotheque.py; sh scripts/rapatrier_fiches.sh; shell scripts/charger_fiches.py; shell scripts/demo.py ;;
+  *) echo "usage : sh scripts/donnees.sh demo|catalogue|bibliotheque|fiches|tout"; exit 1 ;;
 esac

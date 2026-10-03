@@ -26,10 +26,10 @@ on:
         type: string
         default: ""
       donnees:
-        description: "Charger des données : catalogue (24 000 articles), bibliotheque (fiches techniques), demo (un agriculteur complet), tout"
+        description: "Charger des données : catalogue (24 000 articles), bibliotheque (inventaire des fiches), fiches (les PDF du Drive, une heure), demo (un agriculteur complet), tout"
         type: choice
         default: aucune
-        options: [aucune, catalogue, bibliotheque, demo, tout]
+        options: [aucune, catalogue, bibliotheque, fiches, demo, tout]
 
 concurrency: deploiement-erp
 
@@ -64,7 +64,7 @@ jobs:
         run: sh deploy/deployer.sh domaine
       - name: Données (catalogue, démonstration)
         if: ${{ github.event.inputs.donnees != '' && github.event.inputs.donnees != 'aucune' }}
-        run: ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" 'cd /srv/erp/app && sh scripts/donnees.sh ${{ github.event.inputs.donnees }}'
+        run: ssh -i "$CLE" -o IdentitiesOnly=yes -o ServerAliveInterval=60 "$SERVEUR" 'cd /srv/erp/app && sh scripts/donnees.sh ${{ github.event.inputs.donnees }}'
       # Le mot de passe ne passe jamais par un paramètre (GitHub les affiche dans le journal) : il vient du secret
       # CULTIVEAU_ADMIN_MDP, que GitHub masque partout. À changer dans l'ERP après la première connexion.
       - name: Compte administrateur

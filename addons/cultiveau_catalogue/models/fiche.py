@@ -5,6 +5,7 @@ L'inventaire vient du Drive du réseau (donnees/bibliotheque.csv) ; chaque docum
 fichier a pu être rapatrié (scripts/charger_fiches.py), il est joint au document et sa première page sert d'image,
 à l'article aussi s'il n'en a pas.
 """
+import base64
 import csv
 import io
 
@@ -56,6 +57,21 @@ class Fiche(models.Model):
         if self.fichier:
             return {"type": "ir.actions.act_url", "url": f"/web/content/cultiveau.fiche/{self.id}/fichier/{self.fichier_nom or 'document.pdf'}?download=false", "target": "new"}
         return {"type": "ir.actions.act_url", "url": self.url, "target": "new"}
+
+    def cultiveau_joindre(self, contenu, nom, vignette=None, propager=True):
+        """Joint le fichier rapatrié (octets) au document, avec sa première page en image ; l'image devient aussi
+        celle des articles reliés qui n'en ont pas. Renvoie le nombre d'articles illustrés."""
+        self.ensure_one()
+        vals = {"fichier": base64.b64encode(contenu), "fichier_nom": nom}
+        if vignette:
+            vals["vignette"] = base64.b64encode(vignette)
+        self.write(vals)
+        if not (propager and vignette):
+            return 0
+        produits = self.with_context(active_test=False).produit_ids.filtered(lambda p: not p.image_1920)
+        if produits:
+            produits.write({"image_1920": vals["vignette"]})
+        return len(produits)
 
     def action_produits(self):
         self.ensure_one()

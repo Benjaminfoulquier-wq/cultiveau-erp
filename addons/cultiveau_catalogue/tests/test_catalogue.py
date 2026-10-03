@@ -113,3 +113,10 @@ class TestCatalogue(TransactionCase):
         self.assertEqual(p2.cultiveau_fiche_id.name, "Nouvelle fiche")
         self.assertEqual(p2.cultiveau_fiche_id.url, "https://drive.google.com/file/d/XYZ789/view")
         self.assertEqual(fiche.action_ouvrir()["url"], fiche.url)
+        # Le fichier rapatrié est joint ; sa première page illustre la fiche et les articles sans image.
+        png = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")
+        self.assertEqual(fiche.cultiveau_joindre(b"%PDF-1.4 essai", "Big Gun 100.pdf", png), 1)
+        self.assertEqual((base64.b64decode(fiche.fichier), fiche.fichier_nom), (b"%PDF-1.4 essai", "Big Gun 100.pdf"))
+        self.assertTrue(fiche.vignette and p1.image_1920 and p1.cultiveau_fiche_vignette)
+        self.assertIn("/web/content/cultiveau.fiche/", fiche.action_ouvrir()["url"])
+        self.assertEqual(fiche.cultiveau_joindre(b"%PDF-1.4 bis", "Big Gun 100.pdf", png), 0, "les articles déjà illustrés sont laissés")

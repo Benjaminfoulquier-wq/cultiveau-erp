@@ -28,6 +28,7 @@ services:
       - ./odoo.conf:/etc/odoo/odoo.conf:ro
       - ./data/odoo:/var/lib/odoo
       - ./donnees:/mnt/donnees:ro
+      - ./data/fiches:/mnt/fiches:ro
     networks: [erp, web]
 
 networks:
