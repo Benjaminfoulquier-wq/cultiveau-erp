@@ -2,7 +2,8 @@
 # Charge des données dans la base de production, depuis /srv/erp/app (ou la racine du projet) :
 #   sh scripts/donnees.sh demo        # Jean Martin, ses cultures, son persona, son installation, un dépannage, un devis, des opportunités
 #   sh scripts/donnees.sh catalogue   # le catalogue 3D (24 000 articles, quelques minutes) ; relançable
-#   sh scripts/donnees.sh tout        # les deux
+#   sh scripts/donnees.sh bibliotheque  # la bibliothèque technique (2 300 documents du Drive) et le lien article ↔ fiche
+#   sh scripts/donnees.sh tout        # les trois
 set -eu
 . ./.env 2>/dev/null || true
 BASE=${ODOO_DB:-cultiveau}
@@ -11,6 +12,7 @@ shell() { docker compose run --rm -T odoo odoo shell -d "$BASE" --no-http < "$1"
 case "$QUOI" in
   demo) shell scripts/demo.py ;;
   catalogue) shell scripts/charger_catalogue.py ;;
-  tout) shell scripts/charger_catalogue.py; shell scripts/demo.py ;;
-  *) echo "usage : sh scripts/donnees.sh demo|catalogue|tout"; exit 1 ;;
+  bibliotheque) shell scripts/charger_bibliotheque.py ;;
+  tout) shell scripts/charger_catalogue.py; shell scripts/charger_bibliotheque.py; shell scripts/demo.py ;;
+  *) echo "usage : sh scripts/donnees.sh demo|catalogue|bibliotheque|tout"; exit 1 ;;
 esac

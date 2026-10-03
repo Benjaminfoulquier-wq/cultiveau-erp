@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_fiche_list" model="ir.ui.view">
+        <field name="name">cultiveau.fiche.list</field>
+        <field name="model">cultiveau.fiche</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="type_doc"/>
+                <field name="fournisseur_nom"/>
+                <field name="fournisseur_id" optional="hide"/>
+                <field name="famille"/>
+                <field name="sous_famille" optional="show"/>
+                <field name="nb_produits"/>
+                <field name="fichier_nom" optional="hide"/>
+                <button name="action_ouvrir" type="object" string="Ouvrir" icon="fa-file-pdf-o" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_fiche_kanban" model="ir.ui.view">
+        <field name="name">cultiveau.fiche.kanban</field>
+        <field name="model">cultiveau.fiche</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex">
+                            <field name="vignette" widget="image" class="o_kanban_image me-2" options="{'size': [80, 100]}"/>
+                            <div class="flex-grow-1">
+                                <strong><field name="name"/></strong>
+                                <div class="text-muted small"><field name="fournisseur_nom"/> · <field name="type_doc"/></div>
+                                <div class="small"><field name="famille"/><t t-if="record.sous_famille.raw_value"> › <field name="sous_famille"/></t></div>
+                                <div class="small mt-1"><field name="nb_produits"/> article(s)</div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_fiche_form" model="ir.ui.view">
+        <field name="name">cultiveau.fiche.form</field>
+        <field name="model">cultiveau.fiche</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_ouvrir" type="object" string="Ouvrir le document" class="btn-primary" icon="fa-file-pdf-o"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_produits" type="object" class="oe_stat_button" icon="fa-cubes">
+                            <field name="nb_produits" widget="statinfo" string="Articles"/>
+                        </button>
+                    </div>
+                    <field name="vignette" widget="image" class="oe_avatar" options="{'size': [120, 160]}"/>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="type_doc"/>
+                            <field name="fournisseur_id"/>
+                            <field name="fournisseur_nom"/>
+                            <field name="famille"/>
+                            <field name="sous_famille"/>
+                        </group>
+                        <group>
+                            <field name="url" widget="url"/>
+                            <field name="fichier" filename="fichier_nom"/>
+                            <field name="fichier_nom" invisible="1"/>
+                            <field name="mime"/>
+                            <field name="taille"/>
+                            <field name="notes"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Articles reliés" name="produits">
+                            <field name="produit_ids" readonly="1">
+                                <list><field name="default_code"/><field name="name"/><field name="cultiveau_dn"/><field name="cultiveau_pn"/><field name="cultiveau_matiere"/></list>
+                            </field>
+                        </page>
+                        <page string="Origine" name="origine">
+                            <group><field name="source"/><field name="chemin"/><field name="drive_id"/><field name="active"/></group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_fiche_search" model="ir.ui.view">
+        <field name="name">cultiveau.fiche.search</field>
+        <field name="model">cultiveau.fiche</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="fournisseur_nom"/>
+                <field name="famille"/>
+                <field name="sous_famille"/>
+                <filter name="fiches" string="Fiches techniques" domain="[('type_doc', '=', 'fiche')]"/>
+                <filter name="brochures" string="Brochures et catalogues" domain="[('type_doc', 'in', ('brochure', 'catalogue'))]"/>
+                <filter name="notices" string="Notices et pièces" domain="[('type_doc', 'in', ('notice', 'pieces'))]"/>
+                <separator/>
+                <filter name="avec_articles" string="Reliées à des articles" domain="[('produit_ids', '!=', False)]"/>
+                <filter name="avec_fichier" string="Fichier dans l'ERP" domain="[('fichier', '!=', False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="group_fournisseur" string="Fournisseur" context="{'group_by': 'fournisseur_nom'}"/>
+                    <filter name="group_famille" string="Famille" context="{'group_by': 'famille'}"/>
+                    <filter name="group_type" string="Type" context="{'group_by': 'type_doc'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_fiches" model="ir.actions.act_window">
+        <field name="name">Bibliothèque technique</field>
+        <field name="res_model">cultiveau.fiche</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_group_fournisseur': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Les fiches techniques du réseau</p>
+            <p>Fiches, brochures, notices et listes de pièces des fournisseurs, classées par fournisseur et par famille, reliées aux articles du catalogue. Chargées depuis l'inventaire du Drive (scripts/donnees.sh bibliotheque).</p>
+        </field>
+    </record>
+</odoo>

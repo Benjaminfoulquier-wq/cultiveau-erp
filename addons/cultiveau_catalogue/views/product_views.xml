@@ -19,12 +19,14 @@
                             <field name="cultiveau_matiere"/>
                             <field name="cultiveau_raccordement"/>
                             <field name="cultiveau_conditionnement"/>
+                            <field name="cultiveau_fiche_id"/>
                             <field name="cultiveau_fiche_url" widget="url"/>
                             <field name="cultiveau_fiche_notes"/>
                             <field name="cultiveau_source"/>
                         </group>
                     </group>
                     <field name="cultiveau_caracteristiques_html" nolabel="1" readonly="1"/>
+                    <field name="cultiveau_fiche_vignette" widget="image" invisible="not cultiveau_fiche_vignette" options="{'size': [300, 400]}"/>
                 </page>
             </xpath>
         </field>
@@ -59,7 +61,7 @@
                 <separator/>
                 <filter name="cultiveau_3d" string="Catalogue 3D" domain="[('cultiveau_source', '=', 'catalogue3d')]"/>
                 <filter name="cultiveau_matrice" string="Référencement (matrice)" domain="[('cultiveau_source', '=', 'matrice')]"/>
-                <filter name="cultiveau_fiche" string="Avec fiche technique" domain="[('cultiveau_fiche_url', '!=', False)]"/>
+                <filter name="cultiveau_fiche" string="Avec fiche technique" domain="['|', ('cultiveau_fiche_id', '!=', False), ('cultiveau_fiche_url', '!=', False)]"/>
             </filter>
             <xpath expr="//group" position="inside">
                 <filter name="group_matiere" string="Matière" context="{'group_by': 'cultiveau_matiere'}"/>

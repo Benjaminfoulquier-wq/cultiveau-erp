@@ -20,7 +20,7 @@ Description, Prix HT, Unité, Conditionnement, Poids, URL image) ;
 sous-familles, matières, cotes et fiches techniques), par le menu ou par le script
 ``scripts/importer_catalogue_3d.py``.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.2.0.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
@@ -28,6 +28,7 @@ sous-familles, matières, cotes et fiches techniques), par le menu ou par le scr
     "external_dependencies": {"python": ["openpyxl"]},
     "data": [
         "security/ir.model.access.csv",
+        "views/fiche_views.xml",
         "views/product_views.xml",
         "wizard/import_views.xml",
         "views/menus.xml",

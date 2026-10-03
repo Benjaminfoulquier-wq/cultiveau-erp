@@ -47,8 +47,10 @@ class ProductTemplate(models.Model):
     cultiveau_matiere = fields.Char("Matière", index=True, help="inox 304, laiton, PE, PVC, acier galvanisé…")
     cultiveau_raccordement = fields.Char("Raccordement", index=True, help="bout à bout, fileté, à brides, rainuré, compression, électrosoudable…")
     cultiveau_conditionnement = fields.Char("Conditionnement", help="Ex. « Rouleau 500 m », « Carton de 100 ».")
+    cultiveau_fiche_id = fields.Many2one("cultiveau.fiche", "Fiche technique", index=True, ondelete="set null")
     cultiveau_fiche_url = fields.Char("Fiche technique (lien)")
     cultiveau_fiche_notes = fields.Char("Fiche technique (résumé)")
+    cultiveau_fiche_vignette = fields.Image(related="cultiveau_fiche_id.vignette", string="Première page de la fiche")
     cultiveau_caracteristiques = fields.Json("Caractéristiques (données)")
     cultiveau_caracteristiques_html = fields.Html("Caractéristiques", compute="_compute_caracteristiques_html", sanitize=False)
     cultiveau_source = fields.Selection([("matrice", "Matrice d'import"), ("catalogue3d", "Catalogue 3D"), ("saisie", "Saisie")],
@@ -204,7 +206,8 @@ class ProductTemplate(models.Model):
         def idx(liste, i):
             return liste[i] if isinstance(i, int) and 0 <= i < len(liste) else None
 
-        cache_f, cache_c = {}, {}
+        cache_f, cache_c, cache_fiches = {}, {}, {}
+        Fiche = self.env["cultiveau.fiche"]
         fournisseurs = {nom: self._cultiveau_fournisseur(nom, cache_f) for nom in dicts["four"]}
         familles = {i: self._cultiveau_categorie(nom, cache=cache_c) for i, nom in enumerate(dicts["fam"])}
         autre = self._cultiveau_categorie("Autre", cache=cache_c)
@@ -227,6 +230,7 @@ class ProductTemplate(models.Model):
                     carac[cle] = val
             fiche_id = idx(dicts["fiche"], p.get("k"))
             fiche = (fiches or {}).get(fiche_id) if fiche_id else None
+            doc = Fiche.cultiveau_trouver_ou_creer(fiche_id, (fiche or {}).get("t"), (fiche or {}).get("n"), cache_fiches) if fiche_id else Fiche
             valeurs = {
                 "name": p["designation"][:255], "default_code": reference, "type": "consu", "is_storable": True,
                 "categ_id": categorie.id, "weight": float(p["poids"]) if p.get("poids") not in (None, "") else 0.0,
@@ -236,6 +240,7 @@ class ProductTemplate(models.Model):
                 "cultiveau_d_ext": float(p["d_ext"]) if p.get("d_ext") not in (None, "") else 0.0,
                 "cultiveau_epaisseur": float(p["ep"]) if p.get("ep") not in (None, "") else 0.0,
                 "cultiveau_matiere": matiere or False, "cultiveau_raccordement": raccordement or False,
+                "cultiveau_fiche_id": doc.id if doc else False,
                 "cultiveau_fiche_url": f"https://drive.google.com/file/d/{fiche_id}/view" if fiche_id else False,
                 "cultiveau_fiche_notes": ((fiche or {}).get("n") or "")[:255] or False,
                 "cultiveau_caracteristiques": carac, "cultiveau_source": "catalogue3d",

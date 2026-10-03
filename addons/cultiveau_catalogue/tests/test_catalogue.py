@@ -87,3 +87,29 @@ class TestCatalogue(TransactionCase):
         self.assertEqual((bilan["crees"], bilan["maj"]), (0, 1))
         # La recherche par cotes, telle que le menu Catalogue la propose.
         self.assertIn(coude, self.env["product.template"].search([("cultiveau_dn", "=", 15), ("cultiveau_matiere", "ilike", "inox")]))
+
+    def test_bibliotheque_et_lien_fiche(self):
+        Fiche = self.env["cultiveau.fiche"]
+        inventaire = ("source;fournisseur;famille;sous_famille;type_doc;titre;chemin;mime;taille_octets;id;viewUrl\n"
+                      "fiches_techniques;Nelson_Irrigation_Fiches_techniques;Aspersion;Canons;Fiche technique;Big Gun 100;FICHES/NELSON;application/pdf;1234;ABC123;https://drive.google.com/file/d/ABC123/view\n"
+                      "adherents;(racine);Hors bibliothèque;;Brochure;Plaquette;FOURNISSEURS;application/pdf;10;DEF456;https://drive.google.com/file/d/DEF456/view\n")
+        bilan = Fiche.cultiveau_importer_inventaire(inventaire)
+        self.assertEqual((bilan["crees"], bilan["maj"]), (2, 0))
+        bilan = Fiche.cultiveau_importer_inventaire(inventaire)
+        self.assertEqual((bilan["crees"], bilan["maj"]), (0, 2), "relançable sans doublon")
+        fiche = Fiche.search([("drive_id", "=", "ABC123")])
+        self.assertEqual((fiche.type_doc, fiche.famille, fiche.fournisseur_nom), ("fiche", "Aspersion", "Nelson_Irrigation_Fiches_techniques"))
+        self.assertEqual(Fiche.search([("drive_id", "=", "DEF456")]).type_doc, "brochure")
+        # Le catalogue 3D relie l'article à sa fiche, créée a minima si l'inventaire ne la connaît pas encore.
+        dicts = {"four": ["Nelson"], "fam": ["Aspersion"], "sub": ["Canons"], "rac": ["fileté"], "mat": ["laiton"], "fiche": ["ABC123", "XYZ789"], "xk": []}
+        fiches = {"ABC123": {"t": "Big Gun 100", "n": "canon"}, "XYZ789": {"t": "Nouvelle fiche", "n": "inconnue"}}
+        produits = [{"id": "n1", "F": 0, "f": 0, "S": 0, "t": 0, "m": 0, "k": 0, "ref": "BG100", "designation": "Big Gun 100", "poids": 5},
+                    {"id": "n2", "F": 0, "f": 0, "S": 0, "t": 0, "m": 0, "k": 1, "ref": "BG150", "designation": "Big Gun 150", "poids": 7}]
+        self.env["product.template"].cultiveau_importer_3d(dicts, fiches, produits)
+        p1 = self.env["product.template"].search([("default_code", "=", "BG100")])
+        self.assertEqual(p1.cultiveau_fiche_id, fiche)
+        self.assertEqual(fiche.nb_produits, 1)
+        p2 = self.env["product.template"].search([("default_code", "=", "BG150")])
+        self.assertEqual(p2.cultiveau_fiche_id.name, "Nouvelle fiche")
+        self.assertEqual(p2.cultiveau_fiche_id.url, "https://drive.google.com/file/d/XYZ789/view")
+        self.assertEqual(fiche.action_ouvrir()["url"], fiche.url)

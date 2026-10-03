@@ -26,10 +26,10 @@ on:
         type: string
         default: ""
       donnees:
-        description: "Charger des données : catalogue (24 000 articles), demo (un agriculteur complet), tout"
+        description: "Charger des données : catalogue (24 000 articles), bibliotheque (fiches techniques), demo (un agriculteur complet), tout"
         type: choice
         default: aucune
-        options: [aucune, catalogue, demo, tout]
+        options: [aucune, catalogue, bibliotheque, demo, tout]
 
 concurrency: deploiement-erp
 
