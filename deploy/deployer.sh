@@ -45,7 +45,7 @@ $SSH "$SERVEUR" '
   sleep 5
   etat=$(docker compose exec -T db psql -U odoo -d "$ODOO_DB" -tAc "select state from ir_module_module where name='"'"'base'"'"'" 2>/dev/null || true)
   if [ "$etat" = "installed" ]; then
-    docker compose exec -T odoo odoo -d "$ODOO_DB" -u cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs --stop-after-init 2>&1 | tail -3
+    docker compose exec -T odoo odoo -d "$ODOO_DB" -i cultiveau_marque -u cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque --stop-after-init 2>&1 | tail -3
     docker compose restart odoo
   else
     echo "Base « $ODOO_DB » pas encore installée : lancer scripts/installer.sh (première installation)."

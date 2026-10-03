@@ -17,6 +17,18 @@ on:
         type: choice
         default: mise-a-jour
         options: [mise-a-jour, premiere-installation]
+      admin_email:
+        description: "Créer ou mettre à jour un compte administrateur : son e-mail (facultatif)"
+        type: string
+        default: ""
+      admin_mdp:
+        description: "… et son mot de passe (facultatif, masqué dans le journal)"
+        type: string
+        default: ""
+      admin_nom:
+        description: "… et son nom affiché (facultatif)"
+        type: string
+        default: ""
 
 concurrency: deploiement-erp
 
@@ -49,3 +61,12 @@ jobs:
         run: ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" 'cd /srv/erp/app && sh scripts/installer.sh'
       - name: Site erp.cultiveau.fr (Caddy)
         run: sh deploy/deployer.sh domaine
+      - name: Compte administrateur
+        if: ${{ github.event.inputs.admin_email != '' && github.event.inputs.admin_mdp != '' }}
+        env:
+          ADMIN_EMAIL: ${{ github.event.inputs.admin_email }}
+          ADMIN_MDP: ${{ github.event.inputs.admin_mdp }}
+          ADMIN_NOM: ${{ github.event.inputs.admin_nom }}
+        run: |
+          echo "::add-mask::$ADMIN_MDP"
+          ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" "cd /srv/erp/app && . /srv/erp/.env && ADMIN_EMAIL='$ADMIN_EMAIL' ADMIN_MDP='$ADMIN_MDP' ADMIN_NOM='$ADMIN_NOM' docker compose exec -T -e ADMIN_EMAIL -e ADMIN_MDP -e ADMIN_NOM odoo odoo shell -d \$ODOO_DB --no-http < scripts/admin.py" | grep -v "^$" | tail -3

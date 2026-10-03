@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Titre de l'onglet et favicon. -->
+    <template id="layout_cultiveau" inherit_id="web.layout" name="Cultiveau : titre et favicon">
+        <xpath expr="//title" position="replace">
+            <title t-esc="title or 'Cultiveau'"/>
+        </xpath>
+        <xpath expr="//link[@rel='shortcut icon']" position="replace">
+            <link type="image/png" rel="shortcut icon" href="/cultiveau_marque/static/src/img/favicon.png"/>
+        </xpath>
+    </template>
+
+    <!-- Page de connexion : le logo Cultiveau, un pied de page Cultiveau. -->
+    <template id="login_layout_cultiveau" inherit_id="web.login_layout" name="Cultiveau : page de connexion">
+        <xpath expr="//div[@t-if='not disable_footer']" position="replace">
+            <div class="text-center small mt-4 pt-3 border-top">
+                <a href="https://cultiveau.fr" target="_blank" class="text-decoration-none">Cultiveau — l'alliance des indépendants de l'irrigation</a>
+            </div>
+        </xpath>
+        <xpath expr="//div[contains(@t-attf-class, 'o_database_list')]" position="attributes">
+            <attribute name="style">max-width: 340px;</attribute>
+        </xpath>
+    </template>
+
+    <!-- Le titre de la page de connexion. -->
+    <template id="login_cultiveau" inherit_id="web.login" name="Cultiveau : titre de la connexion">
+        <xpath expr="//t[@t-call='web.login_layout']" position="inside">
+            <t t-set="title">Cultiveau — connexion</t>
+        </xpath>
+    </template>
+
+    <!-- Plus de promotion de l'éditeur dans les pages publiques et le portail. -->
+    <template id="brand_promotion_cultiveau" inherit_id="web.brand_promotion" name="Cultiveau : pas de promotion de l'éditeur">
+        <xpath expr="//div[hasclass('o_brand_promotion')]" position="replace">
+            <div class="o_brand_promotion"><a href="https://cultiveau.fr" target="_blank">Cultiveau</a></div>
+        </xpath>
+    </template>
+</odoo>

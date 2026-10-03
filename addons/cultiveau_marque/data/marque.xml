@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Pas d'inscription publique : les comptes sont créés par l'équipe. La réinitialisation du mot de passe reste possible. -->
+        <function model="ir.config_parameter" name="set_param" eval="['auth_signup.invitation_scope', 'b2b']"/>
+        <function model="ir.config_parameter" name="set_param" eval="['auth_signup.reset_password', 'True']"/>
+    </data>
+    <data noupdate="1">
+        <!-- Le logo de la société principale : Cultiveau. -->
+        <record id="base.main_company" model="res.company">
+            <field name="name">Cultiveau</field>
+            <field name="logo" type="base64" file="cultiveau_marque/static/src/img/logo.png"/>
+        </record>
+    </data>
+</odoo>

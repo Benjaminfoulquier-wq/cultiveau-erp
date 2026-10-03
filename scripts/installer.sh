@@ -7,7 +7,7 @@ set -eu
 . ./.env 2>/dev/null || true
 BASE=${ODOO_DB:-cultiveau}
 NATIFS=contacts,sale_management,account,l10n_fr,crm,stock,purchase,project,mass_mailing,calendar
-CULTIVEAU=cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs
+CULTIVEAU=cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque
 
 docker compose up -d db
 sleep 5
