@@ -9,7 +9,7 @@ if not os.path.isdir(dossier):
 Fiche = env["cultiveau.fiche"]
 fiches = Fiche.with_context(active_test=False).search([("drive_id", "!=", False), ("fichier", "=", False)])
 print(f"Documents sans fichier joint : {len(fiches)} ; fichiers rapatriés : {len([f for f in os.listdir(dossier) if not f.endswith('.png') and not f.startswith('.')]) if os.path.isdir(dossier) else 0}.", flush=True)
-joints = illustres = sans_vignette = 0
+joints = illustres = sans_vignette = logos = 0
 for n, fiche in enumerate(fiches, 1):
     chemin = next((os.path.join(dossier, fiche.drive_id + ext) for ext in (".pdf", ".jpg", ".png") if os.path.isfile(os.path.join(dossier, fiche.drive_id + ext))), None)
     if not chemin:
@@ -31,9 +31,13 @@ for n, fiche in enumerate(fiches, 1):
         nom += os.path.splitext(chemin)[1]
     illustres += fiche.cultiveau_joindre(contenu, nom[:255], vignette)
     joints += 1
+    # Une image nommée « logo » dans le dossier d'un fournisseur devient le logo de sa fiche partenaire.
+    if not chemin.endswith(".pdf") and "logo" in nom.lower() and fiche.fournisseur_id and not fiche.fournisseur_id.image_1920:
+        fiche.fournisseur_id.image_1920 = fiche.vignette
+        logos += 1
     if joints % 25 == 0:
         env.cr.commit()
         print(f"  {joints} documents joints…", flush=True)
 env.cr.commit()
-print(f"Fichiers joints : {joints} ({sans_vignette} sans vignette) ; articles illustrés par la première page de leur fiche : {illustres}.")
+print(f"Fichiers joints : {joints} ({sans_vignette} sans vignette) ; articles illustrés par la première page de leur fiche : {illustres} ; logos de fournisseurs : {logos}.")
 print(f"Bibliothèque : {Fiche.search_count([('fichier', '!=', False)])} documents avec fichier sur {Fiche.search_count([])}.")
