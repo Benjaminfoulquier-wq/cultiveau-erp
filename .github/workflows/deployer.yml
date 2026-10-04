@@ -54,7 +54,8 @@ jobs:
             exit 1
           fi
           echo "Clé lue : $lignes lignes, empreinte $(ssh-keygen -l -f "$CLE" | cut -d' ' -f1-2)"
-          ssh-keyscan -H 82.25.116.36 >> ~/.ssh/known_hosts 2>/dev/null
+          for essai in 1 2 3 4; do ssh-keyscan -T 15 -H 82.25.116.36 >> ~/.ssh/known_hosts 2>/dev/null && break; echo "Empreinte du serveur : nouvel essai ($essai)"; sleep $((essai * 5)); done
+          grep -q . ~/.ssh/known_hosts || { echo "::error::Le serveur 82.25.116.36 ne répond pas (empreinte SSH illisible après 4 essais)."; exit 1; }
       - name: Code et conteneurs sur le serveur
         run: sh deploy/deployer.sh
       - name: Première installation (base, modules, réglages)
