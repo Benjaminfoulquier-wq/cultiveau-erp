@@ -64,4 +64,6 @@ def normaliser_telephone(numero):
         chiffres = chiffres[2:]
     elif chiffres.startswith("0") and len(chiffres) == 10:
         chiffres = "33" + chiffres[1:]
+    elif len(chiffres) == 9 and chiffres[0] in "123456789":  # un tableur a mangé le 0 initial
+        chiffres = "33" + chiffres
     return chiffres

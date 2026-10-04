@@ -2,6 +2,7 @@
 <odoo>
     <menuitem id="menu_cultiveau_root" name="Cultiveau" sequence="5" web_icon="cultiveau_base,static/description/icon.png"/>
     <menuitem id="menu_cultiveau_agriculteurs" name="Agriculteurs" parent="menu_cultiveau_root" action="action_agriculteurs" sequence="10"/>
+    <menuitem id="menu_cultiveau_import_clients" name="Importer mes clients" parent="menu_cultiveau_root" action="action_import_clients" sequence="12"/>
     <menuitem id="menu_cultiveau_outils" name="Outils du réseau" parent="menu_cultiveau_root" sequence="80"/>
     <menuitem id="menu_cultiveau_reglages" name="Réglages" parent="menu_cultiveau_root" sequence="100" groups="cultiveau_base.group_equipe"/>
     <menuitem id="menu_cultiveau_config" name="Réglages Cultiveau" parent="menu_cultiveau_reglages" action="action_cultiveau_config_settings" sequence="100"/>

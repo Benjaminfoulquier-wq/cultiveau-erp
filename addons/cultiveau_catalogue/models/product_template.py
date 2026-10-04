@@ -4,6 +4,30 @@ from markupsafe import Markup, escape
 
 from odoo import api, fields, models
 
+from odoo.addons.cultiveau_base import outils
+
+# Les colonnes du fichier d'articles d'un adhérent (export de son ancien logiciel, tarif fournisseur…).
+COLONNES_ARTICLES = {
+    "reference": ["reference", "ref", "code", "code article", "sku", "ref interne", "reference interne", "code produit", "no article", "n article", "article code"],
+    "nom": ["nom", "designation", "libelle", "nom du produit", "produit", "intitule", "article", "description courte", "nom article", "libelle article"],
+    "description": ["description", "descriptif", "description longue", "commentaire", "detail"],
+    "fournisseur": ["fournisseur", "marque", "fabricant", "fourn", "supplier", "nom fournisseur"],
+    "ref_fournisseur": ["ref fournisseur", "reference fournisseur", "code fournisseur", "ref fourn", "ref fabricant"],
+    "categorie": ["categorie", "famille", "rayon", "gamme", "groupe", "category", "type"],
+    "sous_categorie": ["sous famille", "sous categorie", "sous groupe"],
+    "prix": ["prix", "prix ht", "prix de vente", "pv", "pv ht", "tarif", "prix vente ht", "prix unitaire", "prix vente", "pu ht", "prix public", "prix de vente ht"],
+    "prix_achat": ["prix achat", "pa", "pa ht", "prix d achat", "cout", "prix fournisseur", "tarif achat", "prix d achat ht", "prix achat ht", "cout unitaire"],
+    "unite": ["unite", "um", "unite de vente", "uv", "unite de mesure"],
+    "tva": ["tva", "taux tva", "taux de tva", "tva %"],
+    "code_barre": ["code barre", "code barres", "ean", "ean13", "gencod", "barcode"],
+    "stock": ["stock", "quantite", "qte", "qte en stock", "quantite en stock", "stock actuel"],
+    "poids": ["poids", "poids kg", "poids unitaire"],
+    "conditionnement": ["conditionnement", "colisage", "cond"],
+    "dn": ["dn", "diametre nominal", "diametre"], "pn": ["pn", "pression nominale", "pression"],
+    "matiere": ["matiere", "materiau"], "raccordement": ["raccordement", "raccord", "connexion"],
+    "fiche": ["fiche technique", "fiche", "lien fiche", "url fiche"],
+}
+
 COTES_3D = ["dn", "pn", "pouces", "d_ext", "ep", "L", "L1", "H", "K", "D_bride", "nb_trous", "d_trous", "notes"]
 UNITES = {"unite": "uom.product_uom_unit", "unité": "uom.product_uom_unit", "u": "uom.product_uom_unit", "piece": "uom.product_uom_unit",
           "pièce": "uom.product_uom_unit", "metre": "uom.product_uom_meter", "mètre": "uom.product_uom_meter", "m": "uom.product_uom_meter",
@@ -53,8 +77,43 @@ class ProductTemplate(models.Model):
     cultiveau_fiche_vignette = fields.Image(related="cultiveau_fiche_id.vignette", string="Première page de la fiche")
     cultiveau_caracteristiques = fields.Json("Caractéristiques (données)")
     cultiveau_caracteristiques_html = fields.Html("Caractéristiques", compute="_compute_caracteristiques_html", sanitize=False)
-    cultiveau_source = fields.Selection([("matrice", "Matrice d'import"), ("catalogue3d", "Catalogue 3D"), ("saisie", "Saisie")],
+    cultiveau_source = fields.Selection([("matrice", "Matrice d'import"), ("catalogue3d", "Catalogue 3D"), ("adherent", "Import de l'adhérent"), ("saisie", "Saisie")],
                                         string="Source Cultiveau", index=True)
+    cultiveau_reseau = fields.Boolean("Catalogue Cultiveau", index=True,
+                                      help="Un article du catalogue du réseau (référencement, catalogue 3D) : visible de tous les adhérents, "
+                                           "chacun l'ajoute à son catalogue s'il le vend.")
+    cultiveau_adherent_ids = fields.Many2many("res.company", "cultiveau_catalogue_adherent_rel", "product_id", "company_id",
+                                              string="Dans le catalogue de", help="Les adhérents qui ont pris cet article du réseau dans leur catalogue.")
+    cultiveau_mon_catalogue = fields.Boolean("Dans mon catalogue", compute="_compute_mon_catalogue", search="_search_mon_catalogue",
+                                             help="Mes propres articles, et ceux du catalogue Cultiveau que j'ai ajoutés.")
+
+    @api.depends_context("company")
+    @api.depends("company_id", "cultiveau_adherent_ids")
+    def _compute_mon_catalogue(self):
+        societe = self.env.company
+        for p in self:
+            p.cultiveau_mon_catalogue = p.company_id == societe or societe in p.cultiveau_adherent_ids
+
+    def _search_mon_catalogue(self, operator, value):
+        societe = self.env.company
+        domaine = ["|", ("company_id", "=", societe.id), ("cultiveau_adherent_ids", "in", societe.id)]
+        if (operator == "=" and value) or (operator == "!=" and not value):
+            return domaine
+        return ["!"] + domaine
+
+    def action_ajouter_mon_catalogue(self):
+        """Prendre ces articles du réseau dans le catalogue de ma société (depuis la liste ou la fiche)."""
+        societe = self.env.company
+        reseau = self.filtered(lambda p: p.company_id != societe)
+        reseau.write({"cultiveau_adherent_ids": [(4, societe.id)]})
+        return {"type": "ir.actions.client", "tag": "display_notification", "params": {
+            "type": "success", "message": f"{len(reseau)} article(s) ajouté(s) à mon catalogue." if reseau else "Ces articles sont déjà les vôtres.", "next": {"type": "ir.actions.act_window_close"}}}
+
+    def action_retirer_mon_catalogue(self):
+        societe = self.env.company
+        self.write({"cultiveau_adherent_ids": [(3, societe.id)]})
+        return {"type": "ir.actions.client", "tag": "display_notification", "params": {
+            "type": "info", "message": f"{len(self)} article(s) retiré(s) de mon catalogue.", "next": {"type": "ir.actions.act_window_close"}}}
 
     @api.depends("cultiveau_caracteristiques")
     def _compute_caracteristiques_html(self):
@@ -177,7 +236,7 @@ class ProductTemplate(models.Model):
                 "uom_id": self._cultiveau_uom(champs.get("unite")).id,
                 "cultiveau_conditionnement": str(champs.get("conditionnement") or "")[:120] or False,
                 "cultiveau_fiche_url": str(champs.get("fiche") or "")[:500] or False,
-                "cultiveau_source": "matrice", "sale_ok": True, "purchase_ok": True, "company_id": False,
+                "cultiveau_source": "matrice", "cultiveau_reseau": True, "sale_ok": True, "purchase_ok": True, "company_id": False,
             }
             valeurs["uom_po_id"] = valeurs["uom_id"]
             for cle, champ in (("dn", "cultiveau_dn"), ("pn", "cultiveau_pn"), ("d_ext", "cultiveau_d_ext")):
@@ -243,7 +302,7 @@ class ProductTemplate(models.Model):
                 "cultiveau_fiche_id": doc.id if doc else False,
                 "cultiveau_fiche_url": f"https://drive.google.com/file/d/{fiche_id}/view" if fiche_id else False,
                 "cultiveau_fiche_notes": ((fiche or {}).get("n") or "")[:255] or False,
-                "cultiveau_caracteristiques": carac, "cultiveau_source": "catalogue3d",
+                "cultiveau_caracteristiques": carac, "cultiveau_source": "catalogue3d", "cultiveau_reseau": True,
                 "sale_ok": True, "purchase_ok": True, "company_id": False,
             }
             if reference in existants:
@@ -259,4 +318,111 @@ class ProductTemplate(models.Model):
                 {"partner_id": val["_fournisseur"].id, "product_tmpl_id": prod.id, "product_code": val["default_code"], "company_id": False}
                 for val, prod in zip(lot, crees) if val["_fournisseur"]])
             bilan["crees"] += len(crees)
+        return bilan
+
+    # ---------------------------------------------------------------- les articles d'un adhérent
+
+    @api.model
+    def cultiveau_analyser_articles(self, nom_fichier, contenu):
+        """Lit le fichier d'articles d'un adhérent ; renvoie {correspondance, en_tete, lignes, inconnus} ou lève ValueError."""
+        lignes = outils.lire_tableau(nom_fichier, contenu)
+        if not lignes:
+            raise ValueError("le fichier est vide")
+        corr, en_tete, donnees, inconnus = outils.reconnaitre(lignes, COLONNES_ARTICLES, obligatoires=("nom",))
+        if "nom" not in corr:
+            raise ValueError("je ne trouve pas de colonne « Désignation » (ou « Nom », « Libellé ») dans le fichier")
+        return {"correspondance": corr, "en_tete": en_tete, "lignes": donnees, "inconnus": inconnus}
+
+    @api.model
+    def cultiveau_importer_articles(self, nom_fichier, contenu, fournisseur_defaut=None, categorie_defaut=None, mettre_a_jour=True, societe=None):
+        """Importe les articles d'un adhérent dans sa société : ils sont à lui seul et entrent dans son catalogue.
+        Un article déjà présent (même référence dans sa société, sinon même code-barres) est mis à jour. Renvoie un bilan."""
+        societe = societe or self.env.company
+        lu = self.cultiveau_analyser_articles(nom_fichier, contenu)
+        corr = lu["correspondance"]
+        Produit = self.with_company(societe)
+        bilan = {"crees": 0, "maj": 0, "ignores": 0, "erreurs": [], "colonnes": sorted(corr), "inconnus": lu["inconnus"], "stock_ignore": "stock" in corr}
+        cache_f, cache_c, taxes = {}, {}, {}
+        Taxe = self.env["account.tax"] if "account.tax" in self.env else None
+
+        def val(ligne, champ):
+            return outils.valeur(ligne, corr, champ)
+
+        for n, ligne in enumerate(lu["lignes"], start=1):
+            nom = val(ligne, "nom")
+            if not nom or "(exemple)" in nom.lower():
+                bilan["ignores"] += 1
+                continue
+            reference = val(ligne, "reference")[:64]
+            code_barre = val(ligne, "code_barre").replace(" ", "")[:64]
+            fournisseur = self._cultiveau_fournisseur(val(ligne, "fournisseur"), cache_f) if val(ligne, "fournisseur") else fournisseur_defaut
+            parent = self._cultiveau_categorie(val(ligne, "categorie"), cache=cache_c) if val(ligne, "categorie") else categorie_defaut
+            categorie = self._cultiveau_categorie(val(ligne, "sous_categorie"), parent, cache_c) if val(ligne, "sous_categorie") else parent
+            prix, prix_achat = outils.nombre(val(ligne, "prix")), outils.nombre(val(ligne, "prix_achat"))
+            valeurs = {
+                "name": nom[:255], "default_code": reference or False, "type": "consu", "is_storable": True,
+                "company_id": societe.id, "cultiveau_source": "adherent", "cultiveau_reseau": False, "sale_ok": True, "purchase_ok": True,
+                "uom_id": self._cultiveau_uom(val(ligne, "unite")).id,
+            }
+            valeurs["uom_po_id"] = valeurs["uom_id"]
+            if categorie:
+                valeurs["categ_id"] = categorie.id
+            if prix is not None:
+                valeurs["list_price"] = prix
+            if prix_achat is not None:
+                valeurs["standard_price"] = prix_achat
+            if val(ligne, "description"):
+                valeurs["description_sale"] = val(ligne, "description")[:2000]
+            if outils.nombre(val(ligne, "poids")) is not None:
+                valeurs["weight"] = outils.nombre(val(ligne, "poids"))
+            if code_barre:
+                valeurs["barcode"] = code_barre
+            for cle, champ in (("dn", "cultiveau_dn"), ("pn", "cultiveau_pn")):
+                if outils.nombre(val(ligne, cle)) is not None:
+                    valeurs[champ] = outils.nombre(val(ligne, cle))
+            for cle, champ, taille in (("matiere", "cultiveau_matiere", 64), ("raccordement", "cultiveau_raccordement", 64),
+                                       ("conditionnement", "cultiveau_conditionnement", 120), ("fiche", "cultiveau_fiche_url", 500)):
+                if val(ligne, cle):
+                    valeurs[champ] = val(ligne, cle)[:taille]
+            taux = outils.nombre(val(ligne, "tva"))
+            if taux is not None and Taxe is not None:
+                taux = taux * 100 if taux < 1 else taux
+                if taux not in taxes:
+                    taxes[taux] = Taxe.search([("type_tax_use", "=", "sale"), ("amount", "=", taux), ("company_id", "=", societe.id)], limit=1)
+                if taxes[taux]:
+                    valeurs["taxes_id"] = [(6, 0, taxes[taux].ids)]
+            existant = Produit.browse()
+            if reference:
+                existant = Produit.with_context(active_test=False).search([("default_code", "=", reference), ("company_id", "=", societe.id)], limit=1)
+            if not existant and code_barre:
+                existant = Produit.with_context(active_test=False).search([("barcode", "=", code_barre), ("company_id", "in", [societe.id, False])], limit=1)
+            try:
+                if existant:
+                    if not mettre_a_jour:
+                        bilan["ignores"] += 1
+                        continue
+                    if existant.company_id != societe:  # un article du réseau au même code-barres : on le prend, sans le modifier
+                        existant.cultiveau_adherent_ids = [(4, societe.id)]
+                    else:
+                        existant.write({k: v for k, v in valeurs.items() if k not in ("company_id", "cultiveau_source", "cultiveau_reseau", "type", "is_storable")})
+                    produit = existant
+                    bilan["maj"] += 1
+                else:
+                    produit = Produit.create(valeurs)
+                    bilan["crees"] += 1
+            except Exception as e:  # noqa: BLE001 — code-barres en double, unité incompatible…
+                bilan["erreurs"].append(f"ligne {n} ({nom}) : {str(e).splitlines()[0][:160]}")
+                bilan["ignores"] += 1
+                continue
+            if fournisseur and produit.company_id == societe:
+                ligne_f = produit.seller_ids.filtered(lambda s: s.partner_id == fournisseur)[:1]
+                vals_f = {}
+                if prix_achat is not None:
+                    vals_f["price"] = prix_achat
+                if val(ligne, "ref_fournisseur"):
+                    vals_f["product_code"] = val(ligne, "ref_fournisseur")[:64]
+                if ligne_f:
+                    ligne_f.write(vals_f)
+                else:
+                    self.env["product.supplierinfo"].create(dict(vals_f, partner_id=fournisseur.id, product_tmpl_id=produit.id, company_id=societe.id))
         return bilan

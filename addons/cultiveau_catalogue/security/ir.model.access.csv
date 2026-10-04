@@ -3,3 +3,4 @@ access_import_matrice,cultiveau.catalogue.import.matrice,model_cultiveau_catalog
 access_import_3d,cultiveau.catalogue.import.3d,model_cultiveau_catalogue_import_3d,cultiveau_base.group_equipe,1,1,1,1
 access_fiche_user,cultiveau.fiche utilisateur,model_cultiveau_fiche,base.group_user,1,0,0,0
 access_fiche_equipe,cultiveau.fiche équipe,model_cultiveau_fiche,cultiveau_base.group_equipe,1,1,1,1
+access_import_articles,cultiveau.import.articles,model_cultiveau_import_articles,cultiveau_base.group_adherent,1,1,1,1

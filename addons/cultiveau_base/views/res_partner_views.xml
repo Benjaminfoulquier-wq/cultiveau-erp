@@ -48,10 +48,11 @@
         <field name="res_model">res.partner</field>
         <field name="view_mode">kanban,list,form</field>
         <field name="domain">[('cultiveau_type', '=', 'agriculteur')]</field>
-        <field name="context">{'default_cultiveau_type': 'agriculteur', 'default_is_company': False}</field>
+        <field name="context">{'default_cultiveau_type': 'agriculteur', 'default_is_company': False, 'default_company_id': allowed_company_ids[0], 'default_customer_rank': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Vos clients agriculteurs</p>
-            <p>Chaque agriculteur a sa fiche : cultures et frise culturale, persona, devis, factures, appels.</p>
+            <p>Chaque agriculteur a sa fiche : cultures et frise culturale, persona, devis, factures, appels.
+               Pour en reprendre toute une liste : <b>Cultiveau → Importer mes clients</b> (Excel ou CSV, colonnes reconnues automatiquement).</p>
         </field>
     </record>
 </odoo>

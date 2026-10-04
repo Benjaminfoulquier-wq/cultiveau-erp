@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_import_clients_form" model="ir.ui.view">
+        <field name="name">cultiveau.import.clients.form</field>
+        <field name="model">cultiveau.import.clients</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>Déposez le fichier de vos clients tel qu'il sort de votre ancien logiciel, de votre comptable, de l'assistant téléphonique ou de
+                   votre téléphone (Excel ou CSV). Les colonnes sont reconnues par leur intitulé : nom, exploitation, téléphone, e-mail, adresse,
+                   commune, surface, cultures, matériel, commercial, notes… Un client déjà connu est complété, jamais dupliqué.
+                   Vos clients restent dans votre société : les autres adhérents ne les voient pas.</p>
+                <group>
+                    <field name="fichier" filename="nom_fichier"/>
+                    <field name="nom_fichier" invisible="1"/>
+                    <field name="type_defaut"/>
+                    <field name="mettre_a_jour"/>
+                </group>
+                <field name="apercu" invisible="not apercu" readonly="1"/>
+                <field name="resultat" invisible="not resultat" readonly="1"/>
+                <footer>
+                    <button name="action_analyser" type="object" string="Vérifier les colonnes" class="btn-secondary"/>
+                    <button name="action_importer" type="object" string="Importer" class="btn-primary"/>
+                    <button name="action_modele" type="object" string="Télécharger le modèle"/>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_import_clients" model="ir.actions.act_window">
+        <field name="name">Importer mes clients</field>
+        <field name="res_model">cultiveau.import.clients</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

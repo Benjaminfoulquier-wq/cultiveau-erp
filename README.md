@@ -62,7 +62,12 @@ Première connexion : `admin` / `admin`, à changer aussitôt. Puis :
    sur le serveur, `sh scripts/donnees.sh catalogue` charge les 24 000 articles, `bibliotheque` l'inventaire des 2 300 documents du Drive
    (fiches, brochures, notices, reliés aux articles), `fiches` rapatrie les PDF eux-mêmes (3 Go) : chaque document est joint à sa fiche
    et sa première page illustre la fiche et les articles qui n'ont pas de photo ;
-4. **Cultiveau → Agriculteurs** : les clients (import CSV depuis l'assistant ou le CRM), leurs cultures, leur persona, leurs installations.
+4. **Cultiveau → Importer mes clients** : le fichier de l'adhérent (Excel ou CSV, colonnes reconnues par leur intitulé) ; puis
+   **Cultiveau → Agriculteurs** : cultures, persona, installations.
+5. **Catalogue → Catalogue Cultiveau** : « Ajouter à mon catalogue » sur les articles vendus ; **Importer mes articles** pour les siens ;
+   **Mon catalogue** = les deux.
+
+La suite : [docs/FEUILLE-DE-ROUTE.md](docs/FEUILLE-DE-ROUTE.md).
 
 En local, sans Docker : Python 3.10+, PostgreSQL, le code d'Odoo 18 (`git clone --depth 1 -b 18.0 https://github.com/odoo/odoo`), puis
 `python odoo-bin --addons-path=odoo/addons,addons -d cultiveau -i cultiveau_connecteurs,cultiveau_catalogue,l10n_fr,mass_mailing`.

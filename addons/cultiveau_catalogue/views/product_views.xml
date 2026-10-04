@@ -5,6 +5,12 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_ajouter_mon_catalogue" type="object" string="Ajouter à mon catalogue" class="btn-primary"
+                        invisible="cultiveau_mon_catalogue" help="Prendre cet article du catalogue Cultiveau dans le catalogue de ma société."/>
+                <button name="action_retirer_mon_catalogue" type="object" string="Retirer de mon catalogue"
+                        invisible="not cultiveau_mon_catalogue or not cultiveau_reseau"/>
+            </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Technique (irrigation)" name="cultiveau_technique">
                     <group>
@@ -24,6 +30,11 @@
                             <field name="cultiveau_fiche_notes"/>
                             <field name="cultiveau_source"/>
                         </group>
+                        <group string="Catalogue">
+                            <field name="cultiveau_reseau" groups="cultiveau_base.group_equipe"/>
+                            <field name="cultiveau_mon_catalogue"/>
+                            <field name="cultiveau_adherent_ids" widget="many2many_tags" groups="cultiveau_base.group_equipe"/>
+                        </group>
                     </group>
                     <field name="cultiveau_caracteristiques_html" nolabel="1" readonly="1"/>
                     <field name="cultiveau_fiche_vignette" widget="image" invisible="not cultiveau_fiche_vignette" options="{'size': [300, 400]}"/>
@@ -37,7 +48,14 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_tree_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <header>
+                    <button name="action_ajouter_mon_catalogue" type="object" string="Ajouter à mon catalogue" class="btn-primary"/>
+                    <button name="action_retirer_mon_catalogue" type="object" string="Retirer de mon catalogue"/>
+                </header>
+            </xpath>
             <field name="list_price" position="before">
+                <field name="cultiveau_mon_catalogue" optional="show" widget="boolean_toggle" readonly="1" string="Mon catalogue"/>
                 <field name="cultiveau_dn" optional="show"/>
                 <field name="cultiveau_pn" optional="show"/>
                 <field name="cultiveau_matiere" optional="show"/>
@@ -59,6 +77,10 @@
             </field>
             <filter name="services" position="after">
                 <separator/>
+                <filter name="cultiveau_mon_catalogue" string="Mon catalogue" domain="[('cultiveau_mon_catalogue', '=', True)]"/>
+                <filter name="cultiveau_reseau" string="Catalogue Cultiveau" domain="[('cultiveau_reseau', '=', True)]"/>
+                <filter name="cultiveau_mes_articles" string="Mes propres articles" domain="[('cultiveau_source', '=', 'adherent')]"/>
+                <separator/>
                 <filter name="cultiveau_3d" string="Catalogue 3D" domain="[('cultiveau_source', '=', 'catalogue3d')]"/>
                 <filter name="cultiveau_matrice" string="Référencement (matrice)" domain="[('cultiveau_source', '=', 'matrice')]"/>
                 <filter name="cultiveau_fiche" string="Avec fiche technique" domain="['|', ('cultiveau_fiche_id', '!=', False), ('cultiveau_fiche_url', '!=', False)]"/>
@@ -79,13 +101,25 @@
     </record>
 
     <record id="action_catalogue" model="ir.actions.act_window">
-        <field name="name">Catalogue</field>
+        <field name="name">Catalogue Cultiveau</field>
         <field name="res_model">product.template</field>
         <field name="view_mode">list,kanban,form</field>
-        <field name="context">{'search_default_filter_to_sell': 1}</field>
+        <field name="context">{'search_default_filter_to_sell': 1, 'search_default_cultiveau_reseau': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Le catalogue du réseau</p>
-            <p>Cherchez par DN, PN, matière ou raccordement. Importez la matrice de référencement ou le catalogue 3D depuis le menu Catalogue.</p>
+            <p>Les articles référencés par Cultiveau et le catalogue 3D. Cherchez par DN, PN, matière ou raccordement ; cochez ceux que vous vendez
+               et cliquez « Ajouter à mon catalogue ».</p>
+        </field>
+    </record>
+
+    <record id="action_mon_catalogue" model="ir.actions.act_window">
+        <field name="name">Mon catalogue</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,kanban,form</field>
+        <field name="context">{'search_default_filter_to_sell': 1, 'search_default_cultiveau_mon_catalogue': 1, 'default_cultiveau_source': 'saisie', 'default_company_id': allowed_company_ids[0]}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Mon catalogue est vide</p>
+            <p>Importez vos articles (Catalogue → Importer mes articles) ou ajoutez-en depuis le catalogue Cultiveau. Un article créé ici est le vôtre.</p>
         </field>
     </record>
 </odoo>

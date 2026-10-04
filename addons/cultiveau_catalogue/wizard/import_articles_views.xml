@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_import_articles_form" model="ir.ui.view">
+        <field name="name">cultiveau.import.articles.form</field>
+        <field name="model">cultiveau.import.articles</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>Déposez votre fichier d'articles tel qu'il sort de votre ancien logiciel ou du tarif de votre fournisseur (Excel ou CSV).
+                   Les colonnes sont reconnues par leur intitulé : référence, désignation, fournisseur ou marque, famille, prix de vente, prix d'achat,
+                   TVA, unité, code-barres, conditionnement, DN, PN, matière… Ces articles sont les vôtres : ils entrent dans votre catalogue,
+                   à côté de ceux du catalogue Cultiveau que vous aurez ajoutés.</p>
+                <group>
+                    <field name="fichier" filename="nom_fichier"/>
+                    <field name="nom_fichier" invisible="1"/>
+                    <field name="fournisseur_id"/>
+                    <field name="categorie_id"/>
+                    <field name="mettre_a_jour"/>
+                </group>
+                <field name="apercu" invisible="not apercu" readonly="1"/>
+                <field name="resultat" invisible="not resultat" readonly="1"/>
+                <footer>
+                    <button name="action_analyser" type="object" string="Vérifier les colonnes" class="btn-secondary"/>
+                    <button name="action_importer" type="object" string="Importer" class="btn-primary"/>
+                    <button name="action_modele" type="object" string="Télécharger le modèle"/>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_import_articles" model="ir.actions.act_window">
+        <field name="name">Importer mes articles</field>
+        <field name="res_model">cultiveau.import.articles</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

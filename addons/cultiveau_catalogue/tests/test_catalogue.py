@@ -120,3 +120,41 @@ class TestCatalogue(TransactionCase):
         self.assertTrue(fiche.vignette and p1.image_1920 and p1.cultiveau_fiche_vignette)
         self.assertIn("/web/content/cultiveau.fiche/", fiche.action_ouvrir()["url"])
         self.assertEqual(fiche.cultiveau_joindre(b"%PDF-1.4 bis", "Big Gun 100.pdf", png), 0, "les articles déjà illustrés sont laissés")
+
+    def test_articles_adherent_et_mon_catalogue(self):
+        Produit = self.env["product.template"]
+        societe = self.env.company
+        autre = self.env["res.company"].create({"name": "Irrigation du Sud"})
+        # Un article du réseau n'est dans mon catalogue qu'une fois ajouté.
+        reseau = Produit.create({"name": "Vanne papillon DN100", "default_code": "VP100", "company_id": False, "cultiveau_reseau": True, "cultiveau_source": "matrice"})
+        self.assertFalse(reseau.cultiveau_mon_catalogue)
+        reseau.action_ajouter_mon_catalogue()
+        self.assertTrue(reseau.cultiveau_mon_catalogue)
+        self.assertIn(reseau, Produit.search([("cultiveau_mon_catalogue", "=", True)]))
+        self.assertNotIn(reseau, Produit.with_company(autre).search([("cultiveau_mon_catalogue", "=", True)]))
+        reseau.action_retirer_mon_catalogue()
+        self.assertFalse(reseau.cultiveau_mon_catalogue)
+        # Les articles de l'adhérent : fichier à colonnes libres, à lui seul, dans son catalogue.
+        csv = ("Code;Libellé;Marque;Famille;PV HT;PA HT;TVA;Unité;EAN;Stock\n"
+               "TUB32;Tube PE 32 PN10;ATUSA;Tuyaux;1,45;0,98;20;ml;3001234567890;250\n"
+               "GAG16;Goutteur 16 mm 2 l/h;Netafim;Goutte à goutte;0,35;0,2;20;u;;1200\n"
+               ";Sans code mais avec un nom;;;2;;;;;\n").encode("cp1252")
+        bilan = Produit.cultiveau_importer_articles("articles.csv", csv)
+        self.assertEqual((bilan["crees"], bilan["maj"], bilan["ignores"], bilan["erreurs"]), (3, 0, 0, []))
+        self.assertTrue(bilan["stock_ignore"])
+        tube = Produit.search([("default_code", "=", "TUB32")])
+        self.assertEqual((tube.company_id, tube.cultiveau_source, tube.list_price, tube.standard_price, tube.barcode, tube.uom_id.name),
+                         (societe, "adherent", 1.45, 0.98, "3001234567890", self.env.ref("uom.product_uom_meter").name))
+        self.assertEqual((tube.categ_id.name, tube.seller_ids.partner_id.name, tube.seller_ids.price), ("Tuyaux", "ATUSA", 0.98))
+        self.assertTrue(tube.cultiveau_mon_catalogue)
+        self.assertNotIn(tube, Produit.with_company(autre).search([("cultiveau_mon_catalogue", "=", True)]))
+        if "account.tax" in self.env:  # la TVA du fichier est reprise quand la société a cette taxe (base de test : plan générique à 15 %)
+            vingt = self.env["account.tax"].search([("type_tax_use", "=", "sale"), ("amount", "=", 20), ("company_id", "=", societe.id)], limit=1)
+            if vingt:
+                self.assertEqual(tube.taxes_id, vingt)
+        # Relancé avec un prix changé : mis à jour, pas dupliqué.
+        bilan = Produit.cultiveau_importer_articles("articles.csv", "Référence;Désignation;Prix de vente\nTUB32;Tube PE 32 PN10;1,60\n".encode())
+        self.assertEqual((bilan["crees"], bilan["maj"]), (0, 1))
+        self.assertEqual((tube.list_price, Produit.search_count([("default_code", "=", "TUB32")])), (1.6, 1))
+        with self.assertRaises(ValueError):
+            Produit.cultiveau_analyser_articles("x.csv", b"Prix;Stock\n2;3\n")

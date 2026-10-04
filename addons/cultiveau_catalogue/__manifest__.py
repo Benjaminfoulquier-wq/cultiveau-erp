@@ -10,7 +10,11 @@ range les produits par nom et par catégorie ; ce module ajoute les caractérist
 sur chaque article, les filtres qui vont avec, le lien vers la fiche technique, le conditionnement
 et le fournisseur avec son prix et son délai.
 
-Deux imports :
+Le **catalogue Cultiveau** (référencement, catalogue 3D) est commun à tout le réseau ; chaque adhérent y pioche
+ce qu'il vend (« Ajouter à mon catalogue ») et importe ses propres articles depuis n'importe quel fichier
+(Catalogue → Importer mes articles) : ceux-là sont à lui seul. « Mon catalogue » = les deux.
+
+Deux imports réseau :
 
 - la **matrice d'import** Excel du référencement Cultiveau (Référence, Nom, Fournisseur, Catégorie,
 
@@ -20,7 +24,7 @@ Description, Prix HT, Unité, Conditionnement, Poids, URL image) ;
 sous-familles, matières, cotes et fiches techniques), par le menu ou par le script
 ``scripts/importer_catalogue_3d.py``.
 """,
-    "version": "18.0.2.0.0",
+    "version": "18.0.3.0.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
@@ -31,6 +35,7 @@ sous-familles, matières, cotes et fiches techniques), par le menu ou par le scr
         "views/fiche_views.xml",
         "views/product_views.xml",
         "wizard/import_views.xml",
+        "wizard/import_articles_views.xml",
         "views/menus.xml",
     ],
     "installable": True,

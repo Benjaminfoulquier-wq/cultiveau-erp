@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <menuitem id="menu_catalogue" name="Catalogue" parent="cultiveau_base.menu_cultiveau_root" sequence="50"/>
-    <menuitem id="menu_catalogue_produits" name="Articles" parent="menu_catalogue" action="action_catalogue" sequence="10"/>
+    <menuitem id="menu_catalogue_mon" name="Mon catalogue" parent="menu_catalogue" action="action_mon_catalogue" sequence="5"/>
+    <menuitem id="menu_catalogue_produits" name="Catalogue Cultiveau" parent="menu_catalogue" action="action_catalogue" sequence="10"/>
     <menuitem id="menu_catalogue_fournisseurs" name="Fournisseurs" parent="menu_catalogue" action="action_fournisseurs" sequence="20"/>
     <menuitem id="menu_catalogue_fiches" name="Bibliothèque technique" parent="menu_catalogue" action="action_fiches" sequence="25"/>
+    <menuitem id="menu_catalogue_import_articles" name="Importer mes articles" parent="menu_catalogue" action="action_import_articles" sequence="28"/>
     <menuitem id="menu_catalogue_import_matrice" name="Importer la matrice" parent="menu_catalogue" action="action_import_matrice" sequence="30" groups="cultiveau_base.group_equipe"/>
     <menuitem id="menu_catalogue_import_3d" name="Importer le catalogue 3D" parent="menu_catalogue" action="action_import_3d" sequence="40" groups="cultiveau_base.group_equipe"/>
 </odoo>

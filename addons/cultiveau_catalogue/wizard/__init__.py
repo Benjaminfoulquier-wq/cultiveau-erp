@@ -1,1 +1,1 @@
-from . import import_wizard
+from . import import_wizard, import_articles
