@@ -57,7 +57,10 @@ class ResPartnerImport(models.AbstractModel):
         societe = societe or self.env.company
         lu = self.analyser(nom_fichier, contenu)
         corr = lu["correspondance"]
-        Partner = self.env["res.partner"].with_company(societe)
+        # Pendant un import, pas de notification « vous avez été assigné » ni de trace de suivi : un fichier de 2 000 lignes
+        # ne doit pas remplir la boîte mail de l'équipe.
+        Partner = self.env["res.partner"].with_company(societe).with_context(mail_auto_subscribe_no_notify=True, mail_create_nolog=True,
+                                                                               mail_notrack=True, tracking_disable=True)
         bilan = {"crees": 0, "maj": 0, "ignores": 0, "erreurs": [], "colonnes": sorted(corr), "inconnus": lu["inconnus"]}
         france = self.env.ref("base.fr", raise_if_not_found=False)
         pays_cache, users_cache, etiquettes = {}, {}, {}
@@ -153,7 +156,7 @@ class ResPartnerImport(models.AbstractModel):
                     maj.pop("company_id")
                 existant.write(maj)
                 if notes:
-                    existant.message_post(body="Import : " + " ; ".join(notes))
+                    existant.message_post(body="Import : " + " ; ".join(notes), subtype_xmlid="mail.mt_note")
                 partenaire = existant
                 bilan["maj"] += 1
             else:
