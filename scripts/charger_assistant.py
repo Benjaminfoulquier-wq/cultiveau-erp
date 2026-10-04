@@ -71,8 +71,18 @@ if mdp:
             "smtp_user": utilisateur, "smtp_pass": mdp, "from_filter": utilisateur.split("@")[-1], "sequence": 1}
     serveur = Serveur.search([("smtp_user", "=", utilisateur)], limit=1)
     serveur.write(vals) if serveur else Serveur.create(vals)
-    Param = env["ir.config_parameter"].sudo()
-    Param.set_param("mail.default.from", utilisateur)
-    Param.set_param("mail.default.from_filter", utilisateur.split("@")[-1])
+    # Le domaine d'alias : tout e-mail de l'ERP part de notification@cultiveau.fr, quel que soit l'auteur, pour toutes les sociétés.
+    domaine_nom, local = utilisateur.split("@")[-1], utilisateur.split("@")[0]
+    Domaine = env["mail.alias.domain"].sudo()
+    domaine = Domaine.search([("name", "=", domaine_nom)], limit=1)
+    vals_d = {"name": domaine_nom, "default_from": local, "bounce_alias": "bounce", "catchall_alias": "catchall"}
+    domaine = domaine.write(vals_d) and domaine or (domaine or Domaine.create(vals_d))
+    Company.with_context(active_test=False).search([]).write({"alias_domain_id": domaine.id})
+    robot = env.ref("base.partner_root", raise_if_not_found=False)
+    if robot and (not robot.email or robot.email.endswith("example.com")):
+        robot.sudo().write({"email": utilisateur})
+    en_echec = env["mail.mail"].sudo().search([("state", "=", "exception")])
+    en_echec.write({"state": "outgoing", "failure_reason": False})  # repartiront avec le bon expéditeur
     env.cr.commit()
-    print(f"Messagerie sortante : {utilisateur} via {hote}:{port}.")
+    print(f"Messagerie sortante : {utilisateur} via {hote}:{port} ; domaine d'alias {domaine_nom} sur {Company.search_count([])} sociétés ;"
+          f" {len(en_echec)} e-mail(s) en échec remis en file.")
