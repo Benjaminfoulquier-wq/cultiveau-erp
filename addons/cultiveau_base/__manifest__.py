@@ -14,7 +14,7 @@ et comptabilité sont les siens ; l'équipe Cultiveau voit toutes les sociétés
 - les **outils du réseau** (assistant téléphonique, DTe, DISC, Académie) sont à un clic depuis le menu Cultiveau.
 
 """,
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "website": "https://cultiveau.fr",
@@ -24,6 +24,7 @@ et comptabilité sont les siens ; l'équipe Cultiveau voit toutes les sociétés
         "security/cultiveau_security.xml",
         "security/ir.model.access.csv",
         "wizard/import_clients_views.xml",
+        "wizard/import_reseau_views.xml",
         "views/res_partner_views.xml",
         "views/res_company_views.xml",
         "views/res_config_settings_views.xml",

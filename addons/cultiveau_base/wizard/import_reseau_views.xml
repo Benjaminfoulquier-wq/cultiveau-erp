@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_import_reseau_form" model="ir.ui.view">
+        <field name="name">cultiveau.import.reseau.form</field>
+        <field name="model">cultiveau.import.reseau</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>Le fichier du réseau (JSON) : le groupe, l'équipe Cultiveau, les adhérents et leurs équipes, les prospects, les fournisseurs
+                   référencés et leurs contacts, les adresses des outils. Tout est reconnu par nom ou e-mail et complété, jamais dupliqué :
+                   le fichier peut être redéposé après chaque mise à jour.</p>
+                <group>
+                    <field name="fichier" filename="nom_fichier"/>
+                    <field name="nom_fichier" invisible="1"/>
+                </group>
+                <field name="resultat" invisible="not resultat" readonly="1"/>
+                <footer>
+                    <button name="action_importer" type="object" string="Importer le réseau" class="btn-primary"/>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_import_reseau" model="ir.actions.act_window">
+        <field name="name">Importer le réseau</field>
+        <field name="res_model">cultiveau.import.reseau</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

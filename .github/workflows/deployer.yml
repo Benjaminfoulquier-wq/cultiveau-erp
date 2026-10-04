@@ -25,6 +25,11 @@ on:
         description: "… et son nom affiché (facultatif)"
         type: string
         default: ""
+      assistant:
+        description: "Brancher l'assistant téléphonique sur l'ERP (clé, connecteurs, numéros dédiés, clients, messagerie)"
+        type: choice
+        default: non
+        options: [non, oui]
       donnees:
         description: "Charger des données : catalogue (24 000 articles), bibliotheque (inventaire des fiches), fiches (les PDF du Drive, une heure), demo (un agriculteur complet), tout"
         type: choice
@@ -66,6 +71,9 @@ jobs:
       - name: Données (catalogue, démonstration)
         if: ${{ github.event.inputs.donnees != '' && github.event.inputs.donnees != 'aucune' }}
         run: ssh -i "$CLE" -o IdentitiesOnly=yes -o ServerAliveInterval=60 "$SERVEUR" 'cd /srv/erp/app && sh scripts/donnees.sh ${{ github.event.inputs.donnees }}'
+      - name: Assistant téléphonique
+        if: ${{ github.event.inputs.assistant == 'oui' }}
+        run: ssh -i "$CLE" -o IdentitiesOnly=yes -o ServerAliveInterval=60 "$SERVEUR" 'cd /srv/erp/app && sh scripts/connecter_assistant.sh'
       # Le mot de passe ne passe jamais par un paramètre (GitHub les affiche dans le journal) : il vient du secret
       # CULTIVEAU_ADMIN_MDP, que GitHub masque partout. À changer dans l'ERP après la première connexion.
       - name: Compte administrateur

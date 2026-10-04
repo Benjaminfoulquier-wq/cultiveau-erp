@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_import_clients,cultiveau.import.clients,model_cultiveau_import_clients,cultiveau_base.group_adherent,1,1,1,1
+access_import_reseau,cultiveau.import.reseau,model_cultiveau_import_reseau,cultiveau_base.group_equipe,1,1,1,1
