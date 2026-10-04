@@ -55,7 +55,7 @@ def _fiche_client(partner):
         "interventions_ouvertes": [{"id": t.id, "nom": t.name, "urgence": t.cultiveau_urgence, "etape": t.stage_id.name}
                                    for t in request.env["project.task"].sudo().search(
                                        [("partner_id", "=", partner.id), ("cultiveau_intervention", "=", True), ("is_closed", "=", False)], limit=5)],
-        "url": f"/odoo/contacts/{partner.id}",
+        "url": f"/app/contacts/{partner.id}",
     }
 
 
@@ -102,12 +102,12 @@ class CultiveauApi(http.Controller):
             deja = Task.search([("cultiveau_reference_appel", "=", reference)], limit=1) or Lead.search([("cultiveau_reference_appel", "=", reference)], limit=1)
             if deja:
                 return _json({"ok": True, "deja": True, "type": "intervention" if deja._name == "project.task" else "opportunite", "id": deja.id,
-                              "client_id": partner.id, "url": f"/odoo/action-{'project.action_view_all_task' if deja._name == 'project.task' else 'crm.crm_lead_action_pipeline'}/{deja.id}"})
+                              "client_id": partner.id, "url": f"/app/action-{'project.action_view_all_task' if deja._name == 'project.task' else 'crm.crm_lead_action_pipeline'}/{deja.id}"})
         categorie = (donnees.get("categorie") or "autre").lower()
         resume = donnees.get("resume") or donnees.get("symptome") or "Appel reçu par l'assistant"
         if categorie in ("panne", "depannage", "urgence", "intervention"):
             t = request.env["project.task"].cultiveau_creer_depuis_appel(societe, partner, donnees)
-            return _json({"ok": True, "type": "intervention", "id": t.id, "client_id": partner.id, "client_cree": cree, "url": f"/odoo/action-project.action_view_all_task/{t.id}"})
+            return _json({"ok": True, "type": "intervention", "id": t.id, "client_id": partner.id, "client_cree": cree, "url": f"/app/action-project.action_view_all_task/{t.id}"})
         if categorie in ("devis", "projet", "prix", "demande_de_prix", "opportunite"):
             lead = request.env["crm.lead"].with_company(societe).create({
                 "name": resume[:120], "type": "opportunity", "partner_id": partner.id, "company_id": societe.id,
@@ -115,7 +115,7 @@ class CultiveauApi(http.Controller):
                 "cultiveau_urgence": donnees.get("urgence") if donnees.get("urgence") in ("immediate", "journee", "semaine", "non_urgent") else False,
                 "cultiveau_surface_ha": float(donnees.get("surface_ha") or 0) or 0.0,
                 "stage_id": request.env.ref("cultiveau_ventes.stage_demande", raise_if_not_found=False).id or False})
-            return _json({"ok": True, "type": "opportunite", "id": lead.id, "client_id": partner.id, "client_cree": cree, "url": f"/odoo/action-crm.crm_lead_action_pipeline/{lead.id}"})
+            return _json({"ok": True, "type": "opportunite", "id": lead.id, "client_id": partner.id, "client_cree": cree, "url": f"/app/action-crm.crm_lead_action_pipeline/{lead.id}"})
         activite = partner.activity_schedule("mail.mail_activity_data_call", summary=resume[:120], note=donnees.get("transcription") or resume,
                                              user_id=(partner.user_id or request.env.ref("base.user_admin")).id)
-        return _json({"ok": True, "type": "activite", "id": activite.id, "client_id": partner.id, "client_cree": cree, "url": f"/odoo/contacts/{partner.id}"})
+        return _json({"ok": True, "type": "activite", "id": activite.id, "client_id": partner.id, "client_cree": cree, "url": f"/app/contacts/{partner.id}"})

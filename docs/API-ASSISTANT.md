@@ -25,7 +25,7 @@ Réponse (client reconnu) :
             "fenetres_du_mois": [{"culture": "Vigne", "genre": "projet", "surface_ha": 12}], "mois": "novembre",
             "installations": [{"nom": "Goutte à goutte vigne", "type": "Goutte à goutte de surface", "etat": "en_service",
                                "reference_pressions": {"sortie_pompe_bar": 4.2, "point_defavorable_bar": 1.3}, "equipements": ["Pompe E6S (2019)"]}],
-            "interventions_ouvertes": [], "url": "/odoo/contacts/42"}}
+            "interventions_ouvertes": [], "url": "/app/contacts/42"}}
 ```
 
 `persona` : l'un des cinq profils de l'étude PRISM (lion, jaguar, chat, tortue, abeille) et son besoin dominant sur la pyramide
@@ -48,4 +48,4 @@ POST /cultiveau/api/appel
 - `urgence` : `immediate`, `journee`, `semaine`, `non_urgent` ;
 - le client est créé s'il est inconnu (marqué « à vérifier ») ; un appel déjà déposé (même `reference`) n'est pas dupliqué.
 
-Réponse : `{"ok": true, "type": "intervention", "id": 17, "client_id": 42, "client_cree": false, "url": "/odoo/action-project.action_view_all_task/17"}`.
+Réponse : `{"ok": true, "type": "intervention", "id": 17, "client_id": 42, "client_cree": false, "url": "/app/action-project.action_view_all_task/17"}`.
