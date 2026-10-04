@@ -10,7 +10,11 @@ from standard.models import Adherent, Connecteur, Fleche
 cle = os.environ["CLE"]
 url = os.environ.get("ERP_URL", "https://erp.cultiveau.fr")
 sortie, fleches = [], 0
+ignores = []
 for a in Adherent.objects.all():
+    if not a.clients.exists() and not a.personnes.exists() and not a.mise_en_service_le:  # un adhérent d'essai, vide
+        ignores.append(a.entreprise)
+        continue
     c = a.connecteurs.filter(type="odoo").first()
     if not c:
         c = Connecteur.objects.create(adherent=a, type="odoo", nom="ERP Cultiveau", adresse=url, envoyer_sms_client=False, actif=True)
@@ -33,4 +37,5 @@ for a in Adherent.objects.all():
                    "numero_habituel": a.numero_habituel, "zone": a.zone, "clients": clients, "personnes": personnes})
 with open("/data/export-erp.json", "w", encoding="utf-8") as f:
     json.dump(sortie, f, ensure_ascii=False)
-print(f"Assistant : {len(sortie)} adhérents, {sum(len(x['clients']) for x in sortie)} clients ; connecteur ERP posé partout, {fleches} flèche(s) ajoutée(s).")
+print(f"Assistant : {len(sortie)} adhérents, {sum(len(x['clients']) for x in sortie)} clients ; connecteur ERP posé partout, {fleches} flèche(s) ajoutée(s)."
+      + (f" Adhérents d'essai laissés de côté : {', '.join(ignores)}." if ignores else ""))

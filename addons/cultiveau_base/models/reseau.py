@@ -135,14 +135,16 @@ class ReseauMoteur(models.AbstractModel):
             company = Company.browse(1) if Company.browse(1).exists() else Company.search([], limit=1)
         else:
             company = Company.search([("name", "=ilike", d["name"])], limit=1)
-            if not company and d.get("raison"):
-                company = Company.search([("name", "=ilike", d["raison"])], limit=1)
+            for autre in [x for x in [d.get("raison")] + list(d.get("cles") or []) if x]:  # l'assistant l'a créée sous un autre nom
+                if company:
+                    break
+                company = Company.search([("name", "=ilike", autre)], limit=1)
         vals = {"cultiveau_adherent": bool(d.get("adherent", True))}
+        if company and not d.get("principale") and company.name != d["name"]:
+            vals["name"] = d["name"]
         if d.get("numero_dedie"):
             vals["cultiveau_numero_dedie"] = d["numero_dedie"]
         if company:
-            if company.name != d["name"] and not d.get("principale"):
-                pass
             company.write(vals)
             bilan["societes_odoo_maj"] += 1
         else:

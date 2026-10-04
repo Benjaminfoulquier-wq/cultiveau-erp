@@ -49,6 +49,17 @@ for a in json.load(open(chemin, encoding="utf-8")):
         total["clients_maj"] += bilan["maj"]
         total["clients_ignores"] += bilan["ignores"]
     env.cr.commit()
+# Les sociétés créées par un passage précédent pour des adhérents qui ne sont plus exportés (essais) : archivées si vides.
+exportes = {a["id"] for a in json.load(open(chemin, encoding="utf-8"))}
+archivees = []
+for c in Company.search([("cultiveau_assistant_id", "!=", 0), ("cultiveau_assistant_id", "not in", list(exportes))]):
+    if c.id == 1 or env["res.users"].sudo().search_count([("company_id", "=", c.id)]) or env["res.partner"].sudo().search_count([("company_id", "=", c.id), ("id", "!=", c.partner_id.id)]):
+        continue
+    c.write({"active": False, "cultiveau_assistant_id": 0})
+    archivees.append(c.name)
+if archivees:
+    env.cr.commit()
+    print(f"Sociétés d'essai archivées : {', '.join(archivees)}.")
 print(f"Adhérents de l'assistant reliés : {total['adherents']} ({total['crees']} sociétés créées" + (f" : {', '.join(non_trouves)}" if non_trouves else "") + ").")
 print(f"Clients de l'assistant : {total['clients_crees']} créés, {total['clients_maj']} mis à jour, {total['clients_ignores']} ignorés.")
 

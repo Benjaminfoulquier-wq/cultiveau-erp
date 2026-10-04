@@ -5,7 +5,7 @@ RESEAU = {
     "groupe": [
         {"cle": "cultiveau", "principale": True, "name": "Réseau Essai", "forme": "SASU", "street": "1 rue du Réseau", "zip": "11000", "city": "Carcassonne",
          "siret": "939 408 449 00014", "vat": "FR66939408449", "email": "contact@exemple.fr", "website": "https://exemple.fr", "adherent": False},
-        {"cle": "holding", "name": "Holding Essai", "street": "1 rue du Réseau", "zip": "11000", "city": "Carcassonne", "adherent": False, "note": "La holding."},
+        {"cle": "holding", "name": "Holding Essai", "cles": ["HOLDINGESSAI"], "street": "1 rue du Réseau", "zip": "11000", "city": "Carcassonne", "adherent": False, "note": "La holding."},
     ],
     "equipe": [
         {"email": "presidente@exemple.fr", "name": "Présidente Essai", "fonction": "Présidente", "mobile": "06 11 22 33 44", "societe": "cultiveau", "utilisateur": "equipe",
@@ -28,14 +28,17 @@ class TestReseau(TransactionCase):
         Moteur = self.env["cultiveau.reseau.moteur"]
         # Un fournisseur déjà créé par le catalogue, sous son nom court : il est reconnu, pas dupliqué.
         court = self.env["res.partner"].create({"name": "NELSONESSAI", "is_company": True, "supplier_rank": 1})
+        # Une société créée par l'assistant sous son nom court : reconnue et renommée, pas doublée.
+        self.env["res.company"].create({"name": "HOLDINGESSAI"})
         bilan = Moteur.importer(RESEAU)
-        self.assertEqual((bilan["societes_odoo_creees"], bilan["societes_odoo_maj"]), (2, 1), bilan)
+        self.assertEqual((bilan["societes_odoo_creees"], bilan["societes_odoo_maj"]), (1, 2), bilan)
         self.assertEqual((bilan["utilisateurs_crees"], bilan["prospects"], bilan["erreurs"]), (1, 1, []))
         principale = self.env["res.company"].browse(1)
         self.assertEqual((principale.name, principale.partner_id.city, principale.partner_id.vat, principale.cultiveau_adherent), ("Réseau Essai", "Carcassonne", "FR66939408449", False))
         self.assertEqual(self.env["ir.config_parameter"].sudo().get_param("cultiveau.url_assistant"), "https://assistant.exemple.fr")
         holding = self.env["res.company"].search([("name", "=", "Holding Essai")])
         self.assertTrue(holding and not holding.cultiveau_adherent)
+        self.assertFalse(self.env["res.company"].search([("name", "=", "HOLDINGESSAI")]))
         adherent = self.env["res.company"].search([("name", "=", "Irrigation du Sud Essai")])
         self.assertTrue(adherent.cultiveau_adherent)
         self.assertEqual((adherent.partner_id.cultiveau_type, adherent.partner_id.phone, adherent.partner_id.country_id.code), ("adherent", "+33466000000", "FR"))
