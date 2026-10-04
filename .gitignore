@@ -7,3 +7,4 @@ __pycache__/
 node_modules/
 docker-compose.local.yml
 /donnees/assistant.json
+/donnees/reseau-cultiveau.json
