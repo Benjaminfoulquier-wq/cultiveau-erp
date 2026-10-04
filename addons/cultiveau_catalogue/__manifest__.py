@@ -24,7 +24,7 @@ Description, Prix HT, Unité, Conditionnement, Poids, URL image) ;
 sous-familles, matières, cotes et fiches techniques), par le menu ou par le script
 ``scripts/importer_catalogue_3d.py``.
 """,
-    "version": "18.0.3.0.0",
+    "version": "18.0.3.0.1",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
