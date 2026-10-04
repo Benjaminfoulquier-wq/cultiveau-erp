@@ -8,6 +8,7 @@ import os
 import re
 import unicodedata
 
+
 chemin = os.environ.get("ASSISTANT_JSON", "/mnt/donnees/assistant.json")
 if not os.path.exists(chemin):
     chemin = "donnees/assistant.json"
@@ -20,8 +21,19 @@ def cle(texte):
 
 
 Company = env["res.company"].sudo()
+Partner = env["res.partner"].sudo()
 Moteur = env["cultiveau.import.clients.moteur"].sudo()
 societes = {cle(c.name): c for c in Company.search([])}
+principale = Company.browse(1) if Company.browse(1).exists() else Company.search([], limit=1)
+# Le groupe (holding, Cultiveau, Solution Magnus) n'a pas de clients agriculteurs : les contacts que l'assistant lui
+# attribue sont la base de contacts du réseau, rangée sous Cultiveau avec une étiquette au nom de l'adhérent d'origine.
+GROUPE = {"agrifusion", "agrifusion holding", "cultiveau", "solution magnus", "magnus formation"}
+
+
+def etiquette(nom):
+    Cat = env["res.partner.category"].sudo()
+    return Cat.search([("name", "=ilike", nom)], limit=1) or Cat.create({"name": nom})
+
 total = {"adherents": 0, "crees": 0, "clients_crees": 0, "clients_maj": 0, "clients_ignores": 0}
 non_trouves = []
 for a in json.load(open(chemin, encoding="utf-8")):
@@ -38,13 +50,25 @@ for a in json.load(open(chemin, encoding="utf-8")):
     if a.get("zone") and not company.partner_id.comment:
         company.partner_id.comment = f"Zone d'intervention : {a['zone']}"
     total["adherents"] += 1
+    cible = company
+    if cle(a["entreprise"]) in GROUPE or cle(company.name) in GROUPE or not company.cultiveau_adherent:
+        cible = principale
+        deplaces = Partner.search([("company_id", "=", company.id), ("parent_id", "=", False), ("id", "!=", company.partner_id.id),
+                                   ("cultiveau_type", "in", ["agriculteur", "autre", False])]) if company != principale else Partner
+        if deplaces:
+            deplaces.write({"company_id": principale.id, "category_id": [(4, etiquette(f"Contacts de l'assistant — {a['entreprise']}").id)]})
+            print(f"{len(deplaces)} contacts déplacés de {company.name} vers {principale.name}.")
     if a.get("clients"):
         sortie = io.StringIO()
         w = csv.writer(sortie, delimiter=";")
         w.writerow(["Nom", "Exploitation", "Téléphone", "Autre téléphone", "E-mail", "Adresse", "Commune", "Matériel", "Produits", "Commercial", "Notes", "Civilité", "Type"])
         for c in a["clients"]:
             w.writerow([c.get(x) or "" for x in ("nom", "exploitation", "telephone", "telephone2", "email", "adresse", "commune", "materiel", "produits", "commercial", "notes", "civilite", "type")])
-        bilan = Moteur.with_company(company).importer("assistant.csv", sortie.getvalue().encode("utf-8"), societe=company)
+        avant = set(Partner.search([("company_id", "=", cible.id)]).ids) if cible != company else set()
+        bilan = Moteur.with_company(cible).importer("assistant.csv", sortie.getvalue().encode("utf-8"), societe=cible)
+        if cible != company:
+            nouveaux = set(Partner.search([("company_id", "=", cible.id)]).ids) - avant
+            Partner.browse(list(nouveaux)).write({"category_id": [(4, etiquette(f"Contacts de l'assistant — {a['entreprise']}").id)]})
         total["clients_crees"] += bilan["crees"]
         total["clients_maj"] += bilan["maj"]
         total["clients_ignores"] += bilan["ignores"]
