@@ -92,14 +92,14 @@ if mdp:
     Serveur = env["ir.mail_server"].sudo()
     hote, port, utilisateur = os.environ.get("SMTP_HOTE") or "smtp.hostinger.com", int(os.environ.get("SMTP_PORT") or 465), os.environ.get("SMTP_UTILISATEUR") or "notification@cultiveau.fr"
     vals = {"name": "Cultiveau (notification)", "smtp_host": hote, "smtp_port": port, "smtp_encryption": "ssl" if port == 465 else "starttls",
-            "smtp_user": utilisateur, "smtp_pass": mdp, "from_filter": utilisateur.split("@")[-1], "sequence": 1}
+            "smtp_user": utilisateur, "smtp_pass": mdp, "from_filter": utilisateur, "sequence": 1}  # l'hébergeur n'accepte que cette adresse en expéditeur
     serveur = Serveur.search([("smtp_user", "=", utilisateur)], limit=1)
     serveur.write(vals) if serveur else Serveur.create(vals)
     # Le domaine d'alias : tout e-mail de l'ERP part de notification@cultiveau.fr, quel que soit l'auteur, pour toutes les sociétés.
     domaine_nom, local = utilisateur.split("@")[-1], utilisateur.split("@")[0]
     Domaine = env["mail.alias.domain"].sudo()
     domaine = Domaine.search([("name", "=", domaine_nom)], limit=1)
-    vals_d = {"name": domaine_nom, "default_from": local, "bounce_alias": "bounce", "catchall_alias": "catchall"}
+    vals_d = {"name": domaine_nom, "default_from": local, "bounce_alias": local, "catchall_alias": "catchall"}  # le retour (bounce) part aussi de cette adresse
     domaine = domaine.write(vals_d) and domaine or (domaine or Domaine.create(vals_d))
     Company.with_context(active_test=False).search([]).write({"alias_domain_id": domaine.id})
     robot = env.ref("base.partner_root", raise_if_not_found=False)
