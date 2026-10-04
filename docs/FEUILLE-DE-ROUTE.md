@@ -14,7 +14,11 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
-- **Assistant téléphonique** : l'API donne à l'assistant la fiche du client qui appelle (frise, persona, conseil) et reçoit les appels.
+- **Assistant téléphonique** : l'API donne à l'assistant la fiche du client qui appelle (frise, persona, conseil) et reçoit les appels ;
+  le branchement se fait depuis GitHub (« assistant : oui ») : clé, connecteurs, numéros dédiés, clients de l'assistant importés chez
+  chaque adhérent, messagerie sortante.
+- **Le réseau** : Cultiveau, Agrifusion Holding et Solution Magnus, l'équipe, les 16 adhérents et leurs équipes, les prospects, les 39
+  fournisseurs référencés et leurs contacts, importés d'un fichier (Réglages → Importer le réseau).
 - **Marque** : l'ERP est aux couleurs de Cultiveau, sans mention de l'éditeur ; déploiement en un push sur erp.cultiveau.fr.
 
 ## À faire, dans l'ordre

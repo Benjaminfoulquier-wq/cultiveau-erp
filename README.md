@@ -56,7 +56,12 @@ sh deploy/deployer.sh domaine    # le site https://erp.cultiveau.fr quand le DNS
 
 Première connexion : `admin` / `admin`, à changer aussitôt. Puis :
 
-1. **Cultiveau → Réglages** : adresses des outils du réseau, clé de l'API (à reporter dans la page « Clés » de l'assistant) ;
+1. **Cultiveau → Réglages → Importer le réseau** : le fichier JSON du réseau (groupe, équipe et comptes, adhérents et leurs
+   équipes, prospects, fournisseurs référencés et contacts, adresses des outils) ; il reste hors dépôt et se redépose à chaque
+   mise à jour sans doublon. Les réglages (adresses des outils, clé de l'API) se retouchent dans **Réglages Cultiveau** ;
+1. **L'assistant téléphonique** se branche depuis GitHub : « Déployer l'ERP » avec « assistant : oui ». Sur le serveur, la clé
+   de l'API est posée dans l'assistant (connecteur « ERP Cultiveau » et flèche pour chaque adhérent), les adhérents et leurs
+   clients sont importés dans l'ERP, et l'ERP envoie ses e-mails avec le compte notification@cultiveau.fr de l'assistant ;
 2. **Paramètres → Sociétés** : une société par adhérent (nom, SIRET, numéro dédié de l'assistant, dossier DTe) ; un utilisateur par personne, groupe « Adhérent » ; l'équipe Cultiveau a le groupe « Équipe Cultiveau » ;
 3. **Cultiveau → Catalogue → Importer** : la matrice de référencement, puis le catalogue 3D (`python3 scripts/importer_catalogue_3d.py …`) ;
    sur le serveur, `sh scripts/donnees.sh catalogue` charge les 24 000 articles, `bibliotheque` l'inventaire des 2 300 documents du Drive
