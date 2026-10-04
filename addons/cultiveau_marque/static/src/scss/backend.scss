@@ -6,3 +6,12 @@
 .o_main_navbar .o_menu_brand, .o_main_navbar .o_navbar_apps_menu .dropdown-toggle {
     color: #ffffff;
 }
+// Les illustrations des listes vides, redessinées aux couleurs Cultiveau (l'éditeur les dessine en violet).
+.o_nocontent_help {
+    .o_view_nocontent_smiling_face:before {
+        background-image: url(/cultiveau_marque/static/src/img/smiling_face.svg);
+    }
+    .o_view_nocontent_neutral_face:before {
+        background-image: url(/cultiveau_marque/static/src/img/neutral_face.svg);
+    }
+}

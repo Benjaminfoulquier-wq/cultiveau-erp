@@ -4,6 +4,8 @@
         <!-- Pas d'inscription publique : les comptes sont créés par l'équipe. La réinitialisation du mot de passe reste possible. -->
         <function model="ir.config_parameter" name="set_param" eval="['auth_signup.invitation_scope', 'b2b']"/>
         <function model="ir.config_parameter" name="set_param" eval="['auth_signup.reset_password', 'True']"/>
+        <!-- Le nom de l'application sur l'écran d'accueil d'un téléphone. -->
+        <function model="ir.config_parameter" name="set_param" eval="['web.web_app_name', 'Cultiveau']"/>
         <!-- Les couleurs des e-mails et le nom du robot interne de la messagerie : ceux du réseau, réappliqués à chaque mise à jour. -->
         <function model="res.company" name="write" eval="[[ref('base.main_company')], {'email_primary_color': '#183840', 'email_secondary_color': '#0b8aa3'}]"/>
         <function model="res.partner" name="write" eval="[[ref('base.partner_root')], {'name': 'Assistant Cultiveau'}]"/>

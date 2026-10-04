@@ -10,7 +10,7 @@ et favicon Cultiveau, bleu-vert sombre de la barre de menu et cyan des actions (
 logo), titre « Cultiveau » dans l'onglet du navigateur, page de connexion sans pied de page de
 l'éditeur ni lien d'inscription publique, menu utilisateur sans les liens vers l'éditeur.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",

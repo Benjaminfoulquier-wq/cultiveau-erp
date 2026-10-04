@@ -10,6 +10,13 @@
         </xpath>
     </template>
 
+    <!-- La couleur de la barre du navigateur (mobile, application installée) : le bleu-vert Cultiveau, pas le violet. -->
+    <template id="webclient_bootstrap_cultiveau" inherit_id="web.webclient_bootstrap" name="Cultiveau : couleur du navigateur">
+        <xpath expr="//meta[@name='theme-color']" position="attributes">
+            <attribute name="content">#183840</attribute>
+        </xpath>
+    </template>
+
     <!-- Page de connexion : le logo Cultiveau, un pied de page Cultiveau. -->
     <template id="login_layout_cultiveau" inherit_id="web.login_layout" name="Cultiveau : page de connexion">
         <xpath expr="//div[@t-if='not disable_footer']" position="replace">
