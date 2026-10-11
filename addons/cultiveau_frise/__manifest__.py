@@ -30,6 +30,7 @@ sur des valeurs générales.
     "data": [
         "security/ir.model.access.csv",
         "data/frise_gard.xml",
+        "data/cultures_france.xml",
         "data/cron.xml",
         "views/culture_views.xml",
         "views/res_partner_views.xml",

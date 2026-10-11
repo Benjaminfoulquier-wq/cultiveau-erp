@@ -1,11 +1,15 @@
+from markupsafe import Markup
+
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
 MOIS = [(str(i), n) for i, n in enumerate(
     ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"], start=1)]
 MOIS_COURTS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"]
-CATEGORIES = [("vigne", "Vigne"), ("arbo", "Arboriculture"), ("grandes_cultures", "Grandes cultures"),
-              ("maraichage", "Maraîchage"), ("prairies", "Prairies et fourrages"), ("sous_abri", "Sous abri"), ("autre", "Autre")]
+CATEGORIES = [("vigne", "Vigne"), ("arbo", "Arboriculture"), ("petits_fruits", "Petits fruits"), ("grandes_cultures", "Grandes cultures"),
+              ("maraichage", "Maraîchage"), ("prairies", "Prairies et fourrages"), ("sous_abri", "Sous abri"),
+              ("ppam", "Plantes à parfum, aromatiques et médicinales"), ("espaces_verts", "Espaces verts et gazons"),
+              ("pepiniere", "Pépinière et horticulture"), ("tropicales", "Cultures tropicales (DOM)"), ("autre", "Autre")]
 
 # Les quatre saisons émotionnelles de la frise (Journées Cultiveau 2025, atelier 1, pilier 2) : ce que l'agriculteur
 # attend de nous selon le moment de sa culture, et non selon notre calendrier commercial.
@@ -92,6 +96,23 @@ class Culture(models.Model):
     cours_note = fields.Char("Repère", help="Exemple : « Vin IGP Gard : −8 % sur un an (FranceAgriMer) ».")
     cours_date = fields.Date("Relevé le")
     cours_ton = fields.Char("Le ton", compute="_compute_cours_ton")
+    # Les coefficients culturaux de référence (FAO-56, Allen et al. 1998, tableaux 11, 12 et 22) : Kc des quatre phases,
+    # durée des phases, enracinement et fraction p de la réserve utile facilement utilisable. Besoin = ETo × Kc.
+    kc_ini = fields.Float("Kc initial", digits=(3, 2), help="Du semis (ou de la reprise) à environ 10 % de couverture du sol.")
+    kc_mi = fields.Float("Kc de mi-saison", digits=(3, 2), help="Pleine couverture : le besoin de pointe.")
+    kc_fin = fields.Float("Kc de fin de cycle", digits=(3, 2), help="À la récolte (ou à la chute des feuilles).")
+    duree_ini = fields.Integer("Phase initiale (j)")
+    duree_dev = fields.Integer("Développement (j)")
+    duree_mi = fields.Integer("Mi-saison (j)")
+    duree_fin = fields.Integer("Arrière-saison (j)")
+    duree_cycle = fields.Integer("Cycle (j)", compute="_compute_duree_cycle")
+    hauteur_max = fields.Float("Hauteur maximale (m)", digits=(4, 1))
+    racines_min = fields.Float("Enracinement min (m)", digits=(3, 1))
+    racines_max = fields.Float("Enracinement max (m)", digits=(3, 1))
+    p_tarissement = fields.Float("Fraction p", digits=(3, 2),
+                                 help="Part de la réserve utile que la culture consomme sans stress (FAO-56, tableau 22) : la RFU = p × RU.")
+    source_kc = fields.Char("Source des coefficients", default="FAO-56 (Allen et al., 1998)")
+    courbe_kc = fields.Html("Courbe du Kc", compute="_compute_courbe_kc", sanitize=False)
 
     _sql_constraints = [("nom_unique", "unique(name)", "Cette culture existe déjà.")]
 
@@ -99,6 +120,58 @@ class Culture(models.Model):
     def _compute_cours_ton(self):
         for c in self:
             c.cours_ton = TON_COURS[c.cours_tendance or "stable"]
+
+    @api.depends("duree_ini", "duree_dev", "duree_mi", "duree_fin")
+    def _compute_duree_cycle(self):
+        for c in self:
+            c.duree_cycle = (c.duree_ini or 0) + (c.duree_dev or 0) + (c.duree_mi or 0) + (c.duree_fin or 0)
+
+    def kc_au_jour(self, jour):
+        """Le Kc au jour `jour` du cycle (0 = semis ou reprise), selon la courbe FAO-56 : plat, montée, plateau, descente."""
+        self.ensure_one()
+        if not (self.kc_ini and self.kc_mi and self.duree_cycle):
+            return 0.0
+        a, b, c = self.duree_ini, self.duree_ini + self.duree_dev, self.duree_ini + self.duree_dev + self.duree_mi
+        d = self.duree_cycle
+        jour = max(0, min(jour, d))
+        if jour <= a:
+            return self.kc_ini
+        if jour <= b:
+            return round(self.kc_ini + (self.kc_mi - self.kc_ini) * (jour - a) / max(1, b - a), 3)
+        if jour <= c:
+            return self.kc_mi
+        return round(self.kc_mi + ((self.kc_fin or self.kc_mi) - self.kc_mi) * (jour - c) / max(1, d - c), 3)
+
+    def besoin_mm_jour(self, etp, jour):
+        """Le besoin en eau de la culture (mm/j) pour une ETP de référence donnée."""
+        return round(etp * self.kc_au_jour(jour), 2)
+
+    @api.depends("kc_ini", "kc_mi", "kc_fin", "duree_ini", "duree_dev", "duree_mi", "duree_fin", "couleur")
+    def _compute_courbe_kc(self):
+        for c in self:
+            if not (c.kc_ini and c.kc_mi and c.duree_cycle):
+                c.courbe_kc = False
+                continue
+            L, H, G, D, B = 560, 170, 40, 14, 30  # largeur, hauteur, marge gauche, marge droite, marge basse
+            x = lambda j: G + (L - G - D) * j / c.duree_cycle  # noqa: E731
+            y = lambda k: 10 + (H - B - 10) * (1 - min(k, 1.35) / 1.35)  # noqa: E731
+            a, b, m = c.duree_ini, c.duree_ini + c.duree_dev, c.duree_ini + c.duree_dev + c.duree_mi
+            points = [(0, c.kc_ini), (a, c.kc_ini), (b, c.kc_mi), (m, c.kc_mi), (c.duree_cycle, c.kc_fin or c.kc_mi)]
+            trace = " ".join(f"{x(j):.1f},{y(k):.1f}" for j, k in points)
+            graduations = "".join(
+                f"<line x1='{G}' y1='{y(v):.1f}' x2='{L - D}' y2='{y(v):.1f}' stroke='#e3e7ea'/>"
+                f"<text x='{G - 6}' y='{y(v) + 4:.1f}' font-size='10' text-anchor='end' fill='#6c7883'>{v:.1f}</text>" for v in (0.4, 0.8, 1.2))
+            phases = "".join(
+                f"<line x1='{x(j):.1f}' y1='10' x2='{x(j):.1f}' y2='{H - B}' stroke='#c9d1d7' stroke-dasharray='3 3'/>" for j in (a, b, m))
+            noms = "".join(
+                f"<text x='{x((j1 + j2) / 2):.1f}' y='{H - 12}' font-size='10' text-anchor='middle' fill='#4a5560'>{n} ({j2 - j1} j)</text>"
+                for n, j1, j2 in (("initiale", 0, a), ("développement", a, b), ("mi-saison", b, m), ("arrière-saison", m, c.duree_cycle)) if j2 > j1)
+            valeurs = "".join(
+                f"<text x='{x(j):.1f}' y='{y(k) - 7:.1f}' font-size='11' font-weight='600' text-anchor='middle' fill='{c.couleur or '#2a7f8f'}'>{k:.2f}</text>"
+                for j, k in ((a / 2, c.kc_ini), ((b + m) / 2, c.kc_mi), (c.duree_cycle, c.kc_fin or c.kc_mi)))
+            c.courbe_kc = Markup(
+                f"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {L} {H}' style='width:100%;max-width:{L}px'>{graduations}{phases}"
+                f"<polyline points='{trace}' fill='none' stroke='{c.couleur or '#2a7f8f'}' stroke-width='3' stroke-linejoin='round'/>{valeurs}{noms}</svg>")
 
     def _compute_nb_clients(self):
         groupes = self.env["cultiveau.culture.client"]._read_group([("culture_id", "in", self.ids)], ["culture_id"], ["__count"])

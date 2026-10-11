@@ -33,11 +33,38 @@ class TestFrise(TransactionCase):
         self.assertGreater(ligne["cases"][6]["intensite"], ligne["cases"][2]["intensite"])
 
     def test_repli_sur_les_valeurs_generales(self):
-        # Un département sans données : on prend celles valables partout ; sans rien, la ligne est vide.
-        self.assertFalse(self.vigne.stades_pour("64"))
-        self.env["cultiveau.culture.stade"].create({"culture_id": self.vigne.id, "name": "Général", "mois_debut": "4", "mois_fin": "9", "kc_max": 0.7})
-        self.assertEqual(self.vigne.stades_pour("64").name, "Général")
+        # Un département sans données : on prend celles valables partout (la frise France) ; sans rien, la ligne est vide.
+        self.assertEqual(self.vigne.stades_pour("64")[0].name, "Repos hivernal")
         self.assertEqual(self.vigne.stades_pour("30")[0].name, "Débourrement")
+        nouvelle = self.env["cultiveau.culture"].create({"name": "Culture sans frise"})
+        self.assertFalse(nouvelle.stades_pour("64"))
+        self.env["cultiveau.culture.stade"].create({"culture_id": nouvelle.id, "name": "Général", "mois_debut": "4", "mois_fin": "9", "kc_max": 0.7})
+        self.assertEqual(nouvelle.stades_pour("64").name, "Général")
+
+    def test_toutes_les_cultures_avec_frise_et_kc(self):
+        cultures = self.env["cultiveau.culture"].search([])
+        self.assertGreaterEqual(len(cultures), 110)
+        familles = set(cultures.mapped("categorie"))
+        for f in ("grandes_cultures", "maraichage", "arbo", "petits_fruits", "vigne", "prairies", "sous_abri", "espaces_verts", "ppam", "tropicales"):
+            self.assertIn(f, familles)
+        for c in cultures.filtered(lambda c: c.kc_mi):
+            self.assertTrue(0.1 <= c.kc_ini <= 1.3 and 0.25 <= c.kc_mi <= 1.3 and 0.2 <= c.kc_fin <= 1.3, c.name)
+            self.assertGreaterEqual(len(c.stades_pour("")), 2, c.name)
+            self.assertEqual(len(c.fenetres_pour("")), 2, c.name)
+            self.assertIn("<svg", c.courbe_kc, c.name)
+        self.assertEqual(len(cultures.filtered(lambda c: not c.kc_mi)), 0, "chaque culture du catalogue a ses Kc")
+
+    def test_kc_au_jour_suit_la_courbe_fao(self):
+        mais = self.env.ref("cultiveau_frise.culture_mais_grain")
+        self.assertEqual((mais.kc_ini, mais.kc_mi, mais.kc_fin, mais.duree_cycle), (0.3, 1.2, 0.35, 150))
+        self.assertEqual(mais.kc_au_jour(10), 0.3)  # phase initiale
+        self.assertAlmostEqual(mais.kc_au_jour(50), 0.75, places=2)  # mi-chemin de la montée (30 → 70 j)
+        self.assertEqual(mais.kc_au_jour(90), 1.2)  # mi-saison
+        self.assertAlmostEqual(mais.kc_au_jour(150), 0.35, places=2)
+        self.assertEqual(mais.besoin_mm_jour(5.0, 90), 6.0)
+        juillet = mais.ligne_frise("64")["cases"][6]
+        self.assertEqual(juillet["stade"].name, "Floraison (sortie des soies)")
+        self.assertTrue(juillet["critique"])
 
     def test_frise_du_client_et_fenetres(self):
         cc = self.env["cultiveau.culture.client"].create({"partner_id": self.agri.id, "culture_id": self.vigne.id, "surface_ha": 12.5})
@@ -85,6 +112,7 @@ class TestFrise(TransactionCase):
 
     def test_posture_du_client_et_cours(self):
         melon = self.env.ref("cultiveau_frise.culture_melon")
+        (self.vigne | melon).write({"cours_tendance": "stable"})  # indépendant des cours saisis dans la base
         self.env["cultiveau.culture.client"].create({"partner_id": self.agri.id, "culture_id": self.vigne.id, "surface_ha": 12})
         s = self.agri.cultiveau_situation(10)
         self.assertEqual(s["posture"], "proposition", "octobre, vigne en maturation : le moment de proposer")

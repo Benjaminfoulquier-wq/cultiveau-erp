@@ -9,6 +9,11 @@
                 <field name="name"/>
                 <field name="categorie"/>
                 <field name="couleur" widget="color"/>
+                <field name="kc_ini" optional="show"/>
+                <field name="kc_mi" optional="show"/>
+                <field name="kc_fin" optional="show"/>
+                <field name="duree_cycle" optional="hide"/>
+                <field name="racines_max" optional="hide"/>
                 <field name="cours_tendance"/>
                 <field name="nb_clients"/>
             </list>
@@ -57,6 +62,31 @@
                                 </list>
                             </field>
                         </page>
+                        <page string="Coefficients culturaux (Kc)" name="kc">
+                            <p class="text-muted">Le besoin en eau de la culture = ETo (évapotranspiration de référence, Météo-France) × Kc. Valeurs de référence FAO-56 pour un climat sub-humide ; les durées de phase sont indicatives pour la France.</p>
+                            <field name="courbe_kc" nolabel="1" invisible="not courbe_kc"/>
+                            <group>
+                                <group string="Kc">
+                                    <field name="kc_ini"/>
+                                    <field name="kc_mi"/>
+                                    <field name="kc_fin"/>
+                                    <field name="source_kc"/>
+                                </group>
+                                <group string="Durée des phases">
+                                    <field name="duree_ini"/>
+                                    <field name="duree_dev"/>
+                                    <field name="duree_mi"/>
+                                    <field name="duree_fin"/>
+                                    <field name="duree_cycle"/>
+                                </group>
+                                <group string="Plante et sol">
+                                    <field name="hauteur_max"/>
+                                    <field name="racines_min"/>
+                                    <field name="racines_max"/>
+                                    <field name="p_tarissement"/>
+                                </group>
+                            </group>
+                        </page>
                         <page string="Fenêtres commerciales" name="fenetres">
                             <p class="text-muted">Quand l'agriculteur a le temps de parler projet, et quand il achète. Par département ; vide = partout.</p>
                             <field name="fenetre_ids">
@@ -74,10 +104,28 @@
         </field>
     </record>
 
+    <record id="view_culture_search" model="ir.ui.view">
+        <field name="name">cultiveau.culture.search</field>
+        <field name="model">cultiveau.culture</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_famille" string="Famille" context="{'group_by': 'categorie'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="action_cultures" model="ir.actions.act_window">
         <field name="name">Cultures et frise de référence</field>
         <field name="res_model">cultiveau.culture</field>
         <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_par_famille': 1}</field>
+        <field name="help" type="html">
+            <p>Toutes les cultures, avec leur frise mois par mois et leurs coefficients culturaux (Kc, FAO-56). La frise « France » vaut
+               partout où il n'existe pas de frise locale (comme celle du Gard).</p>
+        </field>
     </record>
 
     <record id="view_culture_client_list" model="ir.ui.view">

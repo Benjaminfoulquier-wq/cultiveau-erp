@@ -19,6 +19,7 @@ class TestEuro(TransactionCase):
         self.assertEqual(self.env.ref("base.user_admin").lang, "fr_FR")
 
 
+@tagged("post_install", "-at_install")
 class TestTypesDeClients(TransactionCase):
     def test_chaque_type_a_son_vehicule(self):
         import base64
