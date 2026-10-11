@@ -29,12 +29,14 @@ sur des valeurs générales.
     "depends": ["cultiveau_base"],
     "data": [
         "security/ir.model.access.csv",
+        "data/climat_departements.xml",
         "data/frise_gard.xml",
         "data/cultures_france.xml",
         "data/cron.xml",
         "views/culture_views.xml",
         "views/res_partner_views.xml",
         "views/menus.xml",
+        "views/climat_views.xml",
     ],
     "installable": True,
 }

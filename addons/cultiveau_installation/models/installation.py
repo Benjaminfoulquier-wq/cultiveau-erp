@@ -300,3 +300,22 @@ class Installation(models.Model):
                                 note=f"<p>{escape(i.partner_id.display_name)} — {escape(i.name)}. Comparer les mesures au PV de mise en service.</p>")
             n += 1
         return n
+
+
+SYSTEME_DE_L_INSTALLATION = {"couverture_integrale": "couverture", "couverture_partielle": "couverture", "enrouleur": "enrouleur", "pivot": "pivot",
+                             "goutte_surface": "goutte", "goutte_enterre": "goutte", "micro_aspersion": "micro"}
+
+
+class CultureClient(models.Model):
+    _inherit = "cultiveau.culture.client"
+
+    @api.depends("partner_id", "culture_id", "partner_id.cultiveau_installation_ids.type_systeme", "partner_id.cultiveau_installation_ids.sol_texture",
+                 "partner_id.cultiveau_installation_ids.culture_ids")
+    def _compute_depuis_installation(self):
+        """Le sol et le système de l'installation qui arrose cette culture (sinon la première du client) ; une saisie à la main reste."""
+        for cc in self:
+            installations = cc.partner_id.commercial_partner_id.cultiveau_installation_ids
+            inst = installations.filtered(lambda i: cc.culture_id in i.culture_ids)[:1] or installations[:1]
+            cc.systeme = cc.systeme or SYSTEME_DE_L_INSTALLATION.get(inst.type_systeme) or False
+            cc.sol_texture = cc.sol_texture or inst.sol_texture or False
+

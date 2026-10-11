@@ -151,10 +151,47 @@
             <form>
                 <sheet>
                     <group>
-                        <field name="partner_id"/>
-                        <field name="culture_id"/>
-                        <field name="surface_ha"/>
-                        <field name="departement"/>
+                        <group string="La culture">
+                            <field name="partner_id"/>
+                            <field name="culture_id"/>
+                            <field name="surface_ha"/>
+                            <field name="departement"/>
+                            <field name="date_semis"/>
+                            <field name="precocite"/>
+                        </group>
+                        <group string="Chez le client">
+                            <field name="sol_texture"/>
+                            <field name="ru_mm_m"/>
+                            <field name="systeme"/>
+                            <field name="efficience" widget="percentage"/>
+                            <field name="heures_jour"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-light border mt-2" role="status" invisible="not analyse">
+                        <b>L'analyse : département, culture et client</b>
+                        <field name="analyse" nolabel="1"/>
+                    </div>
+                    <group invisible="not kc_mi_aj">
+                        <group string="Kc adaptés">
+                            <field name="decalage_jours"/>
+                            <field name="kc_ini_aj"/>
+                            <field name="kc_mi_aj"/>
+                            <field name="kc_fin_aj"/>
+                        </group>
+                        <group string="Besoin en eau">
+                            <field name="eto_pointe"/>
+                            <field name="besoin_pointe_mm"/>
+                            <field name="dfc_l_s_ha"/>
+                            <field name="debit_m3h"/>
+                            <field name="besoin_saison_mm"/>
+                            <field name="pluie_efficace_mm"/>
+                            <field name="irrigation_mm"/>
+                            <field name="volume_m3"/>
+                            <field name="rfu_mm"/>
+                            <field name="tour_eau_j"/>
+                        </group>
+                    </group>
+                    <group>
                         <field name="fenetres"/>
                         <field name="notes"/>
                     </group>

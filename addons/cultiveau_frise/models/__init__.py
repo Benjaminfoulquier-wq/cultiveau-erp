@@ -1,1 +1,1 @@
-from . import culture, res_partner
+from . import climat, culture, res_partner

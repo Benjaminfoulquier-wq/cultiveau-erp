@@ -6,3 +6,5 @@ access_culture_stade_equipe,cultiveau.culture.stade équipe,model_cultiveau_cult
 access_culture_fenetre_user,cultiveau.culture.fenetre utilisateur,model_cultiveau_culture_fenetre,base.group_user,1,0,0,0
 access_culture_fenetre_equipe,cultiveau.culture.fenetre équipe,model_cultiveau_culture_fenetre,cultiveau_base.group_equipe,1,1,1,1
 access_culture_client_user,cultiveau.culture.client utilisateur,model_cultiveau_culture_client,base.group_user,1,1,1,1
+access_climat_user,cultiveau.climat utilisateur,model_cultiveau_climat,base.group_user,1,0,0,0
+access_climat_equipe,cultiveau.climat équipe,model_cultiveau_climat,cultiveau_base.group_equipe,1,1,1,1

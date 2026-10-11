@@ -1,42 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Généré par scripts/generer_cultures.py : modifier le script, pas ce fichier. -->
 <odoo>
-    <!-- Les Kc des cultures déjà décrites pour le Gard : remis à jour à chaque mise à jour du module. -->
-    <data noupdate="0">
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_ble_dur')], {'kc_ini': 0.4, 'kc_mi': 1.15, 'kc_fin': 0.3, 'duree_ini': 30, 'duree_dev': 140, 'duree_mi': 40, 'duree_fin': 30, 'hauteur_max': 1.0, 'racines_min': 1.5, 'racines_max': 1.8, 'p_tarissement': 0.55, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_riz')], {'kc_ini': 1.05, 'kc_mi': 1.2, 'kc_fin': 0.9, 'duree_ini': 30, 'duree_dev': 30, 'duree_mi': 80, 'duree_fin': 40, 'hauteur_max': 1.0, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.2, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_colza')], {'kc_ini': 0.35, 'kc_mi': 1.1, 'kc_fin': 0.35, 'duree_ini': 25, 'duree_dev': 60, 'duree_mi': 70, 'duree_fin': 35, 'hauteur_max': 1.5, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.6, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_tournesol')], {'kc_ini': 0.35, 'kc_mi': 1.1, 'kc_fin': 0.35, 'duree_ini': 25, 'duree_dev': 35, 'duree_mi': 45, 'duree_fin': 25, 'hauteur_max': 2.0, 'racines_min': 0.8, 'racines_max': 1.5, 'p_tarissement': 0.45, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_prairies')], {'kc_ini': 0.4, 'kc_mi': 0.95, 'kc_fin': 0.85, 'duree_ini': 10, 'duree_dev': 20, 'duree_mi': 120, 'duree_fin': 45, 'hauteur_max': 0.3, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.6, 'source_kc': 'FAO-56 (Allen et al., 1998) — Prairie pâturée en rotation (FAO-56).'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_tomate')], {'kc_ini': 0.6, 'kc_mi': 1.15, 'kc_fin': 0.8, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 45, 'duree_fin': 30, 'hauteur_max': 0.6, 'racines_min': 0.7, 'racines_max': 1.5, 'p_tarissement': 0.4, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_melon')], {'kc_ini': 0.5, 'kc_mi': 1.05, 'kc_fin': 0.75, 'duree_ini': 25, 'duree_dev': 35, 'duree_mi': 40, 'duree_fin': 20, 'hauteur_max': 0.4, 'racines_min': 0.8, 'racines_max': 1.5, 'p_tarissement': 0.4, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_asperge')], {'kc_ini': 0.5, 'kc_mi': 0.95, 'kc_fin': 0.3, 'duree_ini': 50, 'duree_dev': 30, 'duree_mi': 100, 'duree_fin': 50, 'hauteur_max': 0.2, 'racines_min': 1.2, 'racines_max': 1.8, 'p_tarissement': 0.45, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pommier')], {'kc_ini': 0.5, 'kc_mi': 1.2, 'kc_fin': 0.95, 'duree_ini': 30, 'duree_dev': 50, 'duree_mi': 130, 'duree_fin': 30, 'hauteur_max': 4.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56 : avec couverture active du sol).'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_cerisier')], {'kc_ini': 0.5, 'kc_mi': 1.2, 'kc_fin': 0.95, 'duree_ini': 20, 'duree_dev': 40, 'duree_mi': 150, 'duree_fin': 30, 'hauteur_max': 4.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56).'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pecher')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.9, 'duree_ini': 20, 'duree_dev': 70, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 3.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56, fruits à noyau).'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_abricotier')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.9, 'duree_ini': 20, 'duree_dev': 70, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 3.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56, fruits à noyau).'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_olivier')], {'kc_ini': 0.65, 'kc_mi': 0.7, 'kc_fin': 0.7, 'duree_ini': 30, 'duree_dev': 90, 'duree_mi': 60, 'duree_fin': 90, 'hauteur_max': 4.0, 'racines_min': 1.2, 'racines_max': 1.7, 'p_tarissement': 0.65, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger de 40 à 60 % de couverture (FAO-56).'}]"/>
-        <function model="cultiveau.culture" name="write" eval="[[ref('culture_vigne')], {'kc_ini': 0.3, 'kc_mi': 0.7, 'kc_fin': 0.45, 'duree_ini': 30, 'duree_dev': 60, 'duree_mi': 40, 'duree_fin': 80, 'hauteur_max': 1.5, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.45, 'source_kc': 'FAO-56 (Allen et al., 1998) — Vigne de cuve (FAO-56, wine grapes) : contrainte hydrique modérée recherchée.'}]"/>
-    </data>
-    <!-- Les nouvelles cultures et la frise France de toutes : créées une fois, ensuite modifiables dans l'ERP. -->
+    <!-- Les cultures et la frise France : créées une fois, ensuite modifiables dans l'ERP. -->
     <data noupdate="1">
         <record id="culture_ble_tendre" model="cultiveau.culture">
             <field name="name">Blé tendre d'hiver</field>
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#c9a227</field>
             <field name="sequence">100</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.3</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">140</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">1.0</field>
-            <field name="racines_min">1.5</field>
-            <field name="racines_max">1.8</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_ble_tendre_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_ble_tendre"/>
@@ -235,18 +206,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#d4a017</field>
             <field name="sequence">102</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.25</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">135</field>
-            <field name="duree_mi">35</field>
-            <field name="duree_fin">25</field>
-            <field name="hauteur_max">1.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_orge_hiver_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_orge_hiver"/>
@@ -335,18 +294,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#e1ad01</field>
             <field name="sequence">103</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.25</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">65</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">1.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_orge_printemps_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_orge_printemps"/>
@@ -435,18 +382,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#a67c00</field>
             <field name="sequence">104</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.25</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">65</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">1.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_avoine_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_avoine"/>
@@ -521,18 +456,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#cfa63d</field>
             <field name="sequence">105</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.25</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">140</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">1.2</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc des céréales à paille (FAO-56).</field>
         </record>
         <record id="stade_seigle_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_seigle"/>
@@ -621,18 +544,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#9c7a2e</field>
             <field name="sequence">106</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.25</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">140</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">1.1</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.6</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc des céréales à paille (FAO-56).</field>
         </record>
         <record id="stade_triticale_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_triticale"/>
@@ -721,18 +632,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#c9a227</field>
             <field name="sequence">107</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.25</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">140</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">1.2</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des céréales à paille.</field>
         </record>
         <record id="stade_epeautre_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_epeautre"/>
@@ -821,18 +720,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#b8860b</field>
             <field name="sequence">108</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.2</field>
-            <field name="kc_fin">0.35</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">2.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.7</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_mais_grain_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_mais_grain"/>
@@ -921,18 +808,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#d4a017</field>
             <field name="sequence">109</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.2</field>
-            <field name="kc_fin">0.6</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">2.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.7</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_mais_ensilage_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_mais_ensilage"/>
@@ -1021,18 +896,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#e1ad01</field>
             <field name="sequence">110</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.2</field>
-            <field name="kc_fin">0.5</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">25</field>
-            <field name="hauteur_max">2.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.7</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_mais_semence_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_mais_semence"/>
@@ -1121,18 +984,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#a67c00</field>
             <field name="sequence">111</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">1.05</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">25</field>
-            <field name="duree_mi">25</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">0.8</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_mais_doux_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_mais_doux"/>
@@ -1207,18 +1058,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#cfa63d</field>
             <field name="sequence">112</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.55</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">35</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_sorgho_grain_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_sorgho_grain"/>
@@ -1307,18 +1146,6 @@
             <field name="categorie">prairies</field>
             <field name="couleur">#5b8c2a</field>
             <field name="sequence">200</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.2</field>
-            <field name="kc_fin">1.05</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">2.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc du sorgho fourrager (FAO-56, sweet sorghum).</field>
         </record>
         <record id="stade_sorgho_fourrager_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_sorgho_fourrager"/>
@@ -1393,18 +1220,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#9c7a2e</field>
             <field name="sequence">113</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.3</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">25</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">25</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_millet_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_millet"/>
@@ -1547,18 +1362,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#b8860b</field>
             <field name="sequence">115</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.3</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">20</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">1.0</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc du millet (céréale de cycle court).</field>
         </record>
         <record id="stade_sarrasin_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_sarrasin"/>
@@ -1633,18 +1436,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#d4a017</field>
             <field name="sequence">116</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.5</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">0.8</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.6</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des céréales de printemps (valeurs publiées 0,5 / 1,0 / 0,7 selon les essais).</field>
         </record>
         <record id="stade_quinoa_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_quinoa"/>
@@ -1911,18 +1702,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#cfa63d</field>
             <field name="sequence">119</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.5</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">25</field>
-            <field name="hauteur_max">0.8</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.3</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_soja_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_soja"/>
@@ -2011,18 +1790,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#9c7a2e</field>
             <field name="sequence">120</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.3</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">35</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_pois_proteagineux_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_pois_proteagineux"/>
@@ -2111,18 +1878,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#c9a227</field>
             <field name="sequence">121</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.3</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">25</field>
-            <field name="duree_mi">35</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.8</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">0.7</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_feverole_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_feverole"/>
@@ -2225,18 +1980,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#b8860b</field>
             <field name="sequence">122</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.3</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">0.8</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_lentille_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_lentille"/>
@@ -2311,18 +2054,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#d4a017</field>
             <field name="sequence">123</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.35</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_pois_chiche_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_pois_chiche"/>
@@ -2397,18 +2128,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#e1ad01</field>
             <field name="sequence">124</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.35</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">0.9</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_haricot_sec_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_haricot_sec"/>
@@ -2497,18 +2216,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#a67c00</field>
             <field name="sequence">125</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.3</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.8</field>
-            <field name="racines_min">0.8</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des légumineuses à graines.</field>
         </record>
         <record id="stade_lupin_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_lupin"/>
@@ -2583,18 +2290,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#cfa63d</field>
             <field name="sequence">126</field>
-            <field name="kc_ini">0.35</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.25</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">35</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">1.2</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_lin_oleagineux_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_lin_oleagineux"/>
@@ -2669,18 +2364,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#9c7a2e</field>
             <field name="sequence">127</field>
-            <field name="kc_ini">0.35</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.25</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">35</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">1.2</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_lin_fibre_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_lin_fibre"/>
@@ -2755,18 +2438,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#c9a227</field>
             <field name="sequence">128</field>
-            <field name="kc_ini">0.35</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.4</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">3.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc du lin et du maïs (pas de valeur FAO-56 publiée).</field>
         </record>
         <record id="stade_chanvre_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_chanvre"/>
@@ -2841,18 +2512,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#b8860b</field>
             <field name="sequence">129</field>
-            <field name="kc_ini">0.35</field>
-            <field name="kc_mi">1.2</field>
-            <field name="kc_fin">0.7</field>
-            <field name="duree_ini">40</field>
-            <field name="duree_dev">60</field>
-            <field name="duree_mi">70</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.7</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_betterave_sucriere_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_betterave_sucriere"/>
@@ -2941,18 +2600,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#d4a017</field>
             <field name="sequence">130</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">45</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.6</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_pomme_de_terre_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_pomme_de_terre"/>
@@ -3041,18 +2688,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e4572e</field>
             <field name="sequence">300</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">25</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_pdt_primeur_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_pdt_primeur"/>
@@ -3127,18 +2762,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#e1ad01</field>
             <field name="sequence">131</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_pdt_plant_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_pdt_plant"/>
@@ -3213,18 +2836,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#a67c00</field>
             <field name="sequence">132</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.85</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des cultures sarclées (FAO-56 n'a plus de ligne tabac).</field>
         </record>
         <record id="stade_tabac_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_tabac"/>
@@ -3299,18 +2910,6 @@
             <field name="categorie">grandes_cultures</field>
             <field name="couleur">#cfa63d</field>
             <field name="sequence">133</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des racines (navet, betterave).</field>
         </record>
         <record id="stade_endive_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_endive"/>
@@ -3467,18 +3066,6 @@
             <field name="categorie">prairies</field>
             <field name="couleur">#4f7d23</field>
             <field name="sequence">202</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.9</field>
-            <field name="duree_ini">10</field>
-            <field name="duree_dev">20</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">45</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.6</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_prairie_temporaire_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_prairie_temporaire"/>
@@ -3567,18 +3154,6 @@
             <field name="categorie">prairies</field>
             <field name="couleur">#7cae4a</field>
             <field name="sequence">203</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">0.95</field>
-            <field name="kc_fin">0.9</field>
-            <field name="duree_ini">10</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">150</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.7</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc moyen sur l'année ; entre deux coupes il va de 0,40 à 1,20.</field>
         </record>
         <record id="stade_luzerne_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_luzerne"/>
@@ -3667,18 +3242,6 @@
             <field name="categorie">prairies</field>
             <field name="couleur">#5b8c2a</field>
             <field name="sequence">204</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">0.9</field>
-            <field name="kc_fin">0.85</field>
-            <field name="duree_ini">10</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">150</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.6</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">0.9</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc du trèfle (FAO-56, Berseem).</field>
         </record>
         <record id="stade_trefle_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_trefle"/>
@@ -3767,18 +3330,6 @@
             <field name="categorie">prairies</field>
             <field name="couleur">#6fa03a</field>
             <field name="sequence">205</field>
-            <field name="kc_ini">0.95</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">1.0</field>
-            <field name="duree_ini">10</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">130</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.6</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_ray_grass_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_ray_grass"/>
@@ -3867,18 +3418,6 @@
             <field name="categorie">prairies</field>
             <field name="couleur">#4f7d23</field>
             <field name="sequence">206</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">45</field>
-            <field name="duree_mi">70</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.7</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.55</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_betterave_fourragere_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_betterave_fourragere"/>
@@ -4021,18 +3560,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#f28f3b</field>
             <field name="sequence">302</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.8</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">45</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.6</field>
-            <field name="racines_min">0.7</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_tomate_industrie_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_tomate_industrie"/>
@@ -4121,18 +3648,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#c8553d</field>
             <field name="sequence">303</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.9</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">35</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.7</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_poivron_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_poivron"/>
@@ -4207,18 +3722,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e07a5f</field>
             <field name="sequence">304</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.9</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">35</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.7</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc du poivron (FAO-56).</field>
         </record>
         <record id="stade_piment_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_piment"/>
@@ -4293,18 +3796,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#ef8354</field>
             <field name="sequence">305</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.9</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.8</field>
-            <field name="racines_min">0.7</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_aubergine_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_aubergine"/>
@@ -4379,18 +3870,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e4572e</field>
             <field name="sequence">306</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.7</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_concombre_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_concombre"/>
@@ -4451,18 +3930,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#d1495b</field>
             <field name="sequence">307</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.7</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc du concombre (FAO-56).</field>
         </record>
         <record id="stade_cornichon_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_cornichon"/>
@@ -4523,18 +3990,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#f28f3b</field>
             <field name="sequence">308</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">0.95</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">35</field>
-            <field name="duree_mi">25</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_courgette_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_courgette"/>
@@ -4595,18 +4050,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#c8553d</field>
             <field name="sequence">309</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.8</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_courge_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_courge"/>
@@ -4749,18 +4192,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#ef8354</field>
             <field name="sequence">311</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.8</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_pasteque_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_pasteque"/>
@@ -4835,18 +4266,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e4572e</field>
             <field name="sequence">312</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">15</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.5</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_laitue_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_laitue"/>
@@ -4921,18 +4340,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#d1495b</field>
             <field name="sequence">313</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">20</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.5</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc de la laitue (FAO-56).</field>
         </record>
         <record id="stade_chicoree_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_chicoree"/>
@@ -5007,18 +4414,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#f28f3b</field>
             <field name="sequence">314</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">20</field>
-            <field name="duree_mi">15</field>
-            <field name="duree_fin">5</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.5</field>
-            <field name="p_tarissement">0.2</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_epinard_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_epinard"/>
@@ -5093,18 +4488,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#c8553d</field>
             <field name="sequence">315</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">20</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">0.1</field>
-            <field name="racines_min">0.2</field>
-            <field name="racines_max">0.3</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des petits légumes feuilles.</field>
         </record>
         <record id="stade_mache_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_mache"/>
@@ -5165,18 +4548,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e07a5f</field>
             <field name="sequence">316</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">40</field>
-            <field name="duree_dev">60</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">0.8</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_chou_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_chou"/>
@@ -5251,18 +4622,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#ef8354</field>
             <field name="sequence">317</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">35</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">0.7</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_chou_fleur_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_chou_fleur"/>
@@ -5337,18 +4696,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e4572e</field>
             <field name="sequence">318</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">35</field>
-            <field name="duree_dev">45</field>
-            <field name="duree_mi">40</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_brocoli_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_brocoli"/>
@@ -5423,18 +4770,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#d1495b</field>
             <field name="sequence">319</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">35</field>
-            <field name="duree_mi">90</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_chou_bruxelles_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_chou_bruxelles"/>
@@ -5509,18 +4844,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#f28f3b</field>
             <field name="sequence">320</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_carotte_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_carotte"/>
@@ -5595,18 +4918,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#c8553d</field>
             <field name="sequence">321</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">25</field>
-            <field name="duree_mi">20</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_betterave_potagere_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_betterave_potagere"/>
@@ -5681,18 +4992,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e07a5f</field>
             <field name="sequence">322</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">0.9</field>
-            <field name="kc_fin">0.85</field>
-            <field name="duree_ini">5</field>
-            <field name="duree_dev">10</field>
-            <field name="duree_mi">15</field>
-            <field name="duree_fin">5</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.5</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_radis_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_radis"/>
@@ -5739,18 +5038,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#ef8354</field>
             <field name="sequence">323</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">25</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">0.6</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_navet_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_navet"/>
@@ -5811,18 +5098,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e4572e</field>
             <field name="sequence">324</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_panais_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_panais"/>
@@ -5897,18 +5172,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#d1495b</field>
             <field name="sequence">325</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">1.0</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">70</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc de l'oignon vert (FAO-56).</field>
         </record>
         <record id="stade_poireau_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_poireau"/>
@@ -5983,18 +5246,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#f28f3b</field>
             <field name="sequence">326</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">25</field>
-            <field name="duree_mi">70</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_oignon_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_oignon"/>
@@ -6069,18 +5320,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#c8553d</field>
             <field name="sequence">327</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">50</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc de l'oignon (FAO-56).</field>
         </record>
         <record id="stade_echalote_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_echalote"/>
@@ -6155,18 +5394,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e07a5f</field>
             <field name="sequence">328</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.7</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">70</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.5</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_ail_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_ail"/>
@@ -6255,18 +5482,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#ef8354</field>
             <field name="sequence">329</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">1.0</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">45</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.6</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.5</field>
-            <field name="p_tarissement">0.2</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_celeri_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_celeri"/>
@@ -6341,18 +5556,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e4572e</field>
             <field name="sequence">330</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">1.0</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.5</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc du céleri.</field>
         </record>
         <record id="stade_fenouil_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_fenouil"/>
@@ -6427,18 +5630,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#d1495b</field>
             <field name="sequence">331</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">40</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">250</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.7</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">0.9</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_artichaut_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_artichaut"/>
@@ -6609,18 +5800,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#c8553d</field>
             <field name="sequence">333</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.9</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">0.7</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_haricot_vert_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_haricot_vert"/>
@@ -6695,18 +5874,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e07a5f</field>
             <field name="sequence">334</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">1.1</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">35</field>
-            <field name="duree_fin">5</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_petit_pois_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_petit_pois"/>
@@ -6781,18 +5948,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#ef8354</field>
             <field name="sequence">335</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">1.1</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">25</field>
-            <field name="duree_mi">35</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">0.8</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">0.7</field>
-            <field name="p_tarissement">0.45</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_feve_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_feve"/>
@@ -6867,18 +6022,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#e4572e</field>
             <field name="sequence">336</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.65</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.65</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_patate_douce_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_patate_douce"/>
@@ -6953,18 +6096,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#d1495b</field>
             <field name="sequence">337</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">20</field>
-            <field name="hauteur_max">0.4</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.5</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc de la menthe et du céleri.</field>
         </record>
         <record id="stade_aromatiques_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_aromatiques"/>
@@ -7025,18 +6156,6 @@
             <field name="categorie">petits_fruits</field>
             <field name="couleur">#7b2d8b</field>
             <field name="sequence">500</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">0.85</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">0.2</field>
-            <field name="racines_min">0.2</field>
-            <field name="racines_max">0.3</field>
-            <field name="p_tarissement">0.2</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_fraisier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_fraisier"/>
@@ -7125,18 +6244,6 @@
             <field name="categorie">maraichage</field>
             <field name="couleur">#f28f3b</field>
             <field name="sequence">338</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.85</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.6</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Moyenne des légumes d'un potager (pour les particuliers).</field>
         </record>
         <record id="stade_potager_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_potager"/>
@@ -7307,18 +6414,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#c0392b</field>
             <field name="sequence">401</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.2</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">4.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56).</field>
         </record>
         <record id="stade_poirier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_poirier"/>
@@ -7709,18 +6804,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#b03a2e</field>
             <field name="sequence">405</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.9</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">70</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">3.5</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56, fruits à noyau).</field>
         </record>
         <record id="stade_prunier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_prunier"/>
@@ -7823,18 +6906,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#a23b72</field>
             <field name="sequence">406</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">1.05</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">70</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">3.0</field>
-            <field name="racines_min">0.7</field>
-            <field name="racines_max">1.3</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_kiwi_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_kiwi"/>
@@ -8033,18 +7104,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#8e44ad</field>
             <field name="sequence">408</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">0.9</field>
-            <field name="kc_fin">0.65</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">70</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">5.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Sans couverture du sol (FAO-56).</field>
         </record>
         <record id="stade_amandier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_amandier"/>
@@ -8147,18 +7206,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#d35400</field>
             <field name="sequence">409</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.65</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">10</field>
-            <field name="duree_mi">130</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">4.5</field>
-            <field name="racines_min">1.7</field>
-            <field name="racines_max">2.4</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_noyer_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_noyer"/>
@@ -8261,18 +7308,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#6b8e23</field>
             <field name="sequence">410</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.65</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">110</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">5.0</field>
-            <field name="racines_min">0.8</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc du noyer et de l'amandier.</field>
         </record>
         <record id="stade_noisetier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_noisetier"/>
@@ -8375,18 +7410,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#b03a2e</field>
             <field name="sequence">411</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.65</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">100</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">10.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc du noyer.</field>
         </record>
         <record id="stade_chataignier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_chataignier"/>
@@ -8475,18 +7498,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#a23b72</field>
             <field name="sequence">412</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">0.95</field>
-            <field name="kc_fin">0.7</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">110</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">4.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des fruits à noyau sans couverture.</field>
         </record>
         <record id="stade_figuier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_figuier"/>
@@ -8589,18 +7600,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#c0392b</field>
             <field name="sequence">413</field>
-            <field name="kc_ini">0.65</field>
-            <field name="kc_mi">0.6</field>
-            <field name="kc_fin">0.65</field>
-            <field name="duree_ini">60</field>
-            <field name="duree_dev">90</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">95</field>
-            <field name="hauteur_max">4.0</field>
-            <field name="racines_min">1.1</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Arbres couvrant environ 50 % du sol, sans enherbement (FAO-56).</field>
         </record>
         <record id="stade_agrumes_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_agrumes"/>
@@ -8689,18 +7688,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#8e44ad</field>
             <field name="sequence">414</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">0.85</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">60</field>
-            <field name="duree_dev">90</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">95</field>
-            <field name="hauteur_max">5.0</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.7</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_avocatier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_avocatier"/>
@@ -8761,18 +7748,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#d35400</field>
             <field name="sequence">415</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">0.85</field>
-            <field name="kc_fin">0.65</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">110</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">3.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des fruits à noyau sans couverture.</field>
         </record>
         <record id="stade_grenadier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_grenadier"/>
@@ -8847,18 +7822,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#6b8e23</field>
             <field name="sequence">416</field>
-            <field name="kc_ini">0.45</field>
-            <field name="kc_mi">0.9</field>
-            <field name="kc_fin">0.65</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">110</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">4.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc des fruits à noyau sans couverture.</field>
         </record>
         <record id="stade_kaki_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_kaki"/>
@@ -8933,18 +7896,6 @@
             <field name="categorie">arbo</field>
             <field name="couleur">#b03a2e</field>
             <field name="sequence">417</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">0.45</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">60</field>
-            <field name="duree_mi">30</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">3.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.5</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_pistachier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_pistachier"/>
@@ -9033,18 +7984,6 @@
             <field name="categorie">petits_fruits</field>
             <field name="couleur">#9b2c5a</field>
             <field name="sequence">501</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.5</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">75</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc des petits fruits (FAO-56, berries).</field>
         </record>
         <record id="stade_framboisier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_framboisier"/>
@@ -9147,18 +8086,6 @@
             <field name="categorie">petits_fruits</field>
             <field name="couleur">#5b2a86</field>
             <field name="sequence">502</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.5</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">75</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">0.8</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc des petits fruits (FAO-56).</field>
         </record>
         <record id="stade_myrtillier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_myrtillier"/>
@@ -9247,18 +8174,6 @@
             <field name="categorie">petits_fruits</field>
             <field name="couleur">#7b2d8b</field>
             <field name="sequence">503</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.5</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">75</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc des petits fruits (FAO-56).</field>
         </record>
         <record id="stade_cassis_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_cassis"/>
@@ -9347,18 +8262,6 @@
             <field name="categorie">petits_fruits</field>
             <field name="couleur">#9b2c5a</field>
             <field name="sequence">504</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.5</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">50</field>
-            <field name="duree_mi">75</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">1.5</field>
-            <field name="racines_min">0.6</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Kc des petits fruits (FAO-56).</field>
         </record>
         <record id="stade_mure_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_mure"/>
@@ -9529,18 +8432,6 @@
             <field name="categorie">vigne</field>
             <field name="couleur">#8e3b74</field>
             <field name="sequence">601</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">0.85</field>
-            <field name="kc_fin">0.45</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">2.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_raisin_table_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_raisin_table"/>
@@ -9643,18 +8534,6 @@
             <field name="categorie">vigne</field>
             <field name="couleur">#4a6b2a</field>
             <field name="sequence">602</field>
-            <field name="kc_ini">0.3</field>
-            <field name="kc_mi">1.05</field>
-            <field name="kc_fin">0.85</field>
-            <field name="duree_ini">25</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">80</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">5.0</field>
-            <field name="racines_min">1.0</field>
-            <field name="racines_max">1.2</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_houblon_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_houblon"/>
@@ -9743,18 +8622,6 @@
             <field name="categorie">ppam</field>
             <field name="couleur">#8e7cc3</field>
             <field name="sequence">700</field>
-            <field name="kc_ini">0.35</field>
-            <field name="kc_mi">0.75</field>
-            <field name="kc_fin">0.6</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">60</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.8</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.65</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc estimé (culture conduite en sec ; irrigation de complément sur jeunes plantations).</field>
         </record>
         <record id="stade_lavande_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_lavande"/>
@@ -9843,18 +8710,6 @@
             <field name="categorie">ppam</field>
             <field name="couleur">#6c5ba7</field>
             <field name="sequence">701</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.9</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">80</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">0.8</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc de la menthe (1,15) et des petits légumes.</field>
         </record>
         <record id="stade_ppam_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_ppam"/>
@@ -9943,18 +8798,6 @@
             <field name="categorie">sous_abri</field>
             <field name="couleur">#2a9d8f</field>
             <field name="sequence">800</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.15</field>
-            <field name="kc_fin">0.8</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">150</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">2.5</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Sous abri, l'ETP intérieure vaut environ 60 à 80 % de l'ETP extérieure.</field>
         </record>
         <record id="stade_tomate_abri_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_tomate_abri"/>
@@ -10029,18 +8872,6 @@
             <field name="categorie">sous_abri</field>
             <field name="couleur">#3ab0a2</field>
             <field name="sequence">801</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">60</field>
-            <field name="duree_fin">15</field>
-            <field name="hauteur_max">2.0</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">0.8</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_concombre_abri_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_concombre_abri"/>
@@ -10115,18 +8946,6 @@
             <field name="categorie">sous_abri</field>
             <field name="couleur">#21867a</field>
             <field name="sequence">802</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">0.85</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.1</field>
-            <field name="racines_max">0.2</field>
-            <field name="p_tarissement">0.2</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_fraise_hors_sol_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_fraise_hors_sol"/>
@@ -10201,18 +9020,6 @@
             <field name="categorie">sous_abri</field>
             <field name="couleur">#2a9d8f</field>
             <field name="sequence">803</field>
-            <field name="kc_ini">0.7</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">15</field>
-            <field name="duree_dev">25</field>
-            <field name="duree_mi">15</field>
-            <field name="duree_fin">5</field>
-            <field name="hauteur_max">0.3</field>
-            <field name="racines_min">0.2</field>
-            <field name="racines_max">0.4</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998)</field>
         </record>
         <record id="stade_salade_abri_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_salade_abri"/>
@@ -10259,18 +9066,6 @@
             <field name="categorie">pepiniere</field>
             <field name="couleur">#319795</field>
             <field name="sequence">1000</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.8</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">30</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">30</field>
-            <field name="hauteur_max">0.5</field>
-            <field name="racines_min">0.1</field>
-            <field name="racines_max">0.3</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc estimé ; le besoin dépend surtout du substrat et de l'abri.</field>
         </record>
         <record id="stade_horticulture_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_horticulture"/>
@@ -10345,18 +9140,6 @@
             <field name="categorie">pepiniere</field>
             <field name="couleur">#2c7a7b</field>
             <field name="sequence">1001</field>
-            <field name="kc_ini">0.6</field>
-            <field name="kc_mi">1.0</field>
-            <field name="kc_fin">0.8</field>
-            <field name="duree_ini">30</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">2.0</field>
-            <field name="racines_min">0.2</field>
-            <field name="racines_max">0.4</field>
-            <field name="p_tarissement">0.3</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc estimé ; en conteneur, la réserve est de quelques jours seulement.</field>
         </record>
         <record id="stade_pepiniere_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_pepiniere"/>
@@ -10445,18 +9228,6 @@
             <field name="categorie">espaces_verts</field>
             <field name="couleur">#38a169</field>
             <field name="sequence">900</field>
-            <field name="kc_ini">0.9</field>
-            <field name="kc_mi">0.95</field>
-            <field name="kc_fin">0.95</field>
-            <field name="duree_ini">10</field>
-            <field name="duree_dev">20</field>
-            <field name="duree_mi">180</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">0.1</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.4</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Gazon de saison fraîche, bien entretenu (FAO-56).</field>
         </record>
         <record id="stade_gazon_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_gazon"/>
@@ -10531,18 +9302,6 @@
             <field name="categorie">espaces_verts</field>
             <field name="couleur">#2f855a</field>
             <field name="sequence">901</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">0.7</field>
-            <field name="kc_fin">0.6</field>
-            <field name="duree_ini">20</field>
-            <field name="duree_dev">40</field>
-            <field name="duree_mi">150</field>
-            <field name="duree_fin">40</field>
-            <field name="hauteur_max">2.0</field>
-            <field name="racines_min">0.4</field>
-            <field name="racines_max">1.0</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — ≈ Kc estimé pour les plantations d'ornement établies (paillées, goutte à goutte).</field>
         </record>
         <record id="stade_massifs_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_massifs"/>
@@ -10631,18 +9390,6 @@
             <field name="categorie">tropicales</field>
             <field name="couleur">#dd6b20</field>
             <field name="sequence">1100</field>
-            <field name="kc_ini">0.4</field>
-            <field name="kc_mi">1.25</field>
-            <field name="kc_fin">0.75</field>
-            <field name="duree_ini">35</field>
-            <field name="duree_dev">60</field>
-            <field name="duree_mi">190</field>
-            <field name="duree_fin">120</field>
-            <field name="hauteur_max">3.0</field>
-            <field name="racines_min">1.2</field>
-            <field name="racines_max">2.0</field>
-            <field name="p_tarissement">0.65</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Calendrier de La Réunion.</field>
         </record>
         <record id="stade_canne_sucre_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_canne_sucre"/>
@@ -10731,18 +9478,6 @@
             <field name="categorie">tropicales</field>
             <field name="couleur">#c05621</field>
             <field name="sequence">1101</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">1.1</field>
-            <field name="kc_fin">1.0</field>
-            <field name="duree_ini">120</field>
-            <field name="duree_dev">90</field>
-            <field name="duree_mi">120</field>
-            <field name="duree_fin">60</field>
-            <field name="hauteur_max">4.0</field>
-            <field name="racines_min">0.5</field>
-            <field name="racines_max">0.9</field>
-            <field name="p_tarissement">0.35</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Culture continue (Antilles, La Réunion).</field>
         </record>
         <record id="stade_bananier_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_bananier"/>
@@ -10789,18 +9524,6 @@
             <field name="categorie">tropicales</field>
             <field name="couleur">#b7791f</field>
             <field name="sequence">1102</field>
-            <field name="kc_ini">0.5</field>
-            <field name="kc_mi">0.3</field>
-            <field name="kc_fin">0.3</field>
-            <field name="duree_ini">60</field>
-            <field name="duree_dev">120</field>
-            <field name="duree_mi">600</field>
-            <field name="duree_fin">10</field>
-            <field name="hauteur_max">0.6</field>
-            <field name="racines_min">0.3</field>
-            <field name="racines_max">0.6</field>
-            <field name="p_tarissement">0.5</field>
-            <field name="source_kc">FAO-56 (Allen et al., 1998) — Plante à métabolisme CAM : Kc très faible (FAO-56).</field>
         </record>
         <record id="stade_ananas_fr_1" model="cultiveau.culture.stade">
             <field name="culture_id" ref="culture_ananas"/>
@@ -10856,5 +9579,127 @@
             <field name="mois_debut">3</field>
             <field name="mois_fin">3</field>
         </record>
+    </data>
+    <!-- Les coefficients de référence FAO-56 de toutes les cultures : remis à jour à chaque mise à jour du module. -->
+    <data noupdate="0">
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_ble_tendre')], {'kc_ini': 0.4, 'kc_mi': 1.15, 'kc_fin': 0.3, 'duree_ini': 30, 'duree_dev': 140, 'duree_mi': 40, 'duree_fin': 30, 'hauteur_max': 1.0, 'racines_min': 1.5, 'racines_max': 1.8, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_ble_dur')], {'kc_ini': 0.4, 'kc_mi': 1.15, 'kc_fin': 0.3, 'duree_ini': 30, 'duree_dev': 140, 'duree_mi': 40, 'duree_fin': 30, 'hauteur_max': 1.0, 'racines_min': 1.5, 'racines_max': 1.8, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_orge_hiver')], {'kc_ini': 0.3, 'kc_mi': 1.15, 'kc_fin': 0.25, 'duree_ini': 25, 'duree_dev': 135, 'duree_mi': 35, 'duree_fin': 25, 'hauteur_max': 1.0, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_orge_printemps')], {'kc_ini': 0.3, 'kc_mi': 1.15, 'kc_fin': 0.25, 'duree_ini': 15, 'duree_dev': 30, 'duree_mi': 65, 'duree_fin': 40, 'hauteur_max': 1.0, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_avoine')], {'kc_ini': 0.3, 'kc_mi': 1.15, 'kc_fin': 0.25, 'duree_ini': 15, 'duree_dev': 30, 'duree_mi': 65, 'duree_fin': 40, 'hauteur_max': 1.0, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_seigle')], {'kc_ini': 0.3, 'kc_mi': 1.15, 'kc_fin': 0.25, 'duree_ini': 30, 'duree_dev': 140, 'duree_mi': 40, 'duree_fin': 30, 'hauteur_max': 1.2, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc des céréales à paille (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_triticale')], {'kc_ini': 0.3, 'kc_mi': 1.15, 'kc_fin': 0.25, 'duree_ini': 30, 'duree_dev': 140, 'duree_mi': 40, 'duree_fin': 30, 'hauteur_max': 1.1, 'racines_min': 1.0, 'racines_max': 1.6, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc des céréales à paille (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_epeautre')], {'kc_ini': 0.3, 'kc_mi': 1.15, 'kc_fin': 0.25, 'duree_ini': 30, 'duree_dev': 140, 'duree_mi': 40, 'duree_fin': 30, 'hauteur_max': 1.2, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc des céréales à paille.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_mais_grain')], {'kc_ini': 0.3, 'kc_mi': 1.2, 'kc_fin': 0.35, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 50, 'duree_fin': 30, 'hauteur_max': 2.0, 'racines_min': 1.0, 'racines_max': 1.7, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_mais_ensilage')], {'kc_ini': 0.3, 'kc_mi': 1.2, 'kc_fin': 0.6, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 50, 'duree_fin': 20, 'hauteur_max': 2.0, 'racines_min': 1.0, 'racines_max': 1.7, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_mais_semence')], {'kc_ini': 0.3, 'kc_mi': 1.2, 'kc_fin': 0.5, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 50, 'duree_fin': 25, 'hauteur_max': 2.0, 'racines_min': 1.0, 'racines_max': 1.7, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_mais_doux')], {'kc_ini': 0.3, 'kc_mi': 1.15, 'kc_fin': 1.05, 'duree_ini': 20, 'duree_dev': 25, 'duree_mi': 25, 'duree_fin': 10, 'hauteur_max': 1.5, 'racines_min': 0.8, 'racines_max': 1.2, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_sorgho_grain')], {'kc_ini': 0.3, 'kc_mi': 1.05, 'kc_fin': 0.55, 'duree_ini': 20, 'duree_dev': 35, 'duree_mi': 40, 'duree_fin': 30, 'hauteur_max': 1.5, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_sorgho_fourrager')], {'kc_ini': 0.3, 'kc_mi': 1.2, 'kc_fin': 1.05, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 60, 'duree_fin': 15, 'hauteur_max': 2.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc du sorgho fourrager (FAO-56, sweet sorghum).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_millet')], {'kc_ini': 0.3, 'kc_mi': 1.0, 'kc_fin': 0.3, 'duree_ini': 15, 'duree_dev': 25, 'duree_mi': 40, 'duree_fin': 25, 'hauteur_max': 1.5, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_riz')], {'kc_ini': 1.05, 'kc_mi': 1.2, 'kc_fin': 0.9, 'duree_ini': 30, 'duree_dev': 30, 'duree_mi': 80, 'duree_fin': 40, 'hauteur_max': 1.0, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.2, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_sarrasin')], {'kc_ini': 0.3, 'kc_mi': 1.0, 'kc_fin': 0.3, 'duree_ini': 15, 'duree_dev': 20, 'duree_mi': 30, 'duree_fin': 20, 'hauteur_max': 1.0, 'racines_min': 0.6, 'racines_max': 1.0, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc du millet (céréale de cycle court).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_quinoa')], {'kc_ini': 0.3, 'kc_mi': 1.0, 'kc_fin': 0.5, 'duree_ini': 20, 'duree_dev': 40, 'duree_mi': 50, 'duree_fin': 30, 'hauteur_max': 1.5, 'racines_min': 0.8, 'racines_max': 1.2, 'p_tarissement': 0.6, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc des céréales de printemps (valeurs publiées 0,5 / 1,0 / 0,7 selon les essais).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_colza')], {'kc_ini': 0.35, 'kc_mi': 1.1, 'kc_fin': 0.35, 'duree_ini': 25, 'duree_dev': 60, 'duree_mi': 70, 'duree_fin': 35, 'hauteur_max': 1.5, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.6, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_tournesol')], {'kc_ini': 0.35, 'kc_mi': 1.1, 'kc_fin': 0.35, 'duree_ini': 25, 'duree_dev': 35, 'duree_mi': 45, 'duree_fin': 25, 'hauteur_max': 2.0, 'racines_min': 0.8, 'racines_max': 1.5, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_soja')], {'kc_ini': 0.4, 'kc_mi': 1.15, 'kc_fin': 0.5, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 60, 'duree_fin': 25, 'hauteur_max': 0.8, 'racines_min': 0.6, 'racines_max': 1.3, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pois_proteagineux')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.3, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 35, 'duree_fin': 15, 'hauteur_max': 0.5, 'racines_min': 0.6, 'racines_max': 1.0, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_feverole')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.3, 'duree_ini': 15, 'duree_dev': 25, 'duree_mi': 35, 'duree_fin': 15, 'hauteur_max': 0.8, 'racines_min': 0.5, 'racines_max': 0.7, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_lentille')], {'kc_ini': 0.4, 'kc_mi': 1.1, 'kc_fin': 0.3, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 60, 'duree_fin': 40, 'hauteur_max': 0.5, 'racines_min': 0.6, 'racines_max': 0.8, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pois_chiche')], {'kc_ini': 0.4, 'kc_mi': 1.0, 'kc_fin': 0.35, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 50, 'duree_fin': 20, 'hauteur_max': 0.4, 'racines_min': 0.6, 'racines_max': 1.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_haricot_sec')], {'kc_ini': 0.4, 'kc_mi': 1.15, 'kc_fin': 0.35, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 40, 'duree_fin': 20, 'hauteur_max': 0.4, 'racines_min': 0.6, 'racines_max': 0.9, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_lupin')], {'kc_ini': 0.4, 'kc_mi': 1.1, 'kc_fin': 0.3, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 50, 'duree_fin': 30, 'hauteur_max': 0.8, 'racines_min': 0.8, 'racines_max': 1.5, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc des légumineuses à graines.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_lin_oleagineux')], {'kc_ini': 0.35, 'kc_mi': 1.1, 'kc_fin': 0.25, 'duree_ini': 25, 'duree_dev': 35, 'duree_mi': 50, 'duree_fin': 40, 'hauteur_max': 1.2, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_lin_fibre')], {'kc_ini': 0.35, 'kc_mi': 1.1, 'kc_fin': 0.25, 'duree_ini': 25, 'duree_dev': 35, 'duree_mi': 40, 'duree_fin': 15, 'hauteur_max': 1.2, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_chanvre')], {'kc_ini': 0.35, 'kc_mi': 1.15, 'kc_fin': 0.4, 'duree_ini': 20, 'duree_dev': 40, 'duree_mi': 50, 'duree_fin': 30, 'hauteur_max': 3.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc du lin et du maïs (pas de valeur FAO-56 publiée).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_betterave_sucriere')], {'kc_ini': 0.35, 'kc_mi': 1.2, 'kc_fin': 0.7, 'duree_ini': 40, 'duree_dev': 60, 'duree_mi': 70, 'duree_fin': 40, 'hauteur_max': 0.5, 'racines_min': 0.7, 'racines_max': 1.2, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pomme_de_terre')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.75, 'duree_ini': 25, 'duree_dev': 30, 'duree_mi': 45, 'duree_fin': 30, 'hauteur_max': 0.6, 'racines_min': 0.4, 'racines_max': 0.6, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pdt_primeur')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.75, 'duree_ini': 20, 'duree_dev': 25, 'duree_mi': 30, 'duree_fin': 15, 'hauteur_max': 0.5, 'racines_min': 0.4, 'racines_max': 0.6, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pdt_plant')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.75, 'duree_ini': 25, 'duree_dev': 30, 'duree_mi': 40, 'duree_fin': 15, 'hauteur_max': 0.5, 'racines_min': 0.4, 'racines_max': 0.6, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_tabac')], {'kc_ini': 0.5, 'kc_mi': 1.1, 'kc_fin': 0.85, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 40, 'duree_fin': 30, 'hauteur_max': 1.5, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — ≈ Kc des cultures sarclées (FAO-56 n'a plus de ligne tabac).&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_endive')], {'kc_ini': 0.5, 'kc_mi': 1.1, 'kc_fin': 0.95, 'duree_ini': 20, 'duree_dev': 40, 'duree_mi': 60, 'duree_fin': 30, 'hauteur_max': 0.4, 'racines_min': 0.6, 'racines_max': 1.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc des racines (navet, betterave).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_prairies')], {'kc_ini': 0.4, 'kc_mi': 0.95, 'kc_fin': 0.85, 'duree_ini': 10, 'duree_dev': 20, 'duree_mi': 120, 'duree_fin': 45, 'hauteur_max': 0.3, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.6, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Prairie pâturée en rotation (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_prairie_temporaire')], {'kc_ini': 0.4, 'kc_mi': 1.0, 'kc_fin': 0.9, 'duree_ini': 10, 'duree_dev': 20, 'duree_mi': 120, 'duree_fin': 45, 'hauteur_max': 0.3, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.6, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_luzerne')], {'kc_ini': 0.4, 'kc_mi': 0.95, 'kc_fin': 0.9, 'duree_ini': 10, 'duree_dev': 30, 'duree_mi': 150, 'duree_fin': 30, 'hauteur_max': 0.7, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — Kc moyen sur l'année ; entre deux coupes il va de 0,40 à 1,20.&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_trefle')], {'kc_ini': 0.4, 'kc_mi': 0.9, 'kc_fin': 0.85, 'duree_ini': 10, 'duree_dev': 30, 'duree_mi': 150, 'duree_fin': 30, 'hauteur_max': 0.6, 'racines_min': 0.6, 'racines_max': 0.9, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc du trèfle (FAO-56, Berseem).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_ray_grass')], {'kc_ini': 0.95, 'kc_mi': 1.05, 'kc_fin': 1.0, 'duree_ini': 10, 'duree_dev': 30, 'duree_mi': 130, 'duree_fin': 40, 'hauteur_max': 0.3, 'racines_min': 0.6, 'racines_max': 1.0, 'p_tarissement': 0.6, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_betterave_fourragere')], {'kc_ini': 0.5, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 25, 'duree_dev': 45, 'duree_mi': 70, 'duree_fin': 30, 'hauteur_max': 0.5, 'racines_min': 0.7, 'racines_max': 1.2, 'p_tarissement': 0.55, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_tomate')], {'kc_ini': 0.6, 'kc_mi': 1.15, 'kc_fin': 0.8, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 45, 'duree_fin': 30, 'hauteur_max': 0.6, 'racines_min': 0.7, 'racines_max': 1.5, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_tomate_industrie')], {'kc_ini': 0.6, 'kc_mi': 1.15, 'kc_fin': 0.8, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 45, 'duree_fin': 30, 'hauteur_max': 0.6, 'racines_min': 0.7, 'racines_max': 1.5, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_poivron')], {'kc_ini': 0.6, 'kc_mi': 1.05, 'kc_fin': 0.9, 'duree_ini': 30, 'duree_dev': 35, 'duree_mi': 40, 'duree_fin': 20, 'hauteur_max': 0.7, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_piment')], {'kc_ini': 0.6, 'kc_mi': 1.05, 'kc_fin': 0.9, 'duree_ini': 30, 'duree_dev': 35, 'duree_mi': 40, 'duree_fin': 20, 'hauteur_max': 0.7, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc du poivron (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_aubergine')], {'kc_ini': 0.6, 'kc_mi': 1.05, 'kc_fin': 0.9, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 40, 'duree_fin': 20, 'hauteur_max': 0.8, 'racines_min': 0.7, 'racines_max': 1.2, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_concombre')], {'kc_ini': 0.6, 'kc_mi': 1.0, 'kc_fin': 0.75, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 40, 'duree_fin': 15, 'hauteur_max': 0.3, 'racines_min': 0.7, 'racines_max': 1.2, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_cornichon')], {'kc_ini': 0.6, 'kc_mi': 1.0, 'kc_fin': 0.75, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 30, 'duree_fin': 15, 'hauteur_max': 0.3, 'racines_min': 0.7, 'racines_max': 1.2, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc du concombre (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_courgette')], {'kc_ini': 0.5, 'kc_mi': 0.95, 'kc_fin': 0.75, 'duree_ini': 25, 'duree_dev': 35, 'duree_mi': 25, 'duree_fin': 15, 'hauteur_max': 0.3, 'racines_min': 0.6, 'racines_max': 1.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_courge')], {'kc_ini': 0.5, 'kc_mi': 1.0, 'kc_fin': 0.8, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 30, 'duree_fin': 20, 'hauteur_max': 0.4, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_melon')], {'kc_ini': 0.5, 'kc_mi': 1.05, 'kc_fin': 0.75, 'duree_ini': 25, 'duree_dev': 35, 'duree_mi': 40, 'duree_fin': 20, 'hauteur_max': 0.4, 'racines_min': 0.8, 'racines_max': 1.5, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pasteque')], {'kc_ini': 0.4, 'kc_mi': 1.0, 'kc_fin': 0.75, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 30, 'duree_fin': 30, 'hauteur_max': 0.4, 'racines_min': 0.8, 'racines_max': 1.5, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_laitue')], {'kc_ini': 0.7, 'kc_mi': 1.0, 'kc_fin': 0.95, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 15, 'duree_fin': 10, 'hauteur_max': 0.3, 'racines_min': 0.3, 'racines_max': 0.5, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_chicoree')], {'kc_ini': 0.7, 'kc_mi': 1.0, 'kc_fin': 0.95, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 20, 'duree_fin': 10, 'hauteur_max': 0.3, 'racines_min': 0.3, 'racines_max': 0.5, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc de la laitue (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_epinard')], {'kc_ini': 0.7, 'kc_mi': 1.0, 'kc_fin': 0.95, 'duree_ini': 20, 'duree_dev': 20, 'duree_mi': 15, 'duree_fin': 5, 'hauteur_max': 0.3, 'racines_min': 0.3, 'racines_max': 0.5, 'p_tarissement': 0.2, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_mache')], {'kc_ini': 0.7, 'kc_mi': 1.0, 'kc_fin': 0.95, 'duree_ini': 15, 'duree_dev': 20, 'duree_mi': 30, 'duree_fin': 10, 'hauteur_max': 0.1, 'racines_min': 0.2, 'racines_max': 0.3, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc des petits légumes feuilles.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_chou')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 40, 'duree_dev': 60, 'duree_mi': 50, 'duree_fin': 15, 'hauteur_max': 0.4, 'racines_min': 0.5, 'racines_max': 0.8, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_chou_fleur')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 35, 'duree_dev': 50, 'duree_mi': 40, 'duree_fin': 15, 'hauteur_max': 0.4, 'racines_min': 0.4, 'racines_max': 0.7, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_brocoli')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 35, 'duree_dev': 45, 'duree_mi': 40, 'duree_fin': 15, 'hauteur_max': 0.3, 'racines_min': 0.4, 'racines_max': 0.6, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_chou_bruxelles')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 30, 'duree_dev': 35, 'duree_mi': 90, 'duree_fin': 40, 'hauteur_max': 0.4, 'racines_min': 0.4, 'racines_max': 0.6, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_carotte')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 50, 'duree_fin': 20, 'hauteur_max': 0.3, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_betterave_potagere')], {'kc_ini': 0.5, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 15, 'duree_dev': 25, 'duree_mi': 20, 'duree_fin': 10, 'hauteur_max': 0.4, 'racines_min': 0.6, 'racines_max': 1.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_radis')], {'kc_ini': 0.7, 'kc_mi': 0.9, 'kc_fin': 0.85, 'duree_ini': 5, 'duree_dev': 10, 'duree_mi': 15, 'duree_fin': 5, 'hauteur_max': 0.3, 'racines_min': 0.3, 'racines_max': 0.5, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_navet')], {'kc_ini': 0.5, 'kc_mi': 1.1, 'kc_fin': 0.95, 'duree_ini': 15, 'duree_dev': 30, 'duree_mi': 25, 'duree_fin': 10, 'hauteur_max': 0.6, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_panais')], {'kc_ini': 0.5, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 25, 'duree_dev': 40, 'duree_mi': 60, 'duree_fin': 30, 'hauteur_max': 0.4, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_poireau')], {'kc_ini': 0.7, 'kc_mi': 1.0, 'kc_fin': 1.0, 'duree_ini': 30, 'duree_dev': 50, 'duree_mi': 70, 'duree_fin': 40, 'hauteur_max': 0.5, 'racines_min': 0.3, 'racines_max': 0.6, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — ≈ Kc de l'oignon vert (FAO-56).&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_oignon')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 0.75, 'duree_ini': 15, 'duree_dev': 25, 'duree_mi': 70, 'duree_fin': 40, 'hauteur_max': 0.4, 'racines_min': 0.3, 'racines_max': 0.6, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_echalote')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 0.75, 'duree_ini': 15, 'duree_dev': 30, 'duree_mi': 50, 'duree_fin': 20, 'hauteur_max': 0.3, 'racines_min': 0.3, 'racines_max': 0.6, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — Kc de l'oignon (FAO-56).&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_ail')], {'kc_ini': 0.7, 'kc_mi': 1.0, 'kc_fin': 0.7, 'duree_ini': 30, 'duree_dev': 30, 'duree_mi': 70, 'duree_fin': 20, 'hauteur_max': 0.3, 'racines_min': 0.3, 'racines_max': 0.5, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_celeri')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 1.0, 'duree_ini': 25, 'duree_dev': 40, 'duree_mi': 45, 'duree_fin': 15, 'hauteur_max': 0.6, 'racines_min': 0.3, 'racines_max': 0.5, 'p_tarissement': 0.2, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_fenouil')], {'kc_ini': 0.7, 'kc_mi': 1.05, 'kc_fin': 1.0, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 30, 'duree_fin': 10, 'hauteur_max': 0.5, 'racines_min': 0.3, 'racines_max': 0.5, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc du céleri.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_artichaut')], {'kc_ini': 0.5, 'kc_mi': 1.0, 'kc_fin': 0.95, 'duree_ini': 40, 'duree_dev': 40, 'duree_mi': 250, 'duree_fin': 30, 'hauteur_max': 0.7, 'racines_min': 0.6, 'racines_max': 0.9, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_asperge')], {'kc_ini': 0.5, 'kc_mi': 0.95, 'kc_fin': 0.3, 'duree_ini': 50, 'duree_dev': 30, 'duree_mi': 100, 'duree_fin': 50, 'hauteur_max': 0.2, 'racines_min': 1.2, 'racines_max': 1.8, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_haricot_vert')], {'kc_ini': 0.5, 'kc_mi': 1.05, 'kc_fin': 0.9, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 30, 'duree_fin': 10, 'hauteur_max': 0.4, 'racines_min': 0.5, 'racines_max': 0.7, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_petit_pois')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 1.1, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 35, 'duree_fin': 5, 'hauteur_max': 0.5, 'racines_min': 0.6, 'racines_max': 1.0, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_feve')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 1.1, 'duree_ini': 15, 'duree_dev': 25, 'duree_mi': 35, 'duree_fin': 15, 'hauteur_max': 0.8, 'racines_min': 0.5, 'racines_max': 0.7, 'p_tarissement': 0.45, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_patate_douce')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.65, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 60, 'duree_fin': 40, 'hauteur_max': 0.4, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.65, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_aromatiques')], {'kc_ini': 0.6, 'kc_mi': 1.05, 'kc_fin': 0.95, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 60, 'duree_fin': 20, 'hauteur_max': 0.4, 'racines_min': 0.3, 'racines_max': 0.5, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc de la menthe et du céleri.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_fraisier')], {'kc_ini': 0.4, 'kc_mi': 0.85, 'kc_fin': 0.75, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 0.2, 'racines_min': 0.2, 'racines_max': 0.3, 'p_tarissement': 0.2, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_potager')], {'kc_ini': 0.6, 'kc_mi': 1.05, 'kc_fin': 0.85, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 60, 'duree_fin': 30, 'hauteur_max': 0.6, 'racines_min': 0.3, 'racines_max': 0.6, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — Moyenne des légumes d'un potager (pour les particuliers).&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pommier')], {'kc_ini': 0.5, 'kc_mi': 1.2, 'kc_fin': 0.95, 'duree_ini': 30, 'duree_dev': 50, 'duree_mi': 130, 'duree_fin': 30, 'hauteur_max': 4.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56 : avec couverture active du sol).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_poirier')], {'kc_ini': 0.5, 'kc_mi': 1.2, 'kc_fin': 0.95, 'duree_ini': 30, 'duree_dev': 50, 'duree_mi': 120, 'duree_fin': 30, 'hauteur_max': 4.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_cerisier')], {'kc_ini': 0.5, 'kc_mi': 1.2, 'kc_fin': 0.95, 'duree_ini': 20, 'duree_dev': 40, 'duree_mi': 150, 'duree_fin': 30, 'hauteur_max': 4.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pecher')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.9, 'duree_ini': 20, 'duree_dev': 70, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 3.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56, fruits à noyau).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_abricotier')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.9, 'duree_ini': 20, 'duree_dev': 70, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 3.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56, fruits à noyau).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_prunier')], {'kc_ini': 0.5, 'kc_mi': 1.15, 'kc_fin': 0.9, 'duree_ini': 20, 'duree_dev': 70, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 3.5, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger enherbé (FAO-56, fruits à noyau).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_kiwi')], {'kc_ini': 0.4, 'kc_mi': 1.05, 'kc_fin': 1.05, 'duree_ini': 20, 'duree_dev': 70, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 3.0, 'racines_min': 0.7, 'racines_max': 1.3, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_olivier')], {'kc_ini': 0.65, 'kc_mi': 0.7, 'kc_fin': 0.7, 'duree_ini': 30, 'duree_dev': 90, 'duree_mi': 60, 'duree_fin': 90, 'hauteur_max': 4.0, 'racines_min': 1.2, 'racines_max': 1.7, 'p_tarissement': 0.65, 'satisfaction': 0.6, 'source_kc': 'FAO-56 (Allen et al., 1998) — Verger de 40 à 60 % de couverture (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_amandier')], {'kc_ini': 0.4, 'kc_mi': 0.9, 'kc_fin': 0.65, 'duree_ini': 20, 'duree_dev': 70, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 5.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.4, 'satisfaction': 0.7, 'source_kc': 'FAO-56 (Allen et al., 1998) — Sans couverture du sol (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_noyer')], {'kc_ini': 0.5, 'kc_mi': 1.1, 'kc_fin': 0.65, 'duree_ini': 20, 'duree_dev': 10, 'duree_mi': 130, 'duree_fin': 30, 'hauteur_max': 4.5, 'racines_min': 1.7, 'racines_max': 2.4, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_noisetier')], {'kc_ini': 0.5, 'kc_mi': 1.05, 'kc_fin': 0.65, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 110, 'duree_fin': 40, 'hauteur_max': 5.0, 'racines_min': 0.8, 'racines_max': 1.5, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — ≈ Kc du noyer et de l'amandier.&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_chataignier')], {'kc_ini': 0.5, 'kc_mi': 1.0, 'kc_fin': 0.65, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 100, 'duree_fin': 40, 'hauteur_max': 10.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc du noyer.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_figuier')], {'kc_ini': 0.5, 'kc_mi': 0.95, 'kc_fin': 0.7, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 110, 'duree_fin': 40, 'hauteur_max': 4.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.5, 'satisfaction': 0.7, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc des fruits à noyau sans couverture.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_agrumes')], {'kc_ini': 0.65, 'kc_mi': 0.6, 'kc_fin': 0.65, 'duree_ini': 60, 'duree_dev': 90, 'duree_mi': 120, 'duree_fin': 95, 'hauteur_max': 4.0, 'racines_min': 1.1, 'racines_max': 1.5, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Arbres couvrant environ 50 % du sol, sans enherbement (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_avocatier')], {'kc_ini': 0.6, 'kc_mi': 0.85, 'kc_fin': 0.75, 'duree_ini': 60, 'duree_dev': 90, 'duree_mi': 120, 'duree_fin': 95, 'hauteur_max': 5.0, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.7, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_grenadier')], {'kc_ini': 0.4, 'kc_mi': 0.85, 'kc_fin': 0.65, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 110, 'duree_fin': 40, 'hauteur_max': 3.0, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.5, 'satisfaction': 0.7, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc des fruits à noyau sans couverture.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_kaki')], {'kc_ini': 0.45, 'kc_mi': 0.9, 'kc_fin': 0.65, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 110, 'duree_fin': 40, 'hauteur_max': 4.0, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc des fruits à noyau sans couverture.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pistachier')], {'kc_ini': 0.4, 'kc_mi': 1.1, 'kc_fin': 0.45, 'duree_ini': 20, 'duree_dev': 60, 'duree_mi': 30, 'duree_fin': 40, 'hauteur_max': 3.0, 'racines_min': 1.0, 'racines_max': 1.5, 'p_tarissement': 0.4, 'satisfaction': 0.7, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_framboisier')], {'kc_ini': 0.3, 'kc_mi': 1.05, 'kc_fin': 0.5, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 75, 'duree_fin': 60, 'hauteur_max': 1.5, 'racines_min': 0.6, 'racines_max': 1.2, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc des petits fruits (FAO-56, berries).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_myrtillier')], {'kc_ini': 0.3, 'kc_mi': 1.05, 'kc_fin': 0.5, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 75, 'duree_fin': 60, 'hauteur_max': 1.5, 'racines_min': 0.4, 'racines_max': 0.8, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc des petits fruits (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_cassis')], {'kc_ini': 0.3, 'kc_mi': 1.05, 'kc_fin': 0.5, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 75, 'duree_fin': 60, 'hauteur_max': 1.5, 'racines_min': 0.6, 'racines_max': 1.2, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc des petits fruits (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_mure')], {'kc_ini': 0.3, 'kc_mi': 1.05, 'kc_fin': 0.5, 'duree_ini': 20, 'duree_dev': 50, 'duree_mi': 75, 'duree_fin': 60, 'hauteur_max': 1.5, 'racines_min': 0.6, 'racines_max': 1.2, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Kc des petits fruits (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_vigne')], {'kc_ini': 0.3, 'kc_mi': 0.7, 'kc_fin': 0.45, 'duree_ini': 30, 'duree_dev': 60, 'duree_mi': 40, 'duree_fin': 80, 'hauteur_max': 1.5, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.45, 'satisfaction': 0.4, 'source_kc': 'FAO-56 (Allen et al., 1998) — Vigne de cuve (FAO-56, wine grapes) : contrainte hydrique modérée recherchée.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_raisin_table')], {'kc_ini': 0.3, 'kc_mi': 0.85, 'kc_fin': 0.45, 'duree_ini': 20, 'duree_dev': 40, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 2.0, 'racines_min': 1.0, 'racines_max': 2.0, 'p_tarissement': 0.35, 'satisfaction': 0.85, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_houblon')], {'kc_ini': 0.3, 'kc_mi': 1.05, 'kc_fin': 0.85, 'duree_ini': 25, 'duree_dev': 40, 'duree_mi': 80, 'duree_fin': 10, 'hauteur_max': 5.0, 'racines_min': 1.0, 'racines_max': 1.2, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_lavande')], {'kc_ini': 0.35, 'kc_mi': 0.75, 'kc_fin': 0.6, 'duree_ini': 30, 'duree_dev': 60, 'duree_mi': 60, 'duree_fin': 40, 'hauteur_max': 0.8, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.65, 'satisfaction': 0.3, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc estimé (culture conduite en sec ; irrigation de complément sur jeunes plantations).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_ppam')], {'kc_ini': 0.6, 'kc_mi': 1.0, 'kc_fin': 0.9, 'duree_ini': 20, 'duree_dev': 40, 'duree_mi': 80, 'duree_fin': 30, 'hauteur_max': 0.5, 'racines_min': 0.4, 'racines_max': 0.8, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc de la menthe (1,15) et des petits légumes.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_tomate_abri')], {'kc_ini': 0.6, 'kc_mi': 1.15, 'kc_fin': 0.8, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 150, 'duree_fin': 30, 'hauteur_max': 2.5, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — Sous abri, l'ETP intérieure vaut environ 60 à 80 % de l'ETP extérieure.&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_concombre_abri')], {'kc_ini': 0.6, 'kc_mi': 1.0, 'kc_fin': 0.75, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 60, 'duree_fin': 15, 'hauteur_max': 2.0, 'racines_min': 0.5, 'racines_max': 0.8, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_fraise_hors_sol')], {'kc_ini': 0.4, 'kc_mi': 0.85, 'kc_fin': 0.75, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 0.3, 'racines_min': 0.1, 'racines_max': 0.2, 'p_tarissement': 0.2, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_salade_abri')], {'kc_ini': 0.7, 'kc_mi': 1.0, 'kc_fin': 0.95, 'duree_ini': 15, 'duree_dev': 25, 'duree_mi': 15, 'duree_fin': 5, 'hauteur_max': 0.3, 'racines_min': 0.2, 'racines_max': 0.4, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998)'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_horticulture')], {'kc_ini': 0.5, 'kc_mi': 1.0, 'kc_fin': 0.8, 'duree_ini': 20, 'duree_dev': 30, 'duree_mi': 120, 'duree_fin': 30, 'hauteur_max': 0.5, 'racines_min': 0.1, 'racines_max': 0.3, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — ≈ Kc estimé ; le besoin dépend surtout du substrat et de l'abri.&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_pepiniere')], {'kc_ini': 0.6, 'kc_mi': 1.0, 'kc_fin': 0.8, 'duree_ini': 30, 'duree_dev': 40, 'duree_mi': 120, 'duree_fin': 40, 'hauteur_max': 2.0, 'racines_min': 0.2, 'racines_max': 0.4, 'p_tarissement': 0.3, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — ≈ Kc estimé ; en conteneur, la réserve est de quelques jours seulement.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_gazon')], {'kc_ini': 0.9, 'kc_mi': 0.95, 'kc_fin': 0.95, 'duree_ini': 10, 'duree_dev': 20, 'duree_mi': 180, 'duree_fin': 40, 'hauteur_max': 0.1, 'racines_min': 0.5, 'racines_max': 1.0, 'p_tarissement': 0.4, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Gazon de saison fraîche, bien entretenu (FAO-56).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_massifs')], {'kc_ini': 0.5, 'kc_mi': 0.7, 'kc_fin': 0.6, 'duree_ini': 20, 'duree_dev': 40, 'duree_mi': 150, 'duree_fin': 40, 'hauteur_max': 2.0, 'racines_min': 0.4, 'racines_max': 1.0, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': &quot;FAO-56 (Allen et al., 1998) — ≈ Kc estimé pour les plantations d'ornement établies (paillées, goutte à goutte).&quot;}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_canne_sucre')], {'kc_ini': 0.4, 'kc_mi': 1.25, 'kc_fin': 0.75, 'duree_ini': 35, 'duree_dev': 60, 'duree_mi': 190, 'duree_fin': 120, 'hauteur_max': 3.0, 'racines_min': 1.2, 'racines_max': 2.0, 'p_tarissement': 0.65, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Calendrier de La Réunion.'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_bananier')], {'kc_ini': 0.5, 'kc_mi': 1.1, 'kc_fin': 1.0, 'duree_ini': 120, 'duree_dev': 90, 'duree_mi': 120, 'duree_fin': 60, 'hauteur_max': 4.0, 'racines_min': 0.5, 'racines_max': 0.9, 'p_tarissement': 0.35, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Culture continue (Antilles, La Réunion).'}]"/>
+        <function model="cultiveau.culture" name="write" eval="[[ref('culture_ananas')], {'kc_ini': 0.5, 'kc_mi': 0.3, 'kc_fin': 0.3, 'duree_ini': 60, 'duree_dev': 120, 'duree_mi': 600, 'duree_fin': 10, 'hauteur_max': 0.6, 'racines_min': 0.3, 'racines_max': 0.6, 'p_tarissement': 0.5, 'satisfaction': 1.0, 'source_kc': 'FAO-56 (Allen et al., 1998) — Plante à métabolisme CAM : Kc très faible (FAO-56).'}]"/>
     </data>
 </odoo>

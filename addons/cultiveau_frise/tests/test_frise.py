@@ -145,3 +145,65 @@ class TestFrise(TransactionCase):
         activite = p.activity_ids.filtered(lambda a: a.summary.startswith("Fenêtre "))
         self.assertTrue(activite)
         self.assertIn("période critique", activite.note)
+
+
+@tagged("post_install", "-at_install")
+class TestFriseDepartementale(TransactionCase):
+    """La frise et les Kc s'adaptent au département, puis au client (date de semis, variété, sol, système)."""
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.mais = cls.env.ref("cultiveau_frise.culture_mais_grain")
+
+    def test_kc_corrige_par_le_climat(self):
+        # FAO-56 éq. 62 : Hérault (vent 3 m/s, air à 40 %) → Kc de pointe 1,20 + 0,053 ; Finistère (2,8 m/s, 55 %) → 1,20 − 0,007
+        self.assertEqual(self.mais.kc_ajustes("34"), (0.3, 1.25, 0.35))  # Kc fin < 0,45 : pas de correction
+        self.assertEqual(self.mais.kc_ajustes("29")[1], 1.19)
+        self.assertEqual(self.mais.kc_ajustes(""), (0.3, 1.2, 0.35))
+        tomate = self.env.ref("cultiveau_frise.culture_tomate")
+        self.assertGreater(tomate.kc_ajustes("13")[2], tomate.kc_fin, "Kc fin ≥ 0,45 : corrigé aussi")
+
+    def test_frise_recalee_sur_le_departement(self):
+        floraison = lambda dep: self.mais.stades_pour(dep).filtered(lambda s: "Floraison" in s.name)  # noqa: E731
+        self.assertEqual(floraison("").mois_debut, "7")
+        self.assertEqual(floraison("34").mois_debut, "7", "15 jours d'avance : la floraison reste en juillet")
+        self.assertEqual(floraison("05").mois_debut, "8", "20 jours de retard en montagne : elle passe en août")
+        self.assertGreater(floraison("34").etp_max, floraison("29").etp_max, "l'ETo du département remplace celle de la France")
+        self.assertEqual(floraison("34").kc_max, 1.25, "le Kc du stade est celui du département")
+        # le Gard garde sa frise locale (vigne) ; une culture sans frise locale y prend la frise France recalée
+        vigne = self.env.ref("cultiveau_frise.culture_vigne")
+        self.assertEqual(vigne.stades_pour("30")[0].name, "Débourrement")
+        self.assertEqual(floraison("30").kc_max, 1.25)
+
+    def test_analyse_du_client(self):
+        agri = self.env["res.partner"].create({"name": "Maïsiculteur du Gers", "zip": "32000", "cultiveau_type": "agriculteur"})
+        cc = self.env["cultiveau.culture.client"].create({"partner_id": agri.id, "culture_id": self.mais.id, "surface_ha": 40,
+                                                         "sol_texture": "limoneux", "systeme": "pivot"})
+        self.assertEqual((cc.departement, cc.efficience, cc.ru_mm_m), ("32", 0.85, 170))
+        self.assertEqual(cc.decalage_jours, -10)
+        self.assertTrue(6.0 <= cc.besoin_pointe_mm <= 7.0, cc.besoin_pointe_mm)  # ETo 5,4 × Kc ≈ 1,2
+        self.assertAlmostEqual(cc.debit_m3h, round(cc.besoin_pointe_mm / 0.85 * 10 * 40 / 20), delta=2)
+        self.assertTrue(200 <= cc.irrigation_mm <= 400, cc.irrigation_mm)  # année sèche, pour dimensionner
+        self.assertTrue(150 <= cc.irrigation_moyenne_mm < cc.irrigation_mm, cc.irrigation_moyenne_mm)
+        self.assertEqual(cc.volume_m3, round(cc.irrigation_mm / 0.85 * 10 * 40), "volume à la pompe : besoin ÷ efficience")
+        self.assertTrue(cc.tour_eau_j > 10)
+        self.assertIn("Gers", cc.analyse)
+        # semé tard (20 mai) : sa frise se décale, la floraison passe après celle du département
+        floraison = lambda c: next(case["mois"] for case in c.ligne_frise()["cases"] if case["stade"] and "Floraison" in case["stade"].name)  # noqa: E731
+        avant = floraison(cc)
+        cc.date_semis = "2026-05-20"
+        self.assertGreater(cc.decalage_jours, 20)
+        self.assertGreater(floraison(cc), avant)
+        # le goutte à goutte demande moins d'eau à la pompe que l'enrouleur pour le même besoin
+        cc.systeme = "enrouleur"
+        enrouleur = cc.volume_m3
+        cc.systeme = "goutte"
+        self.assertLess(cc.volume_m3, enrouleur)
+
+    def test_vigne_conduite_en_restriction(self):
+        agri = self.env["res.partner"].create({"name": "Vigneron du Vaucluse", "zip": "84100", "cultiveau_type": "agriculteur"})
+        vigne = self.env.ref("cultiveau_frise.culture_vigne")
+        cc = self.env["cultiveau.culture.client"].create({"partner_id": agri.id, "culture_id": vigne.id, "surface_ha": 10, "systeme": "goutte"})
+        self.assertEqual(vigne.satisfaction, 0.4)
+        self.assertTrue(60 <= cc.irrigation_moyenne_mm <= 160, cc.irrigation_moyenne_mm)

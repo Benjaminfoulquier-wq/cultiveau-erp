@@ -15,21 +15,28 @@
                 </button>
             </xpath>
             <xpath expr="//notebook" position="inside">
-                <page string="Frise culturale" name="cultiveau_frise" invisible="cultiveau_type not in ('agriculteur', False)">
+                <page string="Frise culturale" name="cultiveau_frise" invisible="cultiveau_type and not cultiveau_est_client">
                     <div class="alert alert-info" role="status" invisible="not cultiveau_culture_ids" style="margin-bottom:8px">
                         <b>Ce mois-ci : <field name="cultiveau_posture" readonly="1" class="oe_inline"/></b>
                         <span invisible="not cultiveau_periode_critique" class="badge text-bg-danger ms-2">période critique</span>
                         <span> — </span><field name="cultiveau_posture_detail" readonly="1" class="oe_inline"/>
                         <br/><b>Cours : <field name="cultiveau_cours" readonly="1" class="oe_inline"/></b><span> — </span><field name="cultiveau_cours_ton" readonly="1" class="oe_inline"/>
                     </div>
+                    <field name="cultiveau_est_client" invisible="1"/>
                     <field name="cultiveau_culture_ids" context="{'default_partner_id': id}">
-                        <list editable="bottom">
+                        <list>
                             <field name="culture_id"/>
                             <field name="surface_ha" sum="Total"/>
                             <field name="departement"/>
+                            <field name="date_semis" optional="show"/>
+                            <field name="decalage_jours" string="Décalage (j)" optional="hide"/>
+                            <field name="kc_mi_aj" string="Kc pointe" optional="show"/>
+                            <field name="besoin_pointe_mm" string="Pointe (mm/j)" optional="show"/>
+                            <field name="debit_m3h" string="Débit (m³/h)" optional="show"/>
+                            <field name="irrigation_mm" string="À apporter (mm)" optional="show"/>
+                            <field name="volume_m3" string="Volume (m³)" sum="Total" optional="show"/>
                             <field name="projet_mois"/>
                             <field name="achat_mois"/>
-                            <field name="notes"/>
                         </list>
                     </field>
                     <field name="cultiveau_frise_html" nolabel="1" readonly="1"/>

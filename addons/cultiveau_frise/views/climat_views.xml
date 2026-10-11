@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_climat_list" model="ir.ui.view">
+        <field name="name">cultiveau.climat.list</field>
+        <field name="model">cultiveau.climat</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="code"/>
+                <field name="name"/>
+                <field name="zone"/>
+                <field name="eto_annuelle"/>
+                <field name="pluie_annuelle"/>
+                <field name="eto_7" string="ETo juillet"/>
+                <field name="vent_u2"/>
+                <field name="hr_min"/>
+                <field name="decalage_jours"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_climat_form" model="ir.ui.view">
+        <field name="name">cultiveau.climat.form</field>
+        <field name="model">cultiveau.climat</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="code" class="oe_inline"/> — <field name="name" class="oe_inline"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="zone"/>
+                            <field name="decalage_jours"/>
+                            <field name="vent_u2"/>
+                            <field name="hr_min"/>
+                        </group>
+                        <group>
+                            <field name="eto_annuelle"/>
+                            <field name="pluie_annuelle"/>
+                            <field name="source"/>
+                        </group>
+                    </group>
+                    <group string="ETo de référence (mm/j) et pluie (mm), mois par mois">
+                        <group>
+                            <field name="eto_1"/><field name="eto_2"/><field name="eto_3"/><field name="eto_4"/><field name="eto_5"/><field name="eto_6"/>
+                            <field name="eto_7"/><field name="eto_8"/><field name="eto_9"/><field name="eto_10"/><field name="eto_11"/><field name="eto_12"/>
+                        </group>
+                        <group>
+                            <field name="pluie_1"/><field name="pluie_2"/><field name="pluie_3"/><field name="pluie_4"/><field name="pluie_5"/><field name="pluie_6"/>
+                            <field name="pluie_7"/><field name="pluie_8"/><field name="pluie_9"/><field name="pluie_10"/><field name="pluie_11"/><field name="pluie_12"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_climat_search" model="ir.ui.view">
+        <field name="name">cultiveau.climat.search</field>
+        <field name="model">cultiveau.climat</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" filter_domain="['|', ('name', 'ilike', self), ('code', '=ilike', self)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_zone" string="Zone climatique" context="{'group_by': 'zone'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_climats" model="ir.actions.act_window">
+        <field name="name">Climat des départements</field>
+        <field name="res_model">cultiveau.climat</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p>Le climat de chaque département adapte la frise et les Kc : ETo et pluie du mois, vent et humidité de l'été (correction
+               FAO-56 du Kc), avance ou retard du calendrier. Remplacez les valeurs de la zone par les normales de la station Météo-France la plus proche.</p>
+        </field>
+    </record>
+    <menuitem id="menu_climats" name="Climat des départements" parent="menu_frise" action="action_climats" sequence="30"/>
+</odoo>

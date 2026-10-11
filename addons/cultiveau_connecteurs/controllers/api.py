@@ -64,7 +64,9 @@ def _fiche_client(partner):
         "persona": partner.cultiveau_persona_pour_api(),
         "frise": partner.cultiveau_frise_pour_api(mois),
         "agent": partner.cultiveau_agent_pour_api(),
-        "cultures": [{"culture": cc.culture_id.name, "surface_ha": cc.surface_ha, "projet": cc.projet_mois, "achat": cc.achat_mois} for cc in partner.cultiveau_culture_ids],
+        "cultures": [{"culture": cc.culture_id.name, "surface_ha": cc.surface_ha, "projet": cc.projet_mois, "achat": cc.achat_mois,
+                      "kc_pointe": cc.kc_mi_aj, "besoin_pointe_mm_j": cc.besoin_pointe_mm, "debit_m3h": cc.debit_m3h,
+                      "irrigation_mm": cc.irrigation_mm, "volume_m3": cc.volume_m3} for cc in partner.cultiveau_culture_ids],
         "fenetres_du_mois": fenetres, "mois": MOIS[mois - 1][1],
         "installations": partner.cultiveau_installation_ids.resume_pour_api(),
         "interventions_ouvertes": [{"id": t.id, "nom": t.name, "urgence": t.cultiveau_urgence, "etape": t.stage_id.name}

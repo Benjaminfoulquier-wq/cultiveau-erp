@@ -28,11 +28,12 @@ class ResPartner(models.Model):
         for p in self:
             p.cultiveau_surface_ha = sum(p.cultiveau_culture_ids.mapped("surface_ha"))
 
-    @api.depends("cultiveau_culture_ids", "cultiveau_culture_ids.departement", "departement")
+    @api.depends("cultiveau_culture_ids", "cultiveau_culture_ids.departement", "departement", "cultiveau_culture_ids.date_semis",
+                 "cultiveau_culture_ids.precocite")
     def _compute_frise(self):
         mois_actuel = fields.Date.context_today(self).month
         for p in self:
-            lignes = [dict(cc.culture_id.ligne_frise(cc.departement), cc=cc) for cc in p.cultiveau_culture_ids]
+            lignes = [dict(cc.ligne_frise(), cc=cc) for cc in p.cultiveau_culture_ids]
             p.cultiveau_fenetres = " · ".join(
                 f"{l['culture'].name} : projet {libelle_mois(l['projet'])}, achat {libelle_mois(l['achat'])}" for l in lignes)
             p.cultiveau_frise_html = self._rendre_frise(lignes, mois_actuel) if lignes else Markup(

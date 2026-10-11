@@ -21,6 +21,9 @@ SORTIE = os.path.join(ICI, "..", "addons", "cultiveau_frise", "data", "cultures_
 EXISTANTES = {"vigne", "ble_dur", "pecher", "olivier", "riz", "tournesol", "abricotier", "melon", "tomate", "prairies", "pommier", "colza",
               "asperge", "cerisier"}
 
+# La part du besoin qu'on couvre : les cultures conduites en restriction hydrique (qualité, vigueur) ; 1 pour les autres.
+SATISFACTION = {"vigne": 0.4, "raisin_table": 0.85, "olivier": 0.6, "amandier": 0.7, "figuier": 0.7, "grenadier": 0.7, "pistachier": 0.7, "lavande": 0.3}
+
 # ETo de référence par mois, France (moyenne nationale, mm/j) : (mini, maxi). Le sud dépasse le maxi l'été ; le nord reste au mini.
 ETP = {1: (0.4, 0.8), 2: (0.8, 1.4), 3: (1.5, 2.3), 4: (2.3, 3.3), 5: (3.0, 4.2), 6: (3.6, 5.0),
        7: (4.0, 5.6), 8: (3.5, 5.0), 9: (2.3, 3.5), 10: (1.2, 2.2), 11: (0.5, 1.1), 12: (0.3, 0.7)}
@@ -437,17 +440,16 @@ def generer():
         rang[c["cat"]] += 1
         attributs = [("kc_ini", ini), ("kc_mi", mi), ("kc_fin", fin), ("duree_ini", c["durees"][0]), ("duree_dev", c["durees"][1]),
                      ("duree_mi", c["durees"][2]), ("duree_fin", c["durees"][3]), ("hauteur_max", c["h"]), ("racines_min", c["racines"][0]),
-                     ("racines_max", c["racines"][1]), ("p_tarissement", c["p"]),
+                     ("racines_max", c["racines"][1]), ("p_tarissement", c["p"]), ("satisfaction", SATISFACTION.get(c["code"], 1.0)),
                      ("source_kc", "FAO-56 (Allen et al., 1998)" + (f" — {c['note']}" if c["note"] else ""))]
-        if c["code"] in EXISTANTES:
-            # ces fiches ont été créées « à ne pas mettre à jour » : on écrit leurs Kc par un appel, rejoué à chaque mise à jour
-            valeurs = ", ".join(f"'{k}': {v!r}" for k, v in attributs)
-            lignes_cultures.append(f'        <function model="cultiveau.culture" name="write" eval="[[ref(\'{cid}\')], {{{escape(valeurs, {chr(34): "&quot;"})}}}]"/>\n')
-        else:
+        # les coefficients de référence (Kc, phases, racines, p, part couverte) : écrits par un appel rejoué à chaque mise à jour
+        valeurs = ", ".join(f"'{k}': {v!r}" for k, v in attributs)
+        lignes_cultures.append(f'        <function model="cultiveau.culture" name="write" eval="[[ref(\'{cid}\')], {{{escape(valeurs, {chr(34): "&quot;"})}}}]"/>\n')
+        if c["code"] not in EXISTANTES:
             bloc = f'        <record id="{cid}" model="cultiveau.culture">\n'
             bloc += champ("name", c["nom"]) + champ("categorie", c["cat"]) + champ("couleur", COULEURS[c["cat"]][r % len(COULEURS[c["cat"]])])
             bloc += champ("sequence", 100 + list(COULEURS).index(c["cat"]) * 100 + r)
-            bloc += "".join(champ(k, v) for k, v in attributs) + "        </record>\n"
+            bloc += "        </record>\n"
             lignes_detail.append(bloc)
         # la frise France
         for i, (nom, d, f, t) in enumerate(c["stades"], start=1):
@@ -467,12 +469,12 @@ def generer():
                 f'            <field name="culture_id" ref="{cid}"/>\n' + champ("genre", genre) + champ("mois_debut", d) + champ("mois_fin", f)
                 + "        </record>\n")
     entete = ('<?xml version="1.0" encoding="utf-8"?>\n<!-- Généré par scripts/generer_cultures.py : modifier le script, pas ce fichier. -->\n<odoo>\n'
-              "    <!-- Les Kc des cultures déjà décrites pour le Gard : remis à jour à chaque mise à jour du module. -->\n"
-              '    <data noupdate="0">\n')
-    milieu = ("    </data>\n    <!-- Les nouvelles cultures et la frise France de toutes : créées une fois, ensuite modifiables dans l'ERP. -->\n"
+              "    <!-- Les cultures et la frise France : créées une fois, ensuite modifiables dans l'ERP. -->\n"
               '    <data noupdate="1">\n')
+    milieu = ("    </data>\n    <!-- Les coefficients de référence FAO-56 de toutes les cultures : remis à jour à chaque mise à jour du module. -->\n"
+              '    <data noupdate="0">\n')
     with open(SORTIE, "w") as f:
-        f.write(entete + "".join(lignes_cultures) + milieu + "".join(lignes_detail) + "    </data>\n</odoo>\n")
+        f.write(entete + "".join(lignes_detail) + milieu + "".join(lignes_cultures) + "    </data>\n</odoo>\n")
     return len(CULTURES), sum(len(c["stades"]) for c in CULTURES)
 
 
