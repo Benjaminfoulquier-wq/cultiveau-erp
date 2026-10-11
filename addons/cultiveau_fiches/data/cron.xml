@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cron_lire_fiches" model="ir.cron">
+        <field name="name">Cultiveau : lecture des fiches techniques par l'IA (un lot par nuit)</field>
+        <field name="model_id" ref="cultiveau_catalogue.model_cultiveau_fiche"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_lire()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+    </record>
+</odoo>

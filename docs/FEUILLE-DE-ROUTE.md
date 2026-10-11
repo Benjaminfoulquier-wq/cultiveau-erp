@@ -16,6 +16,8 @@
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
 - **Matrice de pose** : le temps de chaque geste, les coefficients de terrain, la main-d'œuvre calculée au devis depuis la
   nomenclature, et les chantiers terminés qui corrigent les temps constatés geste par geste.
+- **Fiches techniques lues par l'IA** : les caractéristiques de chaque article tirées de sa fiche PDF (page à l'appui), un
+  comparateur côte à côte, la recherche par caractéristique. Clé Mistral à renseigner dans les réglages ; un lot de fiches par nuit.
 - **Présentation des devis et factures** : détail complet, par lot, forfait, ou matériel et main-d'œuvre, au choix de l'adhérent et
   document par document ; lignes masquables ; l'ERP garde tout.
 - **Grille de remises** : typologie de client × famille / sous-famille, exceptions par client, article ou quantité ; la remise se pose
@@ -75,13 +77,13 @@
    des factures en retard puis activité « appeler le client ». Reste : le paiement en ligne (fournisseur de paiement à choisir).
 3. **Tarifs et marges.** Fait : tarifs fournisseurs importés (Excel, CSV ; chaque ligne retrouve son article, hausses et baisses,
    alerte au-delà d'un seuil, prix d'achat des adhérents mis à jour), marge cible par adhérent et par famille, liste de prix de
-   vente construite seule, commande groupée réseau. Reste : les tarifs en PDF (lecture par l'IA, avec les fiches techniques).
+   vente construite seule, commande groupée réseau. Reste : les tarifs en PDF (lecture par l'IA, sur le modèle des fiches techniques).
 4. **Stock et achats.** Fait : la commande groupée réseau (les besoins de plusieurs adhérents regroupés vers un fournisseur
    référencé, une commande d'achat par adhérent). Reste : inventaire initial depuis le fichier d'articles, réassort automatique.
 5. **Du dimensionnement au devis.** Fait : secteurs (organes, maille, conduite d'amenée, dénivelé), débit et pluviométrie par secteur,
    diamètres pour une vitesse sous 1,5 m/s, pertes de charge, pression en tête, HMT, pompe et puissance, note de calcul ; devis par
    lots généré avec la nomenclature, articles pris au catalogue (DN, matière) ou « à préciser ». Reste : les abaques des fabricants
-   (courbes de pompes, portées d'asperseurs) une fois les fiches techniques lues.
+   (courbes de pompes, portées d'asperseurs) : les caractéristiques lues sur les fiches sont là, reste à les brancher sur le calcul.
 6. **Terrain.** Fait : le planning des techniciens sur calendrier, « Ma journée » sur le téléphone, le bon d'intervention signé sur
    place (pièces sorties du camion, temps et déplacement chiffrés, écart au PV signalé), la facture en un clic, le stock camion et son
    réassort, les phases et pointages de chantier avec la rentabilité, les contrats d'entretien (hivernage, remise en route, visites)

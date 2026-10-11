@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_famille_carac_list" model="ir.ui.view">
+        <field name="name">cultiveau.famille.caracteristiques.list</field>
+        <field name="model">cultiveau.famille.caracteristiques</field>
+        <field name="arch" type="xml"><list><field name="sequence" widget="handle"/><field name="name"/><field name="mots"/></list></field>
+    </record>
+    <record id="view_famille_carac_form" model="ir.ui.view">
+        <field name="name">cultiveau.famille.caracteristiques.form</field>
+        <field name="model">cultiveau.famille.caracteristiques</field>
+        <field name="arch" type="xml"><form><sheet><group><field name="name"/><field name="mots"/><field name="champs" widget="text"/></group></sheet></form></field>
+    </record>
+    <record id="action_familles_carac" model="ir.actions.act_window">
+        <field name="name">Familles de caractéristiques</field>
+        <field name="res_model">cultiveau.famille.caracteristiques</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <record id="view_fiche_form_lecture" model="ir.ui.view">
+        <field name="name">cultiveau.fiche.form.lecture</field>
+        <field name="model">cultiveau.fiche</field>
+        <field name="inherit_id" ref="cultiveau_catalogue.view_fiche_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_lire" type="object" string="Lire par l'IA" class="btn-secondary" icon="fa-magic" invisible="not fichier"/>
+                <field name="lecture_etat" widget="badge" decoration-success="lecture_etat == 'lue'" decoration-danger="lecture_etat in ('echec', 'sans_texte')"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <group string="Lecture par l'IA" invisible="not fichier">
+                    <field name="famille_carac_id"/>
+                    <field name="resume_ia"/>
+                    <field name="lue_le"/>
+                    <field name="lecture_message"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_comparateur_form" model="ir.ui.view">
+        <field name="name">cultiveau.comparateur.form</field>
+        <field name="model">cultiveau.comparateur</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h2>Comparer</h2>
+                    <field name="product_ids" widget="many2many_tags"/>
+                    <field name="html" nolabel="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_comparateur" model="ir.actions.act_window">
+        <field name="name">Comparateur</field>
+        <field name="res_model">cultiveau.comparateur</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+    <record id="action_comparer_produits" model="ir.actions.server">
+        <field name="name">Comparer les articles cochés</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list,kanban</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_comparer()</field>
+    </record>
+    <record id="action_lire_fiches_produits" model="ir.actions.server">
+        <field name="name">Lire la fiche technique par l'IA</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list,form</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_lire_fiche()</field>
+    </record>
+    <record id="view_product_search_carac" model="ir.ui.view">
+        <field name="name">product.template.search.cultiveau.carac</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_search_view"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="cultiveau_caracteristiques_texte" string="Caractéristique (ex. debit_m3h=30)"/>
+                <field name="cultiveau_famille_carac_id"/>
+            </field>
+        </field>
+    </record>
+    <menuitem id="menu_comparateur" name="Comparer des articles" parent="cultiveau_catalogue.menu_catalogue" action="action_comparateur" sequence="12"/>
+    <menuitem id="menu_familles_carac" name="Familles de caractéristiques" parent="cultiveau_catalogue.menu_catalogue" action="action_familles_carac" sequence="31" groups="cultiveau_base.group_equipe"/>
+    <record id="res_config_settings_view_form_fiches" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.fiches</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Fiches techniques et IA" name="cultiveau_fiches">
+                    <setting string="Lecture des fiches par l'IA" help="La clé Mistral (console.mistral.ai) : chaque fiche PDF est lue une fois, ses caractéristiques rangées sur les articles avec la page source. Quelques centimes par fiche ; un lot chaque nuit.">
+                        <div class="row mt8"><label for="cultiveau_mistral_cle" class="col-lg-4 o_light_label"/><field name="cultiveau_mistral_cle" password="True"/></div>
+                        <div class="mt8"><field name="cultiveau_fiches_lues" class="oe_inline"/> fiche(s) lue(s), <field name="cultiveau_fiches_a_lire" class="oe_inline"/> à lire</div>
+                        <button name="action_cultiveau_lire_lot" type="object" string="Lire un lot maintenant" class="btn-link" icon="fa-magic"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

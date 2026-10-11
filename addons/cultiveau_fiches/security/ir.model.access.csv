@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_famille_carac_user,cultiveau.famille.caracteristiques lecture,model_cultiveau_famille_caracteristiques,base.group_user,1,0,0,0
+access_famille_carac_equipe,cultiveau.famille.caracteristiques équipe,model_cultiveau_famille_caracteristiques,cultiveau_base.group_equipe,1,1,1,1
+access_comparateur_user,cultiveau.comparateur,model_cultiveau_comparateur,base.group_user,1,1,1,1

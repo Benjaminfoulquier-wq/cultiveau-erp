@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="famille_pompe" model="cultiveau.famille.caracteristiques"><field name="name">Pompes</field><field name="sequence">1</field><field name="mots">pompe, pump, surpresseur, groupe de pompage</field>
+            <field name="champs">debit_m3h: Débit (m³/h)
+hmt_m: Hauteur manométrique (m)
+puissance_kw: Puissance (kW)
+tension_v: Tension (V)
+rendement_pct: Rendement (%)
+type: Type (immergée, surface, multicellulaire…)
+dn_refoulement: Refoulement (DN ou pouces)
+pression_max_bar: Pression max (bar)
+npsh_m: NPSH requis (m)
+poids_kg: Poids (kg)</field></record>
+        <record id="famille_asperseur" model="cultiveau.famille.caracteristiques"><field name="name">Asperseurs et turbines</field><field name="sequence">2</field><field name="mots">asperseur, turbine, tuyère, sprinkler, canon</field>
+            <field name="champs">portee_m: Portée (m)
+debit_m3h: Débit (m³/h)
+pression_bar: Pression de service (bar)
+buse_mm: Buse (mm)
+secteur: Secteur (° ou plein cercle)
+pluviometrie_mm_h: Pluviométrie (mm/h)
+raccord: Raccordement
+ecartement_m: Écartement conseillé (m)</field></record>
+        <record id="famille_goutte" model="cultiveau.famille.caracteristiques"><field name="name">Goutte à goutte</field><field name="sequence">3</field><field name="mots">goutte, gaine, goutteur, dripline, dripper</field>
+            <field name="champs">debit_goutteur_lh: Débit du goutteur (l/h)
+espacement_cm: Espacement des goutteurs (cm)
+diametre_mm: Diamètre (mm)
+epaisseur_mm: Épaisseur de paroi (mm ou mil)
+pression_bar: Plage de pression (bar)
+autoregulant: Autorégulant (oui/non)
+longueur_rouleau_m: Longueur du rouleau (m)
+filtration_microns: Filtration requise (µm)</field></record>
+        <record id="famille_tube" model="cultiveau.famille.caracteristiques"><field name="name">Tubes et tuyaux</field><field name="sequence">4</field><field name="mots">tube, tuyau, PE, PVC, conduite, flexible</field>
+            <field name="champs">diametre_ext_mm: Diamètre extérieur (mm)
+diametre_int_mm: Diamètre intérieur (mm)
+pn_bar: Pression nominale PN (bar)
+epaisseur_mm: Épaisseur (mm)
+matiere: Matière
+sdr: SDR
+longueur_m: Longueur (m, rouleau ou barre)
+rayon_courbure_m: Rayon de courbure mini (m)
+poids_kg_m: Poids (kg/m)</field></record>
+        <record id="famille_vanne" model="cultiveau.famille.caracteristiques"><field name="name">Vannes et électrovannes</field><field name="sequence">5</field><field name="mots">vanne, électrovanne, electrovanne, valve, clapet, régulateur</field>
+            <field name="champs">dn: DN
+raccordement: Raccordement
+pression_max_bar: Pression max (bar)
+tension_v: Tension de commande (V)
+debit_max_m3h: Débit max (m³/h)
+perte_charge_m: Perte de charge au débit nominal (m)
+matiere: Matière du corps</field></record>
+        <record id="famille_filtre" model="cultiveau.famille.caracteristiques"><field name="name">Filtration</field><field name="sequence">6</field><field name="mots">filtre, filtration, hydrocyclone, tamis, disques</field>
+            <field name="champs">debit_max_m3h: Débit max (m³/h)
+finesse_microns: Finesse (µm ou mesh)
+type: Type (disques, tamis, sable, hydrocyclone)
+raccordement: Raccordement
+pression_max_bar: Pression max (bar)
+perte_charge_m: Perte de charge propre (m)
+contre_lavage: Contre-lavage (manuel/automatique)</field></record>
+        <record id="famille_programmateur" model="cultiveau.famille.caracteristiques"><field name="name">Programmateurs et pilotage</field><field name="sequence">7</field><field name="mots">programmateur, controller, pilotage, automate, sonde</field>
+            <field name="champs">voies: Nombre de voies
+alimentation: Alimentation (secteur, pile, solaire)
+programmes: Nombre de programmes
+connectivite: Connectivité (wifi, 4G, radio, bluetooth)
+capteurs: Capteurs pris en charge
+protection: Indice de protection (IP)</field></record>
+        <record id="famille_enrouleur" model="cultiveau.famille.caracteristiques"><field name="name">Enrouleurs et pivots</field><field name="sequence">8</field><field name="mots">enrouleur, pivot, rampe, reel</field>
+            <field name="champs">diametre_tuyau_mm: Diamètre du tuyau (mm)
+longueur_tuyau_m: Longueur du tuyau (m)
+debit_m3h: Débit (m³/h)
+pression_entree_bar: Pression d'entrée (bar)
+largeur_arrosee_m: Largeur arrosée (m)
+vitesse_m_h: Vitesse de rentrée (m/h)
+entrainement: Entraînement (turbine, moteur)</field></record>
+        <record id="famille_raccord" model="cultiveau.famille.caracteristiques"><field name="name">Raccords</field><field name="sequence">9</field><field name="mots">raccord, coude, té, manchon, bride, collier</field>
+            <field name="champs">dn: DN
+raccordement: Type (compression, électrosoudable, fileté, bride)
+pn_bar: PN (bar)
+matiere: Matière
+angle: Angle (°)</field></record>
+    </data>
+</odoo>
