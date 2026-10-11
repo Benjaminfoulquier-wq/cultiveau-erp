@@ -140,8 +140,10 @@ export class VueEnsemble extends Component {
             { type: "ir.actions.act_window", name: "Devis", res_model: "sale.order", view_mode: "list,form", views: [[false, "list"], [false, "form"]], domain: [["state", "in", ["draft", "sent"]]] });
         station(3, "MAGASIN & COUR", 8.8, 0.8, 7.7, 9.2, d.magasin.length,
             { type: "ir.actions.act_window", name: "Articles en stock", res_model: "product.template", view_mode: "list,kanban,form", views: [[false, "list"], [false, "kanban"], [false, "form"]], domain: [["qty_available", ">", 0]] });
-        station(4, "CHANTIERS", 0.8, 13, 7.5, 14, d.chantiers.installations.length + d.chantiers.taches.length,
-            { type: "ir.actions.act_window", name: "Chantiers", res_model: "cultiveau.installation", view_mode: "list,form", views: [[false, "list"], [false, "form"]], domain: [["etat", "=", "realisation"]] });
+        station(4, "CHANTIERS", 0.8, 13, 7.5, 14, (d.chantiers.chantiers || []).length + d.chantiers.installations.length + d.chantiers.taches.length,
+            d.chantiers.chantiers
+                ? { type: "ir.actions.act_window", name: "Chantiers", res_model: "cultiveau.chantier", view_mode: "kanban,list,calendar,form", views: [[false, "kanban"], [false, "list"], [false, "calendar"], [false, "form"]], domain: [["etat", "in", ["brouillon", "planifie", "en_cours"]]] }
+                : { type: "ir.actions.act_window", name: "Chantiers", res_model: "cultiveau.installation", view_mode: "list,form", views: [[false, "list"], [false, "form"]], domain: [["etat", "=", "realisation"]] });
         station(5, "ATELIER & SAV", 8.8, 13, 7.7, 14, d.atelier.length,
             { type: "ir.actions.act_window", name: "Interventions", res_model: "project.task", view_mode: "kanban,list,form", views: [[false, "kanban"], [false, "list"], [false, "form"]], domain: [["cultiveau_intervention", "=", true], ["state", "not in", ["1_done", "1_canceled"]]] });
         station(6, "PARCELLES EN SERVICE", 19.5, 13, 11, 14, d.parcelles.length,
@@ -201,10 +203,25 @@ export class VueEnsemble extends Component {
             ajouter(x, y, pave(x, y, 0, 0.8, 0.8, 0.8, C.carton), { titre: `Préparation à livrer : ${p.nom} — ${p.client}${p.date ? " — " + p.date : ""}`, etiquette: p.client, action: this.fiche("stock.picking", p.id) });
         });
         // 4. Les chantiers : les parcelles en réalisation avec l'équipe de pose et la trancheuse, les mises en service.
-        d.chantiers.installations.forEach((c, i) => {
+        const poses = [
+            ...(d.chantiers.chantiers || []).map((c) => ({ ...c, modele: "cultiveau.chantier" })),
+            ...d.chantiers.installations.map((c) => ({ ...c, modele: "cultiveau.installation", etat: "en_cours", equipe: 1, avancement: 0 })),
+        ];
+        poses.slice(0, 6).forEach((c, i) => {
             const x = 1.2 + (i % 2) * 3.6, y = 13.6 + Math.floor(i / 2) * 3.0;
-            ajouter(x, y, [...parcelle(x, y, c.type, "realisation"), ...pave(x + 0.2, y + 0.2, 0.12, 1.2, 0.8, 0.7, C.orange), ...personnage(x + 1.8, y + 0.2, C.orange), ...personnage(x + 2.3, y + 1.4, C.orange)],
-                    { titre: `Chantier : ${c.nom} — ${c.client} — ${c.type_libelle}${c.surface ? " — " + c.surface + " ha" : ""}${c.commune ? " — " + c.commune : ""}`, etiquette: c.client, action: this.fiche("cultiveau.installation", c.id) });
+            const couleur = c.etat === "planifie" ? C.bleu : C.orange;
+            const equipe = Math.min(3, 1 + (c.equipe || 0));
+            const faces = [...parcelle(x, y, c.type, "realisation")];
+            if (c.etat !== "planifie") {
+                faces.push(...pave(x + 0.2, y + 0.2, 0.12, 1.2, 0.8, 0.7, couleur));
+            }
+            for (let k = 0; k < equipe; k++) {
+                faces.push(...personnage(x + 1.8 + (k % 2) * 0.5, y + 0.2 + k * 0.6, couleur));
+            }
+            const detail = c.modele === "cultiveau.chantier"
+                ? `${c.etat === "planifie" ? "Chantier planifié" : "Chantier en cours"} : ${c.titre} — ${c.client}${c.chef ? " — " + c.chef : ""}${c.debut ? " — du " + c.debut + (c.fin ? " au " + c.fin : "") : ""} — ${c.avancement} %`
+                : `Chantier : ${c.nom} — ${c.client} — ${c.type_libelle}${c.surface ? " — " + c.surface + " ha" : ""}${c.commune ? " — " + c.commune : ""}`;
+            ajouter(x, y, faces, { titre: detail, etiquette: c.client, action: this.fiche(c.modele, c.id) });
         });
         d.chantiers.taches.forEach((t, i) => {
             const x = 1.2 + (i % 2) * 3.6, y = 22.5 + Math.floor(i / 2) * 2.0;

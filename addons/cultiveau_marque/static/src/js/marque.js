@@ -82,6 +82,10 @@ browser.addEventListener(
         if (!a || ev.defaultPrevented || ev.ctrlKey || ev.metaKey || ev.shiftKey || a.target === "_blank" || a.hasAttribute("download")) {
             return;
         }
+        const brut = a.getAttribute("href") || "";
+        if (!brut || brut.startsWith("#") || brut.startsWith("javascript:")) {
+            return;  // les onglets, boutons et ancres de la page : pas une navigation
+        }
         let url;
         try {
             url = new URL(a.href);

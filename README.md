@@ -71,6 +71,8 @@ Première connexion : `admin` / `admin`, à changer aussitôt. Puis :
    **Cultiveau → Agriculteurs** : cultures, persona, installations.
 5. **Catalogue → Catalogue Cultiveau** : « Ajouter à mon catalogue » sur les articles vendus ; **Importer mes articles** pour les siens ;
    **Mon catalogue** = les deux.
+6. **Projets et ventes → une commande confirmée → « Lancer le chantier »** : l'équipe, les dates (Chantiers → Planning), le matériel
+   sorti du magasin, les photos, puis « Mettre en service » avec le PV signé par l'exploitant.
 
 La suite : [docs/FEUILLE-DE-ROUTE.md](docs/FEUILLE-DE-ROUTE.md).
 

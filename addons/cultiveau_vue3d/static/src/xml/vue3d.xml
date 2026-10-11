@@ -14,6 +14,8 @@
                         <b t-esc="state.donnees.compteurs.devis"/> devis — <b t-esc="state.donnees.compteurs.devis_montant.toLocaleString('fr-FR')"/> €</button>
                     <button class="btn btn-sm btn-light" t-on-click="() => this.ouvrirListe('project.task', [['cultiveau_intervention', '=', true], ['state', 'not in', ['1_done', '1_canceled']]], 'Interventions à faire')">
                         <b t-esc="state.donnees.compteurs.interventions"/> interventions</button>
+                    <button class="btn btn-sm btn-light" t-if="state.donnees.compteurs.chantiers" t-on-click="() => this.ouvrirListe('cultiveau.chantier', [['etat', 'in', ['brouillon', 'planifie', 'en_cours']]], 'Chantiers')">
+                        <b t-esc="state.donnees.compteurs.chantiers"/> chantiers</button>
                     <button class="btn btn-sm btn-light" t-on-click="() => this.ouvrirListe('account.move', [['move_type', '=', 'out_invoice'], ['state', '=', 'posted'], ['payment_state', 'in', ['not_paid', 'partial']]], 'Factures à encaisser')">
                         <b t-esc="state.donnees.compteurs.factures"/> factures — <b t-esc="state.donnees.compteurs.factures_montant.toLocaleString('fr-FR')"/> €</button>
                     <div class="btn-group">
@@ -24,6 +26,7 @@
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('cultiveau.installation', {default_etat: 'etude'})">Une étude d'installation</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('sale.order', {})">Un devis</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('project.task', {default_cultiveau_nature: 'depannage'})">Un dépannage</a></li>
+                            <li t-if="state.donnees.chantiers.chantiers"><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('cultiveau.chantier', {})">Un chantier</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('purchase.order', {})">Une commande fournisseur</a></li>
                         </ul>
                     </div>

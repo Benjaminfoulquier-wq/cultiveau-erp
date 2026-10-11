@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_chantier" model="ir.ui.view">
+        <field name="name">sale.order.form.chantier</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_lancer_chantier" type="object" string="Lancer le chantier" class="btn-primary"
+                        invisible="state != 'sale' or cultiveau_nb_chantiers or not partner_id"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_chantiers" type="object" class="oe_stat_button" icon="fa-wrench" invisible="not cultiveau_nb_chantiers">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="cultiveau_nb_chantiers"/></span><span class="o_stat_text">Chantiers</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

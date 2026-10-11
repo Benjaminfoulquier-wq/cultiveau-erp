@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_installation_form_chantier" model="ir.ui.view">
+        <field name="name">cultiveau.installation.form.chantier</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="inherit_id" ref="cultiveau_installation.view_installation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_chantiers" type="object" class="oe_stat_button" icon="fa-wrench">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="nb_chantiers"/></span><span class="o_stat_text">Chantiers</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_chantier,cultiveau.chantier,model_cultiveau_chantier,cultiveau_base.group_adherent,1,1,1,1
+access_chantier_ligne,cultiveau.chantier.ligne,model_cultiveau_chantier_ligne,cultiveau_base.group_adherent,1,1,1,1

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_chantier_form" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.form</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_planifier" type="object" string="Planifier" class="btn-primary" invisible="etat != 'brouillon'"/>
+                    <button name="action_demarrer" type="object" string="Démarrer le chantier" class="btn-primary" invisible="etat != 'planifie'"/>
+                    <button name="action_sortir_materiel" type="object" string="Sortir le matériel du magasin" invisible="etat not in ('planifie', 'en_cours') or picking_id"/>
+                    <button name="action_mise_en_service" type="object" string="Mettre en service (PV A1.3)" class="btn-primary" invisible="etat != 'en_cours' or mise_en_service_le"/>
+                    <button name="action_terminer" type="object" string="Terminer" class="btn-primary" invisible="etat != 'en_cours' or not mise_en_service_le"/>
+                    <button name="action_terminer" type="object" string="Terminer avec réserves" invisible="etat != 'en_cours' or mise_en_service_le"/>
+                    <button name="action_annuler" type="object" string="Annuler" invisible="etat in ('termine', 'annule')"/>
+                    <button name="action_brouillon" type="object" string="Remettre à planifier" invisible="etat != 'annule'"/>
+                    <field name="etat" widget="statusbar" statusbar_visible="brouillon,planifie,en_cours,termine"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_voir_picking" type="object" class="oe_stat_button" icon="fa-truck" invisible="not picking_id">
+                            <div class="o_stat_info"><span class="o_stat_text">Bon de sortie</span></div>
+                        </button>
+                        <button name="action_voir_photos" type="object" class="oe_stat_button" icon="fa-camera">
+                            <div class="o_stat_info"><span class="o_stat_value"><field name="nb_photos"/></span><span class="o_stat_text">Photos</span></div>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Mis en service" bg_color="text-bg-success" invisible="not mise_en_service_le"/>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h2><field name="titre" placeholder="Pose du pivot des Grandes Terres…"/></h2>
+                    </div>
+                    <group>
+                        <group string="Le chantier">
+                            <field name="installation_id" context="{'default_partner_id': partner_id}"/>
+                            <field name="partner_id"/>
+                            <field name="type_systeme"/>
+                            <field name="surface_ha"/>
+                            <field name="sale_order_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                        <group string="L'équipe et les dates">
+                            <field name="chef_id" widget="many2one_avatar_user"/>
+                            <field name="equipe_ids" widget="many2many_avatar_user"/>
+                            <field name="sous_traitant_id"/>
+                            <label for="date_debut" string="Prévu du"/>
+                            <div class="o_row"><field name="date_debut"/> au <field name="date_fin"/></div>
+                            <field name="jours" invisible="not jours"/>
+                            <field name="date_debut_reel" invisible="not date_debut_reel"/>
+                            <field name="date_fin_reel" invisible="not date_fin_reel"/>
+                            <field name="avancement" widget="progressbar"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Matériel" name="materiel">
+                            <field name="ligne_ids">
+                                <list editable="bottom">
+                                    <field name="product_id"/>
+                                    <field name="note"/>
+                                    <field name="quantite_prevue" sum="Prévu"/>
+                                    <field name="uom_id"/>
+                                    <field name="disponible"/>
+                                    <field name="manque" decoration-danger="manque > 0"/>
+                                    <field name="quantite_posee" sum="Posé"/>
+                                </list>
+                            </field>
+                            <field name="machines" placeholder="Trancheuse, mini-pelle, dérouleuse…"/>
+                        </page>
+                        <page string="Préparation et accès" name="preparation">
+                            <group>
+                                <field name="acces" placeholder="Chemin d'accès, qui prévenir, horaires…"/>
+                                <field name="notes" nolabel="1" colspan="2" placeholder="Implantation, repérage des réseaux, autorisations, branchement électrique, forage…"/>
+                            </group>
+                        </page>
+                        <page string="PV de mise en service (A1.3)" name="pv">
+                            <group>
+                                <group string="Essais">
+                                    <field name="pv_date"/>
+                                    <field name="pv_intervenant"/>
+                                    <field name="pv_rincage"/>
+                                    <field name="pv_essai_pression_bar"/>
+                                    <field name="pv_essai_resultat"/>
+                                    <field name="pv_securites_testees"/>
+                                    <field name="pv_antiretour"/>
+                                </group>
+                                <group string="Références de fonctionnement">
+                                    <field name="pv_pression_sortie_pompe_bar"/>
+                                    <field name="pv_pression_point_defavorable_bar"/>
+                                    <field name="pv_uniformite_pct"/>
+                                    <field name="pv_kwh_m3"/>
+                                    <field name="mise_en_service_le"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="pv_debits_secteurs" placeholder="Secteur 1 : 42 m³/h à 3,2 bar…"/>
+                                <field name="pv_reserves"/>
+                                <field name="reserves"/>
+                            </group>
+                            <group string="Signature de l'exploitant sur place">
+                                <group>
+                                    <field name="pv_signe_par"/>
+                                    <field name="pv_signe_le"/>
+                                </group>
+                                <group>
+                                    <field name="pv_signature" widget="signature" options="{'full_name': 'pv_signe_par'}"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_chantier_list" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.list</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="etat == 'annule'" decoration-success="etat == 'termine'" decoration-bf="etat == 'en_cours'">
+                <field name="name"/>
+                <field name="titre"/>
+                <field name="partner_id"/>
+                <field name="installation_id"/>
+                <field name="chef_id" widget="many2one_avatar_user"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="avancement" widget="progressbar"/>
+                <field name="etat" widget="badge" decoration-info="etat == 'planifie'" decoration-warning="etat == 'en_cours'" decoration-success="etat == 'termine'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_chantier_kanban" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.kanban</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="etat" quick_create="false">
+                <field name="etat"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <strong><field name="titre"/></strong>
+                            <small class="text-muted"><field name="name"/></small>
+                        </div>
+                        <div><field name="partner_id"/></div>
+                        <div class="text-muted" t-if="record.date_debut.raw_value">
+                            Du <field name="date_debut"/> au <field name="date_fin"/>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <field name="avancement" widget="progressbar"/>
+                            <field name="chef_id" widget="many2one_avatar_user"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_chantier_calendar" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.calendar</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="arch" type="xml">
+            <calendar date_start="date_debut" date_stop="date_fin" color="chef_id" mode="month" quick_create="false" event_open_popup="false">
+                <field name="titre"/>
+                <field name="partner_id"/>
+                <field name="chef_id" avatar_field="avatar_128"/>
+                <field name="etat"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_chantier_search" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.search</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="titre"/>
+                <field name="partner_id"/>
+                <field name="installation_id"/>
+                <field name="chef_id"/>
+                <field name="equipe_ids"/>
+                <filter name="actifs" string="À faire" domain="[('etat', 'in', ('brouillon', 'planifie', 'en_cours'))]"/>
+                <filter name="en_cours" string="En cours" domain="[('etat', '=', 'en_cours')]"/>
+                <filter name="mes" string="Mes chantiers" domain="['|', ('chef_id', '=', uid), ('equipe_ids', 'in', [uid])]"/>
+                <filter name="reserves" string="Avec réserves" domain="[('reserves', '!=', False)]"/>
+                <group expand="0" string="Regrouper">
+                    <filter name="par_etat" string="État" context="{'group_by': 'etat'}"/>
+                    <filter name="par_chef" string="Chef de chantier" context="{'group_by': 'chef_id'}"/>
+                    <filter name="par_mois" string="Mois" context="{'group_by': 'date_debut:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_chantiers" model="ir.actions.act_window">
+        <field name="name">Chantiers</field>
+        <field name="res_model">cultiveau.chantier</field>
+        <field name="view_mode">kanban,list,calendar,form</field>
+        <field name="context">{'search_default_actifs': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Pas encore de chantier</p>
+            <p>Un chantier se lance depuis une commande (« Lancer le chantier ») ou depuis une installation. Il porte l'équipe, les dates, le matériel sorti du magasin, les photos et le PV de mise en service.</p>
+        </field>
+    </record>
+
+    <record id="action_planning" model="ir.actions.act_window">
+        <field name="name">Planning des chantiers</field>
+        <field name="res_model">cultiveau.chantier</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="domain">[('etat', 'in', ('planifie', 'en_cours'))]</field>
+    </record>
+</odoo>

@@ -20,6 +20,11 @@
 - **Le réseau** : Cultiveau, Agrifusion Holding et Solution Magnus, l'équipe, les 16 adhérents et leurs équipes, les prospects, les 39
   fournisseurs référencés et leurs contacts, importés d'un fichier (Réglages → Importer le réseau).
 - **Marque** : l'ERP est aux couleurs de Cultiveau, sans mention de l'éditeur ; déploiement en un push sur erp.cultiveau.fr.
+- **La vue d'ensemble** : la page d'accueil est le magasin en 3D (accueil et comptoir, bureau d'étude, magasin et cour, chantiers,
+  atelier et SAV, parcelles en service, caisse) ; chaque objet s'ouvre sur ce qu'il représente.
+- **Les chantiers** : lancés depuis la commande, avec l'équipe de pose, les dates (planning par chef de chantier), le matériel prévu
+  d'après la commande et sorti du magasin (bon de sortie), les photos, puis la mise en service : PV A1.3 signé par l'exploitant sur
+  place, l'installation passe « en service » et le registre est tenu.
 
 ## À faire, dans l'ordre
 
@@ -35,9 +40,9 @@
    vers un fournisseur référencé.
 5. **Du dimensionnement au devis.** Dans l'installation : calcul des pertes de charge, débit et pression par secteur, puis génération
    automatique de la nomenclature du devis depuis le catalogue (tubes, raccords, vannes, pompe). C'est le cœur métier.
-6. **Terrain.** Planning des interventions sur calendrier, appli mobile (l'application Odoo fonctionne déjà), feuille d'intervention
-   signée sur place avec photos, temps passé qui part en facturation, entretien préventif programmé depuis la frise (hivernage, remise
-   en route).
+6. **Terrain.** Le comptoir (vente rapide avec scan du code-barres, ticket, encaissement), le planning des interventions sur calendrier,
+   l'appli mobile (l'application fonctionne déjà), la feuille d'intervention signée sur place comme le PV de chantier, le temps passé qui
+   part en facturation, l'entretien préventif programmé depuis la frise (hivernage, remise en route).
 7. **Campagnes au bon moment.** Segmentation par culture, persona et département ; e-mails et SMS déclenchés par la frise (« le maïs
    entre en floraison dans le Gard : proposer la vérification des pivots ») ; portail client où l'agriculteur voit ses devis, factures
    et installations.
