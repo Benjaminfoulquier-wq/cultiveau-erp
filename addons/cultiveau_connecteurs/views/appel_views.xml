@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_appel_form" model="ir.ui.view">
+        <field name="name">cultiveau.appel.form</field>
+        <field name="model">cultiveau.appel</field>
+        <field name="arch" type="xml">
+            <form create="false">
+                <sheet>
+                    <div class="oe_title">
+                        <field name="entete" class="text-muted"/>
+                        <h2><field name="sujet"/></h2>
+                    </div>
+                    <field name="lecteur" nolabel="1" invisible="not lecteur"/>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="numero"/>
+                            <field name="urgence" invisible="not urgence"/>
+                        </group>
+                        <group>
+                            <field name="task_id" invisible="not task_id"/>
+                            <field name="lead_id" invisible="not lead_id"/>
+                            <field name="lien_assistant" widget="url" text="Ouvrir dans l'assistant" invisible="not lien_assistant"/>
+                            <field name="audio_jusqu_au" invisible="not audio_jusqu_au"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Tout ce qui a été dit" name="transcription">
+                            <field name="transcription" nolabel="1"/>
+                        </page>
+                        <page string="Résumé de l'assistant" name="resume">
+                            <field name="resume" nolabel="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_appel_list" model="ir.ui.view">
+        <field name="name">cultiveau.appel.list</field>
+        <field name="model">cultiveau.appel</field>
+        <field name="arch" type="xml">
+            <list create="false" decoration-danger="urgence == 'immediate'">
+                <field name="date"/>
+                <field name="sens" optional="show"/>
+                <field name="partner_id"/>
+                <field name="sujet"/>
+                <field name="duree"/>
+                <field name="urgence" optional="hide"/>
+                <field name="audio_disponible" string="Audio" widget="boolean" optional="show"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_appel_search" model="ir.ui.view">
+        <field name="name">cultiveau.appel.search</field>
+        <field name="model">cultiveau.appel</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="sujet"/>
+                <field name="transcription" string="Ce qui a été dit"/>
+                <field name="numero"/>
+                <filter name="aujourdhui" string="Aujourd'hui" domain="[('date', '&gt;=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="urgents" string="Urgents" domain="[('urgence', '=', 'immediate')]"/>
+                <filter name="sortants" string="Passés par l'assistant" domain="[('sens', '=', 'sortant')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_client" string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter name="par_jour" string="Jour" context="{'group_by': 'date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_appels" model="ir.actions.act_window">
+        <field name="name">Appels</field>
+        <field name="res_model">cultiveau.appel</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun appel pour l'instant</p>
+            <p>Chaque appel de l'assistant téléphonique arrive ici : le sujet en une ligne, tout ce qui a été dit, et l'enregistrement à réécouter.</p>
+        </field>
+    </record>
+    <menuitem id="menu_appels" name="Appels" parent="cultiveau_base.menu_cultiveau_root" action="action_appels" sequence="12"/>
+
+    <record id="view_partner_form_appels" model="ir.ui.view">
+        <field name="name">res.partner.form.appels</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_appels" type="object" class="oe_stat_button" icon="fa-phone" invisible="not cultiveau_nb_appels">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="cultiveau_nb_appels"/></span><span class="o_stat_text">Appels</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

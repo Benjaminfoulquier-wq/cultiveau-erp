@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_assistant_lien_admin,cultiveau.assistant.lien admin,model_cultiveau_assistant_lien,base.group_system,1,1,1,1
+access_appel_user,cultiveau.appel user,model_cultiveau_appel,base.group_user,1,1,0,0
+access_appel_admin,cultiveau.appel admin,model_cultiveau_appel,base.group_system,1,1,1,1

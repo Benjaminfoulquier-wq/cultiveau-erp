@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="regle_appel_societe" model="ir.rule">
+        <field name="name">Appels : ceux de mes adhérents</field>
+        <field name="model_id" ref="model_cultiveau_appel"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

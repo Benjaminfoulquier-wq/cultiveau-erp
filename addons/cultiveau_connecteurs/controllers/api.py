@@ -1,12 +1,15 @@
 """L'API de l'ERP pour les outils du réseau, d'abord l'assistant téléphonique.
 
-Authentification : l'en-tête ``X-Cultiveau-Cle`` doit valoir la clé réglée dans
-Cultiveau → Réglages (paramètre ``cultiveau.cle_api``). Sans clé réglée, l'API est fermée.
+Authentification : l'en-tête ``X-Cultiveau-Cle`` porte soit la clé d'un adhérent (Réglages → Clés d'API,
+« cv_… », limitée à ses sociétés), soit la clé commune du réseau réglée dans Cultiveau → Réglages
+(paramètre ``cultiveau.cle_api``). Sans clé valable, l'API est fermée.
 Les réponses sont en JSON ; les erreurs portent un code HTTP parlant (401, 404, 400).
 """
 import hmac
 import json
 import logging
+
+from markupsafe import Markup
 
 from odoo import SUPERUSER_ID, fields, http
 from odoo.http import request
@@ -21,14 +24,26 @@ def _json(donnees, statut=200):
     return request.make_response(json.dumps(donnees, ensure_ascii=False, default=str), headers=[("Content-Type", "application/json; charset=utf-8")], status=statut)
 
 
-def _autorise():
-    attendue = request.env["ir.config_parameter"].sudo().get_param("cultiveau.cle_api") or ""
+def _autorise(ecriture=False):
+    """Vrai si la clé est bonne. La clé d'un adhérent restreint ensuite tout à ses sociétés (request.cultiveau_societes)."""
+    request.cultiveau_societes = None
     fournie = request.httprequest.headers.get("X-Cultiveau-Cle", "")
-    return bool(attendue) and hmac.compare_digest(attendue, fournie)
+    if fournie.startswith("cv_") and "cultiveau.cle.api" in request.env.registry:
+        cle = request.env["cultiveau.cle.api"].sudo().authentifier(fournie)
+        if not cle or (ecriture and cle.droits != "ecriture"):
+            return False
+        request.cultiveau_societes = cle.company_ids or None
+        return True
+    attendue = request.env["ir.config_parameter"].sudo().get_param("cultiveau.cle_api") or ""
+    return bool(attendue) and bool(fournie) and hmac.compare_digest(attendue, fournie)
 
 
 def _societe(numero_dedie):
-    """L'adhérent reconnu par son numéro dédié ; sinon la société principale."""
+    """L'adhérent reconnu par son numéro dédié ; sinon la société principale. Avec la clé d'un adhérent : forcément l'une des siennes."""
+    permises = getattr(request, "cultiveau_societes", None)
+    if permises:
+        n = normaliser_telephone(numero_dedie)
+        return next((c for c in permises if n and normaliser_telephone(c.cultiveau_numero_dedie) == n), permises[:1])
     Company = request.env["res.company"].sudo()
     n = normaliser_telephone(numero_dedie)
     if n:
@@ -73,7 +88,7 @@ class CultiveauApi(http.Controller):
 
     @http.route("/cultiveau/api/appel", type="http", auth="none", methods=["POST"], csrf=False, save_session=False, readonly=False)
     def appel(self, **kw):
-        if not _autorise():
+        if not _autorise(ecriture=True):
             return _json({"erreur": "clé absente ou invalide"}, 401)
         try:
             donnees = json.loads(request.httprequest.get_data(as_text=True) or "{}")
@@ -105,8 +120,11 @@ class CultiveauApi(http.Controller):
                               "client_id": partner.id, "url": f"/app/action-{'project.action_view_all_task' if deja._name == 'project.task' else 'crm.crm_lead_action_pipeline'}/{deja.id}"})
         categorie = (donnees.get("categorie") or "autre").lower()
         resume = donnees.get("resume") or donnees.get("symptome") or "Appel reçu par l'assistant"
+        # l'appel lui-même : le sujet dans le fil du client, tout ce qui a été dit et l'audio sur sa fiche
+        appel, _nouveau = request.env["cultiveau.appel"].cultiveau_enregistrer(societe, partner, donnees)
         if categorie in ("panne", "depannage", "urgence", "intervention"):
             t = request.env["project.task"].cultiveau_creer_depuis_appel(societe, partner, donnees)
+            appel.cultiveau_rattacher(t)
             return _json({"ok": True, "type": "intervention", "id": t.id, "client_id": partner.id, "client_cree": cree, "url": f"/app/action-project.action_view_all_task/{t.id}"})
         if categorie in ("devis", "projet", "prix", "demande_de_prix", "opportunite"):
             lead = request.env["crm.lead"].with_company(societe).create({
@@ -115,7 +133,29 @@ class CultiveauApi(http.Controller):
                 "cultiveau_urgence": donnees.get("urgence") if donnees.get("urgence") in ("immediate", "journee", "semaine", "non_urgent") else False,
                 "cultiveau_surface_ha": float(donnees.get("surface_ha") or 0) or 0.0,
                 "stage_id": request.env.ref("cultiveau_ventes.stage_demande", raise_if_not_found=False).id or False})
+            appel.cultiveau_rattacher(lead)
             return _json({"ok": True, "type": "opportunite", "id": lead.id, "client_id": partner.id, "client_cree": cree, "url": f"/app/action-crm.crm_lead_action_pipeline/{lead.id}"})
-        activite = partner.activity_schedule("mail.mail_activity_data_call", summary=resume[:120], note=donnees.get("transcription") or resume,
+        if categorie == "sortant" or donnees.get("sens") == "sortant":
+            return _json({"ok": True, "type": "appel", "id": appel.id, "client_id": partner.id, "client_cree": cree, "url": appel._lien()})
+        activite = partner.activity_schedule("mail.mail_activity_data_call", summary=appel.sujet[:120],
+                                             note=Markup('<p>%s</p><p><a href="%s">Voir la conversation</a></p>') % (resume, appel._lien()),
                                              user_id=(partner.user_id or request.env.ref("base.user_admin")).id)
         return _json({"ok": True, "type": "activite", "id": activite.id, "client_id": partner.id, "client_cree": cree, "url": f"/app/contacts/{partner.id}"})
+
+    @http.route("/cultiveau/api/synchro", type="http", auth="none", methods=["POST"], csrf=False, save_session=False, readonly=False)
+    def synchro(self, **kw):
+        """Le CRM de l'assistant recopié dans l'ERP : {"numero_dedie": "+339…", "elements": [{"type": "client", "reference": "CLI-12", …}, …]}."""
+        if not _autorise(ecriture=True):
+            return _json({"erreur": "clé absente, invalide ou en lecture seule"}, 401)
+        try:
+            donnees = json.loads(request.httprequest.get_data(as_text=True) or "{}")
+        except ValueError:
+            return _json({"erreur": "corps JSON illisible"}, 400)
+        elements = donnees.get("elements")
+        if not isinstance(elements, list) or len(elements) > 500:
+            return _json({"erreur": "elements : une liste de 1 à 500 éléments"}, 400)
+        request.update_env(user=SUPERUSER_ID)
+        societe = _societe(donnees.get("numero_dedie"))
+        resultats = request.env["cultiveau.assistant.synchro"].with_company(societe).synchroniser(societe, elements)
+        return _json({"ok": all(r["ok"] for r in resultats), "adherent": societe.name, "resultats": resultats})
+

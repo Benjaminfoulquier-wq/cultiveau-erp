@@ -21,6 +21,6 @@ Côté assistant téléphonique (dépôt cultiveau-assistant), le connecteur « 
     "author": "Cultiveau",
     "license": "LGPL-3",
     "depends": ["cultiveau_base", "cultiveau_frise", "cultiveau_persona", "cultiveau_installation", "cultiveau_ventes", "cultiveau_interventions"],
-    "data": [],
+    "data": ["security/ir.model.access.csv", "security/regles.xml", "views/appel_views.xml"],
     "installable": True,
 }
