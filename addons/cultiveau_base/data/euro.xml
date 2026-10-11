@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Les adhérents vendent en euros : à chaque mise à jour, les sociétés sans écriture repassent en euros et en France. -->
+    <function model="res.company" name="cultiveau_tout_en_euros"/>
+</odoo>

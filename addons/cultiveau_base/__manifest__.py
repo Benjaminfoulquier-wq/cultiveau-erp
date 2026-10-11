@@ -23,6 +23,7 @@ et comptabilité sont les siens ; l'équipe Cultiveau voit toutes les sociétés
     "data": [
         "security/cultiveau_security.xml",
         "security/ir.model.access.csv",
+        "data/euro.xml",
         "wizard/import_clients_views.xml",
         "wizard/import_reseau_views.xml",
         "views/res_partner_views.xml",
