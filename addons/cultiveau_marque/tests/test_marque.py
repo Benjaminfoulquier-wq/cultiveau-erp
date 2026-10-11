@@ -1,6 +1,6 @@
 import json
 
-from odoo.tests import HttpCase, tagged
+from odoo.tests import HttpCase, TransactionCase, tagged
 
 
 @tagged("post_install", "-at_install", "cultiveau")
@@ -33,3 +33,15 @@ class TestMarque(HttpCase):
         self.assertEqual(sw.headers["Service-Worker-Allowed"], "/app")
         self.assertNotIn("/odoo", sw.text)
         self.assertEqual(self.url_open("/app/offline").status_code, 200)
+
+
+@tagged("post_install", "-at_install")
+class TestSansEditeur(TransactionCase):
+    def test_aucun_ecran_ne_nomme_l_editeur(self):
+        for modele in ("res.partner", "res.company", "crm.lead"):
+            if modele not in self.env:
+                continue
+            for lang in [l for l in ("en_US", "fr_FR") if self.env["res.lang"].search_count([("code", "=", l), ("active", "=", True)])]:
+                vues = self.env[modele].with_context(lang=lang).get_views([(False, "form"), (False, "list"), (False, "kanban")])
+                for v in vues["views"].values():
+                    self.assertNotIn("odoo.com", v["arch"].lower(), f"{modele} {lang}")
