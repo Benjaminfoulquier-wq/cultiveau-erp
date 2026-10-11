@@ -27,14 +27,16 @@
                         <div class="col-md-6" invisible="not cultiveau_carte_ndvi"><b>Vigueur (NDVI, dernière image)</b><field name="cultiveau_carte_ndvi" nolabel="1"/></div>
                     </div>
                     <field name="cultiveau_parcelle_ids" context="{'default_partner_id': id}">
-                        <list create="0" decoration-danger="etat == 'alerte'">
+                        <list create="0" limit="200" decoration-danger="etat == 'alerte'" decoration-muted="etat == 'hors_suivi'">
                             <field name="campagne" options="{'enable_formatting': false}"/>
                             <field name="ilot"/>
                             <field name="numero"/>
+                            <field name="code_id"/>
                             <field name="culture_id"/>
                             <field name="surface_ha" sum="Total"/>
-                            <field name="dernier_ndvi"/>
-                            <field name="dernier_ndwi"/>
+                            <field name="derniere_mesure" column_invisible="True"/>
+                            <field name="dernier_ndvi" invisible="not derniere_mesure"/>
+                            <field name="dernier_ndwi" invisible="not derniere_mesure"/>
                             <field name="etat" widget="badge" decoration-danger="etat == 'alerte'" decoration-success="etat == 'ok'"/>
                         </list>
                     </field>

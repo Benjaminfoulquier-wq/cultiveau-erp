@@ -234,4 +234,16 @@
             <field name="culture_id" ref="cultiveau_frise.culture_trefle"/>
         </record>
     </data>
+    <!-- Codes ajoutés après coup : créés s'ils manquent, complétés s'ils ont déjà été rencontrés à un import (sans toucher la culture choisie) -->
+    <data noupdate="0">
+        <function model="cultiveau.code.pac" name="_completer_codes">
+            <value eval="[
+                ('JAC', 'Jachère', True),
+                ('SNE', 'Surface agricole temporairement non exploitée', True),
+                ('BTA', 'Bande tampon', True),
+                ('BOR', 'Bordure de champ', True),
+                ('VRG', 'Verger (autres espèces : l\'espèce est dans la précision)', False),
+            ]"/>
+        </function>
+    </data>
 </odoo>

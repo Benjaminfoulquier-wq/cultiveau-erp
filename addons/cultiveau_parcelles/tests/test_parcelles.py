@@ -36,6 +36,38 @@ XML = f"""<?xml version="1.0" encoding="UTF-8"?>
   </producteur>
 </producteurs>""".encode()
 
+# La forme réelle de l'export Telepac 2026 (données inventées) : espace de noms, ISO-8859-1, îlot numéroté et référencé,
+# surface admissible en ares, surfaces non agricoles (haies, arbres) mêlées aux parcelles, jachère
+EXPORT_2026 = f"""<?xml version="1.0" encoding="ISO-8859-1"?>
+<producteurs xmlns="urn:x-telepac:fr.gouv.agriculture.telepac:echange-producteur" xmlns:gml="http://www.opengis.net/gml">
+<producteur numero-pacage="040999999" campagne="Courante" fichier-xsd="Echanges-producteur-export-2026-V1">
+ <demandeur><identification-societe><exploitation>GAEC DES LANDES ESSAI</exploitation></identification-societe>
+  <siret>12345678900011</siret><courriel>gaec.essai@exemple.fr</courriel></demandeur>
+ <rpg>
+  <ilot numero-ilot-reference="040012345678" numero-ilot="3">
+   <commune>40309</commune>
+   <geometrie><gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>{CARRE}</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon></geometrie>
+   <parcelles>
+    <parcelle>
+     <descriptif-parcelle numero-parcelle="1">
+      <culture-principale culture-secondaire="CPL"><code-culture>MIS</code-culture><precision>001</precision></culture-principale>
+     </descriptif-parcelle>
+     <geometrie><gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>{CARRE}</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon></geometrie>
+     <surface-admissible>1195</surface-admissible>
+    </parcelle>
+    <parcelle>
+     <descriptif-parcelle numero-parcelle="2"><culture-principale><code-culture>JAC</code-culture><precision>001</precision></culture-principale></descriptif-parcelle>
+     <geometrie><gml:Polygon><gml:outerBoundaryIs><gml:LinearRing><gml:coordinates>{CARRE2}</gml:coordinates></gml:LinearRing></gml:outerBoundaryIs></gml:Polygon></geometrie>
+     <surface-admissible>400</surface-admissible>
+    </parcelle>
+   </parcelles>
+   <intersectionsSnaParcelles><intersectionSnaParcelle><numeroSna>7</numeroSna><numeroParcelle>1</numeroParcelle></intersectionSnaParcelle></intersectionsSnaParcelles>
+  </ilot>
+  <sna-declaree><numeroSna>7</numeroSna><typeSna>HAI</typeSna><geometrie><gml:Point><gml:coordinates>502100,6280100</gml:coordinates></gml:Point></geometrie></sna-declaree>
+ </rpg>
+</producteur>
+</producteurs>""".encode("iso-8859-1")
+
 
 def _shapefile(polygones, attributs):
     """Un petit shapefile (polygones) et son dbf, comme ceux que Telepac fournit en ZIP."""
@@ -92,6 +124,19 @@ class TestParcelles(TransactionCase):
         # réimporter ne duplique pas
         self.Parcelle.importer(self.agri, "declaration.xml", XML, 2026)
         self.assertEqual(len(self.agri.cultiveau_parcelle_ids), 2)
+
+    def test_export_telepac_2026(self):
+        client = self.env["res.partner"].create({"name": "M. Essai", "cultiveau_type": "agriculteur"})
+        bilan = self.Parcelle.importer(client, "Dossier-PAC-2026_dossier.xml", EXPORT_2026, 2026)
+        self.assertEqual((bilan["parcelles"], bilan["codes_inconnus"]), (2, []), "la jachère n'est pas un code à relier")
+        mais, jachere = client.cultiveau_parcelle_ids.sorted("numero")
+        self.assertEqual((mais.ilot, mais.numero, mais.commune, mais.pacage), ("3", "1", "40309", "040999999"))
+        self.assertEqual(mais.surface_ha, 11.95, "surface admissible en ares")
+        self.assertEqual((jachere.surface_ha, jachere.suivi, jachere.culture_id.id), (4.0, False, False))
+        # la fiche du client se complète d'après la déclaration
+        self.assertEqual((client.email, client.departement, client.exploitation), ("gaec.essai@exemple.fr", "40", "GAEC DES LANDES ESSAI"))
+        self.assertEqual(client.company_registry, "12345678900011")
+        self.assertEqual(client.cultiveau_culture_ids.culture_id, self.mais)
 
     def test_import_zip_shapefile(self):
         carre = [(502000, 6280000), (502000, 6280400), (502300, 6280400), (502300, 6280000), (502000, 6280000)]

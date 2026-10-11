@@ -4,7 +4,7 @@
         <field name="name">cultiveau.parcelle.list</field>
         <field name="model">cultiveau.parcelle</field>
         <field name="arch" type="xml">
-            <list decoration-danger="etat == 'alerte'" decoration-muted="etat == 'inconnu'">
+            <list decoration-danger="etat == 'alerte'" decoration-muted="etat in ('inconnu', 'hors_suivi')">
                 <field name="partner_id"/>
                 <field name="campagne" optional="hide" options="{'enable_formatting': false}"/>
                 <field name="ilot"/>
@@ -12,8 +12,8 @@
                 <field name="code_id" optional="show"/>
                 <field name="culture_id"/>
                 <field name="surface_ha" sum="Total"/>
-                <field name="dernier_ndvi" optional="show"/>
-                <field name="dernier_ndwi" optional="show"/>
+                <field name="dernier_ndvi" optional="show" invisible="not derniere_mesure"/>
+                <field name="dernier_ndwi" optional="show" invisible="not derniere_mesure"/>
                 <field name="derniere_mesure" optional="show"/>
                 <field name="etat" widget="badge" decoration-danger="etat == 'alerte'" decoration-success="etat == 'ok'"/>
             </list>
@@ -27,7 +27,7 @@
             <form>
                 <header>
                     <button name="action_actualiser" type="object" string="Nouvelles images satellite" icon="fa-globe" invisible="not contour"/>
-                    <field name="etat" widget="statusbar"/>
+                    <field name="etat" widget="statusbar" statusbar_visible="ok,alerte,inconnu"/>
                 </header>
                 <sheet>
                     <div class="oe_title"><h2><field name="name"/></h2></div>
@@ -98,7 +98,7 @@
                 <field name="culture_id"/>
                 <field name="code_id"/>
                 <filter name="a_verifier" string="À vérifier" domain="[('etat', '=', 'alerte')]"/>
-                <filter name="sans_culture" string="Culture à relier" domain="[('culture_id', '=', False)]"/>
+                <filter name="sans_culture" string="Culture à relier" domain="[('culture_id', '=', False), ('code_id.sans_culture', '=', False)]"/>
                 <group expand="0" string="Regrouper par">
                     <filter name="par_client" string="Client" context="{'group_by': 'partner_id'}"/>
                     <filter name="par_culture" string="Culture" context="{'group_by': 'culture_id'}"/>
@@ -199,7 +199,8 @@
             <list editable="bottom" decoration-warning="a_relier">
                 <field name="code"/>
                 <field name="libelle"/>
-                <field name="culture_id"/>
+                <field name="culture_id" invisible="sans_culture"/>
+                <field name="sans_culture"/>
                 <field name="nb_parcelles"/>
                 <field name="a_relier" column_invisible="True"/>
             </list>

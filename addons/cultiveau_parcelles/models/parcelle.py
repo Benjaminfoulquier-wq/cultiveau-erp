@@ -31,15 +31,25 @@ class CodePac(models.Model):
     code = fields.Char("Code PAC", size=3, required=True, index=True)
     libelle = fields.Char("Libellé PAC")
     culture_id = fields.Many2one("cultiveau.culture", "Culture Cultiveau", help="La culture de la frise qui lui correspond : ses Kc, sa frise, ses besoins.")
+    sans_culture = fields.Boolean("Pas une culture", help="Jachère, bande tampon, surface non exploitée… : rien à irriguer ni à suivre.")
     a_relier = fields.Boolean("À relier", compute="_compute_a_relier", store=True)
     nb_parcelles = fields.Integer("Parcelles", compute="_compute_nb")
 
     _sql_constraints = [("code_unique", "unique(code)", "Ce code PAC existe déjà.")]
 
-    @api.depends("culture_id")
+    @api.depends("culture_id", "sans_culture")
     def _compute_a_relier(self):
         for c in self:
-            c.a_relier = not c.culture_id
+            c.a_relier = not c.culture_id and not c.sans_culture
+
+    @api.model
+    def _completer_codes(self, codes):
+        for code, libelle, sans_culture in codes:
+            existant = self.search([("code", "=", code)], limit=1)
+            if not existant:
+                self.create({"code": code, "libelle": libelle, "sans_culture": sans_culture})
+            elif not existant.culture_id:
+                existant.write({"libelle": existant.libelle or libelle, "sans_culture": sans_culture})
 
     def _compute_nb(self):
         compte = {c.id: n for c, n in self.env["cultiveau.parcelle"]._read_group([("code_id", "in", self.ids)], ["code_id"], ["__count"])}
@@ -53,6 +63,8 @@ class CodePac(models.Model):
             parcelles.write({"culture_id": vals["culture_id"]})
             for partner in parcelles.partner_id:
                 partner.cultiveau_cultures_depuis_parcelles()
+        if vals.get("sans_culture"):  # une jachère ne se suit pas au satellite
+            self.env["cultiveau.parcelle"].search([("code_id", "in", self.ids)]).write({"suivi": False})
         return res
 
 
@@ -60,7 +72,7 @@ class Parcelle(models.Model):
     _name = "cultiveau.parcelle"
     _description = "Parcelle d'un client (déclaration PAC)"
     _inherit = ["mail.thread"]
-    _order = "partner_id, campagne desc, ilot, numero"
+    _order = "partner_id, campagne desc, tri, id"
 
     name = fields.Char("Parcelle", compute="_compute_name", store=True)
     partner_id = fields.Many2one("res.partner", "Client", required=True, index=True, ondelete="cascade")
@@ -69,6 +81,7 @@ class Parcelle(models.Model):
     pacage = fields.Char("N° PACAGE")
     ilot = fields.Char("Îlot")
     numero = fields.Char("N° de parcelle")
+    tri = fields.Integer(compute="_compute_tri", store=True, index=True)
     code_id = fields.Many2one("cultiveau.code.pac", "Code culture PAC", index=True)
     precision = fields.Char("Précision PAC")
     culture_id = fields.Many2one("cultiveau.culture", "Culture", index=True, tracking=True)
@@ -84,7 +97,7 @@ class Parcelle(models.Model):
     dernier_ndvi = fields.Float("NDVI", digits=(3, 2), compute="_compute_dernieres", store=True)
     dernier_ndwi = fields.Float("NDWI", digits=(3, 2), compute="_compute_dernieres", store=True)
     derniere_mesure = fields.Date("Dernière image", compute="_compute_dernieres", store=True)
-    etat = fields.Selection([("ok", "Rien à signaler"), ("alerte", "À vérifier"), ("inconnu", "Pas encore d'image")], "État",
+    etat = fields.Selection([("ok", "Rien à signaler"), ("alerte", "À vérifier"), ("inconnu", "Pas encore d'image"), ("hors_suivi", "Non suivie")], "État",
                             compute="_compute_etat", store=True)
     carte = fields.Html("Contour", compute="_compute_carte", sanitize=False)
     courbe = fields.Html("Évolution", compute="_compute_courbe", sanitize=False)
@@ -103,13 +116,24 @@ class Parcelle(models.Model):
             d = p.indice_ids.sorted("date")[-1:] if p.indice_ids else p.indice_ids
             p.dernier_ndvi, p.dernier_ndwi, p.derniere_mesure = (d.ndvi, d.ndwi, d.date) if d else (0.0, 0.0, False)
 
-    @api.depends("alerte_ids.etat", "indice_ids")
+    @api.depends("alerte_ids.etat", "indice_ids", "suivi")
     def _compute_etat(self):
         for p in self:
             if p.alerte_ids.filtered(lambda a: a.etat == "nouvelle"):
                 p.etat = "alerte"
+            elif not p.suivi:
+                p.etat = "hors_suivi"
             else:
                 p.etat = "ok" if p.indice_ids else "inconnu"
+
+    @api.depends("ilot", "numero")
+    def _compute_tri(self):
+        """Îlot 2 avant îlot 10 : l'ordre des numéros, pas celui des lettres."""
+        def nombre(v):
+            chiffres = "".join(c for c in (v or "") if c.isdigit())[:6]
+            return int(chiffres) if chiffres else 0
+        for p in self:
+            p.tri = nombre(p.ilot) * 1000 + nombre(p.numero) % 1000
 
     def anneau(self):
         self.ensure_one()
@@ -156,15 +180,22 @@ class Parcelle(models.Model):
         bilan = {"parcelles": 0, "creees": 0, "sans_contour": 0, "codes_inconnus": set()}
         for p in lues:
             code = Code.search([("code", "=", p["code"])], limit=1) or Code.create({"code": p["code"]})
-            if not code.culture_id:
+            if code.a_relier:
                 bilan["codes_inconnus"].add(code.code)
             anneau = geo.vers_wgs84(geo.fermer(p["anneau"])) if p["anneau"] else None
             valeurs = {"partner_id": partner.id, "campagne": campagne, "pacage": p.get("pacage"), "ilot": p.get("ilot"), "numero": p.get("numero"),
                        "code_id": code.id, "culture_id": code.culture_id.id, "precision": p.get("precision"), "commune": p.get("commune")}
+            if code.sans_culture:
+                valeurs["suivi"] = False
             if anneau:
                 lon, lat = geo.centre(anneau[:-1])
                 valeurs.update(contour=json.dumps([[round(x, 6), round(y, 6)] for x, y in anneau]), longitude=lon, latitude=lat)
-                valeurs["surface_ha"] = p.get("surface_ha") or round(geo.surface_ha(anneau[:-1]), 2)
+                dessinee = geo.surface_ha(anneau[:-1])
+                declaree = p.get("surface_ha")
+                # Telepac donne la surface admissible en ares dans son XML (403 = 4,03 ha) : on garde l'unité qui colle au dessin
+                if declaree and dessinee and abs(declaree / 100 - dessinee) < abs(declaree - dessinee):
+                    declaree = declaree / 100
+                valeurs["surface_ha"] = round(declaree or dessinee, 2)
             else:
                 valeurs["surface_ha"] = p.get("surface_ha") or 0.0
                 bilan["sans_contour"] += 1
@@ -176,12 +207,31 @@ class Parcelle(models.Model):
                 self.create(valeurs)
                 bilan["creees"] += 1
             bilan["parcelles"] += 1
+        self._completer_client(partner, nom_fichier, contenu, lues)
         partner.cultiveau_cultures_depuis_parcelles(campagne)
         partner.message_post(body=Markup("<p>Déclaration PAC %s importée : %s parcelles, %s ha.</p>") % (
             campagne, bilan["parcelles"], round(sum(self.search([("partner_id", "=", partner.id), ("campagne", "=", campagne)]).mapped("surface_ha")), 1)),
             subtype_xmlid="mail.mt_note")
         bilan["codes_inconnus"] = sorted(bilan["codes_inconnus"])
         return bilan
+
+    @api.model
+    def _completer_client(self, partner, nom_fichier, contenu, lues):
+        """Ce que la déclaration dit du client et que sa fiche ignore encore : exploitation, e-mail, SIRET, département."""
+        entete = telepac.lire_entete(contenu) if nom_fichier.lower().endswith(".xml") else {}
+        valeurs = {}
+        if entete.get("courriel") and not partner.email:
+            valeurs["email"] = entete["courriel"]
+        if entete.get("siret") and "company_registry" in partner._fields and not partner.company_registry:
+            valeurs["company_registry"] = entete["siret"]
+        communes = [p["commune"] for p in lues if p.get("commune")]
+        if communes and not partner.departement:
+            insee = max(set(communes), key=communes.count)
+            valeurs["departement"] = insee[:3] if insee.startswith("97") else insee[:2]
+        if entete.get("exploitation") and not partner.exploitation and entete["exploitation"].lower() != (partner.name or "").lower():
+            valeurs["exploitation"] = entete["exploitation"]
+        if valeurs:
+            partner.write(valeurs)
 
     # ---------------------------------------------------------------- le satellite
 
@@ -383,7 +433,7 @@ def dessiner_carte(parcelles, largeur=640, hauteur=360, selon="culture"):
         if not a:
             continue
         points = " ".join("%.1f,%.1f" % proj(x, y) for x, y in a)
-        teinte = couleur_ndvi(p.dernier_ndvi) if selon == "ndvi" else (p.culture_id.couleur or "#9aa3ab")
+        teinte = couleur_ndvi(p.dernier_ndvi) if selon == "ndvi" else (p.culture_id.couleur or ("#dfe6d6" if p.code_id.sans_culture else "#9aa3ab"))
         cx, cy = proj(p.longitude, p.latitude)
         titre = f"{p.name} — {p.surface_ha:g} ha" + (f" — NDVI {p.dernier_ndvi:.2f}" if p.derniere_mesure else "")
         formes.append(f"<polygon points='{points}' fill='{teinte}' fill-opacity='0.75' stroke='#1d3b45' stroke-width='1'><title>{Markup.escape(titre)}</title></polygon>")
@@ -400,7 +450,12 @@ def _legende(parcelles, y, selon):
     else:
         surfaces = {}
         for p in parcelles:
-            cle = (p.culture_id.couleur or "#9aa3ab", p.culture_id.name or "Code à relier")
+            if p.culture_id:
+                cle = (p.culture_id.couleur or "#9aa3ab", p.culture_id.name)
+            elif p.code_id.sans_culture:
+                cle = ("#dfe6d6", "Jachère, bordures")
+            else:
+                cle = ("#9aa3ab", f"{p.code_id.code or 'Code'} à relier")
             surfaces[cle] = surfaces.get(cle, 0) + p.surface_ha
         items = [(c, f"{nom} {ha:.1f} ha".replace(".", ",")) for (c, nom), ha in sorted(surfaces.items(), key=lambda kv: -kv[1])]
     x, morceaux = 10, []

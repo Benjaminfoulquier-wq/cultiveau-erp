@@ -105,10 +105,14 @@ def lire_xml(contenu):
         if not code:
             continue
         numero = next((v for sous in e.iter() for attr, v in sous.attrib.items() if _nom(attr) in ("numero-parcelle", "numero_parcelle", "num_parcel", "numero")), None)
-        ilot, p = None, parents.get(e)
+        # l'îlot et sa commune sont portés par l'élément <ilot numero-ilot="1" numero-ilot-reference="040012127686"> qui l'englobe
+        ilot, commune, p = None, None, parents.get(e)
         while p is not None and ilot is None:
             if "ilot" in _nom(p.tag):
-                ilot = next((v for attr, v in p.attrib.items() if "numero" in _nom(attr) or _nom(attr) in ("num_ilot", "ilot")), None)
+                attrs = {_nom(a): v for a, v in p.attrib.items()}
+                ilot = next((attrs[c] for c in ("numero-ilot", "numero_ilot", "num_ilot", "ilot", "numero") if attrs.get(c)), None)
+                ilot = ilot or next((v for a, v in attrs.items() if "numero" in a), None)
+                commune = next((c.text.strip() for c in p if _nom(c.tag) in ("commune", "code-insee", "insee") and (c.text or "").strip()), None)
             p = parents.get(p)
         precision = None
         for sous in e.iter():
@@ -116,10 +120,28 @@ def lire_xml(contenu):
                 precision = sous.text.strip()
                 break
         surface = _nombre(_valeur(e, CLES_SURFACE))
-        commune = _valeur(e, ("commune", "code-insee", "insee"))
+        commune = _valeur(e, ("commune", "code-insee", "insee")) or commune
         parcelles.append({"pacage": pacage, "ilot": ilot, "numero": numero, "code": code.upper()[:3], "precision": precision,
                           "surface_ha": surface, "anneau": _anneau(e), "commune": commune})
     return parcelles
+
+
+def lire_entete(contenu):
+    """Qui est l'exploitant d'après l'export XML : {pacage, exploitation, siret, courriel}, les clés absentes sont omises."""
+    try:
+        racine = ElementTree.fromstring(contenu)
+    except ElementTree.ParseError:
+        return {}
+    entete = {}
+    for e in racine.iter():
+        n = _nom(e.tag)
+        for attr, v in e.attrib.items():
+            if "pacage" in _nom(attr) and v.strip():
+                entete.setdefault("pacage", v.strip())
+        texte = (e.text or "").strip()
+        if texte and len(e) == 0 and n in ("exploitation", "raison-sociale", "siret", "courriel"):
+            entete.setdefault(n if n != "raison-sociale" else "exploitation", texte)
+    return entete
 
 
 # ---------------------------------------------------------------- shapefile (polygones) + dbf, sans bibliothèque
