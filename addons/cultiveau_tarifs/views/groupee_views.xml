@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_groupee_list" model="ir.ui.view">
+        <field name="name">cultiveau.commande.groupee.list</field>
+        <field name="model">cultiveau.commande.groupee</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="etat == 'commandee'">
+                <field name="name"/>
+                <field name="fournisseur_id"/>
+                <field name="date_limite"/>
+                <field name="nb_adherents"/>
+                <field name="total_ht"/>
+                <field name="etat" widget="badge" decoration-success="etat == 'ouverte'" decoration-info="etat == 'cloturee'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_groupee_form" model="ir.ui.view">
+        <field name="name">cultiveau.commande.groupee.form</field>
+        <field name="model">cultiveau.commande.groupee</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_cloturer" type="object" string="Clôturer" invisible="etat != 'ouverte'" groups="cultiveau_base.group_equipe"/>
+                    <button name="action_rouvrir" type="object" string="Rouvrir" invisible="etat != 'cloturee'" groups="cultiveau_base.group_equipe"/>
+                    <button name="action_commander" type="object" string="Créer les commandes d'achat" class="btn-primary" invisible="etat != 'cloturee'" groups="cultiveau_base.group_equipe"
+                            confirm="Une commande d'achat par adhérent est créée chez le fournisseur, au tarif négocié. Continuer ?"/>
+                    <button name="action_recapitulatif" type="object" string="Récapitulatif pour le fournisseur (Excel)" invisible="not ligne_ids"/>
+                    <field name="etat" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1><field name="name" placeholder="Ex. Tubes PE printemps 2027"/></h1>
+                    <group>
+                        <group>
+                            <field name="fournisseur_id"/>
+                            <field name="date_limite"/>
+                        </group>
+                        <group>
+                            <field name="nb_adherents"/>
+                            <field name="total_ht"/>
+                        </group>
+                    </group>
+                    <group><field name="note" placeholder="Franco, remise supplémentaire, délai, livraison chez chaque adhérent…"/></group>
+                    <notebook>
+                        <page string="Mes besoins" name="mes_besoins">
+                            <p class="text-muted" invisible="etat != 'ouverte'">Déposez vos quantités : le prix est le tarif négocié par le réseau chez ce fournisseur.</p>
+                            <field name="mes_ligne_ids" readonly="etat != 'ouverte'">
+                                <list editable="bottom">
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                    <field name="prix"/>
+                                    <field name="sous_total" sum="Total"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Tous les adhérents" name="tous" groups="cultiveau_base.group_equipe">
+                            <field name="ligne_ids" readonly="etat == 'commandee'">
+                                <list editable="bottom">
+                                    <field name="company_id"/>
+                                    <field name="product_id"/>
+                                    <field name="qty"/>
+                                    <field name="prix"/>
+                                    <field name="sous_total" sum="Total"/>
+                                    <field name="note"/>
+                                    <field name="purchase_line_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Commandes d'achat" name="achats" invisible="not purchase_ids">
+                            <field name="purchase_ids">
+                                <list><field name="name"/><field name="company_id"/><field name="amount_untaxed"/><field name="state"/></list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_groupees" model="ir.actions.act_window">
+        <field name="name">Commandes groupées</field>
+        <field name="res_model">cultiveau.commande.groupee</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucune commande groupée</p>
+            <p>Le réseau ouvre une commande chez un fournisseur référencé ; chaque adhérent dépose ses besoins ; à la clôture, une commande d'achat par adhérent part au tarif négocié.</p>
+        </field>
+    </record>
+</odoo>

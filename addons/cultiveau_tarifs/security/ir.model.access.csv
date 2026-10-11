@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tarif_equipe,cultiveau.tarif.fournisseur équipe,model_cultiveau_tarif_fournisseur,cultiveau_base.group_equipe,1,1,1,1
+access_tarif_ligne_equipe,cultiveau.tarif.ligne équipe,model_cultiveau_tarif_ligne,cultiveau_base.group_equipe,1,1,1,1
+access_tarif_user,cultiveau.tarif.fournisseur lecture,model_cultiveau_tarif_fournisseur,base.group_user,1,0,0,0
+access_tarif_ligne_user,cultiveau.tarif.ligne lecture,model_cultiveau_tarif_ligne,base.group_user,1,0,0,0
+access_marge_user,cultiveau.marge,model_cultiveau_marge,base.group_user,1,1,1,1
+access_groupee_user,cultiveau.commande.groupee lecture,model_cultiveau_commande_groupee,base.group_user,1,0,0,0
+access_groupee_equipe,cultiveau.commande.groupee équipe,model_cultiveau_commande_groupee,cultiveau_base.group_equipe,1,1,1,1
+access_groupee_ligne_user,cultiveau.commande.groupee.ligne,model_cultiveau_commande_groupee_ligne,base.group_user,1,1,1,1

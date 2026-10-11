@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_tarifs" name="Tarifs fournisseurs" parent="cultiveau_catalogue.menu_catalogue" action="action_tarifs" sequence="22" groups="cultiveau_base.group_equipe"/>
+    <menuitem id="menu_groupees" name="Commandes groupées" parent="cultiveau_catalogue.menu_catalogue" action="action_groupees" sequence="24"/>
+</odoo>

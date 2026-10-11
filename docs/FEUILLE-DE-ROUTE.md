@@ -14,6 +14,9 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Tarifs, marges, commande groupée** : le tarif négocié chez chaque fournisseur s'importe et met à jour le prix d'achat de tous les
+  adhérents ; chacun règle sa marge (par famille s'il veut) et sa liste de prix de vente suit ; la commande groupée regroupe les
+  besoins et crée une commande d'achat par adhérent.
 - **Du dimensionnement au devis** : l'installation se découpe en secteurs ; l'ERP calcule débits, diamètres, pertes de charge, pression
   en tête, HMT et pompe, puis génère le devis par lots avec la nomenclature prise au catalogue.
 - **Conseil d'irrigation** : chaque matin, la météo réelle de chaque parcelle (ETo et pluie des trois dernières semaines, prévision à
@@ -62,11 +65,11 @@
    réseau Cultiveau » en pied), devis avec le projet, l'acompte, le bon pour accord et les CGV en dernière page, signature en ligne,
    facture d'acompte en un clic, mentions légales des factures, e-mails en français, relances automatiques des devis sans réponse et
    des factures en retard puis activité « appeler le client ». Reste : le paiement en ligne (fournisseur de paiement à choisir).
-3. **Tarifs et marges.** Les prix négociés par Cultiveau chez chaque fournisseur (import du tarif fournisseur Excel/PDF, mise à jour
-   annuelle), la marge cible par adhérent, le prix de vente proposé automatiquement ; alerte quand un fournisseur change ses prix.
-4. **Stock et achats.** Inventaire initial depuis le fichier d'articles (la colonne « stock » est lue, pas encore importée), stock
-   camion par technicien, réassort automatique, et la **commande groupée réseau** : les besoins de plusieurs adhérents regroupés
-   vers un fournisseur référencé.
+3. **Tarifs et marges.** Fait : tarifs fournisseurs importés (Excel, CSV ; chaque ligne retrouve son article, hausses et baisses,
+   alerte au-delà d'un seuil, prix d'achat des adhérents mis à jour), marge cible par adhérent et par famille, liste de prix de
+   vente construite seule, commande groupée réseau. Reste : les tarifs en PDF (lecture par l'IA, avec les fiches techniques).
+4. **Stock et achats.** Fait : la commande groupée réseau (les besoins de plusieurs adhérents regroupés vers un fournisseur
+   référencé, une commande d'achat par adhérent). Reste : inventaire initial depuis le fichier d'articles, réassort automatique.
 5. **Du dimensionnement au devis.** Fait : secteurs (organes, maille, conduite d'amenée, dénivelé), débit et pluviométrie par secteur,
    diamètres pour une vitesse sous 1,5 m/s, pertes de charge, pression en tête, HMT, pompe et puissance, note de calcul ; devis par
    lots généré avec la nomenclature, articles pris au catalogue (DN, matière) ou « à préciser ». Reste : les abaques des fabricants

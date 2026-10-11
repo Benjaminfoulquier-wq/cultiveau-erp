@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tarif_list" model="ir.ui.view">
+        <field name="name">cultiveau.tarif.fournisseur.list</field>
+        <field name="model">cultiveau.tarif.fournisseur</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="fournisseur_id"/>
+                <field name="date"/>
+                <field name="nb_lignes" string="Lignes"/>
+                <field name="nb_hausses"/>
+                <field name="nb_baisses"/>
+                <field name="nb_inconnus"/>
+                <field name="etat" widget="badge" decoration-success="etat == 'applique'" decoration-info="etat == 'analyse'"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_tarif_form" model="ir.ui.view">
+        <field name="name">cultiveau.tarif.fournisseur.form</field>
+        <field name="model">cultiveau.tarif.fournisseur</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_analyser" type="object" string="Analyser le fichier" class="btn-primary" invisible="etat == 'applique'"/>
+                    <button name="action_appliquer" type="object" string="Appliquer le tarif" class="btn-primary" invisible="etat != 'analyse'"
+                            confirm="Les prix d'achat chez ce fournisseur sont remplacés pour tout le réseau et les listes de prix de vente des adhérents recalculées. Continuer ?"/>
+                    <field name="etat" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1><field name="name"/></h1>
+                    <group>
+                        <group>
+                            <field name="fournisseur_id"/>
+                            <field name="date"/>
+                            <field name="fichier" filename="nom_fichier"/>
+                            <field name="nom_fichier" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="remise_pct"/>
+                            <field name="creer_inconnus"/>
+                            <field name="seuil_alerte_pct"/>
+                        </group>
+                    </group>
+                    <group><field name="note" placeholder="Conditions du tarif : franco, délais, validité…"/></group>
+                    <field name="ligne_ids" readonly="etat == 'applique'">
+                        <list editable="bottom" decoration-danger="etat == 'hausse'" decoration-success="etat == 'baisse'" decoration-muted="etat == 'inchange'" decoration-warning="etat == 'nouveau'">
+                            <field name="etat" widget="badge" decoration-danger="etat == 'hausse'" decoration-success="etat == 'baisse'" decoration-warning="etat == 'nouveau'"/>
+                            <field name="ref_fournisseur"/>
+                            <field name="designation"/>
+                            <field name="product_id"/>
+                            <field name="prix_brut"/>
+                            <field name="prix_net"/>
+                            <field name="ancien_prix"/>
+                            <field name="variation_pct"/>
+                            <field name="delai" optional="hide"/>
+                        </list>
+                    </field>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_tarifs" model="ir.actions.act_window">
+        <field name="name">Tarifs fournisseurs</field>
+        <field name="res_model">cultiveau.tarif.fournisseur</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun tarif</p>
+            <p>Le fichier du fournisseur (Excel ou CSV) : chaque ligne retrouve son article, le prix net négocié remplace l'ancien, les hausses se voient, les adhérents reçoivent leur prix d'achat.</p>
+        </field>
+    </record>
+    <record id="view_marge_list" model="ir.ui.view">
+        <field name="name">cultiveau.marge.list</field>
+        <field name="model">cultiveau.marge</field>
+        <field name="arch" type="xml">
+            <list editable="bottom">
+                <field name="company_id" column_invisible="True"/>
+                <field name="categ_id"/>
+                <field name="marge_pct"/>
+            </list>
+        </field>
+    </record>
+</odoo>
