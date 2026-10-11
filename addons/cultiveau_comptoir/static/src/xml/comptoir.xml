@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_comptoir.Comptoir">
+        <div class="o_cultiveau_comptoir d-flex flex-column h-100" t-if="state.contexte">
+            <div class="o_cultiveau_comptoir_entete d-flex align-items-center gap-3 px-3 py-2">
+                <h2 class="m-0">Comptoir</h2>
+                <span class="text-muted" t-esc="state.contexte.societe.nom"/>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <span class="text-muted">Client :</span>
+                    <button class="btn btn-sm btn-outline-primary" t-on-click="ouvrirClients">
+                        <i class="fa fa-user me-1"/><t t-esc="state.client ? state.client.nom : 'Client de passage'"/>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-grow-1 d-flex overflow-hidden">
+                <!-- la gauche : la douchette, les résultats, le panier -->
+                <div class="o_cultiveau_comptoir_gauche flex-grow-1 d-flex flex-column p-3 overflow-auto">
+                    <div class="input-group input-group-lg mb-2">
+                        <span class="input-group-text"><i class="fa fa-barcode"/></span>
+                        <input t-ref="scan" type="text" class="form-control" placeholder="Scannez le code-barres ou tapez le nom, la référence…"
+                               t-model="state.texte" t-on-keydown="onTouche" t-on-input="onSaisie" autocomplete="off"/>
+                        <button class="btn btn-primary" t-on-click="chercher"><i class="fa fa-search"/></button>
+                    </div>
+                    <div class="o_cultiveau_comptoir_candidats mb-3" t-if="state.candidats.length">
+                        <div t-foreach="state.candidats" t-as="a" t-key="a.id" class="o_cultiveau_comptoir_candidat d-flex align-items-center gap-3 px-3 py-2" t-on-click="() => this.ajouter(a)">
+                            <div class="flex-grow-1">
+                                <div class="fw-bold" t-esc="a.nom"/>
+                                <small class="text-muted"><t t-esc="a.code"/><t t-if="a.barcode"> · <t t-esc="a.barcode"/></t> · TVA <t t-esc="a.tva"/></small>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold"><t t-esc="montant(a.prix_ttc)"/> <t t-esc="state.contexte.devise"/> TTC</div>
+                                <small class="text-muted"><t t-esc="montant(a.prix_ht)"/> HT<t t-if="a.stock !== null"> · stock <t t-esc="a.stock"/></t></small>
+                            </div>
+                            <button class="btn btn-sm btn-primary"><i class="fa fa-plus"/></button>
+                        </div>
+                    </div>
+                    <div t-elif="state.texte.trim().length >= 3 and !state.cherche" class="text-muted mb-3">Aucun article pour « <t t-esc="state.texte"/> ».</div>
+
+                    <table class="table table-sm o_cultiveau_comptoir_panier" t-if="state.panier.length">
+                        <thead><tr><th>Article</th><th class="text-center" style="width: 12rem">Quantité</th><th class="text-end" style="width: 8rem">Prix HT</th><th class="text-end" style="width: 8rem">Total TTC</th><th style="width: 2rem"/></tr></thead>
+                        <tbody>
+                            <tr t-foreach="state.panier" t-as="l" t-key="l.product_id">
+                                <td><div class="fw-bold" t-esc="l.nom"/><small class="text-muted"><t t-esc="l.code"/><t t-if="l.stock !== null and l.stock lt l.quantite"> · <span class="text-danger">stock <t t-esc="l.stock"/></span></t></small></td>
+                                <td class="text-center">
+                                    <div class="input-group input-group-sm">
+                                        <button class="btn btn-outline-secondary" t-on-click="() => this.quantite(l, -1)">−</button>
+                                        <input type="text" class="form-control text-center" t-att-value="l.quantite" t-on-change="(ev) => this.saisirQuantite(l, ev)"/>
+                                        <button class="btn btn-outline-secondary" t-on-click="() => this.quantite(l, 1)">+</button>
+                                    </div>
+                                </td>
+                                <td class="text-end"><input type="text" class="form-control form-control-sm text-end" t-att-value="montant(l.prix_ht)" t-on-change="(ev) => this.saisirPrix(l, ev)"/></td>
+                                <td class="text-end fw-bold"><t t-esc="montant(l.quantite * l.prix_ht * (1 + (l.taux || 0) / 100))"/></td>
+                                <td><button class="btn btn-sm btn-link text-danger" t-on-click="() => this.retirer(l)"><i class="fa fa-trash"/></button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div t-elif="!state.vente" class="o_cultiveau_comptoir_vide text-muted text-center py-5">
+                        <i class="fa fa-shopping-basket fa-3x mb-2"/>
+                        <div>Le panier est vide. Scannez un article ou cherchez-le.</div>
+                    </div>
+
+                    <!-- la vente faite -->
+                    <div class="o_cultiveau_comptoir_fait alert alert-success mt-3" t-if="state.vente and !state.panier.length">
+                        <div class="fs-5 fw-bold" t-esc="state.vente.message"/>
+                        <div class="text-muted"><t t-esc="state.vente.client"/> · <t t-esc="state.vente.lignes"/> article(s) · <t t-esc="montant(state.vente.total_ttc)"/> <t t-esc="state.contexte.devise"/> TTC</div>
+                        <div class="d-flex gap-2 mt-2">
+                            <button class="btn btn-primary" t-if="state.vente.facture_id" t-on-click="ticket"><i class="fa fa-print me-1"/>Ticket</button>
+                            <button class="btn btn-outline-secondary" t-on-click="ouvrirDocument"><t t-esc="state.vente.facture_id ? 'Ouvrir la facture' : 'Ouvrir la commande'"/></button>
+                            <button class="btn btn-outline-primary ms-auto" t-on-click="nouvelleVente"><i class="fa fa-plus me-1"/>Nouvelle vente</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- la droite : les totaux et l'encaissement -->
+                <div class="o_cultiveau_comptoir_droite d-flex flex-column p-3 gap-3">
+                    <div class="o_cultiveau_comptoir_totaux">
+                        <div class="d-flex justify-content-between text-muted"><span>Articles</span><span t-esc="totaux.articles"/></div>
+                        <div class="d-flex justify-content-between"><span>Total HT</span><span><t t-esc="montant(totaux.ht)"/> <t t-esc="state.contexte.devise"/></span></div>
+                        <div class="d-flex justify-content-between text-muted"><span>TVA</span><span><t t-esc="montant(totaux.tva)"/> <t t-esc="state.contexte.devise"/></span></div>
+                        <div class="d-flex justify-content-between fs-3 fw-bold mt-1"><span>À payer</span><span><t t-esc="montant(totaux.ttc)"/> <t t-esc="state.contexte.devise"/></span></div>
+                    </div>
+                    <textarea class="form-control" rows="2" placeholder="Note sur la vente (parcelle, chantier, à rappeler…)" t-model="state.note"/>
+                    <div class="d-grid gap-2" t-if="state.contexte.journaux.length">
+                        <button t-foreach="state.contexte.journaux" t-as="j" t-key="j.id" class="btn btn-lg" t-att-class="j.type === 'cash' ? 'btn-success' : 'btn-primary'"
+                                t-att-disabled="!state.panier.length or state.occupe" t-on-click="() => this.vendre('encaisser', j.id)">
+                            <i t-att-class="j.type === 'cash' ? 'fa fa-money me-2' : 'fa fa-credit-card me-2'"/>Encaisser — <t t-esc="j.libelle"/>
+                        </button>
+                    </div>
+                    <div class="d-grid gap-2" t-else="">
+                        <button class="btn btn-lg btn-success" t-att-disabled="!state.panier.length or state.occupe" t-on-click="() => this.vendre('encaisser')">
+                            <i class="fa fa-money me-2"/>Encaisser
+                        </button>
+                        <small class="text-muted">Premier encaissement : la comptabilité de la société sera mise en place (plan comptable français).</small>
+                    </div>
+                    <div class="d-grid gap-2 mt-auto">
+                        <button class="btn btn-outline-primary" t-att-disabled="!state.panier.length or state.occupe" t-on-click="() => this.vendre('commande')"><i class="fa fa-truck me-2"/>Commande à livrer</button>
+                        <button class="btn btn-outline-secondary" t-att-disabled="!state.panier.length or state.occupe" t-on-click="() => this.vendre('devis')"><i class="fa fa-file-text-o me-2"/>Devis à envoyer</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- le choix du client -->
+            <div class="o_cultiveau_comptoir_voile" t-if="state.choixClient" t-on-click="() => this.state.choixClient = false">
+                <div class="o_cultiveau_comptoir_clients" t-on-click.stop="">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <input type="text" class="form-control" placeholder="Nom, téléphone, commune…" t-model="state.rechercheClient" t-on-input="chercherClient" autofocus="autofocus"/>
+                        <button class="btn btn-outline-secondary text-nowrap" t-on-click="clientDePassage">Client de passage</button>
+                        <button class="btn btn-primary text-nowrap" t-on-click="nouveauClient"><i class="fa fa-plus me-1"/>Nouveau</button>
+                    </div>
+                    <div class="list-group">
+                        <button t-foreach="state.clients" t-as="c" t-key="c.id" class="list-group-item list-group-item-action d-flex justify-content-between" t-on-click="() => this.choisirClient(c)">
+                            <span><t t-esc="c.nom"/><small class="text-muted ms-2" t-esc="c.ville"/></span>
+                            <small class="text-muted" t-esc="c.telephone"/>
+                        </button>
+                        <div class="text-muted p-2" t-if="!state.clients.length">Personne ne répond à cette recherche.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

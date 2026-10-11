@@ -284,6 +284,10 @@ export class VueEnsemble extends Component {
         this.action.doAction({ type: "ir.actions.act_window", name: nom, res_model: modele, view_mode: "list,form", views: [[false, "list"], [false, "form"]], domain: domaine });
     }
 
+    ouvrirAction(xmlid) {
+        this.action.doAction(xmlid);
+    }
+
     creer(modele, contexte) {
         this.action.doAction({ type: "ir.actions.act_window", res_model: modele, views: [[false, "form"]], target: "current", context: contexte || {} });
     }

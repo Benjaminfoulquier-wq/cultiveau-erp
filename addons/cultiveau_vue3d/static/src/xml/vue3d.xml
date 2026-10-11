@@ -21,6 +21,7 @@
                     <div class="btn-group">
                         <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">Créer</button>
                         <ul class="dropdown-menu dropdown-menu-end">
+                            <li t-if="state.donnees.compteurs.comptoir"><a class="dropdown-item" href="#" t-on-click.prevent="() => this.ouvrirAction('cultiveau_comptoir.action_comptoir')">Une vente au comptoir</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('res.partner', {default_cultiveau_type: 'agriculteur', default_is_company: false})">Un agriculteur</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('crm.lead', {default_type: 'opportunity'})">Une demande (appel, visite)</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('cultiveau.installation', {default_etat: 'etude'})">Une étude d'installation</a></li>

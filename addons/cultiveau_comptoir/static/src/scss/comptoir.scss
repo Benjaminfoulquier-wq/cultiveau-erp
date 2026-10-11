@@ -1,0 +1,15 @@
+.o_cultiveau_comptoir {
+    background: #f6f4ee;
+    .o_cultiveau_comptoir_entete { background: #ffffff; border-bottom: 1px solid #e3ded3; h2 { color: #183840; font-weight: 600; } }
+    .o_cultiveau_comptoir_droite { width: 22rem; background: #ffffff; border-left: 1px solid #e3ded3; }
+    .o_cultiveau_comptoir_totaux { background: #f6f4ee; border-radius: 8px; padding: 12px 14px; }
+    .o_cultiveau_comptoir_candidats { background: #ffffff; border: 1px solid #e3ded3; border-radius: 8px; overflow: hidden; }
+    .o_cultiveau_comptoir_candidat { cursor: pointer; border-bottom: 1px solid #f0ece3; &:hover { background: #e9f6f8; } &:last-child { border-bottom: 0; } }
+    .o_cultiveau_comptoir_panier { background: #ffffff; td { vertical-align: middle; } }
+    .o_cultiveau_comptoir_voile { position: absolute; inset: 0; background: rgba(24, 56, 64, 0.45); display: flex; align-items: flex-start; justify-content: center; padding-top: 8vh; z-index: 10; }
+    .o_cultiveau_comptoir_clients { background: #ffffff; border-radius: 10px; padding: 16px; width: 640px; max-width: 92vw; max-height: 80vh; overflow: auto; }
+    @media (max-width: 900px) {
+        .flex-grow-1.d-flex.overflow-hidden { flex-direction: column; overflow: auto !important; }
+        .o_cultiveau_comptoir_droite { width: auto; border-left: 0; border-top: 1px solid #e3ded3; }
+    }
+}
