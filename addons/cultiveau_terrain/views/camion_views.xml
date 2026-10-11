@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_technicien_list" model="ir.ui.view">
+        <field name="name">res.users.list.cultiveau.technicien</field>
+        <field name="model">res.users</field>
+        <field name="priority">60</field>
+        <field name="arch" type="xml">
+            <list create="false">
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="cultiveau_camion_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_technicien_form" model="ir.ui.view">
+        <field name="name">res.users.form.cultiveau.technicien</field>
+        <field name="model">res.users</field>
+        <field name="priority">60</field>
+        <field name="arch" type="xml">
+            <form create="false">
+                <header>
+                    <button name="action_creer_camion" type="object" string="Créer son camion" class="btn-primary" invisible="cultiveau_camion_id"/>
+                    <button name="action_reassort_camion" type="object" string="Réassort du camion" class="btn-primary" invisible="not cultiveau_camion_id"/>
+                    <button name="action_voir_camion" type="object" string="Ce qu'il y a à bord" invisible="not cultiveau_camion_id"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <field name="company_id" readonly="1"/>
+                        <field name="cultiveau_camion_id"/>
+                    </group>
+                    <field name="cultiveau_dotation_ids">
+                        <list editable="bottom">
+                            <field name="product_id"/>
+                            <field name="quantite"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_techniciens" model="ir.actions.act_window">
+        <field name="name">Techniciens et camions</field>
+        <field name="res_model">res.users</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('share', '=', False)]</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'list', 'view_id': ref('view_technicien_list')}), (0, 0, {'view_mode': 'form', 'view_id': ref('view_technicien_form')})]"/>
+    </record>
+</odoo>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="seq_bon" model="ir.sequence">
+            <field name="name">Bon d'intervention</field>
+            <field name="code">cultiveau.bon</field>
+            <field name="prefix">BI/%(year)s/</field>
+            <field name="padding">4</field>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="produit_main_oeuvre" model="product.product">
+            <field name="name">Main-d'œuvre technicien</field>
+            <field name="type">service</field>
+            <field name="list_price">60</field>
+            <field name="default_code">MO-TECH</field>
+            <field name="uom_id" ref="uom.product_uom_hour"/>
+            <field name="uom_po_id" ref="uom.product_uom_hour"/>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="produit_deplacement_km" model="product.product">
+            <field name="name">Déplacement (au kilomètre)</field>
+            <field name="type">service</field>
+            <field name="list_price">0.65</field>
+            <field name="default_code">DEPL-KM</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="produit_deplacement_forfait" model="product.product">
+            <field name="name">Forfait déplacement</field>
+            <field name="type">service</field>
+            <field name="list_price">35</field>
+            <field name="default_code">DEPL-FORF</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="company_id" eval="False"/>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bon_form" model="ir.ui.view">
+        <field name="name">cultiveau.bon.form</field>
+        <field name="model">cultiveau.bon</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_chiffrer_temps" type="object" string="Chiffrer le temps et le déplacement" invisible="etat != 'brouillon'"/>
+                    <button name="action_signer" type="object" string="Valider la signature" class="btn-primary" invisible="etat != 'brouillon'"/>
+                    <button name="action_facturer" type="object" string="Facturer" class="btn-primary" invisible="etat != 'signe' or invoice_id"/>
+                    <button name="action_envoyer" type="object" string="Envoyer au client" invisible="etat not in ('signe', 'facture')"/>
+                    <button name="action_remettre_en_cours" type="object" string="Remettre en cours" invisible="etat not in ('signe', 'annule')"/>
+                    <button name="action_annuler" type="object" string="Annuler" invisible="etat in ('facture', 'annule')"/>
+                    <field name="etat" widget="statusbar" statusbar_visible="brouillon,signe,facture"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_voir_photos" type="object" class="oe_stat_button" icon="fa-camera">
+                            <div class="o_stat_info"><span class="o_stat_value"><field name="nb_photos"/></span><span class="o_stat_text">Photos</span></div>
+                        </button>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not alerte_ecart">
+                        Écart de <field name="ecart_pct" readonly="1" class="oe_inline"/> % aux pressions du PV de mise en service : à surveiller.
+                    </div>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="partner_id" readonly="etat != 'brouillon'"/>
+                            <field name="installation_id" context="{'default_partner_id': partner_id}" readonly="etat != 'brouillon'"/>
+                            <field name="task_id" readonly="etat != 'brouillon'"/>
+                            <field name="chantier_id" readonly="etat != 'brouillon'" optional="hide"/>
+                            <field name="company_id" groups="base.group_multi_company" readonly="etat != 'brouillon'"/>
+                        </group>
+                        <group>
+                            <field name="date" readonly="etat != 'brouillon'"/>
+                            <field name="user_ids" widget="many2many_avatar_user" readonly="etat != 'brouillon'"/>
+                            <label for="heure_arrivee" string="Sur place"/>
+                            <div class="o_row">
+                                <field name="heure_arrivee" widget="float_time" readonly="etat != 'brouillon'"/> →
+                                <field name="heure_depart" widget="float_time" readonly="etat != 'brouillon'"/>
+                            </div>
+                            <field name="duree_heures" widget="float_time" readonly="etat != 'brouillon'"/>
+                            <field name="trajet_km" readonly="etat != 'brouillon'"/>
+                            <field name="forfait_deplacement" readonly="etat != 'brouillon'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Travaux et pièces" name="travaux">
+                            <field name="travaux" placeholder="Ce qui a été fait…" readonly="etat != 'brouillon'"/>
+                            <field name="ligne_ids" readonly="etat != 'brouillon'">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="genre"/>
+                                    <field name="product_id"/>
+                                    <field name="description" optional="show"/>
+                                    <field name="quantite"/>
+                                    <field name="uom_id" optional="show"/>
+                                    <field name="prix_unitaire"/>
+                                    <field name="remise" optional="hide"/>
+                                    <field name="sous_total" sum="Total HT"/>
+                                    <field name="auto" column_invisible="True"/>
+                                </list>
+                            </field>
+                            <group class="oe_subtotal_footer">
+                                <field name="currency_id" invisible="1"/>
+                                <field name="montant_ht"/>
+                                <field name="montant_ttc"/>
+                            </group>
+                        </page>
+                        <page string="Relevés" name="releves">
+                            <group>
+                                <group string="Mesuré aujourd'hui">
+                                    <field name="pression_pompe_mesuree" readonly="etat != 'brouillon'"/>
+                                    <field name="pression_defavorable_mesuree" readonly="etat != 'brouillon'"/>
+                                    <field name="ecart_pct"/>
+                                </group>
+                                <group string="Référence (PV de mise en service)">
+                                    <field name="pression_pompe_reference"/>
+                                    <field name="pression_defavorable_reference"/>
+                                    <field name="alerte_ecart" invisible="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="observations" readonly="etat != 'brouillon'"/>
+                                <field name="recommandations" readonly="etat != 'brouillon'"/>
+                            </group>
+                        </page>
+                        <page string="Signatures" name="signatures">
+                            <group>
+                                <group string="Le client">
+                                    <field name="signe_par" readonly="etat != 'brouillon'"/>
+                                    <field name="signature_client" widget="signature" options="{'full_name': 'signe_par'}" readonly="etat != 'brouillon'"/>
+                                </group>
+                                <group string="Le technicien">
+                                    <field name="signature_technicien" widget="signature" readonly="etat != 'brouillon'"/>
+                                    <field name="signe_le"/>
+                                    <field name="cloturer" readonly="etat != 'brouillon'"/>
+                                </group>
+                            </group>
+                            <group>
+                                <field name="picking_id"/>
+                                <field name="invoice_id"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_bon_list" model="ir.ui.view">
+        <field name="name">cultiveau.bon.list</field>
+        <field name="model">cultiveau.bon</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="etat == 'annule'" decoration-info="etat == 'signe'" decoration-success="etat == 'facture'">
+                <header>
+                    <button name="action_facturer" type="object" string="Facturer les bons signés"/>
+                </header>
+                <field name="date"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="installation_id" optional="show"/>
+                <field name="user_ids" widget="many2many_avatar_user"/>
+                <field name="duree_heures" widget="float_time" sum="Heures"/>
+                <field name="montant_ht" sum="Total HT"/>
+                <field name="alerte_ecart" optional="hide"/>
+                <field name="etat" widget="badge" decoration-info="etat == 'signe'" decoration-success="etat == 'facture'" decoration-warning="etat == 'brouillon'"/>
+                <field name="invoice_id" optional="hide"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_bon_search" model="ir.ui.view">
+        <field name="name">cultiveau.bon.search</field>
+        <field name="model">cultiveau.bon</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="user_ids"/>
+                <field name="installation_id"/>
+                <filter name="a_facturer" string="À facturer" domain="[('etat', '=', 'signe'), ('invoice_id', '=', False)]"/>
+                <filter name="en_cours" string="En cours" domain="[('etat', '=', 'brouillon')]"/>
+                <filter name="mes" string="Mes bons" domain="[('user_ids', 'in', [uid])]"/>
+                <filter name="ecarts" string="Écarts au PV" domain="[('alerte_ecart', '=', True)]"/>
+                <separator/>
+                <filter name="ce_mois" string="Ce mois-ci" domain="[('date', '&gt;=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Regrouper">
+                    <filter name="par_client" string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter name="par_etat" string="État" context="{'group_by': 'etat'}"/>
+                    <filter name="par_mois" string="Mois" context="{'group_by': 'date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_bons" model="ir.actions.act_window">
+        <field name="name">Bons d'intervention</field>
+        <field name="res_model">cultiveau.bon</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun bon d'intervention</p>
+            <p>Sur l'intervention, « Arrivé sur place » ouvre le bon : pièces, temps, déplacement, relevés, photos, signature du client.
+               Signé, il se facture en un clic.</p>
+        </field>
+    </record>
+
+    <record id="action_bons_a_facturer" model="ir.actions.act_window">
+        <field name="name">Bons à facturer</field>
+        <field name="res_model">cultiveau.bon</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_a_facturer': 1, 'search_default_par_client': 1}</field>
+    </record>
+</odoo>

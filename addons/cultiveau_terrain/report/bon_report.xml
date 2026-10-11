@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_bon" model="ir.actions.report">
+        <field name="name">Bon d'intervention</field>
+        <field name="model">cultiveau.bon</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cultiveau_terrain.report_bon</field>
+        <field name="report_file">cultiveau_terrain.report_bon</field>
+        <field name="print_report_name">'Bon %s' % object.name.replace('/', '-')</field>
+        <field name="binding_model_id" ref="model_cultiveau_bon"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_bon">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+                    <div class="page">
+                        <div class="row mb-3">
+                            <div class="col-7">
+                                <h2>Bon d'intervention <span t-field="o.name"/></h2>
+                                <div>Le <span t-field="o.date"/>
+                                    <t t-if="o.heure_arrivee">, de <span t-field="o.heure_arrivee" t-options="{'widget': 'float_time'}"/>
+                                        à <span t-field="o.heure_depart" t-options="{'widget': 'float_time'}"/></t></div>
+                                <div t-if="o.user_ids">Technicien(s) : <t t-out="', '.join(o.user_ids.mapped('name'))"/></div>
+                                <div t-if="o.installation_id">Installation : <span t-field="o.installation_id.name"/></div>
+                            </div>
+                            <div class="col-5">
+                                <strong>Client</strong>
+                                <div t-field="o.partner_id" t-options="{'widget': 'contact', 'fields': ['name', 'address', 'phone'], 'no_marker': True}"/>
+                            </div>
+                        </div>
+                        <div t-if="o.travaux" class="mb-3"><strong>Travaux réalisés</strong><div t-field="o.travaux"/></div>
+                        <table class="table table-sm o_main_table">
+                            <thead><tr><th>Désignation</th><th class="text-end">Quantité</th><th class="text-end">Prix unitaire HT</th><th class="text-end">Total HT</th></tr></thead>
+                            <tbody>
+                                <tr t-foreach="o.ligne_ids" t-as="l">
+                                    <td><t t-out="l.description or l.product_id.display_name"/></td>
+                                    <td class="text-end"><span t-field="l.quantite"/> <span t-field="l.uom_id.name"/></td>
+                                    <td class="text-end"><span t-field="l.prix_unitaire"/></td>
+                                    <td class="text-end"><span t-field="l.sous_total"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row justify-content-end">
+                            <div class="col-5">
+                                <table class="table table-sm">
+                                    <tr><td>Total HT</td><td class="text-end"><span t-field="o.montant_ht"/></td></tr>
+                                    <tr><td><strong>Total TTC</strong></td><td class="text-end"><strong><span t-field="o.montant_ttc"/></strong></td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div t-if="o.pression_pompe_mesuree or o.pression_defavorable_mesuree" class="mb-3">
+                            <strong>Relevés</strong>
+                            <div t-if="o.pression_pompe_mesuree">Sortie pompe : <span t-field="o.pression_pompe_mesuree"/> bar
+                                <t t-if="o.pression_pompe_reference">(référence de mise en service : <span t-field="o.pression_pompe_reference"/> bar)</t></div>
+                            <div t-if="o.pression_defavorable_mesuree">Point défavorable : <span t-field="o.pression_defavorable_mesuree"/> bar
+                                <t t-if="o.pression_defavorable_reference">(référence : <span t-field="o.pression_defavorable_reference"/> bar)</t></div>
+                        </div>
+                        <div t-if="o.observations" class="mb-2"><strong>Observations</strong><div t-field="o.observations"/></div>
+                        <div t-if="o.recommandations" class="mb-3"><strong>Recommandations</strong><div t-field="o.recommandations"/></div>
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <strong>Le client</strong><div t-if="o.signe_par" t-field="o.signe_par"/>
+                                <img t-if="o.signature_client" t-att-src="image_data_uri(o.signature_client)" style="max-height: 3cm; max-width: 8cm;"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Le technicien</strong>
+                                <img t-if="o.signature_technicien" t-att-src="image_data_uri(o.signature_technicien)" style="max-height: 3cm; max-width: 8cm;"/>
+                                <div t-if="o.signe_le">Signé le <span t-field="o.signe_le"/></div>
+                            </div>
+                        </div>
+                        <p class="text-muted small mt-4"><t t-out="o.company_id.name"/>, membre du réseau Cultiveau.</p>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

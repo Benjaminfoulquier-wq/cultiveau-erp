@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_ma_journee" name="Ma journée" parent="cultiveau_interventions.menu_interventions_racine" action="action_ma_journee" sequence="1"/>
+    <menuitem id="menu_planning_techniciens" name="Planning des techniciens" parent="cultiveau_interventions.menu_interventions_racine" action="action_planning_techniciens" sequence="5"/>
+    <menuitem id="menu_bons" name="Bons d'intervention" parent="cultiveau_interventions.menu_interventions_racine" action="action_bons" sequence="15"/>
+    <menuitem id="menu_bons_a_facturer" name="Bons à facturer" parent="cultiveau_interventions.menu_interventions_racine" action="action_bons_a_facturer" sequence="16"/>
+    <menuitem id="menu_techniciens" name="Techniciens et camions" parent="cultiveau_interventions.menu_interventions_racine" action="action_techniciens" sequence="40"/>
+</odoo>

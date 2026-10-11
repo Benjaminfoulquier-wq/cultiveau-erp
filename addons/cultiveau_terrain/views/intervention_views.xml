@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_task_form_terrain" model="ir.ui.view">
+        <field name="name">project.task.form.cultiveau.terrain</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_arrive_sur_place" type="object" string="Arrivé sur place" class="btn-primary"
+                        invisible="not cultiveau_intervention or state in ('1_done', '1_canceled')"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_bons" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="not cultiveau_nb_bons">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="cultiveau_nb_bons"/></span><span class="o_stat_text">Bons</span></div>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='cultiveau_urgence']" position="after">
+                <field name="cultiveau_debut"/>
+                <field name="cultiveau_duree_prevue" widget="float_time"/>
+                <field name="cultiveau_fin"/>
+                <field name="cultiveau_adresse" invisible="not cultiveau_adresse"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_task_calendar_terrain" model="ir.ui.view">
+        <field name="name">project.task.calendar.cultiveau.terrain</field>
+        <field name="model">project.task</field>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <calendar date_start="cultiveau_debut" date_stop="cultiveau_fin" mode="week" color="cultiveau_urgence" quick_create="false" event_open_popup="true"
+                      scales="day,week,month">
+                <field name="partner_id"/>
+                <field name="cultiveau_nature"/>
+                <field name="cultiveau_urgence"/>
+                <field name="cultiveau_adresse"/>
+                <field name="user_ids" widget="many2many_avatar_user" filters="1" avatar_field="avatar_128"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_task_kanban_journee" model="ir.ui.view">
+        <field name="name">project.task.kanban.cultiveau.journee</field>
+        <field name="model">project.task</field>
+        <field name="priority">50</field>
+        <field name="arch" type="xml">
+            <kanban default_order="cultiveau_debut" create="false" class="o_kanban_small_column">
+                <field name="cultiveau_urgence"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between">
+                            <strong><field name="partner_id"/></strong>
+                            <field name="cultiveau_debut" widget="datetime" options="{'show_time': true}"/>
+                        </div>
+                        <div><field name="name"/></div>
+                        <div class="text-muted"><field name="cultiveau_adresse"/></div>
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <field name="cultiveau_nature" widget="badge"/>
+                            <field name="cultiveau_urgence" widget="badge" decoration-danger="cultiveau_urgence == 'immediate'" decoration-warning="cultiveau_urgence == 'journee'"/>
+                        </div>
+                        <button name="action_arrive_sur_place" type="object" class="btn btn-primary btn-sm mt-2 w-100">Arrivé sur place</button>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="action_planning_techniciens" model="ir.actions.act_window">
+        <field name="name">Planning des techniciens</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">calendar,list,form</field>
+        <field name="domain">[('project_id.cultiveau_interventions', '=', True)]</field>
+        <field name="context">{'cultiveau_interventions': 1}</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'calendar', 'view_id': ref('view_task_calendar_terrain')})]"/>
+    </record>
+
+    <record id="action_ma_journee" model="ir.actions.act_window">
+        <field name="name">Ma journée</field>
+        <field name="res_model">project.task</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[('project_id.cultiveau_interventions', '=', True), ('user_ids', 'in', [uid]), ('state', 'not in', ['1_done', '1_canceled'])]</field>
+        <field name="view_ids" eval="[(5, 0, 0), (0, 0, {'view_mode': 'kanban', 'view_id': ref('view_task_kanban_journee')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Rien de prévu pour vous</p>
+            <p>Les interventions qui vous sont confiées, par ordre d'heure. « Arrivé sur place » ouvre le bon.</p>
+        </field>
+    </record>
+</odoo>
