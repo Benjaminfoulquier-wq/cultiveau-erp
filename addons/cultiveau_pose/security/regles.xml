@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="regle_geste_societe" model="ir.rule">
+        <field name="name">Matrice de pose : la sienne et celle du réseau</field>
+        <field name="model_id" ref="model_cultiveau_geste"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+    <record id="regle_retour_societe" model="ir.rule">
+        <field name="name">Retours de chantier : par société</field>
+        <field name="model_id" ref="model_cultiveau_geste_retour"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

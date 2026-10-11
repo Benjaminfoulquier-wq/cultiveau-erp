@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_geste_user,cultiveau.geste,model_cultiveau_geste,base.group_user,1,1,1,1
+access_geste_retour_user,cultiveau.geste.retour,model_cultiveau_geste_retour,base.group_user,1,1,1,1

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_geste_list" model="ir.ui.view">
+        <field name="name">cultiveau.geste.list</field>
+        <field name="model">cultiveau.geste</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" default_order="sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="company_id" column_invisible="True"/>
+                <field name="name"/>
+                <field name="unite"/>
+                <field name="minutes"/>
+                <field name="personnes"/>
+                <field name="mots"/>
+                <field name="categ_ids" widget="many2many_tags" optional="hide"/>
+                <field name="minutes_constatees"/>
+                <field name="nb_retours"/>
+                <button name="action_adopter_constate" type="object" string="Adopter le constaté" icon="fa-check" class="btn-link" invisible="not minutes_constatees"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_geste_form" model="ir.ui.view">
+        <field name="name">cultiveau.geste.form</field>
+        <field name="model">cultiveau.geste</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <h1><field name="name"/></h1>
+                    <group>
+                        <group><field name="company_id" groups="base.group_multi_company"/><field name="unite"/><field name="minutes"/><field name="personnes"/></group>
+                        <group><field name="mots"/><field name="categ_ids" widget="many2many_tags"/><field name="minutes_constatees"/><field name="nb_retours"/><field name="note"/></group>
+                    </group>
+                    <button name="action_adopter_constate" type="object" string="Adopter le temps constaté" class="btn-primary" invisible="not minutes_constatees"/>
+                    <field name="retour_ids"><list><field name="date"/><field name="chantier_id"/><field name="quantite"/><field name="prevu_min"/><field name="reel_min"/><field name="ratio"/></list></field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_gestes" model="ir.actions.act_window">
+        <field name="name">Matrice de pose</field>
+        <field name="res_model">cultiveau.geste</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('company_id', '=', allowed_company_ids[0])]</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Aucun geste</p><p>Réglages → Cultiveau → « Copier la matrice du réseau », puis ajustez les temps avec vos techniciens. Chaque chantier terminé affine les temps constatés.</p></field>
+    </record>
+    <record id="action_gestes_reseau" model="ir.actions.act_window">
+        <field name="name">Matrice de pose du réseau</field>
+        <field name="res_model">cultiveau.geste</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('company_id', '=', False)]</field>
+        <field name="context">{'default_company_id': False}</field>
+    </record>
+    <menuitem id="menu_gestes" name="Matrice de pose" parent="cultiveau_catalogue.menu_catalogue" action="action_gestes" sequence="27"/>
+    <menuitem id="menu_gestes_reseau" name="Matrice de pose du réseau" parent="cultiveau_catalogue.menu_catalogue" action="action_gestes_reseau" sequence="29" groups="cultiveau_base.group_equipe"/>
+    <record id="view_order_form_pose" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau.pose</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='order_lines']" position="after">
+                <page string="Pose" name="cultiveau_pose">
+                    <group>
+                        <group string="Terrain">
+                            <field name="cultiveau_terrain_caillouteux"/><field name="cultiveau_terrain_pente"/><field name="cultiveau_terrain_acces"/><field name="cultiveau_terrain_hiver"/>
+                        </group>
+                        <group string="Main-d'œuvre">
+                            <field name="cultiveau_heures_pose"/>
+                            <button name="action_calculer_pose" type="object" string="Calculer la main-d'œuvre d'après la matrice" class="btn-primary" icon="fa-clock-o"/>
+                        </group>
+                    </group>
+                    <field name="cultiveau_detail_pose" nolabel="1"/>
+                </page>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_uom_qty']" position="before">
+                <field name="cultiveau_ligne_pose" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_chantier_form_pose" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.form.pose</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="inherit_id" ref="cultiveau_chantier.view_chantier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='rentabilite']//field[@name='heures_reelles']" position="after">
+                <field name="cultiveau_heures_devis"/>
+                <field name="cultiveau_ecart_pct"/>
+            </xpath>
+            <xpath expr="//page[@name='rentabilite']" position="inside">
+                <group string="Retour à la matrice de pose" invisible="not cultiveau_retour_ids">
+                    <field name="cultiveau_retour_ids" nolabel="1" readonly="1"><list><field name="geste_id"/><field name="quantite"/><field name="prevu_min"/><field name="reel_min"/><field name="ratio"/></list></field>
+                </group>
+            </xpath>
+        </field>
+    </record>
+    <record id="res_config_settings_view_form_pose" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.pose</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Matrice de pose" name="cultiveau_pose">
+                    <setting string="Main-d'œuvre" help="Le taux horaire facturé au client ; la main-d'œuvre du devis se calcule geste par geste depuis la nomenclature, et chaque chantier terminé corrige les temps.">
+                        <div class="row mt8"><label for="cultiveau_taux_horaire_vente" class="col-lg-4 o_light_label"/><field name="cultiveau_taux_horaire_vente"/></div>
+                        <button name="action_cultiveau_matrice" type="object" string="Ouvrir ma matrice" class="btn-link" icon="fa-table"/>
+                        <button name="action_cultiveau_copier_matrice" type="object" string="Copier la matrice du réseau" class="btn-link" icon="fa-clone"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

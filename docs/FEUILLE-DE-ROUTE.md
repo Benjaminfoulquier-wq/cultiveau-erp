@@ -14,6 +14,8 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Matrice de pose** : le temps de chaque geste, les coefficients de terrain, la main-d'œuvre calculée au devis depuis la
+  nomenclature, et les chantiers terminés qui corrigent les temps constatés geste par geste.
 - **Présentation des devis et factures** : détail complet, par lot, forfait, ou matériel et main-d'œuvre, au choix de l'adhérent et
   document par document ; lignes masquables ; l'ERP garde tout.
 - **Grille de remises** : typologie de client × famille / sous-famille, exceptions par client, article ou quantité ; la remise se pose
