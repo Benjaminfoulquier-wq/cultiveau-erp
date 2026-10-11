@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_installation_form_dimensionnement" model="ir.ui.view">
+        <field name="name">cultiveau.installation.form.dimensionnement</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="inherit_id" ref="cultiveau_installation.view_installation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='dimensionnement']" position="before">
+                <page string="Secteurs et calcul" name="secteurs">
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <button name="action_dimensionner" type="object" string="Calculer le dimensionnement" class="btn-primary" icon="fa-calculator"/>
+                        <button name="action_generer_devis" type="object" string="Générer le devis (nomenclature)" class="btn-secondary" icon="fa-file-text-o" invisible="not debit_equipement_m3_h"/>
+                    </div>
+                    <p class="text-muted">Chaque secteur : sa surface, ses organes et leur maille, sa conduite d'amenée. Le calcul donne le débit, le diamètre (vitesse sous 1,5 m/s), les pertes de charge et la pression en tête de chaque secteur, puis la principale, la HMT et la pompe.</p>
+                    <field name="secteur_ids">
+                        <list editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="surface_ha"/>
+                            <field name="organe"/>
+                            <field name="debit_unitaire"/>
+                            <field name="pression_organe_bar"/>
+                            <field name="espacement_m"/>
+                            <field name="ecartement_m"/>
+                            <field name="nb_saisi" optional="hide"/>
+                            <field name="longueur_m"/>
+                            <field name="denivele_m"/>
+                            <field name="materiau" optional="hide"/>
+                            <field name="diametre_mm" optional="hide"/>
+                            <field name="nb_organes"/>
+                            <field name="debit_m3h"/>
+                            <field name="pluviometrie_mm_h"/>
+                            <field name="diametre_calc"/>
+                            <field name="vitesse_m_s" optional="hide"/>
+                            <field name="pertes_m"/>
+                            <field name="pression_tete_bar"/>
+                        </list>
+                    </field>
+                    <group>
+                        <group string="Station et conduite principale">
+                            <field name="longueur_principale_m"/>
+                            <field name="materiau_principal"/>
+                            <field name="diametre_principal_mm"/>
+                            <field name="denivele_station_m"/>
+                            <field name="hauteur_aspiration_m"/>
+                        </group>
+                        <group string="Pompe">
+                            <field name="simultaneite"/>
+                            <field name="rendement_pompe"/>
+                            <field name="debit_equipement_m3_h" readonly="1"/>
+                            <field name="hmt_m" readonly="1"/>
+                            <field name="puissance_kw"/>
+                        </group>
+                    </group>
+                    <field name="dimensionnement_html" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

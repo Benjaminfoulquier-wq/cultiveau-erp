@@ -14,6 +14,8 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Du dimensionnement au devis** : l'installation se découpe en secteurs ; l'ERP calcule débits, diamètres, pertes de charge, pression
+  en tête, HMT et pompe, puis génère le devis par lots avec la nomenclature prise au catalogue.
 - **Conseil d'irrigation** : chaque matin, la météo réelle de chaque parcelle (ETo et pluie des trois dernières semaines, prévision à
   sept jours, Open-Meteo, gratuit) croisée avec le Kc du jour de la frise du client et la réserve de son sol donne le déficit et le
   conseil (« apporter 25 mm, soit 9 h à votre débit, avant jeudi ») ; les arrosages se notent, l'alerte prévient le commercial, le
@@ -65,8 +67,10 @@
 4. **Stock et achats.** Inventaire initial depuis le fichier d'articles (la colonne « stock » est lue, pas encore importée), stock
    camion par technicien, réassort automatique, et la **commande groupée réseau** : les besoins de plusieurs adhérents regroupés
    vers un fournisseur référencé.
-5. **Du dimensionnement au devis.** Dans l'installation : calcul des pertes de charge, débit et pression par secteur, puis génération
-   automatique de la nomenclature du devis depuis le catalogue (tubes, raccords, vannes, pompe). C'est le cœur métier.
+5. **Du dimensionnement au devis.** Fait : secteurs (organes, maille, conduite d'amenée, dénivelé), débit et pluviométrie par secteur,
+   diamètres pour une vitesse sous 1,5 m/s, pertes de charge, pression en tête, HMT, pompe et puissance, note de calcul ; devis par
+   lots généré avec la nomenclature, articles pris au catalogue (DN, matière) ou « à préciser ». Reste : les abaques des fabricants
+   (courbes de pompes, portées d'asperseurs) une fois les fiches techniques lues.
 6. **Terrain.** Fait : le planning des techniciens sur calendrier, « Ma journée » sur le téléphone, le bon d'intervention signé sur
    place (pièces sorties du camion, temps et déplacement chiffrés, écart au PV signalé), la facture en un clic, le stock camion et son
    réassort, les phases et pointages de chantier avec la rentabilité, les contrats d'entretien (hivernage, remise en route, visites)
