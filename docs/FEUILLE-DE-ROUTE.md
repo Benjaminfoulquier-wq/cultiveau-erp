@@ -46,9 +46,11 @@
    vers un fournisseur référencé.
 5. **Du dimensionnement au devis.** Dans l'installation : calcul des pertes de charge, débit et pression par secteur, puis génération
    automatique de la nomenclature du devis depuis le catalogue (tubes, raccords, vannes, pompe). C'est le cœur métier.
-6. **Terrain.** Le planning des interventions sur calendrier,
-   l'appli mobile (l'application fonctionne déjà), la feuille d'intervention signée sur place comme le PV de chantier, le temps passé qui
-   part en facturation, l'entretien préventif programmé depuis la frise (hivernage, remise en route).
+6. **Terrain.** Fait : le planning des techniciens sur calendrier, « Ma journée » sur le téléphone, le bon d'intervention signé sur
+   place (pièces sorties du camion, temps et déplacement chiffrés, écart au PV signalé), la facture en un clic, le stock camion et son
+   réassort, les phases et pointages de chantier avec la rentabilité, les contrats d'entretien (hivernage, remise en route, visites)
+   qui créent leurs interventions un mois avant, les garanties par équipement, la demande d'avis au client à la signature. Reste :
+   le Gantt multi-semaines des chantiers et l'avis par SMS.
 7. **Campagnes au bon moment.** Segmentation par culture, persona et département ; e-mails et SMS déclenchés par la frise (« le maïs
    entre en floraison dans le Gard : proposer la vérification des pivots ») ; portail client où l'agriculteur voit ses devis, factures
    et installations.

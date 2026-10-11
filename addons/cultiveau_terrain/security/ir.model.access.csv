@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_bon,cultiveau.bon,model_cultiveau_bon,cultiveau_base.group_adherent,1,1,1,1
 access_bon_ligne,cultiveau.bon.ligne,model_cultiveau_bon_ligne,cultiveau_base.group_adherent,1,1,1,1
 access_dotation,cultiveau.camion.dotation,model_cultiveau_camion_dotation,cultiveau_base.group_adherent,1,1,1,1
+access_contrat,cultiveau.contrat,model_cultiveau_contrat,cultiveau_base.group_adherent,1,1,1,1

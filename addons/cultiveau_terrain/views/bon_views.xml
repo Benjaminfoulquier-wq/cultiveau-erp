@@ -96,6 +96,7 @@
                                     <field name="signature_technicien" widget="signature" readonly="etat != 'brouillon'"/>
                                     <field name="signe_le"/>
                                     <field name="cloturer" readonly="etat != 'brouillon'"/>
+                                    <field name="demander_avis" readonly="etat != 'brouillon'"/>
                                 </group>
                             </group>
                             <group>

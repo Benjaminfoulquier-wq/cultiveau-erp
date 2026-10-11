@@ -1,5 +1,6 @@
 import base64
 
+from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
@@ -98,3 +99,36 @@ class TestTerrain(TransactionCase):
         self.assertEqual(set(bons.mapped("invoice_id")), {facture})
         self.assertEqual(len(facture.invoice_line_ids.filtered(lambda l: l.display_type == "line_section")), 2)
         self.assertEqual(facture.amount_untaxed, 120)
+
+    def test_contrat_entretien_et_garantie(self):
+        from datetime import date
+        env = self.env
+        contrat = env["cultiveau.contrat"].create({"partner_id": self.agri.id, "installation_ids": [(6, 0, self.inst.ids)], "prix_annuel": 450,
+                                                   "date_debut": date(2026, 1, 1), "date_fin": date(2026, 12, 31), "visites": 2, "depannage_prioritaire": True})
+        self.assertTrue(contrat.name.startswith("CE/"))
+        natures = sorted(n for _, n, _ in contrat._echeancier())
+        self.assertEqual(natures, ["entretien", "entretien", "hivernage", "remise_en_service"])
+        contrat.action_activer()
+        self.assertEqual(contrat.etat, "actif")
+        # début février : la remise en route se crée, une seule fois même si le cron repasse
+        contrat._generer(date(2026, 1, 15))
+        contrat._generer(date(2026, 2, 3))
+        taches = contrat.task_ids.filtered(lambda t: t.cultiveau_nature == "remise_en_service")
+        self.assertEqual(len(taches), 1)
+        self.assertEqual((taches.partner_id, taches.cultiveau_installation_id), (self.agri, self.inst))
+        contrat._generer(date(2026, 9, 20))
+        self.assertEqual(contrat.task_ids.filtered(lambda t: t.cultiveau_nature == "hivernage").mapped(lambda t: t.date_deadline.date()), [date(2026, 10, 31)])
+        # un dépannage chez ce client passe en priorité et la fiche le dit
+        depannage = env["project.task"].create({"name": "Pompe en panne", "project_id": taches[0].project_id.id, "partner_id": self.agri.id,
+                                                "cultiveau_nature": "depannage", "cultiveau_installation_id": self.inst.id})
+        self.assertEqual(depannage.priority, "1")
+        self.assertTrue(depannage.cultiveau_sous_contrat)
+        # garantie sur l'équipement
+        equipement = env["cultiveau.equipement"].create({"installation_id": self.inst.id, "name": "Pompe", "garantie_fin": fields.Date.today().replace(year=2099)})
+        depannage.cultiveau_equipement_id = equipement
+        self.assertTrue(depannage.cultiveau_sous_garantie)
+        # facture annuelle
+        contrat.action_facturer()
+        self.assertEqual(contrat.invoice_ids.amount_untaxed, 450)
+        renouvele = env["cultiveau.contrat"].browse(contrat.action_renouveler()["res_id"])
+        self.assertEqual((renouvele.date_debut, renouvele.etat), (date(2027, 1, 1), "brouillon"))

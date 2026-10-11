@@ -14,7 +14,16 @@
                     <div class="o_stat_info"><span class="o_stat_value"><field name="cultiveau_nb_bons"/></span><span class="o_stat_text">Bons</span></div>
                 </button>
             </xpath>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info mb-0" role="status" invisible="not cultiveau_sous_contrat and not cultiveau_sous_garantie">
+                    <span invisible="not cultiveau_sous_contrat"><i class="fa fa-handshake-o"/> Client sous contrat d'entretien. </span>
+                    <span invisible="not cultiveau_sous_garantie"><i class="fa fa-shield"/> Équipement sous garantie : vérifier avant de facturer les pièces.</span>
+                </div>
+            </xpath>
             <xpath expr="//field[@name='cultiveau_urgence']" position="after">
+                <field name="cultiveau_contrat_id" invisible="not cultiveau_contrat_id"/>
+                <field name="cultiveau_sous_contrat" invisible="1"/>
+                <field name="cultiveau_sous_garantie" invisible="1"/>
                 <field name="cultiveau_debut"/>
                 <field name="cultiveau_duree_prevue" widget="float_time"/>
                 <field name="cultiveau_fin"/>

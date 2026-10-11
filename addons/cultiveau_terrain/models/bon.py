@@ -47,6 +47,7 @@ class Bon(models.Model):
     signature_technicien = fields.Binary("Signature du technicien", attachment=True, copy=False)
     signe_le = fields.Datetime("Signé le", readonly=True, copy=False)
     cloturer = fields.Boolean("Clore l'intervention à la signature", default=True)
+    demander_avis = fields.Boolean("Demander l'avis du client", help="À la signature, le client reçoit un e-mail pour noter l'intervention.")
     picking_id = fields.Many2one("stock.picking", "Sortie de stock", readonly=True, copy=False)
     invoice_id = fields.Many2one("account.move", "Facture", readonly=True, copy=False, index=True)
     nb_photos = fields.Integer("Photos", compute="_compute_nb_photos")
@@ -141,6 +142,10 @@ class Bon(models.Model):
             b._sortir_les_pieces()
             if b.task_id and b.cloturer:
                 b.task_id._cultiveau_cloturer_depuis_bon(b)
+            if b.task_id and b.demander_avis and b.partner_id.email:
+                modele = self.env.ref("project.rating_project_request_email_template", raise_if_not_found=False)
+                if modele:
+                    b.task_id.rating_send_request(modele, lang=b.partner_id.lang, force_send=False)
             if b.alerte_ecart:
                 b.message_post(body=f"⚠ Écart de {b.ecart_pct:+.0f} % aux pressions du PV de mise en service : à surveiller.")
                 b.activity_schedule("mail.mail_activity_data_todo", summary=f"Écart de {b.ecart_pct:+.0f} % au PV : proposer un diagnostic",

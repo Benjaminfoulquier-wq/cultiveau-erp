@@ -14,6 +14,13 @@ CRM, stocks, achats, e-mailing, projets, contacts et portail client. Les modules
 | `cultiveau_ventes` | Les six phases du projet dans le CRM, devis par lots reliés à l'installation, modèles par type d'installation, simulateur d'irrigation à l'usage (€/m³, mensualité lissée) |
 | `cultiveau_interventions` | Dépannage et entretien : urgence, pièces → devis, registre tenu automatiquement, kanban et calendrier |
 | `cultiveau_connecteurs` | L'API pour l'assistant téléphonique (standard IA) : fiche du client qui appelle avec persona, frise du mois et conseil de l'Agent ; dépôt de l'intervention ou de l'opportunité |
+| `cultiveau_marque` | L'habillage Cultiveau : couleurs, logo, menu, adresses en `/app` (le nom du logiciel n'apparaît nulle part) |
+| `cultiveau_vue3d` | La vue d'ensemble : le site adhérent en 3D (WebGL), chaque poste ouvre l'écran correspondant, familles de produits cliquables, recherche « Où aller ? » |
+| `cultiveau_chantier` | Les chantiers de pose : matériel prévu/posé, sortie et retour du stock, phases, pointages des équipes, rentabilité, conflits d'équipe, PV de mise en service |
+| `cultiveau_comptoir` | La vente au comptoir : scan de l'article, panier, devis, commande ou encaissement immédiat avec ticket |
+| `cultiveau_terrain` | Le terrain : « Ma journée » sur le téléphone, planning des techniciens, bon d'intervention signé sur place → facture, stock camion et réassort, contrats d'entretien (hivernage, remise en route, visites) avec interventions automatiques, garanties, avis du client |
+| `cultiveau_api` | Les clés d'API : REST (OpenAPI) et connecteur MCP pour Claude, en lecture ou écriture, limitées aux adhérents choisis |
+| `cultiveau_site` | La liaison avec cultiveau.fr : clients, interventions, chantiers et bons de l'espace adhérent récupérés chaque heure |
 
 Pourquoi ces modules et pas d'autres : [docs/ANALYSE-ODOO-IRRIGATION.md](docs/ANALYSE-ODOO-IRRIGATION.md).
 D'où viennent les frises, les personas et l'Agent (Journées Cultiveau 2025, étude PRISM 2023, pyramides de Maslow, VoxAgri) :

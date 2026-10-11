@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_contrat_form" model="ir.ui.view">
+        <field name="name">cultiveau.contrat.form</field>
+        <field name="model">cultiveau.contrat</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_activer" type="object" string="Activer" class="btn-primary" invisible="etat != 'brouillon'"/>
+                    <button name="action_facturer" type="object" string="Facturer l'année" invisible="etat not in ('actif', 'expire')"/>
+                    <button name="action_renouveler" type="object" string="Renouveler" invisible="etat not in ('actif', 'expire')"/>
+                    <button name="action_resilier" type="object" string="Résilier" invisible="etat != 'actif'"/>
+                    <field name="etat" widget="statusbar" statusbar_visible="brouillon,actif,expire"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_voir_interventions" type="object" class="oe_stat_button" icon="fa-wrench">
+                            <div class="o_stat_info"><span class="o_stat_value"><field name="nb_interventions"/></span><span class="o_stat_text">Interventions</span></div>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name" readonly="1"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="installation_ids" widget="many2many_tags" context="{'default_partner_id': partner_id}"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <label for="date_debut" string="Période"/>
+                            <div class="o_row"><field name="date_debut"/> → <field name="date_fin"/></div>
+                        </group>
+                        <group>
+                            <field name="hivernage"/>
+                            <field name="remise_en_route"/>
+                            <field name="visites"/>
+                            <field name="depannage_prioritaire"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="prix_annuel"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Conditions particulières, accès, contacts sur place…"/>
+                    <field name="invoice_ids" readonly="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_contrat_list" model="ir.ui.view">
+        <field name="name">cultiveau.contrat.list</field>
+        <field name="model">cultiveau.contrat</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="etat in ('expire', 'resilie')">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="installation_ids" widget="many2many_tags"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="prix_annuel" sum="Total"/>
+                <field name="etat" widget="badge" decoration-success="etat == 'actif'"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_contrats" model="ir.actions.act_window">
+        <field name="name">Contrats d'entretien</field>
+        <field name="res_model">cultiveau.contrat</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun contrat d'entretien</p>
+            <p>Hivernage, remise en route et visites de saison vendus à l'année : les interventions se créent d'elles-mêmes, un mois avant.</p>
+        </field>
+    </record>
+    <menuitem id="menu_contrats" name="Contrats d'entretien" parent="cultiveau_interventions.menu_interventions_racine" action="action_contrats" sequence="35"/>
+
+    <record id="view_equipement_form_garantie" model="ir.ui.view">
+        <field name="name">cultiveau.equipement.form.garantie</field>
+        <field name="model">cultiveau.equipement</field>
+        <field name="inherit_id" ref="cultiveau_installation.view_equipement_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='numero_serie']" position="after">
+                <field name="garantie_fin"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

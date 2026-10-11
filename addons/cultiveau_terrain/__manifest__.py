@@ -28,6 +28,7 @@ Le terrain dans l'ERP
         "views/bon_views.xml",
         "views/intervention_views.xml",
         "views/camion_views.xml",
+        "views/contrat_views.xml",
         "views/menus.xml",
     ],
     "installable": True,
