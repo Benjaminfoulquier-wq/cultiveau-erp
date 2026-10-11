@@ -34,9 +34,9 @@ class TestTypesDeClients(TransactionCase):
         self.assertTrue(base64.b64decode(adherent.avatar_128).startswith(b"\x89PNG"))  # pas de véhicule : le portrait standard
 
     def test_import_reconnait_le_type(self):
-        contenu = "Nom;Ville;Type\nMairie de Vauvert;Vauvert;Collectivité\nPaysages du Sud;Nîmes;paysagiste\nGAEC des Oliviers;Uzès;exploitation agricole\n".encode()
+        contenu = "Nom;Ville;Type\nMairie de Test-sur-Vidourle;Vauvert;Collectivité\nPaysages Test du Sud;Nîmes;paysagiste\nGAEC Test des Oliviers;Uzès;exploitation agricole\n".encode()
         self.env["cultiveau.import.clients.moteur"].importer("clients.csv", contenu, "particulier", self.env.company)
         Partner = self.env["res.partner"]
-        self.assertEqual(Partner.search([("name", "=", "Mairie de Vauvert")]).cultiveau_type, "collectivite")
-        self.assertEqual(Partner.search([("name", "=", "Paysages du Sud")]).cultiveau_type, "paysagiste")
-        self.assertEqual(Partner.search([("name", "=", "GAEC des Oliviers")]).cultiveau_type, "agriculteur")
+        self.assertEqual(Partner.search([("name", "=", "Mairie de Test-sur-Vidourle")]).cultiveau_type, "collectivite")
+        self.assertEqual(Partner.search([("name", "=", "Paysages Test du Sud")]).cultiveau_type, "paysagiste")
+        self.assertEqual(Partner.search([("name", "=", "GAEC Test des Oliviers")]).cultiveau_type, "agriculteur")
