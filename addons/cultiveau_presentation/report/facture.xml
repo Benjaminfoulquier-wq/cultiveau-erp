@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_presentation" inherit_id="account.report_invoice_document" name="Cultiveau : présentation de la facture">
+        <xpath expr="//t[@t-set='lines']" position="attributes">
+            <attribute name="t-value">o.cultiveau_lignes_presentees()</attribute>
+        </xpath>
+    </template>
+</odoo>
