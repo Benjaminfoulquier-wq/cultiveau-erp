@@ -50,7 +50,8 @@ const ZONES = [
     { cle: "administratif", nom: "Administratif", icone: "fa-briefcase", box: [0, 0, 14, 9] },
     { cle: "stockage", nom: "Stockage & familles", icone: "fa-cubes", box: [14, 0, 32, 21] },
     { cle: "atelier", nom: "Atelier & SAV", icone: "fa-wrench", box: [32, 0, 48, 21] },
-    { cle: "dehors", nom: "Dépôt, cour & parking", icone: "fa-truck", box: [0, 22, 48, 37] },
+    { cle: "parking", nom: "Parking clients", icone: "fa-car", box: [0, 22.5, 14.5, 36.5] },
+    { cle: "dehors", nom: "Dépôt & cour", icone: "fa-truck", box: [15, 22, 48, 37] },
     { cle: "agriculteurs", nom: "Chez les clients", icone: "fa-leaf", box: [0, 43, 48, 64] },
 ];
 const TOUT = [-1, -1, 49, 62];
@@ -281,7 +282,7 @@ export class VueEnsemble extends Component {
         poste("comptoir", 11.2, 14.5, [M("comptoir", 11.2, 14.5), M("personne", 12.3, 13.6, { chemise: T.bleu }, Math.PI), M("personne", 12.3, 15.8, { chemise: T.bleu, cheveux: 0x7a5434 }, Math.PI)], {
             zone: "magasin", titre: "Comptoir", icone: "fa-barcode", badge: d.accueil.comptoir.length, haut: 2.6, couleur: "#1d4550",
             texte: "La vente au magasin : on scanne, on encaisse, le ticket sort.",
-            actions: [A("comptoir", "Ouvrir le comptoir", { principal: true, icone: "fa-barcode" }), A("ventes_comptoir", "Ventes au comptoir"), A("agriculteurs", "Les agriculteurs")],
+            actions: [A("comptoir", "Ouvrir le comptoir", { principal: true, icone: "fa-barcode" }), A("ventes_comptoir", "Ventes au comptoir"), A("agriculteurs", "Les clients")],
             mots: "comptoir vente caisse scan douchette ticket encaisser magasin",
         });
         d.accueil.opportunites.forEach((o, i) => {
@@ -380,21 +381,48 @@ export class VueEnsemble extends Component {
         libelle("grande porte 5 × 5 m", 42, 21.8);
 
         // ---------------- dehors : parking, dépôt, cour
-        sol("parking", 0, 23, 14, 13, "#d6d9d4", "dehors");
-        for (let p = 0; p < 7; p++) {
-            sol("place" + p, 0.4 + p * 2.2, 23.4, 0.1, 4.6, "#ffffff", null, 0.01);
-            sol("place-b" + p, 0.4 + p * 2.2, 31.0, 0.1, 4.6, "#ffffff", null, 0.01);
+        sol("parking", 0, 23, 14, 13, "#d6d9d4", "parking");
+        // cinq places de chaque côté de l'allée ; la place bleue (PMR) au bout, côté route
+        for (let p = 0; p < 6; p++) {
+            sol("place" + p, 0.4 + p * 2.7, 23.4, 0.1, 4.6, "#ffffff", null, 0.01);
+            sol("place-b" + p, 0.4 + p * 2.7, 31.0, 0.1, 4.6, "#ffffff", null, 0.01);
         }
-        sol("pmr", 0.5, 23.4, 2.1, 4.6, "#3d7fc4", null, 0.015);
+        sol("pmr", 11.25, 31.0, 2.5, 4.6, "#3d7fc4", null, 0.015);
         libelle("PARKING CLIENTS", 7, 29.5, "zone");
-        decor("voitures", [M("voiture", 3.7, 25.6, { couleur: T.rouge }, -Math.PI / 2), M("voiture", 8.1, 25.7, { couleur: T.blanc }, -Math.PI / 2),
-                           M("voiture", 10.3, 33.4, { couleur: 0x3d7fc4, pickup: true }, Math.PI / 2), M("haie", 7, 36.4, { l: 13 }), M("lampadaire", 13.6, 29.3)]);
-        poste("agriculteurs", 5.0, 33.3, [M("voiture", 5.0, 33.3, { couleur: T.vert, pickup: true }, Math.PI / 2), M("personne", 6.6, 31.6, { chemise: T.orange, pantalon: T.marine }, -Math.PI / 2)], {
-            zone: "dehors", titre: "Les agriculteurs", icone: "fa-users", badge: k.agriculteurs, haut: 2.8, couleur: "#53a832",
-            texte: "Vos clients : leurs cultures, leur profil, ceux à appeler ce mois-ci.",
-            actions: [A("agriculteurs", "Les clients", { principal: true, badge: k.agriculteurs }), A("agriculteur_nouveau", "Nouveau client", { icone: "fa-plus" }),
-                      A("a_contacter", "À contacter ce mois-ci", { badge: k.a_contacter }), A("cultures", "Cultures et frise"), A("personas", "Profils"), A("import_clients", "Importer mes clients")],
-            mots: "agriculteur client contact exploitant culture frise profil persona appeler importer clients",
+        decor("parking-decor", [M("haie", 7, 36.4, { l: 13 }), M("lampadaire", 13.6, 29.3), M("personne", 13.9, 33.2, { chemise: T.orange, pantalon: T.marine }, Math.PI)]);
+        // les clients, chacun son véhicule : on voit qui fait quoi ; un clic ouvre les clients de ce type
+        const parType = k.clients_par_type || {};
+        const TYPES = [
+            { t: "agriculteur", titre: "Agriculteurs", un: "agriculteur", icone: "fa-leaf", couleur: "#3f9a3a", m: ["tracteur", {}],
+              texte: "Les exploitations : leurs cultures et leur frise disent qui appeler au bon moment.",
+              plus: [A("a_contacter", "À contacter ce mois-ci", { badge: k.a_contacter }), A("cultures", "Cultures et frise"), A("personas", "Profils")],
+              mots: "agriculteur exploitant exploitation ferme gaec earl tracteur culture frise" },
+            { t: "collectivite", titre: "Collectivités", un: "collectivité", icone: "fa-university", couleur: "#1f4ea1", m: ["plateau", { couleur: T.blanc, charge: "benne", gyrophare: true, tricolore: true }],
+              texte: "Mairies, syndicats, golfs, stades : arrosage des espaces publics et des terrains de sport.", mots: "collectivite mairie commune syndicat golf stade public espaces verts" },
+            { t: "industrie", titre: "Industries", un: "industriel", icone: "fa-industry", couleur: "#5f6874", m: ["fourgonnette", { couleur: 0x6b7480, bande: 0xf0b429 }],
+              texte: "Usines, carrières, entreprises : pompage, process, lavage, défense incendie.", mots: "industrie usine carriere entreprise pompage process" },
+            { t: "plombier", titre: "Plombiers", un: "plombier", icone: "fa-wrench", couleur: "#2f7fc1", m: ["fourgonnette", { couleur: T.blanc, tuyaux: true, bande: 0x2f7fc1 }],
+              texte: "Les plombiers qui achètent au comptoir : raccords, vannes, pompes, surpresseurs.", mots: "plombier plomberie chauffagiste artisan raccord tuyau" },
+            { t: "particulier", titre: "Particuliers", un: "particulier", icone: "fa-home", couleur: "#2d6cdf", m: ["voiture", { couleur: 0x2d6cdf }],
+              texte: "Jardins, potagers, arrosage automatique, récupération d'eau de pluie.", mots: "particulier jardin potager maison arrosage automatique" },
+            { t: "paysagiste", titre: "Paysagistes", un: "paysagiste", icone: "fa-tree", couleur: "#5fae3e", m: ["plateau", { couleur: 0xf0a23b, charge: "vert" }],
+              texte: "Les paysagistes : programmateurs, électrovannes, goutte-à-goutte, tuyères.", mots: "paysagiste espaces verts jardinier entretien parc" },
+            { t: "pisciniste", titre: "Piscinistes", un: "pisciniste", icone: "fa-tint", couleur: "#1aa7c4", m: ["fourgonnette", { couleur: 0x1aa7c4, echelle: true, galerie: true, bande: T.blanc }],
+              texte: "Les piscinistes : pompes, filtration, raccords PVC pression.", mots: "pisciniste piscine filtration pompe" },
+            { t: "autre", titre: "Autres clients", un: "client", icone: "fa-user", couleur: "#7c8592", m: ["fourgonnette", { couleur: 0xe9edf0 }],
+              texte: "Les clients qui ne rentrent dans aucune case.", mots: "autre client divers" },
+        ];
+        const places = [[1.75, 25.6], [4.45, 25.6], [7.15, 25.6], [9.85, 25.6], [12.55, 25.6], [1.75, 33.4], [4.45, 33.4], [7.15, 33.4]];
+        TYPES.forEach((c, i) => {
+            const [x, y] = places[i];
+            const n = parType[c.t] || 0;
+            poste("client-" + c.t, x, y, [M(c.m[0], x, y, c.m[1], Math.PI / 2)], {
+                zone: "parking", titre: c.titre, icone: c.icone, badge: n, haut: c.t === "agriculteur" ? 3.4 : 2.7, couleur: c.couleur, parametre: c.t,
+                classe: "garer", texte: c.texte,
+                actions: [A("clients_type", `Les ${c.titre.toLowerCase()}`, { principal: true, badge: n }), A("client_type_nouveau", `Nouveau ${c.un}`, { icone: "fa-plus" }),
+                          ...(c.plus || []), A("agriculteurs", "Tous les clients", { badge: k.agriculteurs }), A("import_clients", "Importer mes clients")],
+                mots: c.mots + " client clients",
+            });
         });
         sol("depot", 16, 23, 18, 13, "#dcd6c9", "dehors");
         libelle("DÉPÔT EXTÉRIEUR", 25, 22.8, "zone");
@@ -743,7 +771,7 @@ export class VueEnsemble extends Component {
             m.userData.garde = true; // déjà d'un seul tenant, avec ses couleurs aux sommets
             groupe.add(m);
         }
-        const mobile = ["route", "route2", "passant", "chariot"].includes(o.classe);
+        const mobile = ["route", "route2", "passant", "chariot", "garer"].includes(o.classe);
         for (const md of modeles) {
             const fabrique = this.lib.M[md.m];
             if (!fabrique) {
@@ -755,14 +783,22 @@ export class VueEnsemble extends Component {
             groupe.add(g);
         }
         // les pièces animées restent à part : le bras des pivots, les roues de ce qui roule
-        const garder = new Set(mobile ? ["bras", "roue"] : ["bras"]);
-        const bras = [];
-        groupe.traverse((x) => x.name === "bras" && bras.push(x));
+        const garder = new Set(mobile ? ["bras", "roue", "gyrophare", "fumee"] : ["bras", "gyrophare", "fumee"]);
+        const bras = [], gyros = [], fumees = [];
+        groupe.traverse((x) => (x.name === "bras" && bras.push(x)) || (x.name === "gyrophare" && gyros.push(x)) || (x.name === "fumee" && fumees.push(x)));
         if (o.classe !== "nuage" && o.classe !== "verre" && o.classe !== "toit") {
             this.fusionner(groupe, garder);
         }
         for (const b of bras) {
             this.t3.anim.push({ genre: "pivot", objet: b, vitesse: 0.22 + Math.random() * 0.15, phase: Math.random() * 6 });
+        }
+        for (const gy of gyros) {
+            gy.traverse((x) => x.isMesh && (x.material = x.material.clone()));
+            this.t3.anim.push({ genre: "gyrophare", objet: gy, phase: Math.random() * 6 });
+        }
+        for (const f of fumees) {
+            f.children.forEach((b) => (b.material = b.material.clone()));
+            this.t3.anim.push({ genre: "fumee", objet: f });
         }
         if (mobile) {
             const roues = [];
@@ -785,7 +821,10 @@ export class VueEnsemble extends Component {
         }
         // l'arrivée : chaque objet surgit à son tour, de l'entrée vers le fond du site
         const retard = 0.3 + Math.min(1.7, ((base.x + base.z) / 110) * 1.7) + (o.genre === "decor" ? 0 : 0.25);
-        if (!["nuage", "route", "route2", "passant", "chariot"].includes(o.classe)) {
+        if (o.classe === "garer") {
+            groupe.visible = false;
+            this.t3.anim.push({ genre: "garer", objet: groupe, retard: 0.6 + (this.t3.anim.filter((a) => a.genre === "garer").length) * 0.22 });
+        } else if (!["nuage", "route", "route2", "passant", "chariot"].includes(o.classe)) {
             groupe.scale.set(0.001, 0.001, 0.001);
             this.t3.anim.push({ genre: "pop", objet: groupe, retard });
         }
@@ -846,6 +885,38 @@ export class VueEnsemble extends Component {
                 }
                 case "pivot":
                     o.rotation.y = -(temps * a.vitesse + a.phase);
+                    break;
+                case "garer": {
+                    // entre par l'allée en marche avant, ralentit, le nez plonge au freinage, puis se pose
+                    const k = Math.max(0, Math.min(1, (temps - a.retard) / 1.5));
+                    o.visible = temps >= a.retard;
+                    const e = 1 - Math.pow(1 - k, 3);
+                    const recul = 4.6 * (1 - e);
+                    const b = o.userData.base;
+                    o.position.x = b.x;
+                    o.position.z = b.z + recul;
+                    o.rotation.x = -0.06 * Math.sin(Math.PI * Math.max(0, Math.min(1, (k - 0.7) / 0.3)));
+                    rouler(o, e * 4.6);
+                    if (k >= 1) {
+                        o.position.z = b.z;
+                        o.rotation.x = 0;
+                        a.fini = true;
+                    }
+                    break;
+                }
+                case "gyrophare": {
+                    o.rotation.y = temps * 5 + a.phase;
+                    const flash = (Math.sin(temps * 10 + a.phase) + 1) / 2;
+                    o.traverse((x) => x.isMesh && (x.material.emissiveIntensity = 0.25 + flash * 0.9));
+                    break;
+                }
+                case "fumee":
+                    o.children.forEach((b, i) => {
+                        const vie = (temps * 0.55 + i / o.children.length) % 1;
+                        b.position.set(-vie * 0.5, vie * 1.4, 0);
+                        b.scale.setScalar(0.5 + vie * 1.6);
+                        b.material.opacity = 0.55 * (1 - vie);
+                    });
                     break;
                 case "route": {
                     const d = temps * 7 + 20;

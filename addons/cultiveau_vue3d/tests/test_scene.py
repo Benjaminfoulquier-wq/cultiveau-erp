@@ -51,13 +51,21 @@ class TestScene(TransactionCase):
         for cle in sorted(dispo):
             if cle.startswith("famille_"):
                 continue
-            action = Scene.action(cle)
+            action = Scene.action(cle, "plombier" if cle.startswith("client") else None)
             self.assertTrue(action.get("type"), cle)
         facture = Scene.action("facture_nouvelle")
         self.assertEqual((facture["res_model"], facture["view_mode"], facture["context"]["default_move_type"]), ("account.move", "form", "out_invoice"))
         self.assertEqual([v[1] for v in facture["views"]], ["form"])
         self.assertIn(("payment_state", "in", ("not_paid", "partial")), Scene.action("factures_a_encaisser")["domain"])
         self.assertEqual(Scene.action("schema3d")["type"], "ir.actions.act_url")
+        # le parking : un véhicule par type de client, qui ouvre les clients de ce type
+        self.env["res.partner"].create({"name": "Plomberie du plan", "cultiveau_type": "plombier", "company_id": self.env.company.id})
+        self.assertGreaterEqual(Scene.donnees()["compteurs"]["clients_par_type"]["plombier"], 1)
+        plombiers = Scene.action("clients_type", "plombier")
+        self.assertIn(("cultiveau_type", "=", "plombier"), plombiers["domain"])
+        self.assertEqual((plombiers["name"], plombiers["context"]["default_cultiveau_type"]), ("Plombiers", "plombier"))
+        nouveau = Scene.action("client_type_nouveau", "paysagiste")
+        self.assertEqual((nouveau["view_mode"], nouveau["context"]["default_cultiveau_type"]), ("form", "paysagiste"))
         famille = self.env["product.category"].create({"name": "Famille du plan"})
         sous = self.env["product.category"].create({"name": "Sous-famille du plan", "parent_id": famille.id})
         self.env["product.template"].create({"name": "Raccord du plan", "categ_id": sous.id, "cultiveau_reseau": True, "sale_ok": True})

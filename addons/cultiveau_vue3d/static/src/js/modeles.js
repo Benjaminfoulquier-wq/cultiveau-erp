@@ -101,11 +101,12 @@ export function bibliotheque(THREE) {
         g.add(m);
         return m;
     };
-    const roue = (g, r, l, x, y, z) => {
+    const roue = (g, r, l, x, y, z, jante = T.gris) => {
         const s = new THREE.Group();
         s.name = "roue";
         cyl(s, r, r, l, T.pneu, 0, 0, 0, "z", { r: 0.9 });
-        cyl(s, r * 0.55, r * 0.55, l + 0.02, T.gris, 0, 0, 0, "z", { r: 0.4, m: 0.4 });
+        cyl(s, r * 0.55, r * 0.55, l + 0.02, jante, 0, 0, 0, "z", { r: 0.4, m: 0.4 });
+        cyl(s, r * 0.16, r * 0.16, l + 0.05, T.anthracite, 0, 0, 0, "z", { r: 0.5 });
         s.position.set(x, y, z);
         s.userData.rayon = r;
         g.add(s);
@@ -207,17 +208,143 @@ export function bibliotheque(THREE) {
         return g;
     };
     M.tracteur = (o = {}) => {
+        // un tracteur de ferme : long capot, masses à l'avant, cabine vitrée, grandes roues arrière à jantes jaunes, pot qui fume
         const g = groupe();
-        const c = o.couleur ?? T.vert;
-        bloc(g, 1.8, 0.9, 1.1, c, 0.9, 0.7, 0, { rayon: 0.15 });
-        bloc(g, 1.4, 0.9, 1.3, c, -0.5, 0.8, 0, { rayon: 0.12 });
-        bloc(g, 1.3, 1.2, 1.4, T.vitre, -0.5, 1.7, 0, { rayon: 0.12, o: 0.55, r: 0.1 });
-        bloc(g, 1.5, 0.12, 1.5, c, -0.5, 2.9, 0, { rayon: 0.05 });
-        cyl(g, 0.06, 0.06, 1.0, T.anthracite, 1.4, 1.9, 0.3);
-        roue(g, 0.75, 0.55, -0.6, 0.75, 0.95).scale.set(1, 1, 1);
-        roue(g, 0.75, 0.55, -0.6, 0.75, -0.95);
-        roue(g, 0.45, 0.35, 1.3, 0.45, 0.75);
-        roue(g, 0.45, 0.35, 1.3, 0.45, -0.75);
+        const c = o.couleur ?? 0x2f9a3e;
+        const jante = o.jante ?? 0xf2c230;
+        bloc(g, 2.0, 0.82, 0.95, c, 1.0, 0.72, 0, { rayon: 0.2 });
+        bloc(g, 0.05, 0.55, 0.75, T.anthracite, 2.0, 0.84, 0, { rayon: 0.02 });
+        bloc(g, 0.32, 0.42, 1.0, T.anthracite, 2.18, 0.5, 0, { rayon: 0.06 });
+        bloc(g, 0.05, 0.12, 0.22, 0xfff6c8, 2.02, 1.3, 0.3, { e: 0.8 });
+        bloc(g, 0.05, 0.12, 0.22, 0xfff6c8, 2.02, 1.3, -0.3, { e: 0.8 });
+        bloc(g, 1.45, 0.9, 1.3, c, -0.55, 0.75, 0, { rayon: 0.12 });
+        bloc(g, 1.32, 1.2, 1.26, T.vitre, -0.55, 1.65, 0, { rayon: 0.08, o: 0.5, r: 0.1 });
+        for (const [x, z] of [[0.08, 0.6], [0.08, -0.6], [-1.18, 0.6], [-1.18, -0.6]]) {
+            bloc(g, 0.08, 1.2, 0.08, c, x, 1.65, z, { rayon: 0.02 });
+        }
+        bloc(g, 1.62, 0.14, 1.5, c, -0.55, 2.85, 0, { rayon: 0.06 });
+        bloc(g, 0.06, 0.14, 0.4, T.orange, -0.55, 2.99, 0, { e: 0.5 });
+        for (const z of [1.0, -1.0]) {
+            bloc(g, 1.5, 0.1, 0.62, c, -0.6, 1.62, z, { rayon: 0.04 });
+            roue(g, 0.82, 0.58, -0.6, 0.82, z, jante);
+        }
+        for (const z of [0.72, -0.72]) {
+            roue(g, 0.48, 0.36, 1.45, 0.48, z, jante);
+        }
+        cyl(g, 0.06, 0.06, 1.15, T.anthracite, 0.55, 2.0, 0.32, "y", { m: 0.5, r: 0.4 });
+        const fumee = groupe();
+        fumee.name = "fumee";
+        fumee.position.set(0.55, 2.6, 0.32);
+        for (let i = 0; i < 3; i++) {
+            boule(fumee, 0.16, 0xb9c0c6, 0, 0, 0, { o: 0.6, ombre: false });
+        }
+        g.add(fumee);
+        return g;
+    };
+    M.fourgonnette = (o = {}) => {
+        // la fourgonnette d'un artisan (Partner, Berlingo) : capot court, caisse haute, galerie, échelle ou bande à la couleur
+        const g = groupe();
+        const c = o.couleur ?? T.blanc;
+        bloc(g, 4.3, 0.72, 1.8, c, 0, 0.32, 0, { rayon: 0.2 });
+        bloc(g, 2.75, 0.88, 1.76, c, -0.72, 0.98, 0, { rayon: 0.24 });
+        const pare = bloc(g, 0.9, 0.62, 1.7, c, 0.95, 0.98, 0, { rayon: 0.24 });
+        pare.rotation.z = -0.22;
+        bloc(g, 0.06, 0.5, 1.5, T.vitreFoncee, 1.42, 1.05, 0, { rayon: 0.03, r: 0.2, m: 0.3 }).rotation.z = -0.55;
+        for (const z of [0.89, -0.89]) {
+            bloc(g, 0.78, 0.42, 0.05, T.vitreFoncee, 0.82, 1.18, z, { rayon: 0.02, r: 0.2 });
+            if (o.bande) {
+                bloc(g, 2.6, 0.24, 0.04, o.bande, -0.72, 1.22, z * 1.005, { rayon: 0.02, e: o.bande === T.blanc ? 0.15 : 0 });
+            }
+        }
+        bloc(g, 0.18, 0.26, 1.82, T.anthracite, 2.12, 0.3, 0, { rayon: 0.06 });
+        bloc(g, 0.18, 0.26, 1.82, T.anthracite, -2.12, 0.3, 0, { rayon: 0.06 });
+        bloc(g, 0.05, 0.12, 0.3, 0xfff6c8, 2.13, 0.78, 0.6, { e: 0.8 });
+        bloc(g, 0.05, 0.12, 0.3, 0xfff6c8, 2.13, 0.78, -0.6, { e: 0.8 });
+        bloc(g, 0.05, 0.22, 0.14, T.rouge, -2.14, 1.1, 0.78, { e: 0.4 });
+        bloc(g, 0.05, 0.22, 0.14, T.rouge, -2.14, 1.1, -0.78, { e: 0.4 });
+        for (const x of [1.35, -1.35]) {
+            roue(g, 0.34, 0.24, x, 0.34, 0.86);
+            roue(g, 0.34, 0.24, x, 0.34, -0.86);
+        }
+        if (o.galerie || o.echelle || o.tuyaux) {
+            for (const z of [0.68, -0.68]) {
+                bloc(g, 2.8, 0.06, 0.06, T.anthracite, -0.6, 1.92, z, { vif: true });
+            }
+            for (const x of [-1.8, -0.6, 0.6]) {
+                bloc(g, 0.06, 0.06, 1.42, T.anthracite, x, 1.92, 0, { vif: true });
+            }
+        }
+        if (o.tuyaux) {
+            // les tuyaux du plombier : PVC bleu et cuivre, plus longs que la galerie
+            [[0x2f7fc1, 0.38], [0xc57a3a, 0.16], [0x2f7fc1, -0.06], [0xc57a3a, -0.28], [0x2f7fc1, -0.48]].forEach(([couleur, z], i) => {
+                cyl(g, 0.075, 0.075, 3.9 - (i % 2) * 0.5, couleur, -0.45, 2.06, z, "x", { r: 0.35, m: couleur === 0xc57a3a ? 0.6 : 0.05 });
+            });
+        }
+        if (o.echelle) {
+            // l'échelle de piscine en inox, couchée sur la galerie, rampes cintrées vers l'avant
+            for (const z of [0.32, -0.32]) {
+                barre(g, [-1.6, 2.02, z], [0.2, 2.02, z], 0.045, 0xdfe5ea, { m: 0.8, r: 0.25 });
+                barre(g, [0.2, 2.02, z], [0.45, 2.42, z], 0.045, 0xdfe5ea, { m: 0.8, r: 0.25 });
+                barre(g, [0.45, 2.42, z], [0.75, 2.3, z], 0.045, 0xdfe5ea, { m: 0.8, r: 0.25 });
+            }
+            for (const x of [-1.3, -0.8, -0.3]) {
+                barre(g, [x, 2.02, 0.32], [x, 2.02, -0.32], 0.05, 0xdfe5ea, { m: 0.8, r: 0.25 });
+            }
+        }
+        return g;
+    };
+    M.plateau = (o = {}) => {
+        // le camion plateau : cabine à l'avant, plateau à l'arrière ; chargé d'herbe et de branches (paysagiste)
+        // ou d'une benne (services techniques), avec gyrophare et bande tricolore pour la collectivité
+        const g = groupe();
+        const c = o.couleur ?? T.orange;
+        bloc(g, 4.9, 0.24, 1.5, T.anthracite, -0.1, 0.42, 0, { vif: true });
+        bloc(g, 1.45, 1.42, 1.95, c, 1.55, 0.55, 0, { rayon: 0.22 });
+        bloc(g, 0.06, 0.62, 1.7, T.vitreFoncee, 2.29, 1.25, 0, { rayon: 0.03, r: 0.2, m: 0.3 });
+        for (const z of [0.98, -0.98]) {
+            bloc(g, 0.88, 0.5, 0.05, T.vitreFoncee, 1.62, 1.35, z, { rayon: 0.02, r: 0.2 });
+            if (o.tricolore) {
+                [[0x1f4ea1, 0.66], [0xf7f6f2, 0.82], [0xd94f45, 0.98]].forEach(([couleur, y]) => bloc(g, 1.2, 0.16, 0.04, couleur, 1.55, y, z * 1.005, { vif: true }));
+            }
+        }
+        bloc(g, 0.2, 0.28, 2.0, T.anthracite, 2.32, 0.42, 0, { rayon: 0.06 });
+        bloc(g, 0.05, 0.14, 0.3, 0xfff6c8, 2.31, 0.85, 0.65, { e: 0.8 });
+        bloc(g, 0.05, 0.14, 0.3, 0xfff6c8, 2.31, 0.85, -0.65, { e: 0.8 });
+        bloc(g, 3.35, 0.16, 2.0, T.grisFonce, -0.95, 0.66, 0, { rayon: 0.03 });
+        for (const z of [0.96, -0.96]) {
+            bloc(g, 3.35, 0.2, 0.06, T.gris, -0.95, 0.82, z, { vif: true });
+        }
+        if (o.charge === "vert") {
+            bloc(g, 3.1, 0.34, 1.8, T.herbe, -0.95, 0.82, 0, { rayon: 0.16 });
+            for (const [x, z, h, penche] of [[-2.0, 0.3, 1.3, 0.35], [-1.3, -0.4, 1.5, -0.3], [-0.6, 0.45, 1.2, 0.25], [0.1, -0.2, 1.1, -0.2]]) {
+                const haut = [x + penche * 0.6, 1.16 + h, z + penche * 0.5];
+                barre(g, [x, 1.1, z], haut, 0.05, T.terre);
+                barre(g, [x + penche * 0.3, 1.1 + h * 0.55, z], [x + penche * 0.3 + 0.35, 1.3 + h * 0.6, z - 0.3], 0.035, T.terre);
+                boule(g, 0.32, T.feuillage, haut[0], haut[1], haut[2]);
+                boule(g, 0.24, T.feuillageFonce, haut[0] + 0.25, haut[1] - 0.15, haut[2] - 0.2);
+                boule(g, 0.2, T.feuillage, x + penche * 0.3 + 0.38, 1.3 + h * 0.6, z - 0.32);
+            }
+        } else if (o.charge === "benne") {
+            bloc(g, 3.15, 0.85, 1.95, o.benne ?? 0x7d8fa3, -0.95, 0.82, 0, { rayon: 0.06 });
+            bloc(g, 2.95, 0.05, 1.75, 0x5c6b7b, -0.95, 1.63, 0, { vif: true });
+            for (const x of [-2.1, -1.35, -0.6, 0.15]) {
+                for (const z of [0.99, -0.99]) {
+                    bloc(g, 0.08, 0.7, 0.03, 0x96a6b8, x, 0.9, z, { vif: true });
+                }
+            }
+        }
+        if (o.gyrophare) {
+            const gyro = groupe();
+            gyro.name = "gyrophare";
+            gyro.position.set(1.55, 1.98, 0);
+            cyl(gyro, 0.17, 0.2, 0.22, T.orange, 0, 0.11, 0, "y", { e: 0.6, o: 0.9 });
+            bloc(gyro, 0.05, 0.16, 0.3, 0xffffff, 0.12, 0.03, 0, { e: 0.9 });
+            g.add(gyro);
+        }
+        for (const z of [0.88, -0.88]) {
+            roue(g, 0.4, 0.28, 1.55, 0.4, z);
+            roue(g, 0.4, 0.36, -1.55, 0.4, z);
+        }
         return g;
     };
     M.chariot = () => {

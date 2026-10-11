@@ -9,6 +9,13 @@ Tout est calculé pour la société courante (l'adhérent).
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
+# type de client -> (singulier, pluriel) : un véhicule par type au parking clients
+TYPES_CLIENTS = {
+    "agriculteur": ("Agriculteur", "Agriculteurs"), "collectivite": ("Collectivité", "Collectivités"), "particulier": ("Particulier", "Particuliers"),
+    "industrie": ("Industrie", "Industries"), "plombier": ("Plombier", "Plombiers"), "paysagiste": ("Paysagiste", "Paysagistes"),
+    "pisciniste": ("Pisciniste", "Piscinistes"), "autre": ("Autre", "Autres clients"),
+}
+
 CLOTURES = ("1_done", "1_canceled")
 CHANTIER = ("mise_en_service", "livraison", "modification")
 ATELIER = ("depannage", "entretien", "remise_en_service", "hivernage", "diagnostic", "autre")
@@ -166,6 +173,8 @@ class Scene(models.AbstractModel):
         a_contacter = Partner.search_count([("cultiveau_a_contacter", "=", True), ("company_id", "in", [company.id, False])]) if "cultiveau_a_contacter" in Partner._fields else 0
         return {
             "agriculteurs": Partner.search_count([("company_id", "in", [company.id, False]), ("cultiveau_est_client", "=", True), ("parent_id", "=", False)]),
+            "clients_par_type": {t: n for t, n in Partner._read_group(
+                [("company_id", "in", [company.id, False]), ("cultiveau_est_client", "=", True), ("parent_id", "=", False)], ["cultiveau_type"], ["__count"])},
             "a_contacter": a_contacter,
             "articles_en_stock": len(self.env["stock.quant"]._read_group([("company_id", "=", company.id), ("location_id.usage", "=", "internal"), ("quantity", ">", 0)], ["product_id"])),
             "devis": len(devis), "devis_montant": round(sum(devis.mapped("amount_total"))),
@@ -256,6 +265,8 @@ class Scene(models.AbstractModel):
             "comptoir": ("cultiveau_comptoir.action_comptoir", {}),
             "ventes_comptoir": ("sale.action_orders", {"name": "Ventes au comptoir", "domain": [("origin", "=", "Comptoir")]}),
             "agriculteurs": ("cultiveau_base.action_agriculteurs", {}),
+            "clients_type": ("cultiveau_base.action_agriculteurs", {"type_client": True}),
+            "client_type_nouveau": ("cultiveau_base.action_agriculteurs", {"type_client": True, "form": True}),
             "agriculteur_nouveau": ("cultiveau_base.action_agriculteurs", {"name": "Nouveau client", "form": True,
                                     "context": {"default_cultiveau_type": "agriculteur", "default_is_company": False}}),
             "a_contacter": ("cultiveau_frise.action_a_contacter", {}),
@@ -348,6 +359,13 @@ class Scene(models.AbstractModel):
                 raise UserError("Famille introuvable.")
             domaine.append((r["famille"], "child_of", categorie.id))
             action["name"] = f"{categorie.name} — {r['suffixe']}" if r.get("suffixe") else categorie.name
+        if r.get("type_client"):
+            if parametre not in TYPES_CLIENTS:
+                raise UserError("Type de client inconnu.")
+            domaine.append(("cultiveau_type", "=", parametre))
+            contexte["default_cultiveau_type"] = parametre
+            contexte["default_is_company"] = parametre not in ("particulier", "agriculteur")
+            action["name"] = (f"Nouveau client — {TYPES_CLIENTS[parametre][0]}" if r.get("form") else TYPES_CLIENTS[parametre][1])
         if r.get("name"):
             action["name"] = r["name"]
         action["display_name"] = action["name"]
