@@ -5,6 +5,9 @@ from odoo.tests import TransactionCase, tagged
 class TestImportClients(TransactionCase):
     def test_import_csv_colonnes_libres(self):
         Moteur = self.env["cultiveau.import.clients.moteur"]
+        # La base peut déjà connaître ces personnes (données d'essai) : on les met de côté pour que l'import parte de zéro.
+        self.env["res.partner"].search(["|", "|", ("name", "in", ("Durand Paul", "Paul Durand", "Martin Jean", "Pompes du Gard")),
+                                        ("numero_court", "in", ("33612345678", "33612345679", "33466000000", "33466112233")), ("email", "ilike", "@exemple.fr")]).active = False
         csv = ("Liste clients 2026\n"
                "Client;Société;Tél. portable;Fixe;Mail;Adresse;CP;Ville;Statut;Surface ha;Suivi par;Remarque\n"
                "Durand Paul;EARL des Oliviers;06 12 34 56 78;04 66 00 00 00;Paul.Durand@exemple.fr;12 chemin des Prés;30100;Alès;client;35;;Rappeler\n"

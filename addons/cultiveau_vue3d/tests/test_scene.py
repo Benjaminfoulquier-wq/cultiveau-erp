@@ -41,3 +41,29 @@ class TestScene(TransactionCase):
         self.assertEqual(nouveau.action_id.id, self.env.ref("cultiveau_vue3d.action_vue3d").id)
         self.env["res.users"]._cultiveau_page_accueil_pour_tous()
         self.assertEqual(self.env.user.action_id.id, self.env.ref("cultiveau_vue3d.action_vue3d").id)
+
+    def test_les_postes_du_plan_ouvrent_tout(self):
+        """Chaque porte du plan s'ouvre : actions standard filtrées, formulaires vierges, familles, lien vers Cultiveau 3D."""
+        Scene = self.env["cultiveau.scene"]
+        dispo = Scene._actions_disponibles()
+        for cle in ("facture_nouvelle", "factures_a_encaisser", "fiches", "catalogue", "schema3d", "devis_nouveau", "livraisons", "agriculteurs", "interventions"):
+            self.assertIn(cle, dispo)
+        for cle in sorted(dispo):
+            if cle.startswith("famille_"):
+                continue
+            action = Scene.action(cle)
+            self.assertTrue(action.get("type"), cle)
+        facture = Scene.action("facture_nouvelle")
+        self.assertEqual((facture["res_model"], facture["view_mode"], facture["context"]["default_move_type"]), ("account.move", "form", "out_invoice"))
+        self.assertEqual([v[1] for v in facture["views"]], ["form"])
+        self.assertIn(("payment_state", "in", ("not_paid", "partial")), Scene.action("factures_a_encaisser")["domain"])
+        self.assertEqual(Scene.action("schema3d")["type"], "ir.actions.act_url")
+        famille = self.env["product.category"].create({"name": "Famille du plan"})
+        sous = self.env["product.category"].create({"name": "Sous-famille du plan", "parent_id": famille.id})
+        self.env["product.template"].create({"name": "Raccord du plan", "categ_id": sous.id, "cultiveau_reseau": True, "sale_ok": True})
+        f = next(x for x in Scene.donnees()["familles"] if x["id"] == famille.id)
+        self.assertEqual((f["nom"], f["reseau"]), ("Famille du plan", 1))
+        for cle in ("famille_mien", "famille_stock", "famille_reseau", "famille_fiches"):
+            action = Scene.action(cle, famille.id)
+            self.assertIn("child_of", [c[1] for c in action["domain"] if isinstance(c, (list, tuple))], cle)
+            self.assertTrue(action["name"].startswith("Famille du plan"))

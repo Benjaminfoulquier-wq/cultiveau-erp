@@ -1,21 +1,69 @@
 .o_cultiveau_vue3d {
-    background: #f6f4ee;
+    background: #f4f1ea;
     .o_cultiveau_vue3d_entete { background: #ffffff; border-bottom: 1px solid #e3ded3; h2 { color: #183840; font-weight: 600; } }
-    .o_cultiveau_vue3d_scene { overflow: hidden; }
-    svg { display: block; }
-    text.zone { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; fill: #6b665a; .compte { font-weight: 400; letter-spacing: 0; } }
-    text.libelle { font-size: 7px; paint-order: stroke; stroke: #ffffff; stroke-width: 2px; fill: #8a8373; letter-spacing: 0.06em; pointer-events: none; font-style: italic;
-        &.zone { font-size: 8px; font-weight: 700; font-style: normal; letter-spacing: 0.1em; fill: #6b665a; }
-        &.route, &.entree { font-size: 7px; font-weight: 700; font-style: normal; fill: #5d6b78; }
+    .o_cultiveau_vue3d_zones { background: #ffffff; border-bottom: 1px solid #e3ded3;
+        .btn { font-size: 12px; font-weight: 600; color: #183840; border-radius: 16px; padding: 2px 12px; }
+        .btn-dark { background: #183840; border-color: #183840; color: #ffffff; } }
+    .o_cv_recherche { width: 420px; max-width: 60vw;
+        > .fa { position: absolute; left: 10px; top: 8px; color: #8a8373; }
+        input { padding-left: 30px; border-radius: 16px; background: #f4f1ea; border-color: #e3ded3; }
+        .o_cv_resultats { position: absolute; top: 110%; left: 0; right: 0; z-index: 30; background: #ffffff; border: 1px solid #e3ded3; border-radius: 10px;
+                          box-shadow: 0 10px 30px rgba(24, 56, 64, 0.18); overflow: hidden; }
+        .o_cv_resultat { display: block; width: 100%; text-align: left; border: 0; background: none; padding: 7px 12px; color: #183840;
+            &:hover, &:first-child { background: #e9f6f8; } .fa { width: 18px; color: #0b8aa3; } small { color: #8a8373; } }
     }
-    text.numero { font-size: 10px; font-weight: 700; fill: #ffffff; }
-    .station { cursor: pointer; &:hover circle { fill: #0b8aa3; } }
-    .o_cultiveau_vue3d_stations { background: #ffffff; border-bottom: 1px solid #e3ded3; .btn { font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600; color: #183840; } .badge { background: #183840 !important; } }
-    text.etiquette { font-size: 8px; fill: #183840; paint-order: stroke; stroke: #ffffff; stroke-width: 2px; pointer-events: none; }
-    .element { cursor: pointer; polygon { transition: filter 0.12s; } &:hover polygon { filter: brightness(1.12); } }
-    .o_cultiveau_vue3d_info { position: absolute; left: 16px; bottom: 44px; background: #183840; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; max-width: 70%; }
+    .o_cultiveau_vue3d_scene { overflow: hidden; cursor: grab; user-select: none; touch-action: none;
+        &:active { cursor: grabbing; } }
+    svg { display: block; }
+    polygon { stroke: rgba(255, 255, 255, 0.55); stroke-width: 0.5; stroke-linejoin: round; }
+    .sol polygon { stroke: none; }
+    .sol.cliquable { cursor: zoom-in; &:hover polygon { filter: brightness(1.03); } }
+    .poste, .element { cursor: pointer; transition: transform 0.18s ease, filter 0.18s ease; }
+    .poste:hover, .element:hover, .poste.actif { transform: translateY(-5px); filter: brightness(1.1) drop-shadow(0 6px 4px rgba(24, 56, 64, 0.25)); }
+    .poste.actif { filter: brightness(1.12) drop-shadow(0 0 6px rgba(11, 138, 163, 0.9)); }
+    .element.alerte polygon { animation: cv-alerte 1.6s ease-in-out infinite; }
+    .personne { animation: cv-respire 2.6s ease-in-out infinite alternate; }
+    .roule { animation: cv-route 26s linear infinite; pointer-events: none; }
+    .etincelle { animation: cv-etincelle 0.5s steps(2) infinite; pointer-events: none; }
+    .eau polygon { animation: cv-eau 3s ease-in-out infinite alternate; }
+    .toit { opacity: 0.88; pointer-events: none; }
+    .decor { pointer-events: none; }
+    text.libelle { fill: #8a8373; pointer-events: none; paint-order: stroke; stroke: #ffffff; stroke-width: 3px; stroke-linejoin: round; font-style: italic;
+        &.zone { fill: #183840; font-weight: 800; font-style: normal; letter-spacing: 0.12em; opacity: 0.75; }
+        &.route, &.entree { fill: #5d6b78; font-weight: 700; font-style: normal; letter-spacing: 0.06em; }
+        &.objet { fill: #183840; font-style: normal; }
+    }
+    .etiquette-poste { cursor: pointer;
+        .titre-poste { fill: #183840; font-weight: 700; paint-order: stroke; stroke: #ffffff; stroke-width: 4px; stroke-linejoin: round; }
+        .pastille { fill: #0b8aa3; stroke: #ffffff; stroke-width: 0.15em; }
+        .compte { fill: #ffffff; font-weight: 700; pointer-events: none; }
+        &:hover .titre-poste { fill: #0b8aa3; }
+        &.urgent .pastille { fill: #d9534f; animation: cv-pulse 1.4s ease-in-out infinite; }
+    }
+    .loin text.libelle.piece, .loin text.libelle.objet, .moyen text.libelle.objet { display: none; }
+    .loin .etiquette-poste .titre-poste { opacity: 0.9; }
+    .o_cv_commandes { position: absolute; right: 14px; top: 14px; display: flex; flex-direction: column; gap: 4px;
+        .btn { width: 34px; height: 34px; border-radius: 10px; box-shadow: 0 2px 8px rgba(24, 56, 64, 0.15); } }
+    .o_cv_carte { position: absolute; z-index: 20; background: #ffffff; border-radius: 14px; padding: 14px; box-shadow: 0 18px 40px rgba(24, 56, 64, 0.28);
+                  animation: cv-apparait 0.22s ease-out; cursor: default;
+        .o_cv_carte_icone { width: 38px; height: 38px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; color: #ffffff; font-size: 18px; flex: none; }
+        .o_cv_carte_titre { font-size: 16px; font-weight: 700; color: #183840; line-height: 1.2; }
+        .o_cv_carte_texte { font-size: 12px; color: #6b665a; margin-top: 2px; }
+        .o_cv_carte_stats { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; span { background: #f4f1ea; border-radius: 8px; padding: 2px 8px; font-size: 11px; color: #183840; } }
+        .btn { font-size: 13px; }
+    }
+    .o_cultiveau_vue3d_info { position: absolute; left: 16px; bottom: 44px; background: #183840; color: #ffffff; padding: 6px 12px; border-radius: 8px; font-size: 13px;
+                              max-width: 70%; pointer-events: none; box-shadow: 0 6px 16px rgba(24, 56, 64, 0.25); }
     .o_cultiveau_vue3d_legende {
-        position: absolute; left: 16px; bottom: 12px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: #5d6b78;
+        position: absolute; left: 16px; bottom: 12px; display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: #5d6b78; pointer-events: none;
         i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+        .aide i { width: auto; height: auto; }
     }
 }
+@keyframes cv-respire { from { transform: translateY(0); } to { transform: translateY(-2.5px); } }
+@keyframes cv-route { from { transform: translate(0, 0); } to { transform: translate(2300px, 1330px); } }
+@keyframes cv-etincelle { 0% { opacity: 1; } 100% { opacity: 0.1; } }
+@keyframes cv-eau { from { opacity: 0.75; } to { opacity: 1; } }
+@keyframes cv-alerte { 0%, 100% { filter: none; } 50% { filter: brightness(1.25) saturate(1.3); } }
+@keyframes cv-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+@keyframes cv-apparait { from { opacity: 0; transform: translateY(6px) scale(0.98); } to { opacity: 1; transform: none; } }

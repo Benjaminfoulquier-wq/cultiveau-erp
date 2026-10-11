@@ -7,6 +7,7 @@ les parcelles en service vivent au rythme de la frise : hivernage, remise en rou
 Tout est calculé pour la société courante (l'adhérent).
 """
 from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 CLOTURES = ("1_done", "1_canceled")
 CHANTIER = ("mise_en_service", "livraison", "modification")
@@ -33,6 +34,8 @@ class Scene(models.AbstractModel):
             "parcelles": self._parcelles(company),
             "caisse": self._caisse(company),
             "compteurs": self._compteurs(company, taches),
+            "familles": self._familles(company),
+            "actions": sorted(self._actions_disponibles()),
         }
 
     # ---------------------------------------------------------------- 1. l'accueil : appels et comptoir
@@ -169,4 +172,188 @@ class Scene(models.AbstractModel):
             "interventions": len(taches),
             "installations": self.env["cultiveau.installation"].search_count([("company_id", "=", company.id)]),
             "factures": len(factures), "factures_montant": round(sum(factures.mapped("amount_residual"))),
+            **self._compteurs_catalogue(),
         }
+
+    def _compteurs_catalogue(self):
+        Produit = self.env["product.template"]
+        res = {"fiches": self.env["cultiveau.fiche"].search_count([]) if "cultiveau.fiche" in self.env else 0}
+        if "cultiveau_reseau" in Produit._fields:
+            res["catalogue"] = Produit.search_count([("cultiveau_reseau", "=", True)])
+            res["mon_catalogue"] = Produit.search_count([("cultiveau_mon_catalogue", "=", True), ("sale_ok", "=", True)])
+        return res
+
+    # ---------------------------------------------------------------- les familles de produits (les rayons du magasin)
+
+    def _familles(self, company):
+        """Les familles du catalogue (catégories racines) : articles dans mon catalogue, au catalogue Cultiveau, en stock."""
+        Produit = self.env["product.template"].with_company(company)
+        racines = {}
+
+        def racine(categorie):
+            if not categorie:
+                return None
+            ids = [int(i) for i in (categorie.parent_path or "").split("/") if i]
+            r = self.env["product.category"].browse(ids[0]) if ids else categorie
+            return racines.setdefault(r.id, {"id": r.id, "nom": "Divers" if r == self.env.ref("product.product_category_all", raise_if_not_found=False) else r.name,
+                                             "mien": 0, "reseau": 0, "stock": 0})
+
+        if "cultiveau_mon_catalogue" in Produit._fields:
+            for categorie, n in Produit._read_group([("cultiveau_mon_catalogue", "=", True), ("sale_ok", "=", True)], ["categ_id"], ["__count"]):
+                if (f := racine(categorie)):
+                    f["mien"] += n
+        if "cultiveau_reseau" in Produit._fields:
+            for categorie, n in Produit._read_group([("cultiveau_reseau", "=", True)], ["categ_id"], ["__count"]):
+                if (f := racine(categorie)):
+                    f["reseau"] += n
+        for produit, quantite in self.env["stock.quant"]._read_group([("company_id", "=", company.id), ("location_id.usage", "=", "internal"), ("quantity", ">", 0)],
+                                                                     ["product_id"], ["quantity:sum"]):
+            if (f := racine(produit.categ_id)):
+                f["stock"] += quantite
+        familles = [f for f in racines.values() if f["mien"] or f["reseau"] or f["stock"]]
+        for f in familles:
+            f["stock"] = round(f["stock"])
+        return sorted(familles, key=lambda f: (f["nom"] == "Divers", -(f["mien"] + f["reseau"]), f["nom"]))
+
+    # ---------------------------------------------------------------- les portes : ce que chaque poste du plan ouvre
+
+    def _actions(self):
+        """clé -> (action de référence, réglages). Réglages : name, domain, context, form (ouvrir un formulaire vierge),
+        famille (filtrer sur la famille passée en paramètre), url (paramètre système, lien ouvert dans un onglet)."""
+        nature = lambda *n: [("cultiveau_intervention", "=", True), ("cultiveau_nature", "in", list(n))]  # noqa: E731
+        ouvertes = [("state", "not in", list(CLOTURES))]
+        return {
+            # l'administratif
+            "facture_nouvelle": ("account.action_move_out_invoice_type", {"name": "Nouvelle facture", "form": True, "context": {"default_move_type": "out_invoice"}}),
+            "factures": ("account.action_move_out_invoice_type", {}),
+            "factures_a_encaisser": ("account.action_move_out_invoice_type", {"name": "Factures à encaisser",
+                                     "domain": [("state", "=", "posted"), ("payment_state", "in", ("not_paid", "partial"))]}),
+            "avoirs": ("account.action_move_out_refund_type", {}),
+            "factures_fournisseurs": ("account.action_move_in_invoice_type", {}),
+            "a_payer": ("account.action_move_in_invoice_type", {"name": "Fournisseurs à payer",
+                        "domain": [("state", "=", "posted"), ("payment_state", "in", ("not_paid", "partial"))]}),
+            "paiements": ("account.action_account_payments", {}),
+            "journaux": ("account.action_account_journal_form", {}),
+            "ecritures": ("account.action_account_moves_all", {}),
+            "ventes_analyse": ("sale.action_order_report_all", {}),
+            "achats_analyse": ("purchase.action_purchase_order_report_all", {}),
+            "crm_analyse": ("crm.crm_opportunity_report_action", {}),
+            "reglages": ("cultiveau_base.action_cultiveau_config_settings", {}),
+            "import_reseau": ("cultiveau_base.action_import_reseau", {}),
+            "utilisateurs": ("base.action_res_users", {}),
+            # le bureau d'étude et la salle de réunion
+            "etudes": ("cultiveau_installation.action_installations", {"name": "Études en cours", "domain": [("etat", "in", ("projet", "etude"))]}),
+            "etude_nouvelle": ("cultiveau_installation.action_installations", {"name": "Nouvelle étude", "form": True, "context": {"default_etat": "etude"}}),
+            "installations": ("cultiveau_installation.action_installations", {}),
+            "usages": ("cultiveau_ventes.action_usages", {}),
+            "schema3d": (None, {"url": ("cultiveau.url_schema3d", "https://schema3d.cultiveau.fr"), "name": "Cultiveau 3D"}),
+            "pipeline": ("crm.crm_lead_action_pipeline", {}),
+            "devis": ("sale.action_quotations_with_onboarding", {}),
+            "devis_nouveau": ("sale.action_quotations_with_onboarding", {"name": "Nouveau devis", "form": True}),
+            "commandes": ("sale.action_orders", {}),
+            "rendez_vous": ("calendar.action_calendar_event", {}),
+            # le magasin
+            "comptoir": ("cultiveau_comptoir.action_comptoir", {}),
+            "ventes_comptoir": ("sale.action_orders", {"name": "Ventes au comptoir", "domain": [("origin", "=", "Comptoir")]}),
+            "agriculteurs": ("cultiveau_base.action_agriculteurs", {}),
+            "agriculteur_nouveau": ("cultiveau_base.action_agriculteurs", {"name": "Nouvel agriculteur", "form": True,
+                                    "context": {"default_cultiveau_type": "agriculteur", "default_is_company": False}}),
+            "a_contacter": ("cultiveau_frise.action_a_contacter", {}),
+            "import_clients": ("cultiveau_base.action_import_clients", {}),
+            "cultures": ("cultiveau_frise.action_cultures", {}),
+            "personas": ("cultiveau_persona.action_personas", {}),
+            "fiches": ("cultiveau_catalogue.action_fiches", {}),
+            "catalogue": ("cultiveau_catalogue.action_catalogue", {}),
+            "mon_catalogue": ("cultiveau_catalogue.action_mon_catalogue", {}),
+            "import_articles": ("cultiveau_catalogue.action_import_articles", {}),
+            "fournisseurs": ("cultiveau_catalogue.action_fournisseurs", {}),
+            "categories": ("product.product_category_action_form", {}),
+            "occasion": ("cultiveau_catalogue.action_mon_catalogue", {"name": "Occasion et reprises",
+                         "domain": ["|", ("name", "ilike", "occasion"), ("name", "ilike", "reprise")]}),
+            # une famille de produits (paramètre : la catégorie)
+            "famille_mien": ("cultiveau_catalogue.action_mon_catalogue", {"famille": "categ_id"}),
+            "famille_stock": ("cultiveau_catalogue.action_mon_catalogue", {"famille": "categ_id", "domain": [("qty_available", ">", 0)], "suffixe": "en stock"}),
+            "famille_reseau": ("cultiveau_catalogue.action_catalogue", {"famille": "categ_id", "suffixe": "au catalogue Cultiveau"}),
+            "famille_fiches": ("cultiveau_catalogue.action_fiches", {"famille": "produit_ids.categ_id", "suffixe": "fiches techniques"}),
+            # le stockage, la cour
+            "livraisons": ("stock.action_picking_tree_outgoing", {}),
+            "receptions": ("stock.action_picking_tree_incoming", {}),
+            "inventaire": ("stock.action_view_inventory_tree", {}),
+            "reappro": ("stock.action_orderpoint", {}),
+            "mouvements": ("stock.stock_move_line_action", {}),
+            "achats": ("purchase.purchase_form_action", {}),
+            "achat_nouveau": ("purchase.purchase_rfq", {"name": "Nouvelle commande fournisseur", "form": True}),
+            "demandes_prix": ("purchase.purchase_rfq", {}),
+            # l'atelier et le SAV
+            "interventions": ("cultiveau_interventions.action_interventions", {}),
+            "depannage_nouveau": ("cultiveau_interventions.action_interventions", {"name": "Nouveau dépannage", "form": True,
+                                  "context": {"default_cultiveau_nature": "depannage"}}),
+            "entretiens": ("cultiveau_interventions.action_interventions", {"name": "Entretiens et diagnostics",
+                           "domain": nature("entretien", "diagnostic", "hivernage", "remise_en_service") + ouvertes}),
+            "depannages": ("cultiveau_interventions.action_interventions", {"name": "Dépannages", "domain": nature("depannage") + ouvertes}),
+            "equipements_a_renouveler": ("cultiveau_installation.action_equipements_a_renouveler", {}),
+            "registre": ("cultiveau_installation.action_registre", {}),
+            # chez les agriculteurs
+            "chantiers": ("cultiveau_chantier.action_chantiers", {}),
+            "planning": ("cultiveau_chantier.action_planning", {}),
+            "chantier_nouveau": ("cultiveau_chantier.action_chantiers", {"name": "Nouveau chantier", "form": True}),
+            "parc": ("cultiveau_installation.action_installations", {"name": "Parc installé", "domain": [("etat", "in", ("en_service", "arretee"))]}),
+        }
+
+    def _actions_disponibles(self):
+        dispo = set()
+        for cle, (xmlid, reglages) in self._actions().items():
+            if reglages.get("url") or (xmlid and self.env.ref(xmlid, raise_if_not_found=False)):
+                dispo.add(cle)
+        return dispo
+
+    @api.model
+    def action(self, cle, parametre=None):
+        """L'action à ouvrir pour un poste du plan : l'action standard, filtrée ou en formulaire vierge selon la clé."""
+        actions = self._actions()
+        if cle not in actions:
+            raise UserError(f"Rien n'est relié à « {cle} ».")
+        xmlid, r = actions[cle]
+        if r.get("url"):
+            param, defaut = r["url"]
+            url = self.env["ir.config_parameter"].sudo().get_param(param) or defaut
+            return {"type": "ir.actions.act_url", "url": url, "target": "new", "name": r.get("name", "")}
+        record = self.env.ref(xmlid, raise_if_not_found=False)
+        if not record:
+            raise UserError(f"« {cle} » n'est pas installé sur cette base.")
+        action = self.env[record._name]._for_xml_id(xmlid)
+        if action.get("type") != "ir.actions.act_window":
+            return action
+        contexte = action.get("context") or {}
+        if isinstance(contexte, str):
+            try:
+                from odoo.tools.safe_eval import safe_eval
+                contexte = safe_eval(contexte, {"uid": self.env.uid, "active_id": False, "allowed_company_ids": self.env.companies.ids})
+            except Exception:  # noqa: BLE001 — un contexte calculé côté client : on repart de zéro
+                contexte = {}
+        contexte = {k: v for k, v in contexte.items() if not k.startswith("search_default_")}
+        contexte.update(r.get("context", {}))
+        domaine = list(r.get("domain", []))
+        if action.get("domain") and isinstance(action["domain"], (list, tuple)):
+            domaine = list(action["domain"]) + domaine
+        elif action.get("domain") and isinstance(action["domain"], str) and "uid" not in action["domain"]:
+            try:
+                from odoo.tools.safe_eval import safe_eval
+                domaine = list(safe_eval(action["domain"])) + domaine
+            except Exception:  # noqa: BLE001
+                pass
+        if r.get("famille"):
+            categorie = self.env["product.category"].browse(int(parametre or 0)).exists()
+            if not categorie:
+                raise UserError("Famille introuvable.")
+            domaine.append((r["famille"], "child_of", categorie.id))
+            action["name"] = f"{categorie.name} — {r['suffixe']}" if r.get("suffixe") else categorie.name
+        if r.get("name"):
+            action["name"] = r["name"]
+        action["display_name"] = action["name"]
+        action["domain"] = domaine
+        action["context"] = contexte
+        if r.get("form"):
+            formulaire = next((v for v in action.get("views") or [] if v[1] == "form"), [False, "form"])
+            action.update({"views": [formulaire], "view_mode": "form", "res_id": False, "target": "current"})
+        return action

@@ -10,6 +10,8 @@ class ResConfigSettings(models.TransientModel):
     cultiveau_url_disc = fields.Char("Management (DISC)", config_parameter="cultiveau.url_disc", help="Ex. https://disc.cultiveau.fr")
     cultiveau_url_academie = fields.Char("Académie", config_parameter="cultiveau.url_academie",
                                          help="Ex. https://formations.lesjourneesdecultiveau.fr")
+    cultiveau_url_schema3d = fields.Char("Cultiveau 3D", config_parameter="cultiveau.url_schema3d",
+                                         help="Le tracé du réseau en 3D, ex. https://schema3d.cultiveau.fr")
     cultiveau_cle_api = fields.Char("Clé d'accès des outils du réseau", config_parameter="cultiveau.cle_api",
                                     help="La clé que l'assistant téléphonique présente pour écrire dans l'ERP (en-tête X-Cultiveau-Cle). "
                                          "À reporter dans la page « Clés » de l'assistant.")

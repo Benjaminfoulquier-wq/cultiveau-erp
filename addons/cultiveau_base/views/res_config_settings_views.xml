@@ -25,6 +25,10 @@
                                 <label for="cultiveau_url_academie" class="col-lg-4 o_light_label"/>
                                 <field name="cultiveau_url_academie"/>
                             </div>
+                            <div class="row">
+                                <label for="cultiveau_url_schema3d" class="col-lg-4 o_light_label"/>
+                                <field name="cultiveau_url_schema3d"/>
+                            </div>
                         </setting>
                         <setting string="Clé d'accès des outils" help="Avec cette clé, l'assistant téléphonique écrit dans l'ERP (appels → opportunités et activités) et lit la fiche d'un client qui appelle (persona, cultures).">
                             <field name="cultiveau_cle_api" password="True"/>
