@@ -159,3 +159,32 @@ class CultiveauApi(http.Controller):
         resultats = request.env["cultiveau.assistant.synchro"].with_company(societe).synchroniser(societe, elements)
         return _json({"ok": all(r["ok"] for r in resultats), "adherent": societe.name, "resultats": resultats})
 
+
+    @http.route("/cultiveau/api/relier", type="http", auth="none", methods=["POST"], csrf=False, save_session=False, readonly=False)
+    def relier(self, **kw):
+        """L'assistant relie ses adhérents à l'ERP : pour chaque numéro dédié reconnu, une clé propre à cet adhérent (donnée une seule fois).
+        Réservé à la clé commune du réseau ; une clé d'adhérent ne peut pas en obtenir d'autres."""
+        fournie = request.httprequest.headers.get("X-Cultiveau-Cle", "")
+        if fournie.startswith("cv_") or not _autorise(ecriture=True):
+            return _json({"erreur": "réservé à la clé commune du réseau"}, 401)
+        if "cultiveau.cle.api" not in request.env.registry:
+            return _json({"erreur": "le module des clés d'API n'est pas installé"}, 501)
+        try:
+            donnees = json.loads(request.httprequest.get_data(as_text=True) or "{}")
+        except ValueError:
+            return _json({"erreur": "corps JSON illisible"}, 400)
+        request.update_env(user=SUPERUSER_ID)
+        Company, Cle = request.env["res.company"], request.env["cultiveau.cle.api"]
+        societes = {normaliser_telephone(c.cultiveau_numero_dedie): c for c in Company.search([("cultiveau_numero_dedie", "!=", False)])}
+        resultats = []
+        for a in (donnees.get("adherents") or [])[:200]:
+            numero = normaliser_telephone(a.get("numero_dedie"))
+            societe = societes.get(numero) if numero else None
+            if not societe:
+                resultats.append({"numero_dedie": a.get("numero_dedie"), "trouve": False})
+                continue
+            # une seule clé « assistant » par adhérent : l'ancienne est retirée quand on en demande une nouvelle
+            Cle.search([("company_ids", "in", societe.id), ("usage", "=", "assistant"), ("name", "=", "Assistant téléphonique")]).write({"active": False})
+            cle = Cle.create({"name": "Assistant téléphonique", "usage": "assistant", "droits": "ecriture", "company_ids": [(6, 0, societe.ids)]})
+            resultats.append({"numero_dedie": a.get("numero_dedie"), "trouve": True, "adherent": societe.name, "cle": cle.cle_a_copier})
+        return _json({"ok": True, "resultats": resultats})

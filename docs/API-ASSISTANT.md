@@ -87,3 +87,16 @@ Jusqu'à 500 éléments par envoi, les clients avant ce qui s'y rattache. Chaque
 - **tache** : une activité sur la fiche du client (« rendez-vous » si une heure est donnée), pour la personne dont l'e-mail est donné ;
   renvoyée avec `etat` = `fait`, elle est marquée faite dans l'ERP ; `annule` la retire ;
 - **equipement** : rangé dans l'installation « Matériel connu de l'assistant » du client (parc installé), mis à jour s'il revient.
+
+## Relier les adhérents d'un coup
+
+```
+POST /cultiveau/api/relier          (clé commune du réseau uniquement)
+{"adherents": [{"numero_dedie": "+33970000001"}, …]}
+```
+
+Pour chaque numéro dédié qui correspond à un adhérent de l'ERP, une clé propre à cet adhérent (usage « Assistant », lecture et
+écriture, limitée à sa société) est créée et renvoyée **une seule fois** : `{"resultats": [{"numero_dedie": "…", "trouve": true,
+"adherent": "…", "cle": "cv_…"}, {"numero_dedie": "…", "trouve": false}]}`. Redemander retire l'ancienne clé « Assistant
+téléphonique » de cet adhérent. L'assistant le fait chaque jour (secret `ERP_CLE_RESEAU`) : un adhérent qui passe à l'ERP y est
+relié de lui-même, et tout son CRM y part.

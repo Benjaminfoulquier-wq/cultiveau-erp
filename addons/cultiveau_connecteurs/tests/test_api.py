@@ -144,3 +144,23 @@ class TestApi(HttpCase):
         cle.droits = "lecture"
         r = self.url_open("/cultiveau/api/synchro", data=json.dumps(corps), headers=entetes)
         self.assertEqual(r.status_code, 401)
+
+    def test_l_assistant_relie_ses_adherents(self):
+        if "cultiveau.cle.api" not in self.env:
+            self.skipTest("module des clés absent")
+        corps = {"adherents": [{"numero_dedie": "09 70 00 00 01"}, {"numero_dedie": "+33 1 23 45 67 89"}]}
+        r = self.url_open("/cultiveau/api/relier", data=json.dumps(corps), headers=self.entetes)
+        self.assertEqual(r.status_code, 200, r.text)
+        trouve, inconnu = r.json()["resultats"]
+        self.assertFalse(inconnu["trouve"])
+        self.assertTrue(trouve["cle"].startswith("cv_"))
+        cle = self.env["cultiveau.cle.api"].search([("name", "=", "Assistant téléphonique"), ("company_ids", "in", self.env.company.id)])
+        self.assertEqual((len(cle), cle.droits, cle.usage), (1, "ecriture", "assistant"))
+        # la clé obtenue sert aussitôt, et ne peut pas en demander d'autres
+        entetes = {"X-Cultiveau-Cle": trouve["cle"], "Content-Type": "application/json"}
+        r = self.url_open("/cultiveau/api/synchro", data=json.dumps({"elements": [{"type": "client", "reference": "CLI-9", "nom": "Client relié"}]}), headers=entetes)
+        self.assertTrue(r.json()["ok"], r.text)
+        self.assertEqual(self.url_open("/cultiveau/api/relier", data=json.dumps(corps), headers=entetes).status_code, 401)
+        # redemander remplace la clé : une seule reste active
+        self.url_open("/cultiveau/api/relier", data=json.dumps(corps), headers=self.entetes)
+        self.assertEqual(self.env["cultiveau.cle.api"].search_count([("name", "=", "Assistant téléphonique"), ("company_ids", "in", self.env.company.id)]), 1)
