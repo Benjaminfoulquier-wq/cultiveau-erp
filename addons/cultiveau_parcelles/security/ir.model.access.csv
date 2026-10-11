@@ -4,3 +4,6 @@ access_indice_user,cultiveau.parcelle.indice,model_cultiveau_parcelle_indice,bas
 access_alerte_user,cultiveau.parcelle.alerte,model_cultiveau_parcelle_alerte,base.group_user,1,1,1,1
 access_code_pac_user,cultiveau.code.pac,model_cultiveau_code_pac,base.group_user,1,1,1,0
 access_import_telepac_user,cultiveau.import.telepac,model_cultiveau_import_telepac,base.group_user,1,1,1,1
+access_meteo_jour_user,cultiveau.meteo.jour,model_cultiveau_meteo_jour,base.group_user,1,1,1,1
+access_apport_user,cultiveau.parcelle.apport,model_cultiveau_parcelle_apport,base.group_user,1,1,1,1
+access_apport_assistant_user,cultiveau.apport.assistant,model_cultiveau_apport_assistant,base.group_user,1,1,1,1

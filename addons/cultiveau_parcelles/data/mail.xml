@@ -44,5 +44,22 @@
 </div>
             </field>
         </record>
+        <record id="modele_mail_conseil_irrigation" model="mail.template">
+            <field name="name">Parcelles : conseil d'irrigation</field>
+            <field name="model_id" ref="model_cultiveau_parcelle_alerte"/>
+            <field name="subject">{{ object.company_id.name }} — tour d'eau à prévoir sur {{ object.parcelle_id.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="body_html" type="html">
+<div style="font-family: Arial, sans-serif; font-size: 14px; color: #1d3b45">
+    <p>Bonjour <t t-out="object.partner_id.name"/>,</p>
+    <p>D'après la météo des trois dernières semaines et le stade de votre culture, votre parcelle <b><t t-out="object.parcelle_id.name"/></b> a besoin d'eau :</p>
+    <p style="font-size: 16px"><b><t t-out="object.detail"/></b></p>
+    <p>Si vous avez déjà arrosé, dites-le-nous (ou notez-le dans votre espace) : le bilan se corrige.</p>
+    <p>À votre disposition,<br/><t t-out="object.company_id.name"/></p>
+</div>
+            </field>
+        </record>
     </data>
 </odoo>

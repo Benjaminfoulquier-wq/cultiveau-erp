@@ -14,6 +14,10 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Conseil d'irrigation** : chaque matin, la météo réelle de chaque parcelle (ETo et pluie des trois dernières semaines, prévision à
+  sept jours, Open-Meteo, gratuit) croisée avec le Kc du jour de la frise du client et la réserve de son sol donne le déficit et le
+  conseil (« apporter 25 mm, soit 9 h à votre débit, avant jeudi ») ; les arrosages se notent, l'alerte prévient le commercial, le
+  client reçoit l'e-mail en un clic.
 - **Nouvel adhérent** : un seul écran, sept étapes dans l'ordre (société, utilisateurs, assistant téléphonique, clients, articles,
   comptabilité, facture électronique), chacune rejouable ; l'adhérent travaille le soir même.
 - **Facture électronique** : chaque société s'inscrit sur la plateforme agréée depuis Réglages → Cultiveau (démonstration, puis

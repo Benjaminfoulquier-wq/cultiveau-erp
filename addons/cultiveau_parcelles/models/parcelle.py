@@ -381,7 +381,7 @@ class Alerte(models.Model):
             responsable = partner.user_id or self.env["res.users"].search([("company_ids", "in", societe.id), ("share", "=", False)], limit=1) or self.env.user
             if responsable:
                 partner.activity_schedule("mail.mail_activity_data_call", user_id=responsable.id,
-                                          summary=f"Satellite : {dict(GENRES_ALERTE)[a.genre].lower()} — {a.parcelle_id.name}",
+                                          summary=f"{'Irrigation' if a.genre == 'irrigation' else 'Satellite'} : {dict(self._fields['genre'].selection)[a.genre].lower()} — {a.parcelle_id.name}",
                                           note=Markup("<p>%s</p><p>%s</p>") % (a.detail or "", a.conseil))
         if self.env["ir.config_parameter"].sudo().get_param("cultiveau.parcelles_prevenir_client") == "True":
             alertes.filtered(lambda a: a.partner_id.email).action_prevenir_client()

@@ -501,6 +501,27 @@ class CultureClient(models.Model):
         self.ensure_one()
         return self.culture_id.ligne_frise(self.departement, self.decalage_client())
 
+    def jour_de_cycle(self, jour):
+        """Le rang du jour `jour` (une date) dans le cycle de ce client : 0 au semis ou à la reprise ; None hors cycle."""
+        self.ensure_one()
+        c = self.culture_id
+        if not c or not c.duree_cycle:
+            return None
+        depart = self._depart_habituel()
+        depart = ((self.date_semis.timetuple().tm_yday - 1) if self.date_semis else (depart or 0) + JOURS_PRECOCITE.get(self.precocite or "normale", 0)) % 365
+        rang = ((jour.timetuple().tm_yday - 1) - depart) % 365
+        return rang if rang < min(c.duree_cycle, 365) else None
+
+    def kc_a_la_date(self, jour):
+        """Le Kc de cette culture, pour ce client, à une date du calendrier (0 hors cycle)."""
+        self.ensure_one()
+        rang = self.jour_de_cycle(jour)
+        if rang is None:
+            return 0.0
+        c = self.culture_id
+        ini, mi, fin = c.kc_ajustes(self.departement)
+        return round(courbe_kc(ini, mi, fin or mi, (c.duree_ini, c.duree_dev, c.duree_mi, c.duree_fin), rang), 3)
+
     @api.depends("culture_id", "departement", "surface_ha", "date_semis", "precocite", "ru_mm_m", "efficience", "heures_jour",
                  "culture_id.kc_ini", "culture_id.kc_mi", "culture_id.kc_fin")
     def _compute_analyse(self):

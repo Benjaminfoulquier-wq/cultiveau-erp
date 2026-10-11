@@ -21,6 +21,7 @@
         "data/mail.xml",
         "data/cron.xml",
         "wizard/import_telepac_views.xml",
+        "views/apport_views.xml",
         "views/parcelle_views.xml",
         "views/res_partner_views.xml",
         "views/res_config_settings_views.xml",

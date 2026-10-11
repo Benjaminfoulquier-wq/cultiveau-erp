@@ -1,12 +1,14 @@
 import io
 import struct
 import zipfile
-from datetime import date
+from datetime import date, timedelta
 from unittest import mock
+
+from odoo import Command
 
 from odoo.tests import TransactionCase, tagged
 
-from ..models import geo, sentinel, telepac
+from ..models import geo, irrigation, meteo, sentinel, telepac
 
 # Deux parcelles au sud d'Auch (Gers), en Lambert 93, comme dans un export Telepac
 CARRE = "502000,6280000 502300,6280000 502300,6280400 502000,6280400 502000,6280000"
@@ -195,3 +197,52 @@ class TestParcelles(TransactionCase):
             p1.actualiser_satellite(forcer=True, aujourdhui=date(2026, 9, 25))
         self.assertFalse(p1.alerte_ids)
         self.assertEqual(p1.etat, "ok")
+
+
+    # ---------------------------------------------------------------- conseil d'irrigation
+
+    def _meteo(self, aujourdhui, eto=6.0, pluie=0.0, pluie_prevue=0.0):
+        jours = [aujourdhui + timedelta(days=i) for i in range(-meteo.JOURS_PASSES, meteo.JOURS_A_VENIR)]
+        donnees = {"daily": {"time": [j.isoformat() for j in jours], "et0_fao_evapotranspiration": [eto] * len(jours),
+                             "precipitation_sum": [pluie if j < aujourdhui else pluie_prevue for j in jours]}}
+        return mock.patch.object(meteo.requests, "get", return_value=mock.Mock(status_code=200, json=lambda: donnees, raise_for_status=lambda: None))
+
+    def test_conseil_irrigation(self):
+        self.Parcelle.importer(self.agri, "declaration.xml", XML, 2026)
+        p1 = self.agri.cultiveau_parcelle_ids.filtered(lambda p: p.numero == "1")
+        cc = p1._culture_client()
+        self.assertGreater(cc.kc_a_la_date(date(2026, 7, 15)), 0.8, "maïs en juillet dans le Gers : pleine évapotranspiration")
+        self.assertEqual(cc.kc_a_la_date(date(2026, 1, 15)), 0.0)
+        ete = date(2026, 7, 15)
+        # trois semaines sans pluie, 6 mm d'ETo par jour : la réserve est vide, il faut arroser
+        with self._meteo(ete) as get:
+            n = self.Parcelle._cron_irrigation(ete)
+        self.assertGreaterEqual(n, 1)
+        self.assertEqual(get.call_args.kwargs["params"]["daily"], "et0_fao_evapotranspiration,precipitation_sum")
+        self.assertEqual(p1.etat_eau, "arroser")
+        self.assertAlmostEqual(p1.deficit_mm, p1.rfu_mm, delta=1)
+        self.assertIn("Apporter", p1.conseil)
+        self.assertIn("<table", p1.bilan_eau)
+        alerte = p1.alerte_ids.filtered(lambda a: a.genre == "irrigation")
+        self.assertEqual(len(alerte), 1)
+        self.assertTrue(self.agri.activity_ids, "le commercial est prévenu")
+        alerte.action_prevenir_client()
+        self.assertTrue(alerte.message_ids.filtered(lambda m: "tour d'eau" in (m.subject or "")))
+        # le lendemain, pas de seconde alerte ; l'arrosage noté remet la réserve à niveau
+        with self._meteo(ete + timedelta(days=1)):
+            self.Parcelle._cron_irrigation(ete + timedelta(days=1))
+        self.assertEqual(len(p1.alerte_ids.filtered(lambda a: a.genre == "irrigation")), 1)
+        self.env["cultiveau.apport.assistant"].create({"partner_id": self.agri.id, "parcelle_ids": [Command.set(p1.ids)], "date": ete + timedelta(days=1), "mm": p1.rfu_mm}).action_noter()
+        p1.calculer_bilan(ete + timedelta(days=1))
+        self.assertIn(p1.etat_eau, ("ok", "bientot"))
+        self.assertLess(p1.deficit_mm, 10)
+        # un été pluvieux : rien à faire ; janvier : hors saison
+        with self._meteo(ete, eto=3.0, pluie=8.0):
+            p1.action_actualiser_eau()
+            p1.calculer_bilan(ete)
+        self.assertEqual(p1.etat_eau, "ok")
+        with self._meteo(date(2026, 1, 15), eto=0.5):
+            self.env["cultiveau.meteo.jour"].actualiser({p1._station()}, date(2026, 1, 15))
+        p1.calculer_bilan(date(2026, 1, 15))
+        self.assertEqual(p1.etat_eau, "hors_saison")
+        self.assertIn("Hors saison", str(self.agri.cultiveau_conseil_eau))

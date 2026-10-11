@@ -22,6 +22,14 @@
                     <div class="alert alert-danger mb-2" role="status" invisible="not cultiveau_alertes_parcelles">
                         <field name="cultiveau_alertes_parcelles" class="oe_inline"/> alerte(s) satellite à traiter : voir les parcelles en rouge.
                     </div>
+                    <div class="mb-2" invisible="not cultiveau_conseil_eau">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <b>Conseil d'irrigation</b>
+                            <button name="action_actualiser_eau" type="object" string="Actualiser la météo" icon="fa-cloud" class="btn-link btn-sm"/>
+                            <button name="action_noter_arrosage" type="object" string="Noter un arrosage" icon="fa-tint" class="btn-link btn-sm"/>
+                        </div>
+                        <field name="cultiveau_conseil_eau" nolabel="1"/>
+                    </div>
                     <div class="row" invisible="not cultiveau_carte_parcelles">
                         <div class="col-md-6"><b>Cultures</b><field name="cultiveau_carte_parcelles" nolabel="1"/></div>
                         <div class="col-md-6" invisible="not cultiveau_carte_ndvi"><b>Vigueur (NDVI, dernière image)</b><field name="cultiveau_carte_ndvi" nolabel="1"/></div>

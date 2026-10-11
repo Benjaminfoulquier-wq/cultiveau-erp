@@ -16,6 +16,8 @@
                 <field name="dernier_ndwi" optional="show" invisible="not derniere_mesure"/>
                 <field name="derniere_mesure" optional="show"/>
                 <field name="etat" widget="badge" decoration-danger="etat == 'alerte'" decoration-success="etat == 'ok'"/>
+                <field name="etat_eau" widget="badge" decoration-danger="etat_eau == 'arroser'" decoration-warning="etat_eau == 'bientot'" decoration-success="etat_eau == 'ok'" optional="show"/>
+                <field name="conseil" optional="show"/>
             </list>
         </field>
     </record>
@@ -59,6 +61,34 @@
                         </group>
                     </group>
                     <notebook>
+                        <page string="Eau" name="eau">
+                            <div class="d-flex flex-wrap gap-2 mb-2">
+                                <button name="action_actualiser_eau" type="object" string="Actualiser la météo et le bilan" icon="fa-cloud" class="btn-secondary"/>
+                                <button name="action_noter_arrosage" type="object" string="Noter un arrosage" icon="fa-tint" class="btn-primary"/>
+                            </div>
+                            <group>
+                                <group>
+                                    <field name="etat_eau" widget="badge" decoration-danger="etat_eau == 'arroser'" decoration-warning="etat_eau == 'bientot'" decoration-success="etat_eau == 'ok'"/>
+                                    <field name="conseil"/>
+                                    <field name="dose_mm" invisible="not dose_mm"/>
+                                    <field name="volume_m3" invisible="not volume_m3"/>
+                                    <field name="date_limite" invisible="not date_limite"/>
+                                </group>
+                                <group>
+                                    <field name="deficit_mm"/>
+                                    <field name="rfu_mm"/>
+                                    <field name="derniere_meteo"/>
+                                </group>
+                            </group>
+                            <field name="bilan_eau" nolabel="1"/>
+                            <field name="apport_ids">
+                                <list editable="bottom">
+                                    <field name="date"/>
+                                    <field name="mm"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
                         <page string="Alertes" name="alertes">
                             <field name="alerte_ids">
                                 <list create="0">
@@ -98,6 +128,7 @@
                 <field name="culture_id"/>
                 <field name="code_id"/>
                 <filter name="a_verifier" string="À vérifier" domain="[('etat', '=', 'alerte')]"/>
+                <filter name="a_arroser" string="À arroser" domain="[('etat_eau', 'in', ('arroser', 'bientot'))]"/>
                 <filter name="sans_culture" string="Culture à relier" domain="[('culture_id', '=', False), ('code_id.sans_culture', '=', False)]"/>
                 <group expand="0" string="Regrouper par">
                     <filter name="par_client" string="Client" context="{'group_by': 'partner_id'}"/>

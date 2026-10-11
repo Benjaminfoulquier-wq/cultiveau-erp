@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_apport_assistant_form" model="ir.ui.view">
+        <field name="name">cultiveau.apport.assistant.form</field>
+        <field name="model">cultiveau.apport.assistant</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="partner_id" invisible="1"/>
+                    <field name="parcelle_ids" widget="many2many_tags"/>
+                    <field name="date"/>
+                    <field name="mm"/>
+                    <field name="note"/>
+                </group>
+                <footer>
+                    <button name="action_noter" type="object" string="Noter" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
