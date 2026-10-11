@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- À chaque mise à jour : la mise en page Cultiveau, la couleur, les CGV et la signature en ligne pour les sociétés qui n'ont rien choisi. -->
+    <function model="res.company" name="cultiveau_mise_en_page"/>
+</odoo>

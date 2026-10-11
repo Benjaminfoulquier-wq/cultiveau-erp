@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_cultiveau" inherit_id="account.report_invoice_document" name="Cultiveau : facture">
+        <xpath expr="//div[@id='payment_term']" position="inside">
+            <t t-set="mentions" t-value="o.cultiveau_mentions_legales()"/>
+            <p t-if="mentions" class="text-muted mt-2" style="font-size: 9px;" name="mentions_cultiveau" t-out="mentions"/>
+        </xpath>
+    </template>
+</odoo>

@@ -42,8 +42,23 @@ class ResCompany(models.Model):
             except UserError:
                 continue
         self.sudo().search([("partner_id.country_id", "=", False)]).write({"country_id": france.id})
-        if self.env["res.lang"].sudo().search_count([("code", "=", "fr_FR"), ("active", "=", True)]):
-            self.env["res.users"].sudo().search([("share", "=", False), ("lang", "!=", "fr_FR")]).write({"lang": "fr_FR"})
+        # les listes de prix aussi : c'est leur devise qui fait celle du devis
+        Liste = self.env.get("product.pricelist")
+        if Liste is not None:
+            Liste.sudo().with_context(active_test=False).search([("currency_id", "!=", euro.id)]).write({"currency_id": euro.id})
+        Devis = self.env.get("sale.order")
+        if Devis is not None:  # les devis en cours suivent leur liste de prix ; les commandes confirmées ne bougent pas
+            en_cours = Devis.sudo().search([("state", "in", ("draft", "sent")), ("currency_id", "!=", euro.id)])
+            self.env.add_to_compute(Devis._fields["currency_id"], en_cours)
+            en_cours.modified(["pricelist_id"])
+        # tout le monde en français : utilisateurs, nouveaux utilisateurs, clients (c'est la langue des devis et des e-mails)
+        Langue = self.env["res.lang"].sudo()
+        if not Langue.search_count([("code", "=", "fr_FR"), ("active", "=", True)]):
+            Langue._activate_lang("fr_FR")
+            modules = self.env["ir.module.module"].sudo().search([("state", "=", "installed")])
+            modules._update_translations("fr_FR")
+        self.env["res.users"].sudo().with_context(active_test=False).search([("lang", "!=", "fr_FR")]).write({"lang": "fr_FR"})
+        self.env["res.partner"].sudo().with_context(active_test=False).search([("lang", "!=", "fr_FR")]).write({"lang": "fr_FR"})
 
     def cultiveau_liens(self):
         """Les adresses de l'entreprise dans chaque outil du réseau, d'après les réglages généraux."""

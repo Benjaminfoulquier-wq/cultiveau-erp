@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="modele_mail_devis" model="mail.template">
+            <field name="name">Cultiveau : envoi du devis</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">{{ object.company_id.name }} — votre devis {{ object.name }}</field>
+            <field name="email_from">{{ (object.user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="report_template_ids" eval="[(4, ref('sale.action_report_saleorder'))]"/>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5;">
+    <p>Bonjour <t t-out="object.partner_id.name or ''"/>,</p>
+    <p>Veuillez trouver ci-joint votre devis <strong t-out="object.name"/>
+        <t t-if="object.cultiveau_installation_id"> pour <t t-out="object.cultiveau_installation_id.name"/></t>,
+        d'un montant de <strong t-out="format_amount(object.amount_total, object.currency_id)"/> TTC.</p>
+    <p t-if="object.cultiveau_acompte_pct">Il est valable <t t-if="object.validity_date">jusqu'au <t t-out="format_date(object.validity_date)"/></t><t t-else="">30 jours</t> ;
+        un acompte de <t t-out="int(object.cultiveau_acompte_pct)"/> % est demandé à la commande.</p>
+    <p t-if="object.require_signature" style="margin: 18px 0;">
+        <a t-att-href="object.get_base_url() + object.get_portal_url()"
+           style="background: #0b8aa3; color: #ffffff; padding: 10px 18px; border-radius: 4px; text-decoration: none; font-weight: 600;">Voir et signer le devis en ligne</a>
+    </p>
+    <p>Je reste à votre disposition pour en parler.</p>
+    <p>Bien cordialement,<br/>
+        <t t-out="object.user_id.name or object.company_id.name"/><t t-if="object.user_id.phone"> — <t t-out="object.user_id.phone"/></t><br/>
+        <t t-out="object.company_id.name"/><t t-if="object.company_id.cultiveau_mention_reseau">, membre du réseau Cultiveau</t></p>
+</div>
+            </field>
+        </record>
+
+        <record id="modele_mail_relance_devis" model="mail.template">
+            <field name="name">Cultiveau : relance d'un devis</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">{{ object.company_id.name }} — avez-vous pu regarder le devis {{ object.name }} ?</field>
+            <field name="email_from">{{ (object.user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="report_template_ids" eval="[(4, ref('sale.action_report_saleorder'))]"/>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5;">
+    <p>Bonjour <t t-out="object.partner_id.name or ''"/>,</p>
+    <p>Je me permets de revenir vers vous au sujet du devis <strong t-out="object.name"/>
+        (<t t-out="format_amount(object.amount_total, object.currency_id)"/> TTC) que je vous ai envoyé
+        <t t-if="object.cultiveau_envoye_le">le <t t-out="format_date(object.cultiveau_envoye_le)"/></t>.
+        Il est joint à nouveau à ce message.</p>
+    <p>Avez-vous des questions, ou un point à ajuster ? Un appel suffit : je peux aussi passer vous voir sur place.</p>
+    <p t-if="object.require_signature" style="margin: 18px 0;">
+        <a t-att-href="object.get_base_url() + object.get_portal_url()"
+           style="background: #0b8aa3; color: #ffffff; padding: 10px 18px; border-radius: 4px; text-decoration: none; font-weight: 600;">Voir et signer le devis en ligne</a>
+    </p>
+    <p>Bien cordialement,<br/>
+        <t t-out="object.user_id.name or object.company_id.name"/><t t-if="object.user_id.phone"> — <t t-out="object.user_id.phone"/></t><br/>
+        <t t-out="object.company_id.name"/></p>
+</div>
+            </field>
+        </record>
+
+        <record id="modele_mail_facture" model="mail.template">
+            <field name="name">Cultiveau : envoi de la facture</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="subject">{{ object.company_id.name }} — facture {{ object.name }}</field>
+            <field name="email_from">{{ (object.invoice_user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5;">
+    <p>Bonjour <t t-out="object.partner_id.name or ''"/>,</p>
+    <p>Veuillez trouver ci-joint la facture <strong t-out="object.name"/>
+        d'un montant de <strong t-out="format_amount(object.amount_total, object.currency_id)"/> TTC<t t-if="object.invoice_origin">, relative à <t t-out="object.invoice_origin"/></t>.
+        <t t-if="object.invoice_date_due">Elle est payable avant le <strong t-out="format_date(object.invoice_date_due)"/>.</t></p>
+    <p t-if="object.partner_bank_id">Règlement par virement sur le compte <t t-out="object.partner_bank_id.acc_number"/>, en rappelant la référence <t t-out="object.name"/>.</p>
+    <p>Merci de votre confiance.</p>
+    <p>Bien cordialement,<br/><t t-out="object.company_id.name"/><t t-if="object.company_id.cultiveau_mention_reseau">, membre du réseau Cultiveau</t></p>
+</div>
+            </field>
+        </record>
+
+        <record id="modele_mail_relance_facture" model="mail.template">
+            <field name="name">Cultiveau : rappel d'une facture</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="subject">{{ object.company_id.name }} — rappel : facture {{ object.name }} échue le {{ format_date(object.invoice_date_due) }}</field>
+            <field name="email_from">{{ (object.invoice_user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="report_template_ids" eval="[(4, ref('account.account_invoices'))]"/>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5;">
+    <p>Bonjour <t t-out="object.partner_id.name or ''"/>,</p>
+    <p>Sauf erreur de notre part, la facture <strong t-out="object.name"/> du <t t-out="format_date(object.invoice_date)"/>,
+        d'un montant restant dû de <strong t-out="format_amount(object.amount_residual, object.currency_id)"/>, était payable le
+        <t t-out="format_date(object.invoice_date_due)"/> et n'a pas encore été réglée. Elle est jointe à ce message.</p>
+    <p>Si le règlement est parti entre-temps, merci de ne pas tenir compte de ce rappel. Sinon, nous vous remercions de le faire
+        <t t-if="object.partner_bank_id">par virement sur le compte <t t-out="object.partner_bank_id.acc_number"/> </t>dans les meilleurs délais,
+        ou de nous appeler si quelque chose pose question.</p>
+    <p>Bien cordialement,<br/><t t-out="object.company_id.name"/></p>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>

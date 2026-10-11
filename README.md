@@ -20,6 +20,7 @@ CRM, stocks, achats, e-mailing, projets, contacts et portail client. Les modules
 | `cultiveau_comptoir` | La vente au comptoir : scan de l'article, panier, devis, commande ou encaissement immédiat avec ticket |
 | `cultiveau_terrain` | Le terrain : « Ma journée » sur le téléphone, planning des techniciens, bon d'intervention signé sur place → facture, stock camion et réassort, contrats d'entretien (hivernage, remise en route, visites) avec interventions automatiques, garanties, avis du client |
 | `cultiveau_api` | Les clés d'API : REST (OpenAPI) et connecteur MCP pour Claude, en lecture ou écriture, limitées aux adhérents choisis |
+| `cultiveau_documents` | Devis et factures au nom de l'adhérent : mise en page à sa marque, acompte, bon pour accord, signature en ligne, CGV, mentions légales, e-mails en français, relances automatiques |
 | `cultiveau_site` | La liaison avec cultiveau.fr : clients, interventions, chantiers et bons de l'espace adhérent récupérés chaque heure |
 
 Pourquoi ces modules et pas d'autres : [docs/ANALYSE-ODOO-IRRIGATION.md](docs/ANALYSE-ODOO-IRRIGATION.md).

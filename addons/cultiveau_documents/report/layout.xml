@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- La mise en page « Cultiveau » : le logo et la couleur de l'adhérent, ses coordonnées, « membre du réseau Cultiveau » en pied. -->
+    <template id="external_layout_cultiveau">
+        <t t-set="couleur" t-value="company.primary_color or '#0b8aa3'"/>
+        <t t-set="sombre" t-value="company.secondary_color or '#183840'"/>
+        <div t-attf-class="header o_company_#{company.id}_layout">
+            <div class="d-flex justify-content-between align-items-end pb-2" t-attf-style="border-bottom: 3px solid {{couleur}};">
+                <div>
+                    <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-height: 56px; max-width: 220px;"/>
+                    <div t-else="" t-attf-style="font-size: 20px; font-weight: 700; color: {{sombre}};" t-esc="company.name"/>
+                </div>
+                <div class="text-end" style="font-size: 10px; line-height: 1.35;">
+                    <div t-attf-style="font-weight: 700; font-size: 12px; color: {{sombre}};" t-esc="company.name"/>
+                    <div t-if="company.street" t-esc="company.street"/>
+                    <div t-if="company.street2" t-esc="company.street2"/>
+                    <div><t t-esc="company.zip or ''"/> <t t-esc="company.city or ''"/></div>
+                    <div t-if="company.phone">Tél. <t t-esc="company.phone"/></div>
+                    <div t-if="company.email" t-esc="company.email"/>
+                </div>
+            </div>
+        </div>
+
+        <div t-attf-class="article o_report_layout_standard o_table_standard o_company_#{company.id}_layout o_snail_mail"
+             t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
+            <t t-call="web.address_layout"/>
+            <h2 t-attf-style="color: {{sombre}};" t-out="layout_document_title"/>
+            <t t-out="0"/>
+        </div>
+
+        <div t-attf-class="footer o_company_#{company.id}_layout {{report_type != 'pdf' and 'mt-auto'}}">
+            <div class="d-flex align-items-center pt-2" t-attf-style="border-top: 1px solid {{couleur}}; font-size: 9px; color: #555;">
+                <div class="flex-grow-1">
+                    <div t-if="company.report_footer and not is_html_empty(company.report_footer)" t-field="company.report_footer"/>
+                    <div t-else="" t-esc="company.cultiveau_ligne_legale()"/>
+                    <div t-if="company.cultiveau_mention_reseau" t-attf-style="color: {{couleur}}; font-weight: 600; margin-top: 2px;">
+                        <img src="/cultiveau_marque/static/src/img/logo.png" alt="Cultiveau" style="height: 11px; vertical-align: middle; margin-right: 4px;"/>
+                        Membre du réseau Cultiveau — l'alliance des indépendants de l'irrigation · cultiveau.fr
+                    </div>
+                </div>
+                <div class="text-end text-nowrap ps-3">
+                    <div t-if="report_type == 'pdf' and display_name_in_footer" t-out="o.name"/>
+                    <div t-if="report_type == 'pdf'">Page <span class="page"/> / <span class="topage"/></div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <record id="report_layout_cultiveau" model="report.layout">
+        <field name="name">Cultiveau</field>
+        <field name="sequence">1</field>
+        <field name="view_id" ref="external_layout_cultiveau"/>
+        <field name="image">/web/static/img/preview_standard.png</field>
+    </record>
+</odoo>

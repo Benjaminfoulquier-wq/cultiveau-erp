@@ -37,8 +37,10 @@
 1. **Mise en route d'un adhérent en dix minutes.** Un assistant « Nouvel adhérent » : raison sociale, SIRET, logo, utilisateurs,
    numéro dédié de l'assistant, puis import de ses clients et de ses articles dans la foulée. Aujourd'hui ces étapes existent mais
    séparément, dans les réglages.
-2. **Devis et factures au nom de l'adhérent.** Modèle PDF propre (logo et couleurs de l'adhérent, mention « membre du réseau
-   Cultiveau »), conditions générales, acompte, signature en ligne du devis, relances automatiques des devis sans réponse.
+2. **Devis et factures au nom de l'adhérent.** Fait : mise en page « Cultiveau » (logo et couleur de l'adhérent, « membre du
+   réseau Cultiveau » en pied), devis avec le projet, l'acompte, le bon pour accord et les CGV en dernière page, signature en ligne,
+   facture d'acompte en un clic, mentions légales des factures, e-mails en français, relances automatiques des devis sans réponse et
+   des factures en retard puis activité « appeler le client ». Reste : le paiement en ligne (fournisseur de paiement à choisir).
 3. **Tarifs et marges.** Les prix négociés par Cultiveau chez chaque fournisseur (import du tarif fournisseur Excel/PDF, mise à jour
    annuelle), la marge cible par adhérent, le prix de vente proposé automatiquement ; alerte quand un fournisseur change ses prix.
 4. **Stock et achats.** Inventaire initial depuis le fichier d'articles (la colonne « stock » est lue, pas encore importée), stock

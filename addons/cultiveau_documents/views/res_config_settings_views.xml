@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_documents" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.documents</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Devis et factures" name="cultiveau_documents">
+                    <setting string="Acompte à la commande" help="Le pourcentage proposé sur chaque devis ; la facture d'acompte se fait en un clic.">
+                        <div class="mt8"><field name="cultiveau_acompte_pct" class="oe_inline" style="width: 4rem;"/> % du devis TTC, demandés à la commande</div>
+                        <div class="mt8"><field name="cultiveau_mention_reseau"/><label for="cultiveau_mention_reseau"/></div>
+                        <div class="mt8 text-muted">Logo et couleur : Réglages → Mise en page des documents.</div>
+                    </setting>
+                    <setting string="Relances automatiques" help="Les devis envoyés sans réponse et les factures échues sont relancés par e-mail, puis une activité « appeler le client » est créée.">
+                        <div class="mt8"><field name="cultiveau_relances_devis"/><label for="cultiveau_relances_devis"/></div>
+                        <div class="row mt8" invisible="not cultiveau_relances_devis">
+                            <label for="cultiveau_relance_devis_jours" class="col-lg-4 o_light_label"/><field name="cultiveau_relance_devis_jours" style="width: 4rem;"/>
+                            <label for="cultiveau_relance_devis_max" class="col-lg-4 o_light_label"/><field name="cultiveau_relance_devis_max" style="width: 4rem;"/>
+                        </div>
+                        <div class="mt8"><field name="cultiveau_relances_factures"/><label for="cultiveau_relances_factures"/></div>
+                        <div class="row mt8" invisible="not cultiveau_relances_factures">
+                            <label for="cultiveau_relance_facture_jours" class="col-lg-4 o_light_label"/><field name="cultiveau_relance_facture_jours" style="width: 4rem;"/>
+                            <label for="cultiveau_relance_facture_max" class="col-lg-4 o_light_label"/><field name="cultiveau_relance_facture_max" style="width: 4rem;"/>
+                        </div>
+                    </setting>
+                    <setting id="cgv_cultiveau" help="Imprimées en dernière page de chaque devis. Le texte proposé est un modèle : faites-le relire avant de l'utiliser." class="col-12">
+                        <span class="o_form_label">Conditions générales de vente</span>
+                        <field name="cultiveau_cgv" class="oe_inline mt8" nolabel="1"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

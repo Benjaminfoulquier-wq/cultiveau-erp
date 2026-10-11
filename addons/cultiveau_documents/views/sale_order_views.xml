@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_documents" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau.documents</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_cancel']" position="before">
+                <button name="action_facture_acompte" type="object" string="Facture d'acompte" class="btn-primary"
+                        invisible="state != 'sale' or cultiveau_acompte_facture or not cultiveau_acompte_pct or invoice_status == 'invoiced'"/>
+                <button name="action_relancer" type="object" string="Relancer" invisible="state != 'sent'"/>
+            </xpath>
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <label for="cultiveau_acompte_pct"/>
+                <div class="o_row">
+                    <field name="cultiveau_acompte_pct" style="width: 4rem;" readonly="state not in ('draft', 'sent')"/> %, soit
+                    <field name="cultiveau_acompte_montant"/>
+                </div>
+                <field name="cultiveau_acompte_facture" invisible="1"/>
+                <field name="cultiveau_envoye_le" invisible="not cultiveau_envoye_le"/>
+                <field name="cultiveau_relances" invisible="not cultiveau_relances"/>
+            </xpath>
+        </field>
+    </record>
+    <record id="view_sales_order_filter_documents" model="ir.ui.view">
+        <field name="name">sale.order.search.cultiveau.documents</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <filter name="relances" string="Relancés sans réponse" domain="[('state', '=', 'sent'), ('cultiveau_relances', '>', 0)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
