@@ -70,8 +70,14 @@ class ApiMoteur(models.AbstractModel):
 
     # ---------------------------------------------------------------- les droits de la clé
 
+    def _par_utilisateur(self, cle):
+        """Sans clé et hors de l'API (appel depuis l'ERP : assistant, écran), on travaille avec les droits de la personne connectée."""
+        return not cle and not self.env.su
+
     def _societes(self, cle):
-        """Les sociétés que la clé peut voir : celles de la clé, sinon tout le réseau."""
+        """Les sociétés visibles : celles de la clé ; celles où la personne connectée travaille ; sinon (API sans restriction) tout le réseau."""
+        if self._par_utilisateur(cle):
+            return self.env.companies
         return cle.company_ids if cle and cle.company_ids else self.env["res.company"].sudo().search([])
 
     def _domaine_societe(self, reglages, modele, cle):
@@ -90,11 +96,14 @@ class ApiMoteur(models.AbstractModel):
             raise AccessError("Cette clé est en lecture seule.")
 
     def _env(self, cle):
-        """Le superutilisateur, sur les sociétés de la clé : les règles d'accès sont remplacées par le filtre des adhérents."""
+        """Pour l'API : le superutilisateur, sur les sociétés de la clé (les règles d'accès sont remplacées par le filtre des adhérents).
+        Depuis l'ERP : la personne connectée, avec ses propres droits."""
         societes = self._societes(cle)
         contexte = {"allowed_company_ids": societes.ids, "active_test": True}
         if self.env["res.lang"].sudo().search_count([("code", "=", "fr_FR"), ("active", "=", True)]):
             contexte["lang"] = "fr_FR"
+        if self._par_utilisateur(cle):
+            return self.with_context(**contexte).env
         return self.sudo().with_context(**contexte).env
 
     # ---------------------------------------------------------------- lire

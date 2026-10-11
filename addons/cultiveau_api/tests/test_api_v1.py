@@ -1,6 +1,6 @@
 import json
 
-from odoo.tests import HttpCase, tagged
+from odoo.tests import HttpCase, TransactionCase, tagged
 
 
 @tagged("post_install", "-at_install", "cultiveau")
@@ -123,3 +123,16 @@ class TestApiV1(HttpCase):
                 self.assertEqual(fiche["id"], liste["resultats"][0]["id"], ressource)
         self.assertEqual(moteur.lire("chantiers", chantier.id)["titre"], "Pose API")
         self.assertIn("pv", moteur.lire("chantiers", chantier.id))
+
+
+@tagged("post_install", "-at_install")
+class TestMoteurDepuisLErp(TransactionCase):
+    def test_sans_cle_un_utilisateur_garde_ses_droits(self):
+        """Appelé depuis l'ERP (et non par l'API), le moteur ne passe pas en super-utilisateur."""
+        autre = self.env["res.company"].create({"name": "Adhérent voisin du moteur"})
+        self.env["res.partner"].create({"name": "Client caché du voisin", "company_id": autre.id, "cultiveau_type": "agriculteur"})
+        vendeur = self.env["res.users"].create({"name": "Vendeur du moteur", "login": "vendeur.moteur@exemple.fr", "company_id": self.env.company.id,
+                                                "company_ids": [(6, 0, self.env.company.ids)], "groups_id": [(6, 0, [self.env.ref("base.group_user").id])]})
+        moteur = self.env["cultiveau.api.moteur"].with_user(vendeur)
+        noms = [r["nom"] for r in moteur.lister("clients", {"q": "Client caché du voisin"})["resultats"]]
+        self.assertNotIn("Client caché du voisin", noms)
