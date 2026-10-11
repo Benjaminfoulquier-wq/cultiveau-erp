@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_adhesion_equipe,cultiveau.adhesion équipe,model_cultiveau_adhesion,cultiveau_base.group_equipe,1,1,1,1
+access_adhesion_utilisateur_equipe,cultiveau.adhesion.utilisateur équipe,model_cultiveau_adhesion_utilisateur,cultiveau_base.group_equipe,1,1,1,1

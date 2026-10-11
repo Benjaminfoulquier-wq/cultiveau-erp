@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_adhesion_list" model="ir.ui.view">
+        <field name="name">cultiveau.adhesion.list</field>
+        <field name="model">cultiveau.adhesion</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="etat"/>
+                <field name="progression" widget="progressbar"/>
+                <field name="create_date" string="Commencé le"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_adhesion_form" model="ir.ui.view">
+        <field name="name">cultiveau.adhesion.form</field>
+        <field name="model">cultiveau.adhesion</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_etape" type="object" string="Passer cette étape" invisible="etat == 'fini'"/>
+                    <button name="action_ouvrir_societe" type="object" string="Ouvrir la société" invisible="not company_id"/>
+                    <field name="etat" widget="statusbar" options="{'clickable': '1'}"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Raison sociale de l'adhérent"/></h1>
+                        <field name="progression" widget="progressbar"/>
+                    </div>
+                    <group>
+                        <group string="Où en est-on"><field name="bilan" nolabel="1" colspan="2"/></group>
+                        <group><field name="company_id" invisible="not company_id"/><field name="compta_en_place" invisible="1"/><field name="efacture_etat" invisible="1"/></group>
+                    </group>
+                    <!-- 1 -->
+                    <div invisible="etat != 'societe'">
+                        <h3>1. La société</h3>
+                        <p class="text-muted">Ce qui apparaît sur ses devis, ses factures et ses e-mails. Le SIRET sert à la comptabilité (FEC) et à la facture électronique.</p>
+                        <group>
+                            <group>
+                                <field name="siret"/>
+                                <field name="tva"/>
+                                <field name="street"/>
+                                <field name="zip"/>
+                                <field name="city"/>
+                            </group>
+                            <group>
+                                <field name="phone"/>
+                                <field name="email"/>
+                                <field name="website"/>
+                                <field name="logo" widget="image" options="{'size': [120, 60]}"/>
+                                <field name="couleur" widget="color"/>
+                            </group>
+                        </group>
+                        <button name="action_creer_societe" type="object" string="Créer la société" class="btn-primary" invisible="company_id"/>
+                        <button name="action_creer_societe" type="object" string="Enregistrer les changements" class="btn-secondary" invisible="not company_id"/>
+                    </div>
+                    <!-- 2 -->
+                    <div invisible="etat != 'utilisateurs'">
+                        <h3>2. Les utilisateurs</h3>
+                        <p class="text-muted">Chacun reçoit un e-mail pour choisir son mot de passe. Le rôle donne les bons droits : le gérant voit tout, le technicien ses chantiers et son stock, le comptable lit sans modifier.</p>
+                        <field name="utilisateur_ids">
+                            <list editable="bottom">
+                                <field name="name"/>
+                                <field name="email"/>
+                                <field name="role"/>
+                                <field name="user_id" readonly="1"/>
+                            </list>
+                        </field>
+                        <button name="action_inviter" type="object" string="Inviter les utilisateurs" class="btn-primary mt-2"/>
+                    </div>
+                    <!-- 3 -->
+                    <div invisible="etat != 'assistant'">
+                        <h3>3. L'assistant téléphonique</h3>
+                        <p class="text-muted">Le numéro dédié décroché par l'assistant et le numéro de l'adhérent dans l'assistant. Les appels et le CRM arrivent ensuite d'eux-mêmes dans l'ERP (clé commune réglée dans l'assistant).</p>
+                        <group>
+                            <field name="numero_dedie" placeholder="+33 5 00 00 00 00"/>
+                            <field name="assistant_id"/>
+                        </group>
+                        <button name="action_assistant" type="object" string="Enregistrer" class="btn-primary"/>
+                    </div>
+                    <!-- 4 -->
+                    <div invisible="etat != 'clients'">
+                        <h3>4. Ses clients</h3>
+                        <p class="text-muted">Un fichier Excel ou CSV : l'export de l'ancien logiciel, du comptable ou de l'assistant téléphonique. Les colonnes sont reconnues par leur intitulé ; un client déjà connu est complété, jamais dupliqué.</p>
+                        <group>
+                            <field name="fichier_clients" filename="nom_fichier_clients"/>
+                            <field name="nom_fichier_clients" invisible="1"/>
+                            <field name="type_client_defaut"/>
+                        </group>
+                        <field name="bilan_clients" nolabel="1"/>
+                        <button name="action_importer_clients" type="object" string="Importer les clients" class="btn-primary"/>
+                    </div>
+                    <!-- 5 -->
+                    <div invisible="etat != 'articles'">
+                        <h3>5. Ses articles</h3>
+                        <p class="text-muted">Son fichier d'articles (Excel ou CSV). Il pourra ensuite piocher dans le catalogue Cultiveau (« Ajouter à mon catalogue »).</p>
+                        <group>
+                            <field name="fichier_articles" filename="nom_fichier_articles"/>
+                            <field name="nom_fichier_articles" invisible="1"/>
+                        </group>
+                        <field name="bilan_articles" nolabel="1"/>
+                        <button name="action_importer_articles" type="object" string="Importer les articles" class="btn-primary"/>
+                    </div>
+                    <!-- 6 -->
+                    <div invisible="etat != 'compta'">
+                        <h3>6. La comptabilité</h3>
+                        <p class="text-muted">Le plan comptable français, les journaux et les modèles de rapprochement sont posés ; le comptable reçoit un accès en lecture seule.</p>
+                        <group>
+                            <field name="regime_tva"/>
+                            <field name="comptable_email" placeholder="cabinet@exemple.fr"/>
+                        </group>
+                        <button name="action_compta" type="object" string="Mettre en place" class="btn-primary"/>
+                    </div>
+                    <!-- 7 -->
+                    <div invisible="etat != 'efacture'">
+                        <h3>7. La facture électronique</h3>
+                        <p class="text-muted">L'inscription de la société sur la plateforme agréée : en démonstration pour s'entraîner, en réel pour recevoir et émettre. La double authentification doit être exigée (Réglages → Cultiveau).</p>
+                        <button name="action_efacture" type="object" string="Inscrire la société" class="btn-primary"/>
+                        <button name="action_terminer" type="object" string="Terminer sans inscrire pour l'instant" class="btn-secondary"/>
+                    </div>
+                    <!-- 8 -->
+                    <div invisible="etat != 'fini'">
+                        <h3>L'adhérent est prêt</h3>
+                        <p>Ses utilisateurs se connectent sur erp.cultiveau.fr avec l'e-mail reçu. Les étapes non faites restent accessibles en cliquant dessus en haut.</p>
+                    </div>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_adhesion" model="ir.actions.act_window">
+        <field name="name">Nouvel adhérent</field>
+        <field name="res_model">cultiveau.adhesion</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Un adhérent rejoint le réseau ?</p>
+            <p>Sa société, ses utilisateurs, son numéro d'assistant, ses clients, ses articles, sa comptabilité et la facture électronique : dix minutes, dans l'ordre.</p>
+        </field>
+    </record>
+    <menuitem id="menu_adhesion" name="Nouvel adhérent" parent="cultiveau_base.menu_cultiveau_reglages" action="action_adhesion" sequence="5"/>
+</odoo>

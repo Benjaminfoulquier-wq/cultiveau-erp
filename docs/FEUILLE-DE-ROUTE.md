@@ -14,6 +14,8 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Nouvel adhérent** : un seul écran, sept étapes dans l'ordre (société, utilisateurs, assistant téléphonique, clients, articles,
+  comptabilité, facture électronique), chacune rejouable ; l'adhérent travaille le soir même.
 - **Facture électronique** : chaque société s'inscrit sur la plateforme agréée depuis Réglages → Cultiveau (démonstration, puis
   réel), reçoit ses factures fournisseurs par la plateforme et y émettra les siennes à l'échéance de 2027 ; e-reporting du comptoir ;
   double authentification exigée d'un clic ; sauvegarde nocturne vérifiée, copiée hors serveur si un espace de stockage est fourni.
@@ -47,9 +49,9 @@
 
 ## À faire, dans l'ordre
 
-1. **Mise en route d'un adhérent en dix minutes.** Un assistant « Nouvel adhérent » : raison sociale, SIRET, logo, utilisateurs,
-   numéro dédié de l'assistant, puis import de ses clients et de ses articles dans la foulée. Aujourd'hui ces étapes existent mais
-   séparément, dans les réglages.
+1. **Mise en route d'un adhérent en dix minutes.** Fait : Réglages → Nouvel adhérent enchaîne la société (SIRET, logo, couleur),
+   les utilisateurs invités avec leur rôle, le numéro de l'assistant, l'import des clients et des articles, la comptabilité et le
+   comptable, l'inscription sur la plateforme agréée ; l'avancement se voit, chaque étape se rejoue.
 2. **Devis et factures au nom de l'adhérent.** Fait : mise en page « Cultiveau » (logo et couleur de l'adhérent, « membre du
    réseau Cultiveau » en pied), devis avec le projet, l'acompte, le bon pour accord et les CGV en dernière page, signature en ligne,
    facture d'acompte en un clic, mentions légales des factures, e-mails en français, relances automatiques des devis sans réponse et
