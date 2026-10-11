@@ -2,5 +2,6 @@
 <odoo>
     <menuitem id="menu_chantiers_racine" name="Chantiers" parent="cultiveau_base.menu_cultiveau_root" sequence="22"/>
     <menuitem id="menu_planning" name="Planning" parent="menu_chantiers_racine" action="action_planning" sequence="10"/>
+    <menuitem id="menu_planning_phases" name="Planning des équipes de pose" parent="menu_chantiers_racine" action="action_planning_phases" sequence="15"/>
     <menuitem id="menu_chantiers" name="Tous les chantiers" parent="menu_chantiers_racine" action="action_chantiers" sequence="20"/>
 </odoo>

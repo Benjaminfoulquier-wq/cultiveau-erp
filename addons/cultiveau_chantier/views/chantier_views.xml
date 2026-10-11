@@ -9,6 +9,8 @@
                     <button name="action_planifier" type="object" string="Planifier" class="btn-primary" invisible="etat != 'brouillon'"/>
                     <button name="action_demarrer" type="object" string="Démarrer le chantier" class="btn-primary" invisible="etat != 'planifie'"/>
                     <button name="action_sortir_materiel" type="object" string="Sortir le matériel du magasin" invisible="etat not in ('planifie', 'en_cours') or picking_id"/>
+                    <button name="action_pointer" type="object" string="Pointer mes heures" invisible="etat != 'en_cours'"/>
+                    <button name="action_retour_materiel" type="object" string="Retour du matériel non posé" invisible="etat not in ('en_cours', 'termine') or not picking_id or retour_picking_id"/>
                     <button name="action_mise_en_service" type="object" string="Mettre en service (PV A1.3)" class="btn-primary" invisible="etat != 'en_cours' or mise_en_service_le"/>
                     <button name="action_terminer" type="object" string="Terminer" class="btn-primary" invisible="etat != 'en_cours' or not mise_en_service_le"/>
                     <button name="action_terminer" type="object" string="Terminer avec réserves" invisible="etat != 'en_cours' or mise_en_service_le"/>
@@ -24,6 +26,9 @@
                         <button name="action_voir_photos" type="object" class="oe_stat_button" icon="fa-camera">
                             <div class="o_stat_info"><span class="o_stat_value"><field name="nb_photos"/></span><span class="o_stat_text">Photos</span></div>
                         </button>
+                    </div>
+                    <div class="alert alert-warning" role="alert" invisible="not conflits">
+                        <i class="fa fa-exclamation-triangle"/> Équipe déjà prise ailleurs aux mêmes dates : <field name="conflits" readonly="1" class="oe_inline"/>
                     </div>
                     <widget name="web_ribbon" title="Mis en service" bg_color="text-bg-success" invisible="not mise_en_service_le"/>
                     <div class="oe_title">
@@ -65,6 +70,54 @@
                                 </list>
                             </field>
                             <field name="machines" placeholder="Trancheuse, mini-pelle, dérouleuse…"/>
+                        </page>
+                        <page string="Phases et heures" name="phases">
+                            <field name="phase_ids">
+                                <list editable="bottom" decoration-danger="depassement" decoration-muted="etat == 'termine'">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="date_debut"/>
+                                    <field name="date_fin"/>
+                                    <field name="user_ids" widget="many2many_avatar_user"/>
+                                    <field name="heures_prevues" sum="Prévu"/>
+                                    <field name="heures_reelles" sum="Pointé"/>
+                                    <field name="etat" widget="badge" decoration-info="etat == 'en_cours'" decoration-success="etat == 'termine'"/>
+                                    <field name="depassement" column_invisible="True"/>
+                                </list>
+                            </field>
+                            <field name="pointage_ids">
+                                <list editable="top">
+                                    <field name="date"/>
+                                    <field name="user_id" widget="many2one_avatar_user"/>
+                                    <field name="phase_id"/>
+                                    <field name="heures" sum="Heures"/>
+                                    <field name="note"/>
+                                    <field name="cout" sum="Coût" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Rentabilité" name="rentabilite">
+                            <group>
+                                <group string="Vendu">
+                                    <field name="ca_ht"/>
+                                </group>
+                                <group string="Réel">
+                                    <field name="cout_materiel"/>
+                                    <field name="cout_main_oeuvre"/>
+                                    <field name="heures_prevues"/>
+                                    <field name="heures_reelles"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group>
+                                    <field name="marge" decoration-danger="marge &lt; 0" decoration-success="marge &gt; 0"/>
+                                    <field name="marge_pct" decoration-danger="marge_pct &lt; 15"/>
+                                </group>
+                                <group>
+                                    <field name="retour_picking_id"/>
+                                </group>
+                            </group>
+                            <div class="text-muted">Matériel posé au coût d'achat ; main-d'œuvre au coût horaire d'un poseur réglé sur la société de l'adhérent.</div>
                         </page>
                         <page string="Préparation et accès" name="preparation">
                             <group>
@@ -204,6 +257,62 @@
             <p class="o_view_nocontent_smiling_face">Pas encore de chantier</p>
             <p>Un chantier se lance depuis une commande (« Lancer le chantier ») ou depuis une installation. Il porte l'équipe, les dates, le matériel sorti du magasin, les photos et le PV de mise en service.</p>
         </field>
+    </record>
+
+    <record id="view_pointage_form" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.pointage.form</field>
+        <field name="model">cultiveau.chantier.pointage</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="chantier_id" readonly="1"/>
+                    <field name="phase_id"/>
+                    <field name="user_id"/>
+                    <field name="date"/>
+                    <field name="heures" widget="float_time"/>
+                    <field name="note"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_phase_calendar" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.phase.calendar</field>
+        <field name="model">cultiveau.chantier.phase</field>
+        <field name="arch" type="xml">
+            <calendar date_start="date_debut" date_stop="date_fin" mode="month" color="chantier_id" quick_create="false">
+                <field name="chantier_id"/>
+                <field name="partner_id"/>
+                <field name="etat"/>
+                <field name="user_ids" widget="many2many_avatar_user" filters="1" avatar_field="avatar_128"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_phase_list" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.phase.list</field>
+        <field name="model">cultiveau.chantier.phase</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="depassement">
+                <field name="chantier_id"/>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="user_ids" widget="many2many_avatar_user"/>
+                <field name="heures_prevues" sum="Prévu"/>
+                <field name="heures_reelles" sum="Pointé"/>
+                <field name="etat"/>
+                <field name="depassement" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_planning_phases" model="ir.actions.act_window">
+        <field name="name">Planning des équipes de pose</field>
+        <field name="res_model">cultiveau.chantier.phase</field>
+        <field name="view_mode">calendar,list</field>
+        <field name="domain">[('chantier_id.etat', 'in', ('planifie', 'en_cours'))]</field>
     </record>
 
     <record id="action_planning" model="ir.actions.act_window">

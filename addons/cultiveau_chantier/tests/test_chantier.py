@@ -91,3 +91,32 @@ class TestChantier(TransactionCase):
         self.assertEqual((mien["etat"], mien["equipe"], mien["chef"]), ("en_cours", 1, self.env.user.name))
         self.assertNotIn(chantier.installation_id.id, [i["id"] for i in d["chantiers"]["installations"]])
         self.assertGreaterEqual(d["compteurs"]["chantiers"], 1)
+
+    def test_phases_heures_rentabilite_retour(self):
+        chantier = self.env["cultiveau.chantier"].browse(self.commande.action_lancer_chantier()["res_id"])
+        self.assertEqual(len(chantier.phase_ids), 4, "les phases type sont créées")
+        self.tube.standard_price = 2.0
+        self.env.company.cultiveau_taux_horaire_cout = 40
+        pose = chantier.phase_ids[1]
+        pose.heures_prevues = 10
+        chantier.write({"date_debut": "2026-10-20", "date_fin": "2026-10-24", "equipe_ids": [(4, self.poseur.id)]})
+        chantier.action_planifier()
+        chantier.action_demarrer()
+        chantier.action_sortir_materiel()
+        chantier.picking_id.move_ids.quantity = 120
+        chantier.picking_id.move_ids.picked = True
+        chantier.picking_id.button_validate()
+        self.env["cultiveau.chantier.pointage"].create({"chantier_id": chantier.id, "phase_id": pose.id, "user_id": self.poseur.id, "heures": 12})
+        self.assertEqual((pose.heures_reelles, pose.depassement, chantier.heures_reelles), (12, True, 12))
+        chantier.ligne_ids.quantite_posee = 100
+        self.assertEqual(chantier.ca_ht, self.commande.amount_untaxed)
+        self.assertEqual((chantier.cout_materiel, chantier.cout_main_oeuvre), (200.0, 480.0))
+        self.assertAlmostEqual(chantier.marge, self.commande.amount_untaxed - 680)
+        # le matériel non posé revient au dépôt
+        retour = self.env["stock.picking"].browse(chantier.action_retour_materiel()["res_id"])
+        self.assertEqual((retour.move_ids.product_id, retour.move_ids.product_uom_qty), (self.tube, 20))
+        # le même poseur sur un autre chantier aux mêmes dates : conflit signalé
+        autre = self.env["cultiveau.chantier"].create({"titre": "Autre pose", "installation_id": chantier.installation_id.id, "company_id": self.societe.id,
+                                                       "date_debut": "2026-10-22", "date_fin": "2026-10-23", "equipe_ids": [(4, self.poseur.id)]})
+        autre.action_planifier()
+        self.assertIn("Poseur Chantier", autre.conflits)
