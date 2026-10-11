@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cloture_list" model="ir.ui.view">
+        <field name="name">cultiveau.cloture.list</field>
+        <field name="model">cultiveau.cloture</field>
+        <field name="arch" type="xml">
+            <list><field name="name"/><field name="date_debut"/><field name="date_fin"/><field name="resultat"/><field name="etat" widget="badge" decoration-success="etat == 'cloturee'"/><field name="company_id" groups="base.group_multi_company"/></list>
+        </field>
+    </record>
+    <record id="view_cloture_form" model="ir.ui.view">
+        <field name="name">cultiveau.cloture.form</field>
+        <field name="model">cultiveau.cloture</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_cloturer" type="object" string="Clôturer l'exercice" class="btn-primary" invisible="etat == 'cloturee'"
+                            confirm="Les comptes de charges et de produits sont soldés dans le résultat (120 ou 129) et l'exercice est verrouillé. À faire après la révision du comptable. Continuer ?"/>
+                    <button name="action_rouvrir" type="object" string="Rouvrir" invisible="etat != 'cloturee'" groups="account.group_account_manager"/>
+                    <field name="etat" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1><field name="name"/></h1>
+                    <group>
+                        <group><field name="company_id" groups="base.group_multi_company"/><field name="date_debut" readonly="etat == 'cloturee'"/><field name="date_fin" readonly="etat == 'cloturee'"/></group>
+                        <group><field name="resultat"/><field name="move_id"/></group>
+                    </group>
+                    <group><field name="note" placeholder="Affectation du résultat décidée en assemblée, remarques du comptable…"/></group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_clotures" model="ir.actions.act_window">
+        <field name="name">Clôture d'exercice</field>
+        <field name="res_model">cultiveau.cloture</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Aucun exercice clôturé</p><p>Après la révision du comptable : le résultat est soldé en 120 (bénéfice) ou 129 (perte) et l'exercice verrouillé.</p></field>
+    </record>
+</odoo>

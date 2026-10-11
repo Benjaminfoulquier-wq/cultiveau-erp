@@ -14,6 +14,8 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Pilotage** : le tableau de bord de l'adhérent et celui du réseau ; bilan et compte de résultat ; clôture d'exercice ;
+  immobilisations amorties chaque mois.
 - **Tarifs, marges, commande groupée** : le tarif négocié chez chaque fournisseur s'importe et met à jour le prix d'achat de tous les
   adhérents ; chacun règle sa marge (par famille s'il veut) et sa liste de prix de vente suit ; la commande groupée regroupe les
   besoins et crée une commande d'achat par adhérent.
@@ -82,8 +84,9 @@
 7. **Campagnes au bon moment.** Segmentation par culture, persona et département ; e-mails et SMS déclenchés par la frise (« le maïs
    entre en floraison dans le Gard : proposer la vérification des pivots ») ; portail client où l'agriculteur voit ses devis, factures
    et installations.
-8. **Pilotage.** Tableau de bord de l'adhérent (chiffre d'affaires, devis en cours, taux de signature, saisonnalité) et tableau de bord
-   réseau pour l'équipe Cultiveau (volumes par fournisseur, adhérents actifs, catalogue réellement vendu) ; export vers le comptable.
+8. **Pilotage.** Fait : tableau de bord de l'adhérent (CA et courbe sur deux ans, devis, taux de signature, retards, fournisseurs,
+   trésorerie, TVA, chantiers, parcelles) et vue réseau (CA, devis, retards, trésorerie, dernière connexion par adhérent) ; bilan et
+   compte de résultat ; export vers le comptable. Reste : volumes par fournisseur et catalogue réellement vendu dans la vue réseau.
 9. **Les outils connectés dans les deux sens.** Depuis l'assistant téléphonique : créer un rendez-vous ou un devis à la fin de l'appel ;
    synchronisation automatique des clients entre l'assistant et l'ERP (plus besoin de fichier) ; DTe et DISC lisibles depuis la fiche
    de l'adhérent.
@@ -91,7 +94,8 @@
     attendant, la première page de la fiche technique sert d'image. Catalogue 3D visuel à terme.
 11. **Comptabilité.** Fait : plan et journaux français par société, import des relevés (CSV, OFX, CAMT, QIF), rapprochement proposé
     et validé en un clic, lettrage automatique des tiers, déclaration de TVA calculée et son écriture, exports FEC / grand livre /
-    balance, accès du comptable. Reste : le paiement en ligne, les immobilisations et la clôture d'exercice (à-nouveaux).
+    balance, accès du comptable, bilan et compte de résultat, clôture d'exercice, immobilisations. Reste : le paiement en ligne,
+    les virements SEPA fournisseurs en lot.
 12. **Exploitation et sécurité.** Fait : sauvegarde quotidienne vérifiée (30 jours, hebdomadaires 90 jours) et copie hors serveur dès
     qu'un espace de stockage est renseigné (secret `CULTIVEAU_RCLONE_CONF`), double authentification. Reste : changement des mots de
     passe d'origine, journal des accès, RGPD (export et suppression d'un client), dépôt GitHub privé.

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_etats_form" model="ir.ui.view">
+        <field name="name">cultiveau.etats.form</field>
+        <field name="model">cultiveau.etats</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_calculer" type="object" string="Calculer" class="btn-primary"/>
+                    <button name="action_export_csv" type="object" string="Export CSV" invisible="not resultat_html"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group><field name="company_id" groups="base.group_multi_company"/><field name="date_debut"/><field name="date_fin"/><field name="comparer"/></group>
+                        <group invisible="not resultat_html"><field name="chiffre_affaires"/><field name="resultat_net"/><field name="total_bilan"/></group>
+                    </group>
+                    <field name="resultat_html" nolabel="1"/>
+                    <field name="bilan_html" nolabel="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_etats" model="ir.actions.act_window">
+        <field name="name">Bilan et compte de résultat</field>
+        <field name="res_model">cultiveau.etats</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+</odoo>

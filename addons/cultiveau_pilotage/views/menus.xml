@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_tableau" name="Tableau de bord" parent="cultiveau_base.menu_cultiveau_root" action="action_tableau" sequence="2"/>
+    <menuitem id="menu_etats" name="Bilan et compte de résultat" parent="account.menu_finance" action="action_etats" sequence="19" groups="account.group_account_readonly"/>
+    <menuitem id="menu_cloture" name="Clôture d'exercice" parent="account.menu_finance" action="action_clotures" sequence="20" groups="account.group_account_readonly"/>
+    <menuitem id="menu_immos" name="Immobilisations" parent="account.menu_finance" action="action_immos" sequence="21" groups="account.group_account_readonly"/>
+</odoo>

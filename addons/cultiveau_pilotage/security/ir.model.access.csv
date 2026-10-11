@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_etats,cultiveau.etats,model_cultiveau_etats,account.group_account_readonly,1,1,1,1
+access_tableau,cultiveau.tableau,model_cultiveau_tableau,base.group_user,1,1,1,1
+access_cloture,cultiveau.cloture,model_cultiveau_cloture,account.group_account_manager,1,1,1,1
+access_cloture_lecture,cultiveau.cloture lecture,model_cultiveau_cloture,account.group_account_readonly,1,0,0,0
+access_immo,cultiveau.immobilisation,model_cultiveau_immobilisation,account.group_account_invoice,1,1,1,1
+access_immo_ligne,cultiveau.immobilisation.ligne,model_cultiveau_immobilisation_ligne,account.group_account_invoice,1,1,1,1
+access_immo_lecture,cultiveau.immobilisation lecture,model_cultiveau_immobilisation,account.group_account_readonly,1,0,0,0
+access_immo_ligne_lecture,cultiveau.immobilisation.ligne lecture,model_cultiveau_immobilisation_ligne,account.group_account_readonly,1,0,0,0
