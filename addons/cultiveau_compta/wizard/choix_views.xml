@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_rapprochement_choix_form" model="ir.ui.view">
+        <field name="name">cultiveau.rapprochement.choix.form</field>
+        <field name="model">cultiveau.rapprochement.choix</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="ligne_id" invisible="1"/><field name="company_id" invisible="1"/><field name="currency_id" invisible="1"/>
+                        <field name="libelle"/>
+                        <field name="montant"/>
+                    </group>
+                    <group>
+                        <field name="partner_id"/>
+                        <field name="total"/>
+                    </group>
+                </group>
+                <field name="aml_ids" context="{'list_view_ref': 'cultiveau_compta.view_aml_choix_list'}">
+                    <list>
+                        <field name="date"/>
+                        <field name="move_id"/>
+                        <field name="partner_id"/>
+                        <field name="account_id"/>
+                        <field name="amount_residual" string="Reste à régler"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_rapprocher" type="object" string="Rapprocher" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_rapprochement_compte_form" model="ir.ui.view">
+        <field name="name">cultiveau.rapprochement.compte.form</field>
+        <field name="model">cultiveau.rapprochement.compte</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="ligne_id" invisible="1"/><field name="company_id" invisible="1"/><field name="currency_id" invisible="1"/>
+                    <field name="montant"/>
+                    <field name="account_id"/>
+                    <field name="partner_id"/>
+                    <field name="libelle"/>
+                    <field name="tax_ids" widget="many2many_tags"/>
+                    <field name="ttc" invisible="not tax_ids"/>
+                </group>
+                <footer>
+                    <button name="action_passer" type="object" string="Enregistrer" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

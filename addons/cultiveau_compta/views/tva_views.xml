@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_tva_list" model="ir.ui.view">
+        <field name="name">cultiveau.tva.list</field>
+        <field name="model">cultiveau.tva</field>
+        <field name="arch" type="xml">
+            <list decoration-muted="etat == 'validee'">
+                <field name="name"/>
+                <field name="date_debut"/>
+                <field name="date_fin"/>
+                <field name="ca_ht"/>
+                <field name="tva_brute"/>
+                <field name="tva_deductible"/>
+                <field name="tva_due"/>
+                <field name="credit"/>
+                <field name="etat" widget="badge" decoration-success="etat == 'validee'" decoration-info="etat == 'calculee'"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+                <field name="currency_id" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_tva_form" model="ir.ui.view">
+        <field name="name">cultiveau.tva.form</field>
+        <field name="model">cultiveau.tva</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_calculer" type="object" string="Calculer" class="btn-primary" invisible="etat == 'validee'"/>
+                    <button name="action_valider" type="object" string="Valider et passer l'écriture" class="btn-primary" invisible="etat != 'calculee'"
+                            confirm="L'écriture de TVA est passée au journal d'opérations diverses et la période est verrouillée pour la TVA. Continuer ?"/>
+                    <button name="action_export_csv" type="object" string="Export CSV" invisible="etat == 'brouillon'"/>
+                    <button name="action_annuler" type="object" string="Annuler l'écriture" invisible="etat != 'validee'" groups="account.group_account_manager"/>
+                    <field name="etat" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <h1><field name="name"/></h1>
+                    <group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="date_debut" readonly="etat == 'validee'"/>
+                            <field name="date_fin" readonly="etat == 'validee'"/>
+                        </group>
+                        <group>
+                            <field name="tva_due" class="fw-bold"/>
+                            <field name="credit"/>
+                            <field name="move_id" invisible="not move_id"/>
+                        </group>
+                    </group>
+                    <field name="ligne_ids" readonly="1">
+                        <list decoration-bf="total" create="0" delete="0">
+                            <field name="code" column_invisible="True"/>
+                            <field name="libelle"/>
+                            <field name="montant" sum=""/>
+                            <field name="total" column_invisible="True"/>
+                        </list>
+                    </field>
+                    <group><field name="note" placeholder="Ce qu'il faut savoir sur cette période (régularisation, crédit demandé en remboursement…)"/></group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+    <record id="action_tva" model="ir.actions.act_window">
+        <field name="name">Déclarations de TVA</field>
+        <field name="res_model">cultiveau.tva</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucune déclaration</p>
+            <p>Créez la déclaration de la période écoulée : les cases de la CA3 se remplissent d'après les factures et les achats enregistrés. Reportez-les sur impots.gouv.fr, puis validez pour passer l'écriture de TVA.</p>
+        </field>
+    </record>
+</odoo>

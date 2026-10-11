@@ -14,6 +14,11 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Comptabilité** : chaque société a son plan comptable français et ses journaux ; le relevé de la banque s'importe (CSV, OFX,
+  CAMT.053, QIF) et chaque ligne est proposée en face d'une facture, d'un paiement du comptoir ou d'un compte (frais bancaires,
+  emprunt, TVA…), le sûr se rapproche seul, le reste se valide en un clic ; les clients et fournisseurs se lettrent d'eux-mêmes ;
+  la déclaration de TVA se calcule d'après les écritures et passe son écriture ; le comptable a son accès et ses exports (FEC,
+  grand livre, balance, journaux).
 - **Parcelles et satellite** : on demande à l'agriculteur son fichier Telepac (un e-mail en un clic) ; à l'import, ses parcelles
   (contours, surfaces, îlots) et ses cultures se remplissent d'après les codes PAC. Chaque parcelle suivie reçoit les images
   Sentinel-2 gratuites (Copernicus) : NDVI et NDWI, courbe de la saison, et une alerte quand la vigueur chute, que l'eau des
@@ -68,8 +73,9 @@
    de l'adhérent.
 10. **Photos et visuels.** Il n'y a pas de photos produits dans le Drive : il faut une source (sites fournisseurs, dossier photos) ; en
     attendant, la première page de la fiche technique sert d'image. Catalogue 3D visuel à terme.
-11. **Comptabilité.** Le plan comptable français est installé ; reste par société : journaux, TVA, import des relevés bancaires,
-    rapprochement, FEC, accès du comptable externe.
+11. **Comptabilité.** Fait : plan et journaux français par société, import des relevés (CSV, OFX, CAMT, QIF), rapprochement proposé
+    et validé en un clic, lettrage automatique des tiers, déclaration de TVA calculée et son écriture, exports FEC / grand livre /
+    balance, accès du comptable. Reste : le paiement en ligne, les immobilisations et la clôture d'exercice (à-nouveaux).
 12. **Exploitation et sécurité.** Sauvegarde quotidienne hors serveur, double authentification, changement des mots de passe d'origine,
     journal des accès, RGPD (export et suppression d'un client).
 

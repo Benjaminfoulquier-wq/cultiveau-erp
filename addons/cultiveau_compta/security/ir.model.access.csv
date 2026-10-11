@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tva_facturation,cultiveau.tva facturation,model_cultiveau_tva,account.group_account_invoice,1,1,1,1
+access_tva_ligne_facturation,cultiveau.tva.ligne facturation,model_cultiveau_tva_ligne,account.group_account_invoice,1,1,1,1
+access_tva_lecture,cultiveau.tva lecture,model_cultiveau_tva,account.group_account_readonly,1,0,0,0
+access_tva_ligne_lecture,cultiveau.tva.ligne lecture,model_cultiveau_tva_ligne,account.group_account_readonly,1,0,0,0
+access_import_releve,cultiveau.import.releve,model_cultiveau_import_releve,account.group_account_invoice,1,1,1,1
+access_choix,cultiveau.rapprochement.choix,model_cultiveau_rapprochement_choix,account.group_account_invoice,1,1,1,1
+access_compte,cultiveau.rapprochement.compte,model_cultiveau_rapprochement_compte,account.group_account_invoice,1,1,1,1
+access_lettrage,cultiveau.lettrage,model_cultiveau_lettrage,account.group_account_invoice,1,1,1,1
+access_export,cultiveau.export.assistant,model_cultiveau_export_assistant,account.group_account_readonly,1,1,1,1

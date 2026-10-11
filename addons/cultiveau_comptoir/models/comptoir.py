@@ -77,8 +77,9 @@ class Comptoir(models.AbstractModel):
         liste = partner.with_company(societe).property_product_pricelist
         ht = liste._get_product_price(produit, quantite or 1.0, uom=produit.uom_id) if liste else produit.lst_price
         taxes = produit.taxes_id.filtered(lambda t: t.company_id == societe)
-        if liste and liste.fiscal_position_id:
-            taxes = liste.fiscal_position_id.map_tax(taxes)
+        position = partner.with_company(societe).property_account_position_id
+        if position:
+            taxes = position.map_tax(taxes)
         calcul = taxes.compute_all(ht, societe.currency_id, 1.0, produit, partner)
         return {"prix_ht": round(calcul["total_excluded"], 2), "prix_ttc": round(calcul["total_included"], 2),
                 "tva": ", ".join(t.name for t in taxes) if taxes else "sans TVA", "taux": sum(t.amount for t in taxes if t.amount_type == "percent")}

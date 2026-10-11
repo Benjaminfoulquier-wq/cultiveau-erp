@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_import_releve_form" model="ir.ui.view">
+        <field name="name">cultiveau.import.releve.form</field>
+        <field name="model">cultiveau.import.releve</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="text-muted">Téléchargez le relevé sur le site de votre banque (CSV, OFX, CAMT.053 ou QIF). Les opérations déjà importées sont ignorées ;
+                   les lignes sûres (une facture du même montant au nom du client, un paiement du comptoir, des frais bancaires…) se rapprochent d'elles-mêmes.</p>
+                <group>
+                    <field name="company_id" invisible="1"/>
+                    <field name="journal_id"/>
+                    <field name="fichier" filename="nom_fichier"/>
+                    <field name="nom_fichier" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_importer" type="object" string="Importer" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_import_releve" model="ir.actions.act_window">
+        <field name="name">Importer un relevé bancaire</field>
+        <field name="res_model">cultiveau.import.releve</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

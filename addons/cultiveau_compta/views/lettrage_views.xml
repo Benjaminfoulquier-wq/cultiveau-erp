@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_aml_a_lettrer_list" model="ir.ui.view">
+        <field name="name">account.move.line.cultiveau.lettrage.list</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" default_order="partner_id, date">
+                <header>
+                    <button name="action_cultiveau_lettrer" type="object" string="Lettrer la sélection" class="btn-primary"/>
+                </header>
+                <field name="date"/>
+                <field name="move_id"/>
+                <field name="partner_id"/>
+                <field name="account_id"/>
+                <field name="name"/>
+                <field name="date_maturity" string="Échéance"/>
+                <field name="debit" sum="Débit"/>
+                <field name="credit" sum="Crédit"/>
+                <field name="amount_residual" string="Reste" sum="Reste"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_aml_a_lettrer_search" model="ir.ui.view">
+        <field name="name">account.move.line.cultiveau.lettrage.search</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="move_id"/>
+                <field name="name"/>
+                <filter name="clients" string="Clients" domain="[('account_id.account_type', '=', 'asset_receivable')]"/>
+                <filter name="fournisseurs" string="Fournisseurs" domain="[('account_id.account_type', '=', 'liability_payable')]"/>
+                <separator/>
+                <filter name="en_retard" string="Échues" domain="[('date_maturity', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <group expand="1" string="Regrouper par">
+                    <filter name="par_tiers" string="Tiers" context="{'group_by': 'partner_id'}"/>
+                    <filter name="par_compte" string="Compte" context="{'group_by': 'account_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_a_lettrer" model="ir.actions.act_window">
+        <field name="name">Écritures à lettrer</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_aml_a_lettrer_list"/>
+        <field name="search_view_id" ref="view_aml_a_lettrer_search"/>
+        <field name="domain">[('cultiveau_a_lettrer', '=', True)]</field>
+        <field name="context">{'search_default_par_tiers': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Tout est lettré</p>
+            <p>Chaque facture a trouvé son règlement. Les écritures qui apparaîtront ici attendent le leur.</p>
+        </field>
+    </record>
+    <record id="view_lettrage_auto_form" model="ir.ui.view">
+        <field name="name">cultiveau.lettrage.form</field>
+        <field name="model">cultiveau.lettrage</field>
+        <field name="arch" type="xml">
+            <form>
+                <p>Pour chaque client et chaque fournisseur : les factures et les règlements du même montant, les règlements qui citent le numéro de la facture,
+                   puis les règlements qui font la somme de plusieurs factures. Ce qui reste s'affiche ensuite, à lettrer à la main.</p>
+                <group><field name="company_id" groups="base.group_multi_company"/></group>
+                <footer>
+                    <button name="action_lettrer" type="object" string="Lettrer" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_lettrage_auto" model="ir.actions.act_window">
+        <field name="name">Lettrage automatique</field>
+        <field name="res_model">cultiveau.lettrage</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_ligne_releve_a_rapprocher_list" model="ir.ui.view">
+        <field name="name">account.bank.statement.line.cultiveau.list</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-success="cultiveau_confiance == 'sure'" decoration-muted="is_reconciled" default_order="date desc, id desc">
+                <header>
+                    <button name="action_proposer" type="object" string="Chercher les contreparties" display="always"/>
+                    <button name="action_rapprocher_sur" type="object" string="Rapprocher ce qui est sûr" class="btn-primary" display="always"/>
+                </header>
+                <field name="date"/>
+                <field name="journal_id"/>
+                <field name="payment_ref"/>
+                <field name="partner_id" string="Tiers"/>
+                <field name="amount" sum="Total"/>
+                <field name="cultiveau_proposition"/>
+                <field name="cultiveau_confiance" widget="badge" decoration-success="cultiveau_confiance == 'sure'" decoration-warning="cultiveau_confiance == 'probable'"/>
+                <field name="is_reconciled" column_invisible="True"/>
+                <field name="cultiveau_partner_propose_id" column_invisible="True"/>
+                <button name="action_valider_proposition" type="object" string="Valider" icon="fa-check" class="btn-link text-success" invisible="is_reconciled or cultiveau_confiance == 'aucune'"/>
+                <button name="action_choisir_facture" type="object" string="Facture…" icon="fa-file-text-o" class="btn-link" invisible="is_reconciled"/>
+                <button name="action_autre_compte" type="object" string="Compte…" icon="fa-book" class="btn-link" invisible="is_reconciled"/>
+                <button name="action_acompte" type="object" string="Acompte" icon="fa-user" class="btn-link" invisible="is_reconciled or (not partner_id and not cultiveau_partner_propose_id)"/>
+                <button name="action_defaire" type="object" string="Défaire" icon="fa-undo" class="btn-link text-muted" invisible="not is_reconciled"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_ligne_releve_search" model="ir.ui.view">
+        <field name="name">account.bank.statement.line.cultiveau.search</field>
+        <field name="model">account.bank.statement.line</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="payment_ref"/>
+                <field name="partner_id"/>
+                <field name="amount"/>
+                <field name="journal_id"/>
+                <filter name="a_rapprocher" string="À rapprocher" domain="[('is_reconciled', '=', False)]"/>
+                <filter name="rapprochees" string="Rapprochées" domain="[('is_reconciled', '=', True)]"/>
+                <separator/>
+                <filter name="sures" string="Sûres" domain="[('cultiveau_confiance', '=', 'sure')]"/>
+                <filter name="a_confirmer" string="À confirmer" domain="[('cultiveau_confiance', '=', 'probable')]"/>
+                <filter name="a_la_main" string="À faire à la main" domain="[('cultiveau_confiance', '=', 'aucune'), ('is_reconciled', '=', False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_journal" string="Compte bancaire" context="{'group_by': 'journal_id'}"/>
+                    <filter name="par_releve" string="Relevé" context="{'group_by': 'statement_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_a_rapprocher" model="ir.actions.act_window">
+        <field name="name">Relevés à rapprocher</field>
+        <field name="res_model">account.bank.statement.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="view_ligne_releve_a_rapprocher_list"/>
+        <field name="search_view_id" ref="view_ligne_releve_search"/>
+        <field name="context">{'search_default_a_rapprocher': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Rien à rapprocher</p>
+            <p>Importez le relevé de la banque (Banque → Importer un relevé) : chaque opération est proposée en face d'une facture, d'un paiement ou d'un compte.</p>
+        </field>
+    </record>
+</odoo>

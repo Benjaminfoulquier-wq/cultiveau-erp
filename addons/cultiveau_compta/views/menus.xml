@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_banque" name="Banque" parent="account.menu_finance" sequence="15" groups="account.group_account_invoice"/>
+    <menuitem id="menu_a_rapprocher" name="Relevés à rapprocher" parent="menu_banque" action="action_a_rapprocher" sequence="10"/>
+    <menuitem id="menu_import_releve" name="Importer un relevé" parent="menu_banque" action="action_import_releve" sequence="20"/>
+    <menuitem id="menu_releves" name="Relevés" parent="menu_banque" action="account.action_bank_statement_tree" sequence="30"/>
+    <menuitem id="menu_lettrage" name="Lettrage" parent="account.menu_finance" sequence="16" groups="account.group_account_invoice"/>
+    <menuitem id="menu_a_lettrer" name="Écritures à lettrer" parent="menu_lettrage" action="action_a_lettrer" sequence="10"/>
+    <menuitem id="menu_lettrage_auto" name="Lettrage automatique" parent="menu_lettrage" action="action_lettrage_auto" sequence="20"/>
+    <menuitem id="menu_tva" name="TVA" parent="account.menu_finance" sequence="17" action="action_tva" groups="account.group_account_invoice"/>
+    <menuitem id="menu_export" name="Export pour le comptable" parent="account.menu_finance" sequence="18" action="action_export_assistant" groups="account.group_account_readonly"/>
+</odoo>

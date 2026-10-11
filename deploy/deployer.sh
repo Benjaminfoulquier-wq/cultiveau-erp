@@ -47,7 +47,7 @@ $SSH "$SERVEUR" '
   if [ "$etat" = "installed" ]; then
     # « run » passe par le point d entrée de l image, qui donne à Odoo l adresse de la base ; « exec » ne le ferait pas.
     docker compose stop odoo >/dev/null 2>&1 || true
-    if docker compose run --rm odoo odoo -d "$ODOO_DB" -i cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles -u cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles --stop-after-init > /tmp/erp-maj.log 2>&1; then
+    if docker compose run --rm odoo odoo -d "$ODOO_DB" -i cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles,cultiveau_compta -u cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles,cultiveau_compta --stop-after-init > /tmp/erp-maj.log 2>&1; then
       echo "Modules Cultiveau à jour."
     else
       tail -25 /tmp/erp-maj.log; docker compose up -d odoo; echo "ÉCHEC de la mise à jour des modules (journal ci-dessus)."; exit 1

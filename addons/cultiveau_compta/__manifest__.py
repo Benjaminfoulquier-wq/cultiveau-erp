@@ -1,0 +1,32 @@
+{
+    "name": "Cultiveau — Comptabilité",
+    "summary": "Banque, lettrage, TVA et exports : la comptabilité française d'un adhérent, sans module payant",
+    "description": """
+La comptabilité courante d'un adhérent, dans l'ERP : la mise en place par société (plan comptable français, journaux en français, modèles de rapprochement),
+l'import des relevés bancaires (CSV, OFX, CAMT.053, QIF) sans doublon, le rapprochement proposé ligne par ligne et validé en un clic,
+le lettrage des clients et des fournisseurs, la déclaration de TVA (CA3) calculée d'après les écritures avec son écriture de clôture,
+et les exports pour le comptable (FEC, grand livre, balance, journaux) avec un accès en lecture seule pour lui.
+""",
+    "version": "18.0.1.0.0",
+    "category": "Cultiveau",
+    "author": "Cultiveau",
+    "website": "https://cultiveau.fr",
+    "license": "LGPL-3",
+    "depends": ["cultiveau_base", "account", "l10n_fr_account"],
+    "data": [
+        "security/ir.model.access.csv",
+        "security/regles.xml",
+        "data/cron.xml",
+        "wizard/import_releve_views.xml",
+        "wizard/choix_views.xml",
+        "wizard/export_views.xml",
+        "views/releve_views.xml",
+        "views/lettrage_views.xml",
+        "views/tva_views.xml",
+        "views/res_config_settings_views.xml",
+        "views/menus.xml",
+        "data/mise_en_place.xml",
+    ],
+    "installable": True,
+    "auto_install": False,
+}

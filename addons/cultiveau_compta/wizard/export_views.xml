@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_export_assistant_form" model="ir.ui.view">
+        <field name="name">cultiveau.export.assistant.form</field>
+        <field name="model">cultiveau.export.assistant</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="text-muted">Le FEC est le fichier que demandent le comptable et l'administration (il porte le nom SIREN + FEC + date de clôture). Les autres exports s'ouvrent dans un tableur.</p>
+                <group>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                    <field name="genre"/>
+                    <field name="date_debut"/>
+                    <field name="date_fin"/>
+                </group>
+                <footer>
+                    <button name="action_exporter" type="object" string="Télécharger" class="btn-primary"/>
+                    <button string="Annuler" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_export_assistant" model="ir.actions.act_window">
+        <field name="name">Exporter la comptabilité</field>
+        <field name="res_model">cultiveau.export.assistant</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+</odoo>

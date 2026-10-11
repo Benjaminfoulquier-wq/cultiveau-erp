@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_compta" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.compta</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Comptabilité" name="cultiveau_compta">
+                    <setting string="Comptabilité de la société" help="Plan comptable français, TVA à 20 % par défaut, journaux Ventes, Achats, Banque, Caisse, Chèques et Opérations diverses, modèles de rapprochement. Se met en place d'elle-même ; ce bouton la vérifie.">
+                        <field name="cultiveau_compta_en_place" invisible="1"/>
+                        <span class="text-success" invisible="not cultiveau_compta_en_place"><i class="fa fa-check"/> En place</span>
+                        <button name="action_cultiveau_compta_en_place" type="object" string="Mettre en place" class="btn-link" icon="fa-cog"/>
+                    </setting>
+                    <setting string="Régime de TVA" help="Détermine la période proposée pour chaque déclaration : le mois, le trimestre ou l'année.">
+                        <field name="cultiveau_regime_tva"/>
+                    </setting>
+                    <setting string="Le comptable" help="Il reçoit un accès qui lit la comptabilité (écritures, exports FEC, grand livre, balance) sans rien pouvoir modifier.">
+                        <div class="row mt8"><label for="cultiveau_comptable_email" class="col-lg-4 o_light_label"/><field name="cultiveau_comptable_email" placeholder="cabinet@exemple.fr"/></div>
+                        <button name="action_cultiveau_inviter_comptable" type="object" string="Inviter le comptable" class="btn-link" icon="fa-envelope"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
