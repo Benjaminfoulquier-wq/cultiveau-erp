@@ -26,7 +26,7 @@
                         <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-plus me-1"/>Créer</button>
                         <ul class="dropdown-menu dropdown-menu-end">
                             <li t-if="state.donnees.compteurs.comptoir"><a class="dropdown-item" href="#" t-on-click.prevent="() => this.ouvrirAction('cultiveau_comptoir.action_comptoir')">Une vente au comptoir</a></li>
-                            <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.lancer({cle: 'facture_nouvelle'})">Une facture</a></li>
+                            <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.lancer({cle: 'facture_nouvelle'}, null)">Une facture</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('sale.order', {})">Un devis</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('res.partner', {default_cultiveau_type: 'agriculteur', default_is_company: false})">Un agriculteur</a></li>
                             <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('crm.lead', {default_type: 'opportunity'})">Une demande (appel, visite)</a></li>
@@ -44,45 +44,20 @@
                     <i t-att-class="'fa me-1 ' + z.icone"/><t t-esc="z.nom"/>
                 </button>
             </div>
-            <div t-ref="scene" class="o_cultiveau_vue3d_scene flex-grow-1 position-relative" t-att-class="classeScene"
-                 t-on-wheel="onMolette" t-on-pointerdown="onAppui" t-on-pointermove="onDeplacement" t-on-pointerup="onRelache" t-on-pointerleave="onRelache">
-                <svg t-if="state.donnees" t-att-viewBox="viewBox" preserveAspectRatio="xMidYMid meet" class="w-100 h-100" t-on-click.self="clicFond">
-                    <g class="sols">
-                        <g t-foreach="state.sols" t-as="s" t-key="s.cle" t-att-class="s.zone ? 'sol cliquable' : 'sol'" t-on-click="() => this.clicSol(s)">
-                            <polygon t-foreach="s.faces" t-as="f" t-key="f_index" t-att-points="f.points" t-att-fill="f.fill"/>
-                        </g>
-                    </g>
-                    <g class="objets">
-                        <g t-foreach="state.objets" t-as="o" t-key="o.cle" t-att-class="o.genre + ' ' + o.classe + (state.carte and o.poste === state.carte ? ' actif' : '')"
-                           t-on-click="() => this.clicObjet(o)"
-                           t-on-mouseenter="() => state.survol = (o.genre === 'poste' ? o.poste.titre + ' — ' + o.poste.texte : o.titre)" t-on-mouseleave="() => state.survol = null">
-                            <polygon t-foreach="o.faces" t-as="f" t-key="f_index" t-att-points="f.points" t-att-fill="f.fill"/>
-                        </g>
-                    </g>
-                    <g class="libelles">
-                        <text t-foreach="state.libelles" t-as="l" t-key="l_index" t-att-x="l.p[0]" t-att-y="l.p[1]" t-att-class="'libelle ' + l.genre" text-anchor="middle"
-                              t-att-style="'font-size:' + taillePolice(l.genre === 'zone' ? 13 : l.genre === 'objet' ? 9.5 : 10) + 'px'"><t t-esc="l.texte"/></text>
-                    </g>
-                    <g class="postes">
-                        <g t-foreach="state.postes" t-as="p" t-key="p.cle" class="etiquette-poste" t-att-class="p.urgent ? 'urgent' : ''" t-on-click="() => this.ouvrirPoste(p)">
-                            <text t-att-x="p.ancre[0]" t-att-y="p.ancre[1] - 4 / echelle" text-anchor="middle" class="titre-poste"
-                                  t-att-style="'font-size:' + taillePolice(11.5) + 'px'"><t t-esc="p.titre"/></text>
-                            <t t-if="p.badge">
-                                <circle t-att-cx="p.ancre[0] + 0" t-att-cy="p.ancre[1] - 22 / echelle" t-att-r="9 / echelle" class="pastille"/>
-                                <text t-att-x="p.ancre[0]" t-att-y="p.ancre[1] - 18.5 / echelle" text-anchor="middle" class="compte"
-                                      t-att-style="'font-size:' + taillePolice(9.5) + 'px'"><t t-esc="p.badge > 999 ? Math.round(p.badge / 1000) + 'k' : p.badge"/></text>
-                            </t>
-                        </g>
-                    </g>
-                </svg>
+            <div class="o_cultiveau_vue3d_scene flex-grow-1 position-relative" t-if="!state.sans3d">
+                <div t-ref="hote" class="o_cv3_hote"/>
+                <div t-ref="calque" class="o_cv3_calque loin"/>
+                <div class="o_cv3_chargement" t-if="!state.pret"><i class="fa fa-cube fa-spin"/> Construction du site…</div>
 
                 <div class="o_cv_commandes">
-                    <button class="btn btn-light btn-sm" title="Rapprocher" t-on-click="() => this.zoomer(0.75)"><i class="fa fa-plus"/></button>
-                    <button class="btn btn-light btn-sm" title="Éloigner" t-on-click="() => this.zoomer(1.33)"><i class="fa fa-minus"/></button>
-                    <button class="btn btn-light btn-sm" title="Tout le site" t-on-click="toutVoir"><i class="fa fa-arrows-alt"/></button>
+                    <button class="btn btn-light btn-sm" title="Rapprocher (+)" t-on-click="() => this.zoomer(0.75)"><i class="fa fa-plus"/></button>
+                    <button class="btn btn-light btn-sm" title="Éloigner (−)" t-on-click="() => this.zoomer(1.33)"><i class="fa fa-minus"/></button>
+                    <button class="btn btn-light btn-sm" title="Tourner à gauche (Q)" t-on-click="() => this.tourner(-1)"><i class="fa fa-rotate-left"/></button>
+                    <button class="btn btn-light btn-sm" title="Tourner à droite (E)" t-on-click="() => this.tourner(1)"><i class="fa fa-rotate-right"/></button>
+                    <button class="btn btn-light btn-sm" title="Tout le site (0)" t-on-click="toutVoir"><i class="fa fa-arrows-alt"/></button>
                 </div>
 
-                <div class="o_cv_carte" t-if="state.carte" t-att-style="positionCarte" t-on-click.stop="">
+                <div class="o_cv_carte" t-ref="carte" t-if="state.carte" t-on-click.stop="" t-on-pointerdown.stop="">
                     <div class="d-flex align-items-start gap-2">
                         <span class="o_cv_carte_icone" t-att-style="'background:' + state.carte.couleur"><i t-att-class="'fa ' + state.carte.icone"/></span>
                         <div class="flex-grow-1">
@@ -104,14 +79,30 @@
                     </div>
                 </div>
 
-                <div class="o_cultiveau_vue3d_info" t-if="state.survol and !state.carte" t-esc="state.survol"/>
+                <div class="o_cv3_bulle" t-ref="bulle" t-att-class="state.survol and !state.carte ? 'visible' : ''" t-esc="state.survol or ''"/>
                 <div class="o_cultiveau_vue3d_legende">
-                    <span class="aide"><i class="fa fa-mouse-pointer"/> clic : ouvrir · molette : zoomer · glisser : se déplacer</span>
-                    <span><i style="background:#d9534f"/> urgent</span>
-                    <span><i style="background:#f0a04b"/> aujourd'hui / chantier</span>
-                    <span><i style="background:#0b8aa3"/> cette semaine / envoyé</span>
-                    <span><i style="background:#6fa352"/> en service</span>
-                    <span><i style="background:#e3b23c"/> à l'étude</span>
+                    <span class="aide"><i class="fa fa-mouse-pointer"/> clic : ouvrir · molette : zoomer · glisser : se déplacer · Q / E : tourner</span>
+                    <span><i style="background:#e2605b"/> urgent</span>
+                    <span><i style="background:#f6a852"/> aujourd'hui / chantier</span>
+                    <span><i style="background:#0b9bb8"/> cette semaine / envoyé</span>
+                    <span><i style="background:#76b357"/> en service</span>
+                    <span><i style="background:#efbf4a"/> à l'étude</span>
+                </div>
+            </div>
+            <div class="o_cv3_sans3d flex-grow-1 overflow-auto p-3" t-else="">
+                <div class="text-muted mb-3">La 3D n'est pas disponible sur ce navigateur : voici les mêmes portes, zone par zone.</div>
+                <div t-foreach="postesParZone" t-as="z" t-key="z.cle" class="mb-4">
+                    <h4><i t-att-class="'fa me-2 ' + z.icone"/><t t-esc="z.nom"/></h4>
+                    <div class="d-flex flex-wrap gap-3">
+                        <div t-foreach="z.postes" t-as="p" t-key="p.cle" class="o_cv_carte position-static" style="width: 300px">
+                            <div class="o_cv_carte_titre" t-esc="p.titre"/>
+                            <div class="o_cv_carte_texte" t-esc="p.texte"/>
+                            <div class="d-grid gap-1 mt-2">
+                                <button t-foreach="p.actions" t-as="a" t-key="a.cle" class="btn btn-sm text-start" t-att-class="a.principal ? 'btn-primary' : 'btn-light'"
+                                        t-on-click="() => this.lancer(a, p)"><t t-esc="a.libelle"/></button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

@@ -23,6 +23,7 @@ d'étude, magasin et cour, chantiers, atelier et SAV, parcelles en service, cais
     "data": ["views/menus.xml", "data/accueil.xml"],
     "assets": {
         "web.assets_backend": [
+            "cultiveau_vue3d/static/src/js/modeles.js",
             "cultiveau_vue3d/static/src/js/vue3d.js",
             "cultiveau_vue3d/static/src/xml/vue3d.xml",
             "cultiveau_vue3d/static/src/scss/vue3d.scss",
