@@ -4,8 +4,13 @@
     .o_cultiveau_vue3d_scene { overflow: hidden; }
     svg { display: block; }
     text.zone { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; fill: #6b665a; .compte { font-weight: 400; letter-spacing: 0; } }
+    text.libelle { font-size: 7px; paint-order: stroke; stroke: #ffffff; stroke-width: 2px; fill: #8a8373; letter-spacing: 0.06em; pointer-events: none; font-style: italic;
+        &.zone { font-size: 8px; font-weight: 700; font-style: normal; letter-spacing: 0.1em; fill: #6b665a; }
+        &.route, &.entree { font-size: 7px; font-weight: 700; font-style: normal; fill: #5d6b78; }
+    }
     text.numero { font-size: 10px; font-weight: 700; fill: #ffffff; }
-    .station { cursor: pointer; &:hover text.zone { fill: #0b8aa3; } }
+    .station { cursor: pointer; &:hover circle { fill: #0b8aa3; } }
+    .o_cultiveau_vue3d_stations { background: #ffffff; border-bottom: 1px solid #e3ded3; .btn { font-size: 11px; letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600; color: #183840; } .badge { background: #183840 !important; } }
     text.etiquette { font-size: 8px; fill: #183840; paint-order: stroke; stroke: #ffffff; stroke-width: 2px; pointer-events: none; }
     .element { cursor: pointer; polygon { transition: filter 0.12s; } &:hover polygon { filter: brightness(1.12); } }
     .o_cultiveau_vue3d_info { position: absolute; left: 16px; bottom: 44px; background: #183840; color: #ffffff; padding: 6px 12px; border-radius: 6px; font-size: 13px; max-width: 70%; }
