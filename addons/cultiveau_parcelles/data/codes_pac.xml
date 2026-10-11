@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Les codes cultures PAC les plus courants, reliés aux cultures de la frise. Les autres codes rencontrés à l'import
+         apparaissent « à relier » dans Parcelles → Codes cultures PAC (notice « Cultures et précisions » de la campagne). -->
+    <data noupdate="1">
+        <record id="code_pac_bth" model="cultiveau.code.pac">
+            <field name="code">BTH</field>
+            <field name="libelle">Blé tendre d'hiver</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_ble_tendre"/>
+        </record>
+        <record id="code_pac_btp" model="cultiveau.code.pac">
+            <field name="code">BTP</field>
+            <field name="libelle">Blé tendre de printemps</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_ble_tendre"/>
+        </record>
+        <record id="code_pac_bdh" model="cultiveau.code.pac">
+            <field name="code">BDH</field>
+            <field name="libelle">Blé dur d'hiver</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_ble_dur"/>
+        </record>
+        <record id="code_pac_bdp" model="cultiveau.code.pac">
+            <field name="code">BDP</field>
+            <field name="libelle">Blé dur de printemps</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_ble_dur"/>
+        </record>
+        <record id="code_pac_orh" model="cultiveau.code.pac">
+            <field name="code">ORH</field>
+            <field name="libelle">Orge d'hiver</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_orge_hiver"/>
+        </record>
+        <record id="code_pac_orp" model="cultiveau.code.pac">
+            <field name="code">ORP</field>
+            <field name="libelle">Orge de printemps</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_orge_printemps"/>
+        </record>
+        <record id="code_pac_avh" model="cultiveau.code.pac">
+            <field name="code">AVH</field>
+            <field name="libelle">Avoine d'hiver</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_avoine"/>
+        </record>
+        <record id="code_pac_avp" model="cultiveau.code.pac">
+            <field name="code">AVP</field>
+            <field name="libelle">Avoine de printemps</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_avoine"/>
+        </record>
+        <record id="code_pac_sgh" model="cultiveau.code.pac">
+            <field name="code">SGH</field>
+            <field name="libelle">Seigle d'hiver</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_seigle"/>
+        </record>
+        <record id="code_pac_tth" model="cultiveau.code.pac">
+            <field name="code">TTH</field>
+            <field name="libelle">Triticale d'hiver</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_triticale"/>
+        </record>
+        <record id="code_pac_ttp" model="cultiveau.code.pac">
+            <field name="code">TTP</field>
+            <field name="libelle">Triticale de printemps</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_triticale"/>
+        </record>
+        <record id="code_pac_epe" model="cultiveau.code.pac">
+            <field name="code">EPE</field>
+            <field name="libelle">Épeautre</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_epeautre"/>
+        </record>
+        <record id="code_pac_mis" model="cultiveau.code.pac">
+            <field name="code">MIS</field>
+            <field name="libelle">Maïs</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_mais_grain"/>
+        </record>
+        <record id="code_pac_mie" model="cultiveau.code.pac">
+            <field name="code">MIE</field>
+            <field name="libelle">Maïs ensilage</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_mais_ensilage"/>
+        </record>
+        <record id="code_pac_sog" model="cultiveau.code.pac">
+            <field name="code">SOG</field>
+            <field name="libelle">Sorgho</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_sorgho_grain"/>
+        </record>
+        <record id="code_pac_riz" model="cultiveau.code.pac">
+            <field name="code">RIZ</field>
+            <field name="libelle">Riz</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_riz"/>
+        </record>
+        <record id="code_pac_srs" model="cultiveau.code.pac">
+            <field name="code">SRS</field>
+            <field name="libelle">Sarrasin</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_sarrasin"/>
+        </record>
+        <record id="code_pac_czh" model="cultiveau.code.pac">
+            <field name="code">CZH</field>
+            <field name="libelle">Colza d'hiver</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_colza"/>
+        </record>
+        <record id="code_pac_czp" model="cultiveau.code.pac">
+            <field name="code">CZP</field>
+            <field name="libelle">Colza de printemps</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_colza"/>
+        </record>
+        <record id="code_pac_trn" model="cultiveau.code.pac">
+            <field name="code">TRN</field>
+            <field name="libelle">Tournesol</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_tournesol"/>
+        </record>
+        <record id="code_pac_soj" model="cultiveau.code.pac">
+            <field name="code">SOJ</field>
+            <field name="libelle">Soja</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_soja"/>
+        </record>
+        <record id="code_pac_lih" model="cultiveau.code.pac">
+            <field name="code">LIH</field>
+            <field name="libelle">Lin non textile d'hiver</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_lin_oleagineux"/>
+        </record>
+        <record id="code_pac_lip" model="cultiveau.code.pac">
+            <field name="code">LIP</field>
+            <field name="libelle">Lin non textile de printemps</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_lin_oleagineux"/>
+        </record>
+        <record id="code_pac_lif" model="cultiveau.code.pac">
+            <field name="code">LIF</field>
+            <field name="libelle">Lin fibres</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_lin_fibre"/>
+        </record>
+        <record id="code_pac_chv" model="cultiveau.code.pac">
+            <field name="code">CHV</field>
+            <field name="libelle">Chanvre</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_chanvre"/>
+        </record>
+        <record id="code_pac_fvl" model="cultiveau.code.pac">
+            <field name="code">FVL</field>
+            <field name="libelle">Féverole</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_feverole"/>
+        </record>
+        <record id="code_pac_lec" model="cultiveau.code.pac">
+            <field name="code">LEC</field>
+            <field name="libelle">Lentille cultivée</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_lentille"/>
+        </record>
+        <record id="code_pac_pch" model="cultiveau.code.pac">
+            <field name="code">PCH</field>
+            <field name="libelle">Pois chiche</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_pois_chiche"/>
+        </record>
+        <record id="code_pac_btn" model="cultiveau.code.pac">
+            <field name="code">BTN</field>
+            <field name="libelle">Betterave non fourragère</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_betterave_sucriere"/>
+        </record>
+        <record id="code_pac_bvf" model="cultiveau.code.pac">
+            <field name="code">BVF</field>
+            <field name="libelle">Betterave fourragère</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_betterave_fourragere"/>
+        </record>
+        <record id="code_pac_ptc" model="cultiveau.code.pac">
+            <field name="code">PTC</field>
+            <field name="libelle">Pomme de terre de consommation</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_pomme_de_terre"/>
+        </record>
+        <record id="code_pac_ptf" model="cultiveau.code.pac">
+            <field name="code">PTF</field>
+            <field name="libelle">Pomme de terre féculière</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_pomme_de_terre"/>
+        </record>
+        <record id="code_pac_tab" model="cultiveau.code.pac">
+            <field name="code">TAB</field>
+            <field name="libelle">Tabac</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_tabac"/>
+        </record>
+        <record id="code_pac_vrc" model="cultiveau.code.pac">
+            <field name="code">VRC</field>
+            <field name="libelle">Vigne : raisins de cuve</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_vigne"/>
+        </record>
+        <record id="code_pac_vrt" model="cultiveau.code.pac">
+            <field name="code">VRT</field>
+            <field name="libelle">Vigne : raisins de table</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_raisin_table"/>
+        </record>
+        <record id="code_pac_oli" model="cultiveau.code.pac">
+            <field name="code">OLI</field>
+            <field name="libelle">Oliveraie</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_olivier"/>
+        </record>
+        <record id="code_pac_agr" model="cultiveau.code.pac">
+            <field name="code">AGR</field>
+            <field name="libelle">Agrume</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_agrumes"/>
+        </record>
+        <record id="code_pac_lav" model="cultiveau.code.pac">
+            <field name="code">LAV</field>
+            <field name="libelle">Lavande, lavandin</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_lavande"/>
+        </record>
+        <record id="code_pac_mlo" model="cultiveau.code.pac">
+            <field name="code">MLO</field>
+            <field name="libelle">Melon</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_melon"/>
+        </record>
+        <record id="code_pac_tom" model="cultiveau.code.pac">
+            <field name="code">TOM</field>
+            <field name="libelle">Tomate</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_tomate"/>
+        </record>
+        <record id="code_pac_fra" model="cultiveau.code.pac">
+            <field name="code">FRA</field>
+            <field name="libelle">Fraise</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_fraisier"/>
+        </record>
+        <record id="code_pac_pph" model="cultiveau.code.pac">
+            <field name="code">PPH</field>
+            <field name="libelle">Prairie permanente, herbe prédominante</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_prairies"/>
+        </record>
+        <record id="code_pac_prl" model="cultiveau.code.pac">
+            <field name="code">PRL</field>
+            <field name="libelle">Prairie en rotation longue</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_prairie_temporaire"/>
+        </record>
+        <record id="code_pac_ptr" model="cultiveau.code.pac">
+            <field name="code">PTR</field>
+            <field name="libelle">Autre prairie temporaire</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_prairie_temporaire"/>
+        </record>
+        <record id="code_pac_luz" model="cultiveau.code.pac">
+            <field name="code">LUZ</field>
+            <field name="libelle">Luzerne</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_luzerne"/>
+        </record>
+        <record id="code_pac_tre" model="cultiveau.code.pac">
+            <field name="code">TRE</field>
+            <field name="libelle">Trèfle</field>
+            <field name="culture_id" ref="cultiveau_frise.culture_trefle"/>
+        </record>
+    </data>
+</odoo>

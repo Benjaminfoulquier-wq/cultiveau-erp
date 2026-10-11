@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_parcelles" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.parcelles</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Suivi des parcelles par satellite" name="cultiveau_satellite">
+                    <setting string="Copernicus Data Space (Sentinel-2, gratuit)"
+                             help="Créez un compte gratuit sur dataspace.copernicus.eu, puis dans le tableau de bord Sentinel Hub un « client OAuth » : copiez ici son identifiant et son secret. Environ 40 000 unités de calcul par mois sont offertes ; une parcelle en consomme une fraction par passage.">
+                        <div class="row mt8"><label for="cultiveau_copernicus_id" class="col-lg-4 o_light_label"/><field name="cultiveau_copernicus_id"/></div>
+                        <div class="row mt8"><label for="cultiveau_copernicus_secret" class="col-lg-4 o_light_label"/><field name="cultiveau_copernicus_secret" password="True"/></div>
+                    </setting>
+                    <setting string="Prévenir le client" help="Par défaut, l'alerte arrive au commercial (activité) qui prévient le client en un clic après avoir regardé. Cochez pour que l'e-mail parte tout seul.">
+                        <field name="cultiveau_parcelles_prevenir_client"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

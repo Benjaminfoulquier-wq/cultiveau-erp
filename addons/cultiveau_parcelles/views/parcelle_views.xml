@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_parcelle_list" model="ir.ui.view">
+        <field name="name">cultiveau.parcelle.list</field>
+        <field name="model">cultiveau.parcelle</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="etat == 'alerte'" decoration-muted="etat == 'inconnu'">
+                <field name="partner_id"/>
+                <field name="campagne" optional="hide" options="{'enable_formatting': false}"/>
+                <field name="ilot"/>
+                <field name="numero"/>
+                <field name="code_id" optional="show"/>
+                <field name="culture_id"/>
+                <field name="surface_ha" sum="Total"/>
+                <field name="dernier_ndvi" optional="show"/>
+                <field name="dernier_ndwi" optional="show"/>
+                <field name="derniere_mesure" optional="show"/>
+                <field name="etat" widget="badge" decoration-danger="etat == 'alerte'" decoration-success="etat == 'ok'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_parcelle_form" model="ir.ui.view">
+        <field name="name">cultiveau.parcelle.form</field>
+        <field name="model">cultiveau.parcelle</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_actualiser" type="object" string="Nouvelles images satellite" icon="fa-globe" invisible="not contour"/>
+                    <field name="etat" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h2><field name="name"/></h2></div>
+                    <div class="row">
+                        <div class="col-md-4"><field name="carte" nolabel="1"/></div>
+                        <div class="col-md-8"><field name="courbe" nolabel="1"/></div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="culture_id"/>
+                            <field name="code_id"/>
+                            <field name="precision"/>
+                            <field name="surface_ha"/>
+                            <field name="irriguee"/>
+                            <field name="suivi"/>
+                        </group>
+                        <group>
+                            <field name="dernier_ndvi"/>
+                            <field name="dernier_ndwi"/>
+                            <field name="derniere_mesure"/>
+                            <field name="lien_geoportail" widget="url" text="Voir la parcelle sur Géoportail"/>
+                            <field name="lien_copernicus" widget="url" text="Voir les images Sentinel-2"/>
+                            <field name="campagne" options="{'enable_formatting': false}"/>
+                            <field name="ilot"/>
+                            <field name="numero"/>
+                            <field name="pacage"/>
+                            <field name="commune"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Alertes" name="alertes">
+                            <field name="alerte_ids">
+                                <list create="0">
+                                    <field name="date"/>
+                                    <field name="genre"/>
+                                    <field name="detail"/>
+                                    <field name="etat" widget="badge" decoration-danger="etat == 'nouvelle'"/>
+                                    <button name="action_prevenir_client" type="object" string="Prévenir le client" icon="fa-envelope" invisible="etat != 'nouvelle'"/>
+                                    <button name="action_rien_d_anormal" type="object" string="Rien d'anormal" icon="fa-check" invisible="etat != 'nouvelle'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Mesures satellite" name="mesures">
+                            <field name="indice_ids">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="ndvi"/>
+                                    <field name="ndwi"/>
+                                    <field name="ndvi_ecart"/>
+                                    <field name="couverture" widget="percentage"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_parcelle_search" model="ir.ui.view">
+        <field name="name">cultiveau.parcelle.search</field>
+        <field name="model">cultiveau.parcelle</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="culture_id"/>
+                <field name="code_id"/>
+                <filter name="a_verifier" string="À vérifier" domain="[('etat', '=', 'alerte')]"/>
+                <filter name="sans_culture" string="Culture à relier" domain="[('culture_id', '=', False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_client" string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter name="par_culture" string="Culture" context="{'group_by': 'culture_id'}"/>
+                    <filter name="par_campagne" string="Campagne" context="{'group_by': 'campagne'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_parcelles" model="ir.actions.act_window">
+        <field name="name">Parcelles</field>
+        <field name="res_model">cultiveau.parcelle</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucune parcelle</p>
+            <p>Demandez à vos clients leur fichier Telepac (fiche du client → onglet « Parcelles PAC ») : leurs parcelles, leurs cultures,
+               puis le suivi par satellite.</p>
+        </field>
+    </record>
+
+    <record id="view_alerte_list" model="ir.ui.view">
+        <field name="name">cultiveau.parcelle.alerte.list</field>
+        <field name="model">cultiveau.parcelle.alerte</field>
+        <field name="arch" type="xml">
+            <list create="0" decoration-muted="etat != 'nouvelle'">
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="parcelle_id"/>
+                <field name="culture_id"/>
+                <field name="genre"/>
+                <field name="detail"/>
+                <field name="etat" widget="badge" decoration-danger="etat == 'nouvelle'" decoration-success="etat == 'client_prevenu'"/>
+                <button name="action_prevenir_client" type="object" string="Prévenir le client" icon="fa-envelope" invisible="etat != 'nouvelle'"/>
+                <button name="action_rien_d_anormal" type="object" string="Rien d'anormal" icon="fa-check" invisible="etat != 'nouvelle'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_alerte_form" model="ir.ui.view">
+        <field name="name">cultiveau.parcelle.alerte.form</field>
+        <field name="model">cultiveau.parcelle.alerte</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_prevenir_client" type="object" string="Prévenir le client" class="btn-primary" invisible="etat != 'nouvelle'"/>
+                    <button name="action_rien_d_anormal" type="object" string="Rien d'anormal" invisible="etat != 'nouvelle'"/>
+                    <field name="etat" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h2><field name="genre" readonly="1"/></h2></div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="parcelle_id"/>
+                            <field name="culture_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="ndvi"/>
+                            <field name="ndwi"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="detail"/>
+                        <field name="conseil"/>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_alertes" model="ir.actions.act_window">
+        <field name="name">Alertes satellite</field>
+        <field name="res_model">cultiveau.parcelle.alerte</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_a_traiter': 1}</field>
+    </record>
+    <record id="view_alerte_search" model="ir.ui.view">
+        <field name="name">cultiveau.parcelle.alerte.search</field>
+        <field name="model">cultiveau.parcelle.alerte</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <filter name="a_traiter" string="À traiter" domain="[('etat', '=', 'nouvelle')]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_genre" string="Ce qui cloche" context="{'group_by': 'genre'}"/>
+                    <filter name="par_client" string="Client" context="{'group_by': 'partner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_code_pac_list" model="ir.ui.view">
+        <field name="name">cultiveau.code.pac.list</field>
+        <field name="model">cultiveau.code.pac</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" decoration-warning="a_relier">
+                <field name="code"/>
+                <field name="libelle"/>
+                <field name="culture_id"/>
+                <field name="nb_parcelles"/>
+                <field name="a_relier" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_codes_pac" model="ir.actions.act_window">
+        <field name="name">Codes cultures PAC</field>
+        <field name="res_model">cultiveau.code.pac</field>
+        <field name="view_mode">list</field>
+        <field name="help" type="html">
+            <p>Chaque code culture de la déclaration PAC, relié à une culture de la frise. Un code rencontré à l'import et inconnu ici
+               apparaît en orange : choisissez sa culture une fois, toutes les parcelles et les cultures des clients suivent.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_parcelles_racine" name="Parcelles" parent="cultiveau_base.menu_cultiveau_root" sequence="17"/>
+    <menuitem id="menu_parcelles" name="Parcelles" parent="menu_parcelles_racine" action="action_parcelles" sequence="10"/>
+    <menuitem id="menu_alertes" name="Alertes satellite" parent="menu_parcelles_racine" action="action_alertes" sequence="20"/>
+    <menuitem id="menu_codes_pac" name="Codes cultures PAC" parent="menu_parcelles_racine" action="action_codes_pac" sequence="30"/>
+</odoo>

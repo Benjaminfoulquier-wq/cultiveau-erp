@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_parcelle_user,cultiveau.parcelle,model_cultiveau_parcelle,base.group_user,1,1,1,1
+access_indice_user,cultiveau.parcelle.indice,model_cultiveau_parcelle_indice,base.group_user,1,1,1,1
+access_alerte_user,cultiveau.parcelle.alerte,model_cultiveau_parcelle_alerte,base.group_user,1,1,1,1
+access_code_pac_user,cultiveau.code.pac,model_cultiveau_code_pac,base.group_user,1,1,1,0
+access_import_telepac_user,cultiveau.import.telepac,model_cultiveau_import_telepac,base.group_user,1,1,1,1

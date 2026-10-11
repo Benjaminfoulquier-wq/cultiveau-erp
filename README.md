@@ -21,6 +21,7 @@ CRM, stocks, achats, e-mailing, projets, contacts et portail client. Les modules
 | `cultiveau_terrain` | Le terrain : « Ma journée » sur le téléphone, planning des techniciens, bon d'intervention signé sur place → facture, stock camion et réassort, contrats d'entretien (hivernage, remise en route, visites) avec interventions automatiques, garanties, avis du client |
 | `cultiveau_api` | Les clés d'API : REST (OpenAPI) et connecteur MCP pour Claude, en lecture ou écriture, limitées aux adhérents choisis |
 | `cultiveau_documents` | Devis et factures au nom de l'adhérent : mise en page à sa marque, acompte, bon pour accord, signature en ligne, CGV, mentions légales, e-mails en français, relances automatiques |
+| `cultiveau_parcelles` | Les parcelles PAC de chaque agriculteur : sa déclaration Telepac (XML, shapefile ZIP ou GeoJSON) demandée par e-mail puis importée, les cultures du client remplies d'après les codes PAC, la carte des parcelles, le suivi Sentinel-2 gratuit (Copernicus Data Space : NDVI et NDWI tous les 5 jours, nuages masqués) et les alertes « ce qui cloche » (chute de vigueur, stress hydrique, parcelle hétérogène) lues selon le stade de la frise, avec un e-mail au client en un clic |
 | `cultiveau_site` | La liaison avec cultiveau.fr : clients, interventions, chantiers et bons de l'espace adhérent récupérés chaque heure |
 
 Pourquoi ces modules et pas d'autres : [docs/ANALYSE-ODOO-IRRIGATION.md](docs/ANALYSE-ODOO-IRRIGATION.md).

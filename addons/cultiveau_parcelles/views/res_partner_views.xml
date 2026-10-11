@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_parcelles" model="ir.ui.view">
+        <field name="name">res.partner.form.parcelles</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_parcelles" type="object" class="oe_stat_button" icon="fa-map-o" invisible="not cultiveau_nb_parcelles">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="cultiveau_nb_parcelles"/></span><span class="o_stat_text">Parcelles</span></div>
+                </button>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Parcelles PAC" name="cultiveau_parcelles" invisible="cultiveau_type and not cultiveau_est_client">
+                    <field name="cultiveau_est_client" invisible="1"/>
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <button name="action_demander_telepac" type="object" string="Demander son fichier Telepac" icon="fa-envelope" class="btn-secondary"/>
+                        <button name="action_importer_telepac" type="object" string="Importer sa déclaration PAC" icon="fa-upload" class="btn-primary"/>
+                        <button name="action_actualiser_satellite" type="object" string="Nouvelles images satellite" icon="fa-globe" class="btn-secondary"
+                                invisible="not cultiveau_nb_parcelles"/>
+                    </div>
+                    <div class="alert alert-danger mb-2" role="status" invisible="not cultiveau_alertes_parcelles">
+                        <field name="cultiveau_alertes_parcelles" class="oe_inline"/> alerte(s) satellite à traiter : voir les parcelles en rouge.
+                    </div>
+                    <div class="row" invisible="not cultiveau_carte_parcelles">
+                        <div class="col-md-6"><b>Cultures</b><field name="cultiveau_carte_parcelles" nolabel="1"/></div>
+                        <div class="col-md-6" invisible="not cultiveau_carte_ndvi"><b>Vigueur (NDVI, dernière image)</b><field name="cultiveau_carte_ndvi" nolabel="1"/></div>
+                    </div>
+                    <field name="cultiveau_parcelle_ids" context="{'default_partner_id': id}">
+                        <list create="0" decoration-danger="etat == 'alerte'">
+                            <field name="campagne" options="{'enable_formatting': false}"/>
+                            <field name="ilot"/>
+                            <field name="numero"/>
+                            <field name="culture_id"/>
+                            <field name="surface_ha" sum="Total"/>
+                            <field name="dernier_ndvi"/>
+                            <field name="dernier_ndwi"/>
+                            <field name="etat" widget="badge" decoration-danger="etat == 'alerte'" decoration-success="etat == 'ok'"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

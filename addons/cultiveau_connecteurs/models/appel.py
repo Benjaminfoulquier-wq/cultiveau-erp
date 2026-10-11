@@ -117,7 +117,7 @@ class Partner(models.Model):
     _inherit = "res.partner"
 
     cultiveau_appel_ids = fields.One2many("cultiveau.appel", "partner_id", string="Appels")
-    cultiveau_nb_appels = fields.Integer("Appels", compute="_compute_nb_appels")
+    cultiveau_nb_appels = fields.Integer("Nombre d'appels", compute="_compute_nb_appels")
 
     def _compute_nb_appels(self):
         donnees = {p.id: n for p, n in self.env["cultiveau.appel"]._read_group([("partner_id", "in", self.ids)], ["partner_id"], ["__count"])}

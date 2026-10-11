@@ -14,6 +14,11 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Parcelles et satellite** : on demande à l'agriculteur son fichier Telepac (un e-mail en un clic) ; à l'import, ses parcelles
+  (contours, surfaces, îlots) et ses cultures se remplissent d'après les codes PAC. Chaque parcelle suivie reçoit les images
+  Sentinel-2 gratuites (Copernicus) : NDVI et NDWI, courbe de la saison, et une alerte quand la vigueur chute, que l'eau des
+  feuilles baisse ou que la parcelle devient hétérogène, en pleine saison seulement (d'après la frise du client) ; le commercial a
+  une activité « appeler », le client un e-mail en un clic (ou automatiquement si on le choisit).
 - **Assistant téléphonique** : l'API donne à l'assistant la fiche du client qui appelle (frise, persona, conseil) et reçoit les appels ;
   le branchement se fait depuis GitHub (« assistant : oui ») : clé, connecteurs, numéros dédiés, clients de l'assistant importés chez
   chaque adhérent, messagerie sortante.

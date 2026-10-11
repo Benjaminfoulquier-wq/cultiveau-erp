@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="modele_mail_demande_telepac" model="mail.template">
+            <field name="name">Cultiveau : demander la déclaration PAC (Telepac)</field>
+            <field name="model_id" ref="base.model_res_partner"/>
+            <field name="subject">{{ user.company_id.name }} — votre fichier Telepac, pour suivre vos parcelles</field>
+            <field name="email_from">{{ (user.email_formatted or user.company_id.email_formatted) }}</field>
+            <field name="partner_to">{{ object.id }}</field>
+            <field name="lang">{{ object.lang }}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5;">
+    <p>Bonjour <t t-out="object.name or ''"/>,</p>
+    <p>Pour suivre vos parcelles irriguées au plus près, nous vous proposons de nous transmettre le fichier de votre déclaration PAC.
+       Il nous donne le contour et la culture de chaque parcelle : nous pouvons alors calculer les besoins en eau de vos cultures et
+       surveiller leur état par satellite (images Sentinel-2, tous les 5 jours), pour vous prévenir si une parcelle décroche
+       (manque d'eau, arrosage irrégulier).</p>
+    <p><b>Comment faire :</b> connectez-vous à <a href="https://www.telepac.agriculture.gouv.fr">telepac.agriculture.gouv.fr</a>, ouvrez votre
+       dossier PAC de l'année et téléchargez l'export de votre déclaration (îlots et parcelles) au format XML — ou, à défaut, le fichier
+       des parcelles au format « shape » (ZIP). Envoyez-le simplement en réponse à ce message.</p>
+    <p>Ces données ne servent qu'au suivi de vos parcelles et ne sont transmises à personne.</p>
+    <p>Bien cordialement,<br/><t t-out="user.name"/><br/><t t-out="user.company_id.name"/></p>
+</div>
+            </field>
+        </record>
+
+        <record id="modele_mail_alerte" model="mail.template">
+            <field name="name">Cultiveau : prévenir le client d'une alerte satellite</field>
+            <field name="model_id" ref="model_cultiveau_parcelle_alerte"/>
+            <field name="subject">{{ object.company_id.name }} — à vérifier sur votre parcelle {{ object.parcelle_id.name }}</field>
+            <field name="email_from">{{ (object.partner_id.user_id.email_formatted or object.company_id.email_formatted or user.email_formatted) }}</field>
+            <field name="partner_to">{{ object.partner_id.id }}</field>
+            <field name="lang">{{ object.partner_id.lang }}</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px; font-size: 14px; line-height: 1.5;">
+    <p>Bonjour <t t-out="object.partner_id.name or ''"/>,</p>
+    <p>Les dernières images satellite (Sentinel-2, image du <t t-out="format_date(object.date)"/>) montrent quelque chose à vérifier sur votre
+       parcelle <b t-out="object.parcelle_id.name"/> (<t t-out="object.parcelle_id.surface_ha"/> ha) :
+       <b t-out="dict(object._fields['genre'].selection).get(object.genre)"/>.</p>
+    <p t-out="object.detail"/>
+    <p t-out="object.conseil"/>
+    <p>Si vous voulez, nous passons vérifier l'installation (pression, débits, uniformité de l'arrosage). Un simple appel suffit.</p>
+    <p>Bien cordialement,<br/><t t-out="object.partner_id.user_id.name or object.company_id.name"/><br/><t t-out="object.company_id.name"/></p>
+</div>
+            </field>
+        </record>
+    </data>
+</odoo>
