@@ -14,6 +14,8 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Grille de remises** : typologie de client × famille / sous-famille, exceptions par client, article ou quantité ; la remise se pose
+  seule sur chaque ligne de devis, la marge est sous les yeux ; grille du réseau copiable.
 - **Pilotage** : le tableau de bord de l'adhérent et celui du réseau ; bilan et compte de résultat ; clôture d'exercice ;
   immobilisations amorties chaque mois.
 - **Tarifs, marges, commande groupée** : le tarif négocié chez chaque fournisseur s'importe et met à jour le prix d'achat de tous les

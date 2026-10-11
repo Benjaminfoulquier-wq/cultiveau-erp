@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_remise_list" model="ir.ui.view">
+        <field name="name">cultiveau.remise.list</field>
+        <field name="model">cultiveau.remise</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" default_order="cultiveau_type, categ_id, quantite_min">
+                <field name="company_id" column_invisible="True"/>
+                <field name="cultiveau_type"/>
+                <field name="categ_id"/>
+                <field name="partner_id" optional="show"/>
+                <field name="product_id" optional="show"/>
+                <field name="quantite_min" optional="show"/>
+                <field name="remise_pct"/>
+                <field name="note" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_remise_search" model="ir.ui.view">
+        <field name="name">cultiveau.remise.search</field>
+        <field name="model">cultiveau.remise</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="categ_id"/><field name="partner_id"/><field name="product_id"/>
+                <filter name="reseau" string="Grille réseau" domain="[('company_id', '=', False)]"/>
+                <group expand="1" string="Regrouper par">
+                    <filter name="par_type" string="Typologie de client" context="{'group_by': 'cultiveau_type'}"/>
+                    <filter name="par_famille" string="Famille" context="{'group_by': 'categ_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_grille" model="ir.actions.act_window">
+        <field name="name">Grille de remises</field>
+        <field name="res_model">cultiveau.remise</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_par_type': 1}</field>
+        <field name="domain">[('company_id', '=', allowed_company_ids[0])]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucune remise</p>
+            <p>Une ligne par typologie de client et par famille (ou sous-famille) : « agriculteur × tuyaux : 15 % ». Une ligne pour un client ou un article précis l'emporte. Réglages → Cultiveau copie la grille du réseau en un clic.</p>
+        </field>
+    </record>
+    <record id="action_grille_reseau" model="ir.actions.act_window">
+        <field name="name">Grille de remises du réseau</field>
+        <field name="res_model">cultiveau.remise</field>
+        <field name="view_mode">list</field>
+        <field name="context">{'search_default_par_type': 1, 'default_company_id': False}</field>
+        <field name="domain">[('company_id', '=', False)]</field>
+    </record>
+    <menuitem id="menu_grille" name="Grille de remises" parent="cultiveau_catalogue.menu_catalogue" action="action_grille" sequence="23"/>
+    <menuitem id="menu_grille_reseau" name="Grille de remises du réseau" parent="cultiveau_catalogue.menu_catalogue" action="action_grille_reseau" sequence="26" groups="cultiveau_base.group_equipe"/>
+    <record id="view_order_form_grille" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau.grille</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/list/field[@name='discount']" position="before">
+                <field name="cultiveau_remise_grille" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

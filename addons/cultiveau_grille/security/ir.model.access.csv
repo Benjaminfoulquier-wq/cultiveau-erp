@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_remise_user,cultiveau.remise,model_cultiveau_remise,base.group_user,1,0,0,0
+access_remise_vente,cultiveau.remise vente,model_cultiveau_remise,sales_team.group_sale_manager,1,1,1,1
+access_remise_equipe,cultiveau.remise équipe,model_cultiveau_remise,cultiveau_base.group_equipe,1,1,1,1

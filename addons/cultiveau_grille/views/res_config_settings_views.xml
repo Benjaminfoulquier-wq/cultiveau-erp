@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_grille" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.grille</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_tarifs.res_config_settings_view_form_tarifs"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_tarifs']" position="inside">
+                <setting string="Ma grille de remises" help="Par typologie de client et par famille ou sous-famille, avec des exceptions pour un client, un article ou une quantité. Au devis, chaque ligne trouve sa remise d'elle-même.">
+                    <div><field name="cultiveau_nb_remises" class="oe_inline"/> ligne(s) dans la grille</div>
+                    <button name="action_cultiveau_grille" type="object" string="Ouvrir ma grille" class="btn-link" icon="fa-table"/>
+                    <button name="action_cultiveau_copier_grille" type="object" string="Copier la grille du réseau" class="btn-link" icon="fa-clone"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>
