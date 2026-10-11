@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_site_connexion_list" model="ir.ui.view">
+        <field name="name">cultiveau.site.connexion.list</field>
+        <field name="model">cultiveau.site.connexion</field>
+        <field name="arch" type="xml">
+            <list decoration-danger="en_erreur" decoration-muted="not active">
+                <field name="company_id"/>
+                <field name="url"/>
+                <field name="derniere_synchro"/>
+                <field name="resultat"/>
+                <field name="en_erreur" column_invisible="True"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_site_connexion_form" model="ir.ui.view">
+        <field name="name">cultiveau.site.connexion.form</field>
+        <field name="model">cultiveau.site.connexion</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_tester" type="object" string="Tester la connexion"/>
+                    <button name="action_synchroniser" type="object" string="Synchroniser maintenant" class="btn-primary"/>
+                    <button name="action_reinitialiser" type="object" string="Tout relire au prochain passage"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_voir_bons" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <div class="o_stat_info"><span class="o_stat_value"><field name="nb_bons"/></span><span class="o_stat_text">Bons du site</span></div>
+                        </button>
+                    </div>
+                    <div class="alert alert-danger" role="alert" invisible="not en_erreur"><field name="resultat" readonly="1"/></div>
+                    <group>
+                        <group string="L'adhérent sur cultiveau.fr">
+                            <field name="company_id"/>
+                            <field name="url"/>
+                            <field name="cle" password="True"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Ce qui est récupéré">
+                            <field name="clients"/>
+                            <field name="interventions"/>
+                            <field name="chantiers"/>
+                            <field name="bons"/>
+                        </group>
+                    </group>
+                    <group string="Suivi">
+                        <group>
+                            <field name="derniere_synchro"/>
+                            <field name="resultat" invisible="en_erreur"/>
+                            <field name="en_erreur" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="curseur_clients"/>
+                            <field name="curseur_bons"/>
+                        </group>
+                    </group>
+                    <div class="text-muted">
+                        <p>La clé se crée sur cultiveau.fr, administration → <b>Clés API</b>, pour l'entreprise de cet adhérent, avec les droits
+                           <code>clients:read</code>, <code>interventions:read</code>, <code>chantiers:read</code> et <code>bons:read</code>.
+                           Le site n'autorise qu'une clé active par adhérent : en créer une révoque la précédente (si l'adhérent en utilise déjà une,
+                           reprenez la même).</p>
+                        <p>Lecture seule : l'ERP ne modifie rien sur le site. Synchronisation automatique toutes les heures.</p>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_site_connexions" model="ir.actions.act_window">
+        <field name="name">Liaison avec cultiveau.fr</field>
+        <field name="res_model">cultiveau.site.connexion</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'active_test': False}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun adhérent relié au site</p>
+            <p>Pour chaque adhérent qui travaille dans l'espace adhérent de cultiveau.fr : sa clé d'API du site. L'ERP récupère alors
+               ses clients, interventions, chantiers et bons d'intervention.</p>
+        </field>
+    </record>
+
+    <record id="view_site_bon_list" model="ir.ui.view">
+        <field name="name">cultiveau.site.bon.list</field>
+        <field name="model">cultiveau.site.bon</field>
+        <field name="arch" type="xml">
+            <list create="false">
+                <field name="date"/>
+                <field name="numero"/>
+                <field name="partner_id"/>
+                <field name="type_intervention"/>
+                <field name="technicien"/>
+                <field name="task_id" optional="show"/>
+                <field name="chantier_id" optional="hide"/>
+                <field name="statut"/>
+                <field name="signe_client" widget="boolean"/>
+                <field name="total_ht" sum="Total HT"/>
+                <field name="total_ttc" sum="Total TTC"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_site_bon_form" model="ir.ui.view">
+        <field name="name">cultiveau.site.bon.form</field>
+        <field name="model">cultiveau.site.bon</field>
+        <field name="arch" type="xml">
+            <form create="false" edit="false">
+                <sheet>
+                    <div class="oe_title"><h1><field name="numero"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="date"/>
+                            <field name="partner_id"/>
+                            <field name="client_nom"/>
+                            <field name="task_id"/>
+                            <field name="chantier_id"/>
+                            <field name="type_intervention"/>
+                            <field name="statut"/>
+                        </group>
+                        <group>
+                            <field name="technicien"/>
+                            <field name="equipement"/>
+                            <field name="duree_minutes"/>
+                            <field name="signe_client"/>
+                            <field name="signe_technicien"/>
+                            <field name="company_id"/>
+                        </group>
+                    </group>
+                    <field name="ligne_ids">
+                        <list>
+                            <field name="genre"/>
+                            <field name="reference"/>
+                            <field name="designation"/>
+                            <field name="product_id"/>
+                            <field name="quantite"/>
+                            <field name="unite"/>
+                            <field name="prix_unitaire_ht"/>
+                            <field name="remise"/>
+                            <field name="total_ht" sum="Total"/>
+                        </list>
+                    </field>
+                    <group class="oe_subtotal_footer">
+                        <field name="total_articles_ht"/>
+                        <field name="total_mo_ht"/>
+                        <field name="total_deplacement_ht"/>
+                        <field name="total_ht"/>
+                        <field name="total_tva"/>
+                        <field name="total_ttc"/>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                        <field name="observations"/>
+                        <field name="recommandations"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_site_bons" model="ir.actions.act_window">
+        <field name="name">Bons du site</field>
+        <field name="res_model">cultiveau.site.bon</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun bon d'intervention du site</p>
+            <p>Les bons d'intervention saisis sur cultiveau.fr arrivent ici dès qu'un adhérent est relié au site.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_site_connexions" name="Liaison avec cultiveau.fr" parent="cultiveau_base.menu_cultiveau_reglages" action="action_site_connexions" sequence="125"/>
+    <menuitem id="menu_site_bons" name="Bons du site" parent="cultiveau_interventions.menu_interventions_racine" action="action_site_bons" sequence="30"/>
+</odoo>

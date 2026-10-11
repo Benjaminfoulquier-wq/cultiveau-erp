@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cron_synchro_site" model="ir.cron">
+        <field name="name">Cultiveau : synchroniser l'espace adhérent de cultiveau.fr</field>
+        <field name="model_id" ref="model_cultiveau_site_connexion"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_synchroniser()</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">hours</field>
+        <field name="active" eval="True"/>
+    </record>
+</odoo>

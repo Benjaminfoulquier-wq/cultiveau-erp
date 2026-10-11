@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_site_connexion,cultiveau.site.connexion,model_cultiveau_site_connexion,cultiveau_base.group_equipe,1,1,1,1
+access_site_bon_equipe,cultiveau.site.bon équipe,model_cultiveau_site_bon,cultiveau_base.group_equipe,1,1,1,1
+access_site_bon,cultiveau.site.bon,model_cultiveau_site_bon,cultiveau_base.group_adherent,1,0,0,0
+access_site_bon_ligne,cultiveau.site.bon.ligne,model_cultiveau_site_bon_ligne,cultiveau_base.group_adherent,1,0,0,0
+access_site_bon_ligne_equipe,cultiveau.site.bon.ligne équipe,model_cultiveau_site_bon_ligne,cultiveau_base.group_equipe,1,1,1,1

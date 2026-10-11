@@ -96,3 +96,25 @@ Exemples : « Quelles interventions urgentes chez Eaux Vives ? », « Résume le
 
 Le connecteur parle le protocole MCP (HTTP, réponses JSON, versions 2024-11-05 à 2025-06-18) ; il accepte aussi
 la clé en en-tête `Authorization: Bearer` à l'adresse `/cultiveau/mcp`.
+
+## 4. Ce que l'ERP récupère de cultiveau.fr
+
+L'espace adhérent de cultiveau.fr a sa propre API externe (`/api/external`, en-tête `X-API-Key`). L'ERP s'en sert pour
+récupérer, adhérent par adhérent, ce qui est saisi sur le site.
+
+1. Sur **cultiveau.fr**, administration → **Clés API** : une clé pour l'entreprise de l'adhérent, avec les droits
+   `clients:read`, `interventions:read`, `chantiers:read`, `bons:read`. Le site n'autorise **qu'une clé active par
+   adhérent** : en créer une révoque la précédente (si l'adhérent en utilise déjà une ailleurs, reprendre la même).
+2. Dans **l'ERP**, Cultiveau → Réglages → **Liaison avec cultiveau.fr** → Nouveau : l'adhérent, la clé ; « Tester la
+   connexion », puis « Synchroniser maintenant ».
+
+| Sur le site | Dans l'ERP |
+|---|---|
+| Clients du SAV | Contacts de l'adhérent (retrouvés par téléphone, e-mail ou nom ; pas de doublon) |
+| Fiches d'intervention | Interventions (nature, urgence, étape, date prévue, symptômes, travaux, pièces) |
+| Chantiers | Chantiers (avec une installation « projet » créée pour le client au besoin) |
+| Bons d'intervention | Interventions → **Bons du site** (articles, main-d'œuvre, déplacement, totaux, signatures) |
+
+Lecture seule côté site ; synchronisation toutes les heures (600 requêtes par heure et par clé sur le site). Les
+clients et les bons sont relus depuis la dernière synchronisation ; les interventions et les chantiers sont relus en
+entier (le site ne permet pas mieux). Le parc installé et les PV ne sont pas encore exposés par le site.
