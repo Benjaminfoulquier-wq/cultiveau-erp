@@ -51,7 +51,7 @@ const ZONES = [
     { cle: "stockage", nom: "Stockage & familles", icone: "fa-cubes", box: [14, 0, 32, 21] },
     { cle: "atelier", nom: "Atelier & SAV", icone: "fa-wrench", box: [32, 0, 48, 21] },
     { cle: "dehors", nom: "Dépôt, cour & parking", icone: "fa-truck", box: [0, 22, 48, 37] },
-    { cle: "agriculteurs", nom: "Chez les agriculteurs", icone: "fa-leaf", box: [0, 43, 48, 64] },
+    { cle: "agriculteurs", nom: "Chez les clients", icone: "fa-leaf", box: [0, 43, 48, 64] },
 ];
 const TOUT = [-1, -1, 49, 62];
 
@@ -392,7 +392,7 @@ export class VueEnsemble extends Component {
         poste("agriculteurs", 5.0, 33.3, [M("voiture", 5.0, 33.3, { couleur: T.vert, pickup: true }, Math.PI / 2), M("personne", 6.6, 31.6, { chemise: T.orange, pantalon: T.marine }, -Math.PI / 2)], {
             zone: "dehors", titre: "Les agriculteurs", icone: "fa-users", badge: k.agriculteurs, haut: 2.8, couleur: "#53a832",
             texte: "Vos clients : leurs cultures, leur profil, ceux à appeler ce mois-ci.",
-            actions: [A("agriculteurs", "Les agriculteurs", { principal: true, badge: k.agriculteurs }), A("agriculteur_nouveau", "Nouvel agriculteur", { icone: "fa-plus" }),
+            actions: [A("agriculteurs", "Les clients", { principal: true, badge: k.agriculteurs }), A("agriculteur_nouveau", "Nouveau client", { icone: "fa-plus" }),
                       A("a_contacter", "À contacter ce mois-ci", { badge: k.a_contacter }), A("cultures", "Cultures et frise"), A("personas", "Profils"), A("import_clients", "Importer mes clients")],
             mots: "agriculteur client contact exploitant culture frise profil persona appeler importer clients",
         });

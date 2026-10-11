@@ -1,12 +1,22 @@
 from odoo import api, fields, models
 
 TYPES = [
-    ("agriculteur", "Agriculteur / client"),
+    ("agriculteur", "Agriculteur"),
+    ("collectivite", "Collectivité"),
+    ("particulier", "Particulier"),
+    ("industrie", "Industrie"),
+    ("plombier", "Plombier"),
+    ("paysagiste", "Paysagiste"),
+    ("pisciniste", "Pisciniste"),
     ("adherent", "Adhérent du réseau"),
     ("fournisseur", "Fournisseur"),
     ("partenaire", "Partenaire (coopérative, chambre, pépinière…)"),
     ("autre", "Autre"),
 ]
+
+
+# Les types de clients (ceux qui achètent de l'irrigation) : chacun a son véhicule en guise de portrait.
+CLIENTS = ["agriculteur", "collectivite", "particulier", "industrie", "plombier", "paysagiste", "pisciniste", "autre"]
 
 
 def departement_depuis_code_postal(code_postal):
@@ -24,7 +34,41 @@ def departement_depuis_code_postal(code_postal):
 class ResPartner(models.Model):
     _inherit = "res.partner"
 
-    cultiveau_type = fields.Selection(TYPES, string="Type Cultiveau", index=True)
+    cultiveau_type = fields.Selection(TYPES, string="Type de contact", index=True,
+                                      help="Agriculteur, collectivité (mairie, syndicat, golf, stade…), particulier, industrie, plombier, paysagiste, pisciniste… "
+                                           "Chaque type a son véhicule : on voit d'un coup d'œil qui fait quoi.")
+    cultiveau_est_client = fields.Boolean("Client", compute="_compute_est_client", store=True, index=True)
+
+    @api.depends("cultiveau_type")
+    def _compute_est_client(self):
+        for p in self:
+            p.cultiveau_est_client = p.cultiveau_type in CLIENTS
+
+    # ---------------------------------------------------------------- le portrait : un véhicule par type de client
+    def _avatar_get_placeholder_path(self):
+        if self.cultiveau_type in CLIENTS and not self.parent_id:
+            return f"cultiveau_base/static/src/img/clients/{self.cultiveau_type}.svg"
+        return super()._avatar_get_placeholder_path()
+
+    @api.depends("cultiveau_type", "parent_id")
+    def _compute_avatar_1920(self):
+        super()._compute_avatar_1920()
+
+    @api.depends("cultiveau_type", "parent_id")
+    def _compute_avatar_1024(self):
+        super()._compute_avatar_1024()
+
+    @api.depends("cultiveau_type", "parent_id")
+    def _compute_avatar_512(self):
+        super()._compute_avatar_512()
+
+    @api.depends("cultiveau_type", "parent_id")
+    def _compute_avatar_256(self):
+        super()._compute_avatar_256()
+
+    @api.depends("cultiveau_type", "parent_id")
+    def _compute_avatar_128(self):
+        super()._compute_avatar_128()
     exploitation = fields.Char("Exploitation", help="Le nom de l'exploitation agricole, s'il diffère du contact.")
     departement = fields.Char(
         "Département", size=3, compute="_compute_departement", store=True, readonly=False, index=True,

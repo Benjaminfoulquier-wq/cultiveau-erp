@@ -6,7 +6,7 @@ rangé dans la société de l'adhérent : ses clients ne sont pas visibles des a
 from odoo import api, models
 
 from .. import outils
-from .res_partner import normaliser_telephone
+from .res_partner import CLIENTS, normaliser_telephone
 
 COLONNES = {
     "civilite": ["civilite", "titre", "genre"],
@@ -33,7 +33,13 @@ COLONNES = {
     "notes": ["notes", "remarque", "remarques", "commentaire", "commentaires", "observations", "note"],
 }
 TYPES_MOTS = [("fournisseur", "fournisseur"), ("partenaire", "partenaire"), ("coop", "partenaire"), ("chambre", "partenaire"),
-              ("adherent", "adherent"), ("prospect", "prospect"), ("client", "agriculteur"), ("agri", "agriculteur")]
+              ("adherent", "adherent"), ("prospect", "prospect"),
+              ("collectivite", "collectivite"), ("mairie", "collectivite"), ("commune", "collectivite"), ("syndicat", "collectivite"),
+              ("golf", "collectivite"), ("stade", "collectivite"), ("public", "collectivite"),
+              ("particulier", "particulier"), ("prive", "particulier"), ("jardin", "particulier"),
+              ("industrie", "industrie"), ("usine", "industrie"), ("carriere", "industrie"), ("entreprise", "industrie"),
+              ("plomb", "plombier"), ("paysag", "paysagiste"), ("espaces verts", "paysagiste"), ("piscin", "pisciniste"),
+              ("client", "agriculteur"), ("agri", "agriculteur"), ("exploit", "agriculteur"), ("gaec", "agriculteur"), ("earl", "agriculteur")]
 
 
 class ResPartnerImport(models.AbstractModel):
@@ -93,7 +99,7 @@ class ResPartnerImport(models.AbstractModel):
                 type_c = "agriculteur"
             valeurs = {
                 "name": nom_complet[:160], "is_company": not nom and bool(exploitation), "company_id": societe.id,
-                "cultiveau_type": type_c, "customer_rank": 1 if type_c in ("agriculteur",) else 0,
+                "cultiveau_type": type_c, "customer_rank": 1 if type_c in CLIENTS else 0,
                 "supplier_rank": 1 if type_c == "fournisseur" else 0,
             }
             if nom and exploitation:

@@ -6,7 +6,7 @@ CRM, stocks, achats, e-mailing, projets, contacts et portail client. Les modules
 
 | Module | Ce qu'il apporte |
 |---|---|
-| `cultiveau_base` | Le réseau : adhérents (une société Odoo chacun), agriculteurs, département, outils du réseau dans le menu, réglages |
+| `cultiveau_base` | Le réseau : adhérents (une société chacun), clients typés (agriculteur, collectivité, particulier, industrie, plombier, paysagiste, pisciniste — chacun son véhicule en portrait), import de clients, département, outils du réseau dans le menu, réglages |
 | `cultiveau_frise` | La frise culturale : cultures de chaque client, stades et besoins en eau par département, fenêtres « projet » et « achat », les quatre saisons émotionnelles (écoute, support, discret, proposition), les périodes critiques, les cours agricoles, « À contacter ce mois-ci » |
 | `cultiveau_persona` | Les cinq personas de l'étude PRISM (🦁 Lion, 🐆 Jaguar, 🐈 Chat, 🐢 Tortue, 🐝 Abeille), huit questions pour les reconnaître, leur besoin sur la pyramide de Maslow, et **l'Agent** qui croise persona × frise × cours pour dire quand appeler et sur quel ton |
 | `cultiveau_catalogue` | Le catalogue technique (DN, PN, matière, raccordement, fiches) ; import de la matrice Cultiveau et du catalogue 3D |

@@ -30,8 +30,8 @@ class Facture(models.Model):
         self.ensure_one()
         if self.move_type not in ("out_invoice", "out_refund") or (self.company_id.country_id and self.company_id.country_id.code != "FR"):
             return ""
-        if not self.partner_id.commercial_partner_id.is_company and self.partner_id.cultiveau_type not in ("agriculteur", "adherent", "partenaire"):
-            return ""
+        if self.partner_id.commercial_partner_id.cultiveau_type == "particulier":
+            return ""  # entre professionnels seulement
         return ("En cas de retard de paiement, pénalités au taux de trois fois le taux d'intérêt légal et indemnité forfaitaire de 40 € pour frais "
                 "de recouvrement (art. L. 441-10 du Code de commerce). Pas d'escompte pour paiement anticipé.")
 

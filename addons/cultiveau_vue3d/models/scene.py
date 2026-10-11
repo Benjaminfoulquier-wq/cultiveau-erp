@@ -165,7 +165,7 @@ class Scene(models.AbstractModel):
         factures = self.env["account.move"].search([("company_id", "=", company.id), ("move_type", "=", "out_invoice"), ("state", "=", "posted"), ("payment_state", "in", ("not_paid", "partial"))])
         a_contacter = Partner.search_count([("cultiveau_a_contacter", "=", True), ("company_id", "in", [company.id, False])]) if "cultiveau_a_contacter" in Partner._fields else 0
         return {
-            "agriculteurs": Partner.search_count([("company_id", "in", [company.id, False]), ("cultiveau_type", "=", "agriculteur"), ("parent_id", "=", False)]),
+            "agriculteurs": Partner.search_count([("company_id", "in", [company.id, False]), ("cultiveau_est_client", "=", True), ("parent_id", "=", False)]),
             "a_contacter": a_contacter,
             "articles_en_stock": len(self.env["stock.quant"]._read_group([("company_id", "=", company.id), ("location_id.usage", "=", "internal"), ("quantity", ">", 0)], ["product_id"])),
             "devis": len(devis), "devis_montant": round(sum(devis.mapped("amount_total"))),
@@ -256,7 +256,7 @@ class Scene(models.AbstractModel):
             "comptoir": ("cultiveau_comptoir.action_comptoir", {}),
             "ventes_comptoir": ("sale.action_orders", {"name": "Ventes au comptoir", "domain": [("origin", "=", "Comptoir")]}),
             "agriculteurs": ("cultiveau_base.action_agriculteurs", {}),
-            "agriculteur_nouveau": ("cultiveau_base.action_agriculteurs", {"name": "Nouvel agriculteur", "form": True,
+            "agriculteur_nouveau": ("cultiveau_base.action_agriculteurs", {"name": "Nouveau client", "form": True,
                                     "context": {"default_cultiveau_type": "agriculteur", "default_is_company": False}}),
             "a_contacter": ("cultiveau_frise.action_a_contacter", {}),
             "import_clients": ("cultiveau_base.action_import_clients", {}),

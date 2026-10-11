@@ -38,7 +38,7 @@ class Installation(models.Model):
 
     name = fields.Char("Installation", required=True, tracking=True, help="Ex. « Pivot des Grandes Terres », « Goutte à goutte vigne Mas Neuf ».")
     partner_id = fields.Many2one("res.partner", "Agriculteur", required=True, index=True, tracking=True,
-                                 domain="[('cultiveau_type', 'in', ('agriculteur', False))]")
+                                 domain="['|', ('cultiveau_est_client', '=', True), ('cultiveau_type', '=', False)]")
     company_id = fields.Many2one("res.company", "Adhérent", required=True, default=lambda self: self.env.company, index=True)
     user_id = fields.Many2one("res.users", "Suivie par", default=lambda self: self.env.user, tracking=True)
     type_systeme = fields.Selection(TYPES, "Type d'installation", required=True, tracking=True)

@@ -55,7 +55,7 @@
         </xpath>
     </template>
     <template id="mail_notification_light_cultiveau" inherit_id="mail.mail_notification_light" name="Cultiveau : pied des e-mails (léger)">
-        <xpath expr="//td[contains(text(), 'Powered by')]" position="replace">
+        <xpath expr="//span[@id='mail_unfollow']/.." position="replace">
             <td align="center" style="min-width: 590px;">
                 Envoyé par <a target="_blank" href="https://cultiveau.fr" style="color: #0b8aa3;">Cultiveau</a>
                 <span id="mail_unfollow">

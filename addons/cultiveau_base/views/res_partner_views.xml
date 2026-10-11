@@ -32,26 +32,35 @@
         <field name="arch" type="xml">
             <filter name="type_company" position="after">
                 <separator/>
+                <filter name="cultiveau_clients" string="Clients" domain="[('cultiveau_est_client', '=', True)]"/>
                 <filter name="cultiveau_agriculteurs" string="Agriculteurs" domain="[('cultiveau_type', '=', 'agriculteur')]"/>
+                <filter name="cultiveau_collectivites" string="Collectivités" domain="[('cultiveau_type', '=', 'collectivite')]"/>
+                <filter name="cultiveau_particuliers" string="Particuliers" domain="[('cultiveau_type', '=', 'particulier')]"/>
+                <filter name="cultiveau_industries" string="Industries" domain="[('cultiveau_type', '=', 'industrie')]"/>
+                <filter name="cultiveau_plombiers" string="Plombiers" domain="[('cultiveau_type', '=', 'plombier')]"/>
+                <filter name="cultiveau_paysagistes" string="Paysagistes" domain="[('cultiveau_type', '=', 'paysagiste')]"/>
+                <filter name="cultiveau_piscinistes" string="Piscinistes" domain="[('cultiveau_type', '=', 'pisciniste')]"/>
+                <separator/>
                 <filter name="cultiveau_adherents" string="Adhérents" domain="[('cultiveau_type', '=', 'adherent')]"/>
                 <filter name="cultiveau_fournisseurs" string="Fournisseurs Cultiveau" domain="[('cultiveau_type', '=', 'fournisseur')]"/>
             </filter>
             <filter name="group_country" position="after">
                 <filter name="group_departement" string="Département" context="{'group_by': 'departement'}"/>
-                <filter name="group_cultiveau_type" string="Type Cultiveau" context="{'group_by': 'cultiveau_type'}"/>
+                <filter name="group_cultiveau_type" string="Type de contact" context="{'group_by': 'cultiveau_type'}"/>
             </filter>
         </field>
     </record>
 
     <record id="action_agriculteurs" model="ir.actions.act_window">
-        <field name="name">Agriculteurs</field>
+        <field name="name">Clients</field>
         <field name="res_model">res.partner</field>
         <field name="view_mode">kanban,list,form</field>
-        <field name="domain">[('cultiveau_type', '=', 'agriculteur')]</field>
-        <field name="context">{'default_cultiveau_type': 'agriculteur', 'default_is_company': False, 'default_company_id': allowed_company_ids[0], 'default_customer_rank': 1}</field>
+        <field name="domain">[('cultiveau_est_client', '=', True), ('parent_id', '=', False)]</field>
+        <field name="context">{'default_cultiveau_type': 'agriculteur', 'default_is_company': False, 'default_company_id': allowed_company_ids[0], 'default_customer_rank': 1, 'search_default_group_cultiveau_type': 1}</field>
         <field name="help" type="html">
-            <p class="o_view_nocontent_smiling_face">Vos clients agriculteurs</p>
-            <p>Chaque agriculteur a sa fiche : cultures et frise culturale, persona, devis, factures, appels.
+            <p class="o_view_nocontent_smiling_face">Vos clients</p>
+            <p>Agriculteurs, collectivités, particuliers, industries, plombiers, paysagistes, piscinistes : chacun son véhicule, on voit qui fait quoi.
+               L'agriculteur a en plus ses cultures et sa frise culturale : on sait qui contacter au bon moment.
                Pour en reprendre toute une liste : <b>Cultiveau → Importer mes clients</b> (Excel ou CSV, colonnes reconnues automatiquement).</p>
         </field>
     </record>
