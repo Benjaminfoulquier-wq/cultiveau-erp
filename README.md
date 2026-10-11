@@ -75,7 +75,7 @@ Première connexion : `admin` / `admin`, à changer aussitôt. Puis :
 7. **Projets et ventes → une commande confirmée → « Lancer le chantier »** : l'équipe, les dates (Chantiers → Planning), le matériel
    sorti du magasin, les photos, puis « Mettre en service » avec le PV signé par l'exploitant.
 
-La suite : [docs/FEUILLE-DE-ROUTE.md](docs/FEUILLE-DE-ROUTE.md).
+L'API et le connecteur Claude : [docs/API.md](docs/API.md). La suite : [docs/FEUILLE-DE-ROUTE.md](docs/FEUILLE-DE-ROUTE.md).
 
 En local, sans Docker : Python 3.10+, PostgreSQL, le code d'Odoo 18 (`git clone --depth 1 -b 18.0 https://github.com/odoo/odoo`), puis
 `python odoo-bin --addons-path=odoo/addons,addons -d cultiveau -i cultiveau_connecteurs,cultiveau_catalogue,l10n_fr,mass_mailing`.

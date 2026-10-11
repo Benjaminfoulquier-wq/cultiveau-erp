@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_cle_api,cultiveau.cle.api,model_cultiveau_cle_api,cultiveau_base.group_equipe,1,1,1,1

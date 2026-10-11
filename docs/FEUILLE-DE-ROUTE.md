@@ -26,6 +26,8 @@
   le panier, le client ou « client de passage », puis « Encaisser » (espèces, carte, chèque, virement) : commande confirmée, sortie de
   stock validée, facture payée, ticket ; ou « Commande à livrer », ou « Devis à envoyer ». Le plan comptable français se met en place
   tout seul au premier encaissement d'un adhérent.
+- **L'API** : une clé par outil (Réglages → Clés d'API), l'API REST `/cultiveau/api/v1` (clients, interventions, chantiers,
+  installations, devis, factures, articles…) et le connecteur Claude ; voir [API.md](API.md).
 - **Les chantiers** : lancés depuis la commande, avec l'équipe de pose, les dates (planning par chef de chantier), le matériel prévu
   d'après la commande et sorti du magasin (bon de sortie), les photos, puis la mise en service : PV A1.3 signé par l'exploitant sur
   place, l'installation passe « en service » et le registre est tenu.
