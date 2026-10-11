@@ -155,7 +155,7 @@ class Parcelle(models.Model):
     @api.depends("contour", "culture_id.couleur", "etat")
     def _compute_carte(self):
         for p in self:
-            p.carte = dessiner_carte(p, 260, 200) if p.contour else False
+            p.carte = dessiner_carte(p, 260, 200, legende=False) if p.contour else False
 
     @api.depends("indice_ids")
     def _compute_courbe(self):
@@ -421,7 +421,7 @@ def couleur_ndvi(ndvi):
     return next(c for seuil, c in paliers if ndvi < seuil)
 
 
-def dessiner_carte(parcelles, largeur=640, hauteur=360, selon="culture"):
+def dessiner_carte(parcelles, largeur=640, hauteur=360, selon="culture", legende=True):
     """Les contours des parcelles, colorés par culture (ou par NDVI), une pastille rouge sur celles à vérifier."""
     avec = [p for p in parcelles if p.contour]
     anneaux = [p.anneau() for p in avec]
@@ -439,8 +439,9 @@ def dessiner_carte(parcelles, largeur=640, hauteur=360, selon="culture"):
         formes.append(f"<polygon points='{points}' fill='{teinte}' fill-opacity='0.75' stroke='#1d3b45' stroke-width='1'><title>{Markup.escape(titre)}</title></polygon>")
         if p.etat == "alerte":
             formes.append(f"<circle cx='{cx:.1f}' cy='{cy:.1f}' r='6' fill='#d94f45' stroke='#ffffff' stroke-width='2'/>")
-    return Markup(f"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {largeur} {hauteur + 30}' style='width:100%;max-width:{largeur}px;background:#eef3ea;"
-                  f"border-radius:8px'>{''.join(formes)}{_legende(avec, hauteur, selon)}</svg>")
+    bas = _legende(avec, hauteur, selon) if legende else ""
+    return Markup(f"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 {largeur} {hauteur + (30 if legende else 0)}' style='width:100%;max-width:{largeur}px;background:#eef3ea;"
+                  f"border-radius:8px'>{''.join(formes)}{bas}</svg>")
 
 
 def _legende(parcelles, y, selon):

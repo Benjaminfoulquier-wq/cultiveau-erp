@@ -108,10 +108,36 @@
         </field>
     </record>
 
+    <record id="view_parcelle_kanban" model="ir.ui.view">
+        <field name="name">cultiveau.parcelle.kanban</field>
+        <field name="model">cultiveau.parcelle</field>
+        <field name="arch" type="xml">
+            <kanban default_order="partner_id, campagne desc, tri" quick_create="false">
+                <field name="etat"/>
+                <field name="derniere_mesure"/>
+                <field name="carte"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex align-items-center">
+                            <div class="me-2" style="width:110px;flex:none"><t t-out="record.carte.raw_value"/></div>
+                            <div class="flex-grow-1">
+                                <strong><field name="name"/></strong>
+                                <div class="small text-muted"><field name="partner_id"/></div>
+                                <div class="small"><field name="surface_ha"/> ha<t t-if="record.culture_id.raw_value"> · <field name="culture_id"/></t><t t-else=""> · <field name="code_id"/></t></div>
+                                <div class="small" t-if="record.derniere_mesure.raw_value">NDVI <field name="dernier_ndvi"/> · NDWI <field name="dernier_ndwi"/> le <field name="derniere_mesure"/></div>
+                                <field name="etat" widget="badge" decoration-danger="etat == 'alerte'" decoration-success="etat == 'ok'"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
     <record id="action_parcelles" model="ir.actions.act_window">
         <field name="name">Parcelles</field>
         <field name="res_model">cultiveau.parcelle</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Aucune parcelle</p>
             <p>Demandez à vos clients leur fichier Telepac (fiche du client → onglet « Parcelles PAC ») : leurs parcelles, leurs cultures,
