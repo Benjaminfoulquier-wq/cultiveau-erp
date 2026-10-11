@@ -97,3 +97,18 @@ browser.addEventListener(
     },
     true
 );
+
+// Le service worker (page hors ligne, application installée) est déclaré sous /app, comme l'adresse de l'application.
+import { patch } from "@web/core/utils/patch";
+import { WebClient } from "@web/webclient/webclient";
+
+patch(WebClient.prototype, {
+    registerServiceWorker() {
+        if (navigator.serviceWorker) {
+            navigator.serviceWorker
+                .register("/web/service-worker.js", { scope: PREFIXE })
+                .then(() => this.serviceWorkerActivatedDeferred?.resolve())
+                .catch((e) => console.info("Service worker :", e.message));
+        }
+    },
+});

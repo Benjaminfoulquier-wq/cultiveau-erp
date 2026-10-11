@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Les comptes existants arrivent eux aussi sur la vue d'ensemble (les nouveaux l'ont par défaut). -->
+    <function model="res.users" name="_cultiveau_page_accueil_pour_tous"/>
+</odoo>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_vue3d.Vue">
+        <div class="o_cultiveau_vue3d d-flex flex-column h-100">
+            <div class="o_cultiveau_vue3d_entete d-flex align-items-center gap-3 px-3 py-2 flex-wrap">
+                <h2 class="m-0" t-esc="state.donnees ? state.donnees.societe.nom : ''"/>
+                <span class="text-muted">le parcours client, station par station</span>
+                <div class="ms-auto d-flex gap-2 flex-wrap" t-if="state.donnees">
+                    <button class="btn btn-sm btn-light" t-on-click="() => this.ouvrirListe('res.partner', [['cultiveau_type', '=', 'agriculteur'], ['parent_id', '=', false]], 'Agriculteurs')">
+                        <b t-esc="state.donnees.compteurs.agriculteurs"/> agriculteurs</button>
+                    <button class="btn btn-sm btn-light" t-if="state.donnees.compteurs.a_contacter" t-on-click="() => this.ouvrirListe('res.partner', [['cultiveau_a_contacter', '=', true]], 'À contacter ce mois-ci')">
+                        <b t-esc="state.donnees.compteurs.a_contacter"/> à contacter ce mois-ci</button>
+                    <button class="btn btn-sm btn-light" t-on-click="() => this.ouvrirListe('sale.order', [['state', 'in', ['draft', 'sent']]], 'Devis en cours')">
+                        <b t-esc="state.donnees.compteurs.devis"/> devis — <b t-esc="state.donnees.compteurs.devis_montant.toLocaleString('fr-FR')"/> €</button>
+                    <button class="btn btn-sm btn-light" t-on-click="() => this.ouvrirListe('project.task', [['cultiveau_intervention', '=', true], ['state', 'not in', ['1_done', '1_canceled']]], 'Interventions à faire')">
+                        <b t-esc="state.donnees.compteurs.interventions"/> interventions</button>
+                    <button class="btn btn-sm btn-light" t-on-click="() => this.ouvrirListe('account.move', [['move_type', '=', 'out_invoice'], ['state', '=', 'posted'], ['payment_state', 'in', ['not_paid', 'partial']]], 'Factures à encaisser')">
+                        <b t-esc="state.donnees.compteurs.factures"/> factures — <b t-esc="state.donnees.compteurs.factures_montant.toLocaleString('fr-FR')"/> €</button>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">Créer</button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('res.partner', {default_cultiveau_type: 'agriculteur', default_is_company: false})">Un agriculteur</a></li>
+                            <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('crm.lead', {default_type: 'opportunity'})">Une demande (appel, visite)</a></li>
+                            <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('cultiveau.installation', {default_etat: 'etude'})">Une étude d'installation</a></li>
+                            <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('sale.order', {})">Un devis</a></li>
+                            <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('project.task', {default_cultiveau_nature: 'depannage'})">Un dépannage</a></li>
+                            <li><a class="dropdown-item" href="#" t-on-click.prevent="() => this.creer('purchase.order', {})">Une commande fournisseur</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="o_cultiveau_vue3d_scene flex-grow-1 position-relative">
+                <svg t-if="state.donnees" t-att-viewBox="state.viewBox" preserveAspectRatio="xMidYMid meet" class="w-100 h-100">
+                    <g class="decor">
+                        <t t-foreach="state.decor" t-as="d" t-key="d.cle">
+                            <polygon t-foreach="d.faces" t-as="f" t-key="f_index" t-att-points="f.points" t-att-fill="f.fill" stroke="#ffffff" stroke-width="0.4"/>
+                        </t>
+                    </g>
+                    <g class="elements">
+                        <g t-foreach="state.elements" t-as="e" t-key="e.cle" class="element" t-on-click="() => this.ouvrir(e)"
+                           t-on-mouseenter="() => state.survol = e.titre" t-on-mouseleave="() => state.survol = null">
+                            <title t-esc="e.titre"/>
+                            <polygon t-foreach="e.faces" t-as="f" t-key="f_index" t-att-points="f.points" t-att-fill="f.fill" stroke="#ffffff" stroke-width="0.5"/>
+                            <text t-att-x="etiquette(e)[0]" t-att-y="etiquette(e)[1]" class="etiquette"><t t-esc="e.etiquette"/></text>
+                        </g>
+                    </g>
+                    <g class="stations">
+                        <g t-foreach="state.stations" t-as="s" t-key="s.numero" class="station" t-on-click="() => this.ouvrir(s)">
+                            <circle t-att-cx="s.ancre[0] - 60" t-att-cy="s.ancre[1] + 12" r="9" fill="#183840"/>
+                            <text t-att-x="s.ancre[0] - 60" t-att-y="s.ancre[1] + 16" class="numero" text-anchor="middle"><t t-esc="s.numero"/></text>
+                            <text t-att-x="s.ancre[0] - 46" t-att-y="s.ancre[1] + 16" class="zone"><t t-esc="s.nom"/> <tspan class="compte" t-if="s.compte">(<t t-esc="s.compte"/>)</tspan></text>
+                        </g>
+                    </g>
+                </svg>
+                <div class="o_cultiveau_vue3d_info" t-if="state.survol" t-esc="state.survol"/>
+                <div class="o_cultiveau_vue3d_legende">
+                    <span><i style="background:#d9534f"/> urgence immédiate</span>
+                    <span><i style="background:#f0a04b"/> dans la journée / chantier</span>
+                    <span><i style="background:#0b8aa3"/> cette semaine / envoyé</span>
+                    <span><i style="background:#6fa352"/> en service</span>
+                    <span><i style="background:#e3b23c"/> à l'étude / en attente</span>
+                    <span><i style="background:#b5bcc4"/> projet / brouillon</span>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
