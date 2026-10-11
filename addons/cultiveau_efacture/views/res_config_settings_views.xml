@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_efacture" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.efacture</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Facture électronique" name="cultiveau_efacture">
+                    <setting string="Plateforme agréée"
+                             help="Depuis le 1er septembre 2026, toute entreprise doit pouvoir recevoir ses factures par une plateforme agréée ; les PME et TPE les émettent par elle à partir du 1er septembre 2027. Inscrivez la société d'abord en démonstration (rien ne part), puis en réel.">
+                        <div class="row mt8"><label for="cultiveau_siret" class="col-lg-4 o_light_label"/><field name="cultiveau_siret"/></div>
+                        <div class="mt8">
+                            <field name="cultiveau_efacture_etat" invisible="1"/>
+                            <span class="badge rounded-pill text-bg-success" invisible="cultiveau_efacture_etat != 'prod'">Inscrite, en réel</span>
+                            <span class="badge rounded-pill text-bg-info" invisible="cultiveau_efacture_etat not in ('demo', 'test')">Inscrite en démonstration</span>
+                            <span class="badge rounded-pill text-bg-warning" invisible="cultiveau_efacture_etat != 'attente'">Inscription en cours</span>
+                            <span class="badge rounded-pill text-bg-danger" invisible="cultiveau_efacture_etat != 'refusee'">Inscription refusée</span>
+                            <span class="badge rounded-pill text-bg-secondary" invisible="cultiveau_efacture_etat != 'non'">Pas encore inscrite</span>
+                            <span class="ms-2 text-muted" invisible="not cultiveau_pdp_identifiant">Identifiant <field name="cultiveau_pdp_identifiant" class="oe_inline"/></span>
+                            <span class="ms-2 text-muted" invisible="not cultiveau_annuaire_depuis">— sur l'annuaire depuis le <field name="cultiveau_annuaire_depuis" class="oe_inline"/></span>
+                        </div>
+                        <button name="action_cultiveau_inscription" type="object" string="Inscrire la société" class="btn-link" icon="fa-arrow-right"/>
+                    </setting>
+                    <setting string="E-reporting" help="Les ventes aux particuliers (le comptoir) et les encaissements sont transmis à l'administration par la plateforme. Obligatoire à la même date que l'émission des factures.">
+                        <field name="cultiveau_ereporting"/>
+                        <div class="row mt8" invisible="not cultiveau_ereporting"><label for="cultiveau_ereporting_depuis" class="col-lg-4 o_light_label"/><field name="cultiveau_ereporting_depuis"/></div>
+                    </setting>
+                    <setting string="Double authentification" help="Exigée par la plateforme agréée pour inscrire une société, et bonne pour tout le monde : un code arrive par e-mail à chaque connexion depuis un nouvel appareil ; chacun peut aussi utiliser une application d'authentification.">
+                        <field name="cultiveau_double_auth" invisible="1"/>
+                        <span class="text-success" invisible="not cultiveau_double_auth"><i class="fa fa-check"/> Exigée de tous les utilisateurs</span>
+                        <button name="action_cultiveau_double_auth" type="object" string="Exiger la double authentification" class="btn-link" icon="fa-lock" invisible="cultiveau_double_auth"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

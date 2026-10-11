@@ -14,6 +14,9 @@
   Abeille) et l'Agent qui dit comment aborder le client ce mois-ci.
 - **Installations, devis, interventions** : le dossier de chaque site (analyse des besoins, dimensionnement, équipements), devis liés à
   l'installation, simulateur « irrigation à l'usage », interventions planifiées et registre.
+- **Facture électronique** : chaque société s'inscrit sur la plateforme agréée depuis Réglages → Cultiveau (démonstration, puis
+  réel), reçoit ses factures fournisseurs par la plateforme et y émettra les siennes à l'échéance de 2027 ; e-reporting du comptoir ;
+  double authentification exigée d'un clic ; sauvegarde nocturne vérifiée, copiée hors serveur si un espace de stockage est fourni.
 - **Comptabilité** : chaque société a son plan comptable français et ses journaux ; le relevé de la banque s'importe (CSV, OFX,
   CAMT.053, QIF) et chaque ligne est proposée en face d'une facture, d'un paiement du comptoir ou d'un compte (frais bancaires,
   emprunt, TVA…), le sûr se rapproche seul, le reste se valide en un clic ; les clients et fournisseurs se lettrent d'eux-mêmes ;
@@ -76,8 +79,9 @@
 11. **Comptabilité.** Fait : plan et journaux français par société, import des relevés (CSV, OFX, CAMT, QIF), rapprochement proposé
     et validé en un clic, lettrage automatique des tiers, déclaration de TVA calculée et son écriture, exports FEC / grand livre /
     balance, accès du comptable. Reste : le paiement en ligne, les immobilisations et la clôture d'exercice (à-nouveaux).
-12. **Exploitation et sécurité.** Sauvegarde quotidienne hors serveur, double authentification, changement des mots de passe d'origine,
-    journal des accès, RGPD (export et suppression d'un client).
+12. **Exploitation et sécurité.** Fait : sauvegarde quotidienne vérifiée (30 jours, hebdomadaires 90 jours) et copie hors serveur dès
+    qu'un espace de stockage est renseigné (secret `CULTIVEAU_RCLONE_CONF`), double authentification. Reste : changement des mots de
+    passe d'origine, journal des accès, RGPD (export et suppression d'un client), dépôt GitHub privé.
 
 ## Ce que ça demande à Cultiveau
 

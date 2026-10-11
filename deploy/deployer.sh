@@ -23,7 +23,10 @@ $SSH "$SERVEUR" "
     } > /srv/erp/.env
   fi
 "
+# La configuration du stockage hors serveur voyage avec le code, puis est rangée hors du dépôt (jamais commitée : .gitignore).
+if [ -n "${RCLONE_CONF:-}" ]; then umask 077; printf '%s\n' "$RCLONE_CONF" > deploy/rclone.conf.tmp; fi
 rsync -az --delete -e "$SSH" --exclude=/.git --exclude=/data --exclude=/.env --exclude=__pycache__ ./ "$SERVEUR:/srv/erp/app/"
+rm -f deploy/rclone.conf.tmp
 $SSH "$SERVEUR" '
   set -e
   cd /srv/erp/app
@@ -35,6 +38,9 @@ $SSH "$SERVEUR" '
   chown -R 101:101 /srv/erp/data/odoo
   chmod +x deploy/sauvegarde.sh scripts/*.sh
   grep -q "erp/app/deploy/sauvegarde.sh" /etc/crontab || echo "45 1 * * * root /srv/erp/app/deploy/sauvegarde.sh" >> /etc/crontab
+  # Sauvegarde hors serveur : rclone, et sa configuration si elle est fournie (un espace de stockage chez un autre hébergeur).
+  command -v rclone > /dev/null 2>&1 || (apt-get update -qq && apt-get install -y -qq rclone > /dev/null)
+  if [ -s /srv/erp/app/deploy/rclone.conf.tmp ]; then umask 077; mv /srv/erp/app/deploy/rclone.conf.tmp /srv/erp/rclone.conf; fi
   docker compose pull -q
   # Les droits du dossier de fichiers d Odoo sont posés depuis l intérieur du conteneur : c est le seul point de vue
   # qui vaut quelle que soit la façon dont le serveur mappe les utilisateurs des conteneurs.
@@ -47,7 +53,7 @@ $SSH "$SERVEUR" '
   if [ "$etat" = "installed" ]; then
     # « run » passe par le point d entrée de l image, qui donne à Odoo l adresse de la base ; « exec » ne le ferait pas.
     docker compose stop odoo >/dev/null 2>&1 || true
-    if docker compose run --rm odoo odoo -d "$ODOO_DB" -i cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles,cultiveau_compta -u cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles,cultiveau_compta --stop-after-init > /tmp/erp-maj.log 2>&1; then
+    if docker compose run --rm odoo odoo -d "$ODOO_DB" -i cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles,cultiveau_compta,cultiveau_efacture -u cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles,cultiveau_compta,cultiveau_efacture --stop-after-init > /tmp/erp-maj.log 2>&1; then
       echo "Modules Cultiveau à jour."
     else
       tail -25 /tmp/erp-maj.log; docker compose up -d odoo; echo "ÉCHEC de la mise à jour des modules (journal ci-dessus)."; exit 1
