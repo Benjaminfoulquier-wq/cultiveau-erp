@@ -14,6 +14,10 @@
         <!-- Les couleurs des e-mails et le nom du robot interne de la messagerie : ceux du réseau, réappliqués à chaque mise à jour. -->
         <function model="res.company" name="write" eval="[[ref('base.main_company')], {'email_primary_color': '#183840', 'email_secondary_color': '#0b8aa3'}]"/>
         <function model="res.partner" name="write" eval="[[ref('base.partner_root')], {'name': 'Assistant Cultiveau'}]"/>
+        <!-- Son avatar : le logo Cultiveau, pas le robot de l'éditeur. -->
+        <record id="base.partner_root" model="res.partner">
+            <field name="image_1920" type="base64" file="cultiveau_marque/static/src/img/avatar.png"/>
+        </record>
     </data>
     <data noupdate="1">
         <!-- Le logo de la société principale : Cultiveau. -->
