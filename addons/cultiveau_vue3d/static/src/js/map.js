@@ -5,6 +5,7 @@ import { Component, onMounted, onWillStart, onWillUnmount, useRef, useState } fr
 import { loadJS } from "@web/core/assets";
 import { registry } from "@web/core/registry";
 import { router } from "@web/core/browser/router";
+import { rpc } from "@web/core/network/rpc";
 import { useService } from "@web/core/utils/hooks";
 import { standardActionServiceProps } from "@web/webclient/actions/action_service";
 import { creerKit } from "./kit";
@@ -13,14 +14,14 @@ import { Moteur } from "./moteur";
 const LIB = "/cultiveau_vue3d/static/lib/three/three.min.js";
 const ICONES = { personne: "fa-user", camion: "fa-truck", client: "fa-car", dossier: "fa-leaf", chantier: "fa-wrench", intervention: "fa-bolt", rayon: "fa-archive", rayon_fixe: "fa-archive",
                  zone: "fa-map-o", borne: "fa-id-card-o", livraison: "fa-truck", poste: "fa-desktop", machine: "fa-cog", objet: "fa-cube", comptoir: "fa-shopping-basket", etabli: "fa-wrench", article: "fa-cube",
-                 assistant: "fa-comments-o", appel: "fa-phone" };
+                 assistant: "fa-comments-o", appel: "fa-phone", salle: "fa-users" };
 const GENRES_FICHE = { personne: "personne", camion: "camion", client: "client", dossier: "dossier", chantier: "chantier", intervention: "intervention", rayon: "rayon", zone: "zone", borne: "borne",
                        livraison: "livraison", poste: "poste", machine: "intervention", article: "article", appel: "appel" };
 const ICONES_EVENEMENT = { arrivee: "fa-sign-in", depart: "fa-sign-out", pause_debut: "fa-coffee", pause_fin: "fa-coffee", depart_intervention: "fa-truck", retour_intervention: "fa-truck",
                            depart_chantier: "fa-truck", retour_chantier: "fa-truck", bon_signe: "fa-pencil", devis_signe: "fa-check-circle", devis_envoye: "fa-paper-plane", facture_payee: "fa-euro",
                            livraison: "fa-dropbox", sortie_stock: "fa-cube", stock_bas: "fa-exclamation-triangle", intervention_creee: "fa-bolt", intervention_terminee: "fa-check",
                            chantier_demarre: "fa-wrench", chantier_termine: "fa-flag-checkered", mise_en_service: "fa-tint", alerte_irrigation: "fa-tint", ambiance: "fa-bell-o", etape: "fa-arrow-right",
-                           appel: "fa-phone" };
+                           appel: "fa-phone", reunion: "fa-calendar" };
 const sansAccents = (t) => (t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const heure = (iso) => {
     if (!iso) {
@@ -58,6 +59,7 @@ export class MapVivante extends Component {
             selection: null, fiche: null, ficheChargement: false, complete: null, onglet: "equipe", notifs: [], kpi: [], flash: {}, suivi: null, visite: null,
             edition: false, palette: false, objetEdite: null, lien: { modele: "", recherche: "", resultats: [] }, historique: [], futur: [], planModifie: false, creerOuvert: false,
             demo: { actif: false, etape: 0 }, erreur: "",
+            planif: null,
         });
         this.traites = new Set();
         this.minuteries = [];
@@ -118,6 +120,7 @@ export class MapVivante extends Component {
             this.state.kpi = v.kpi;
             this._zones();
             this.moteur?.peupler(v);
+            this.majSalle();
             if (this.state.selection && this.state.fiche) {
                 this.ouvrirFiche(this.state.selection, false);
             }
@@ -155,6 +158,7 @@ export class MapVivante extends Component {
             this.moteur.construire(v.plan);
             this.state.chargement = 75;
             this.moteur.peupler(v, true);
+            this.majSalle();
             this.state.chargement = 100;
             // la boucle : frame(dt) séparée, pas de temps borné, pause quand l'onglet est caché
             let dernier = performance.now();
@@ -304,6 +308,9 @@ export class MapVivante extends Component {
                 m.assistantDecroche(25);
                 this.rafraichir();
                 break;
+            case "reunion":
+                this.rafraichir();
+                break;
             case "ambiance":
                 break;
             default:
@@ -327,6 +334,7 @@ export class MapVivante extends Component {
         if (c.installation_id) { return `dossier:${c.installation_id}`; }
         if (c.picking_id) { return `livraison:${c.picking_id}`; }
         if (c.appel_id) { return `appel:${c.appel_id}`; }
+        if (c.reunion_id) { return "zone:reunion"; }
         if (ev.modele === "project.task") { return `intervention:${ev.res_id}`; }
         if (ev.modele === "cultiveau.installation") { return `dossier:${ev.res_id}`; }
         if (ev.modele === "res.users") { return `personne:${ev.res_id}`; }
@@ -363,6 +371,10 @@ export class MapVivante extends Component {
         if (this.state.edition && o.statique && o.plan) {
             this.state.objetEdite = { cle, id: o.plan.id, type: o.plan.type, rot: o.plan.rot || 0, entite: o.plan.entite, zone: o.plan.zone };
             this.state.fiche = null;
+            return;
+        }
+        if (o.genre === "salle" || (o.genre === "zone" && o.id === "reunion" && this.state.v.reunion)) {
+            this.ouvrirSalle(cle);
             return;
         }
         if (o.genre === "assistant") {
@@ -540,6 +552,18 @@ export class MapVivante extends Component {
                 window.open(a.url, "_blank");
                 return;
             }
+            if (a.cle === "planifier_reunion") {
+                this.ouvrirPlanif({ client: a.client_id ? { id: a.client_id, nom: a.client_nom || f.nom } : null, participants: a.user_id ? [a.user_id] : [], titre: a.titre || "" });
+                return;
+            }
+            if (a.cle === "rejoindre") {
+                window.open(a.lien, "_blank");
+                return;
+            }
+            if (a.cle === "connecter_google" || a.cle === "connecter_outlook") {
+                await this.connecterAgenda(a.cle === "connecter_google" ? "google" : "microsoft");
+                return;
+            }
             if (a.cle === "notifier") {
                 await this.action.doAction({ type: "ir.actions.act_window", res_model: "mail.compose.message", view_mode: "form", target: "new",
                                              context: { default_model: "res.partner", default_res_ids: [a.id], default_composition_mode: "comment", default_partner_ids: [a.id] } });
@@ -592,6 +616,128 @@ export class MapVivante extends Component {
             return (this.state.v.dossiers || []).find((d) => d.id === f.installation) || (this.state.v.parcelles || []).map((p) => ({ ...p, etapes: null })).find((d) => d.id === f.installation && d.etapes) || null;
         }
         return null;
+    }
+
+    // ------------------------------------------------------------------ la salle de réunion, les agendas, la visio
+    majSalle() {
+        const r = this.state.v?.reunion;
+        const zone = this.moteur?.objets.get("zone:reunion");
+        if (!r || !zone || !this.moteur) {
+            return;
+        }
+        const s = r.salle;
+        const html = s.en_cours
+            ? `<span class="o_cv_salle occupee"><i class="fa fa-circle"></i> <b>${r.salle_nom}</b> · ${s.en_cours.titre} · jusqu'à ${heure(s.en_cours.fin)}</span>`
+            : `<span class="o_cv_salle libre"><i class="fa fa-circle"></i> <b>${r.salle_nom}</b> · libre${s.prochaine ? ` · ${heure(s.prochaine.debut)} ${s.prochaine.titre}` : ""}</span>`;
+        const c = zone.centre;
+        this.moteur.etiquette("salle:reunion", html, "salle", new window.THREE.Vector3(c.x, 2.9, c.z));
+    }
+    async ouvrirSalle(cle) {
+        this.state.ficheChargement = true;
+        try {
+            const f = await this.orm.call("cultiveau.map", "fiche", ["zone", 0], { cle: "reunion" });
+            f.cle = cle;
+            f.icone = ICONES.salle;
+            f.genre = "salle";
+            this.state.fiche = f;
+        } catch (e) {
+            this.notification.add(e.data?.message || e.message, { type: "warning" });
+        } finally {
+            this.state.ficheChargement = false;
+        }
+    }
+    ouvrirPlanif(pre = {}) {
+        const r = this.state.v?.reunion;
+        if (!r) {
+            this.notification.add("Les réunions ne sont pas installées sur cet ERP.", { type: "warning" });
+            return;
+        }
+        this.state.planif = {
+            titre: pre.titre || (pre.client ? `Rendez-vous ${pre.client.nom}` : "Point d'équipe"), participants: [...(pre.participants || [])], client: pre.client || null,
+            duree: 60, lieu: pre.client ? "visio" : "salle", visio: r.visio_defaut || "erp", lien: "", description: "",
+            rechercheClient: "", resultatsClient: [], creneaux: null, choisi: null, occupe: false, fait: null,
+        };
+    }
+    ouvrirUrl(url) {
+        if (url) {
+            window.open(url, "_blank", "noopener");
+        }
+    }
+    fermerPlanif() {
+        this.state.planif = null;
+    }
+    basculerParticipant(id) {
+        const p = this.state.planif;
+        p.participants = p.participants.includes(id) ? p.participants.filter((x) => x !== id) : [...p.participants, id];
+        p.creneaux = null;
+        p.choisi = null;
+    }
+    async chercherClientPlanif() {
+        const p = this.state.planif;
+        if ((p.rechercheClient || "").length < 2) {
+            p.resultatsClient = [];
+            return;
+        }
+        const r = await this.orm.call("cultiveau.map", "chercher", [p.rechercheClient, 6]);
+        p.resultatsClient = r.filter((x) => x.genre === "client");
+    }
+    choisirClientPlanif(c) {
+        const p = this.state.planif;
+        p.client = { id: c.id, nom: c.nom };
+        p.rechercheClient = "";
+        p.resultatsClient = [];
+        if (!p.titre || p.titre === "Point d'équipe") {
+            p.titre = `Rendez-vous ${c.nom}`;
+        }
+    }
+    async proposerCreneaux() {
+        const p = this.state.planif;
+        p.occupe = true;
+        try {
+            p.creneaux = await this.orm.call("cultiveau.reunion", "creneaux", [p.participants, p.duree], { salle: p.lieu === "salle" });
+            p.choisi = p.creneaux.length ? 0 : null;
+        } catch (e) {
+            this.notification.add(e.data?.message || e.message, { type: "danger" });
+        } finally {
+            p.occupe = false;
+        }
+    }
+    async planifier() {
+        const p = this.state.planif;
+        if (p.choisi === null || !p.creneaux || !p.creneaux[p.choisi]) {
+            return;
+        }
+        p.occupe = true;
+        try {
+            const res = await this.orm.call("cultiveau.reunion", "planifier", [{
+                titre: p.titre, debut: p.creneaux[p.choisi].debut_utc, duree_min: p.duree, user_ids: p.participants, client_id: p.client?.id || false,
+                lieu: p.lieu, visio: p.lieu === "exterieur" ? "aucune" : p.visio, lien: p.lien, description: p.description,
+            }]);
+            p.fait = res;
+            this.rafraichir();
+        } catch (e) {
+            this.notification.add(e.data?.message || e.message, { type: "danger" });
+        } finally {
+            p.occupe = false;
+        }
+    }
+    async connecterAgenda(fournisseur) {
+        try {
+            const r = await rpc(`/${fournisseur === "google" ? "google" : "microsoft"}_calendar/sync_data`, { model: "calendar.event", fromurl: window.location.href });
+            if (r.status === "need_auth" && r.url) {
+                window.location.href = r.url;
+            } else if (r.status === "need_config_from_admin") {
+                this.notification.add(`La connexion ${fournisseur === "google" ? "Google Agenda" : "Outlook"} n'est pas encore configurée : l'administrateur renseigne les identifiants dans Réglages → Cultiveau → Réunions et agendas.`, { type: "warning", sticky: true });
+            } else {
+                this.notification.add(`Votre agenda ${fournisseur === "google" ? "Google" : "Outlook"} est synchronisé.`, { type: "success" });
+                this.rafraichir();
+            }
+        } catch (e) {
+            this.notification.add(e.data?.message || e.message, { type: "danger" });
+        }
+    }
+    get equipePlanif() {
+        return (this.state.v?.personnes || []).filter((p) => !p.moi);
     }
 
     // ------------------------------------------------------------------ Mathis

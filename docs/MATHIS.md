@@ -13,6 +13,8 @@ interventions et opportunités dans l'ERP par l'API. Le module `cultiveau_mathis
   ouvrir un écran). Il ne devine jamais un chiffre : il appelle l'outil, et dit quand il ne trouve rien.
 - **Il agit avec votre accord** : créer un client, une intervention, une opportunité, ajouter une note, préparer un courriel à un client,
   enregistrer un pointage. Chaque action est d'abord une proposition dans le panneau ; rien n'est écrit avant le clic « Confirmer ».
+- **Il planifie les réunions** (module Réunions) : il cherche les créneaux libres de chacun et crée la réunion avec sa visio après
+  confirmation.
 - **Ses réponses sont cliquables** : une fiche citée ouvre l'écran correspondant. Une action peut ouvrir un écran (le tableau de bord,
   les écritures à lettrer) ou un brouillon de courriel à relire.
 - Les conversations sont les vôtres (Réglages → Map vivante → Conversations avec Mathis) ; une conversation repart à zéro au-delà

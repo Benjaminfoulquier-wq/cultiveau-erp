@@ -2,4 +2,6 @@
 <odoo>
     <!-- Les comptes existants arrivent eux aussi sur la vue d'ensemble (les nouveaux l'ont par défaut). -->
     <function model="res.users" name="_cultiveau_page_accueil_pour_tous"/>
+    <!-- Les plans jamais retouchés suivent le générateur (ex. la salle de réunion agrandie). -->
+    <function model="cultiveau.plan" name="regenerer_non_modifies"/>
 </odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_reunion" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.reunion</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Réunions et agendas" name="cultiveau_reunion">
+                    <setting string="La salle de réunion" help="Les réunions planifiées depuis la map, une fiche ou Mathis : créneaux proposés dans ces heures, du lundi au vendredi.">
+                        <div class="row mt8"><label for="cultiveau_salle_nom" class="col-lg-4 o_light_label"/><field name="cultiveau_salle_nom"/></div>
+                        <div class="row mt8"><label for="cultiveau_heures_reunion" class="col-lg-4 o_light_label"/><field name="cultiveau_heures_reunion"/></div>
+                        <div class="row mt8"><label for="cultiveau_visio_defaut" class="col-lg-4 o_light_label"/><field name="cultiveau_visio_defaut"/></div>
+                    </setting>
+                    <setting string="Google Agenda et Google Meet" help="Créez un identifiant OAuth « Application Web » dans la console Google Cloud (API Google Calendar activée), avec cette adresse de retour, puis collez l'identifiant et le secret. Chacun connecte ensuite son agenda depuis la salle de réunion de la map.">
+                        <div class="row mt8"><label for="cultiveau_url_retour_google" class="col-lg-4 o_light_label"/><field name="cultiveau_url_retour_google" readonly="1"/></div>
+                        <div class="row mt8"><label for="cal_client_id" string="Identifiant client" class="col-lg-4 o_light_label"/><field name="cal_client_id"/></div>
+                        <div class="row mt8"><label for="cal_client_secret" string="Secret client" class="col-lg-4 o_light_label"/><field name="cal_client_secret" password="True"/></div>
+                    </setting>
+                    <setting string="Outlook et Teams" help="Inscrivez une application dans le portail Microsoft Entra (autorisations Calendars.ReadWrite et OnlineMeetings.ReadWrite), avec cette adresse de retour, puis collez l'identifiant et le secret.">
+                        <div class="row mt8"><label for="cultiveau_url_retour_microsoft" class="col-lg-4 o_light_label"/><field name="cultiveau_url_retour_microsoft" readonly="1"/></div>
+                        <div class="row mt8"><label for="cal_microsoft_client_id" string="Identifiant client" class="col-lg-4 o_light_label"/><field name="cal_microsoft_client_id"/></div>
+                        <div class="row mt8"><label for="cal_microsoft_client_secret" string="Secret client" class="col-lg-4 o_light_label"/><field name="cal_microsoft_client_secret" password="True"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

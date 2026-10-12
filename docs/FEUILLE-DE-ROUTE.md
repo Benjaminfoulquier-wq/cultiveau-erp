@@ -54,6 +54,8 @@
 - **Le réseau** : Cultiveau, Agrifusion Holding et Solution Magnus, l'équipe, les 16 adhérents et leurs équipes, les prospects, les 39
   fournisseurs référencés et leurs contacts, importés d'un fichier (Réglages → Importer le réseau).
 - **Marque** : l'ERP est aux couleurs de Cultiveau, sans mention de l'éditeur ; déploiement en un push sur erp.cultiveau.fr.
+- **Réunions et agendas** : la salle de réunion de la map suit les agendas ; créneaux libres proposés, invitations, visio intégrée,
+  Google Meet ou Teams selon l'agenda connecté.
 - **Mathis dans l'ERP** : l'assistant du standard IA est aussi dans l'ERP et sur la map : questions sur les données dans les droits de
   chacun, actions confirmées d'un clic, appels téléphoniques en direct sur la map.
 - **La Map vivante** : la page d'accueil est le site de l'adhérent en 3D, relié aux données en temps réel (équipe, camions, clients,

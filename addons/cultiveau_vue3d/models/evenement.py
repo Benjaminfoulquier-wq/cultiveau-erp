@@ -15,7 +15,7 @@ GENRES = [
     ("bon_signe", "Bon signé"), ("devis_envoye", "Devis envoyé"), ("devis_signe", "Devis signé"), ("facture_payee", "Facture payée"),
     ("chantier_demarre", "Chantier démarré"), ("chantier_termine", "Chantier terminé"), ("mise_en_service", "Mise en service"),
     ("livraison", "Livraison reçue"), ("sortie_stock", "Sortie de stock"), ("stock_bas", "Stock bas"), ("alerte_irrigation", "Alerte irrigation"),
-    ("etape", "Changement d'étape"), ("appel", "Appel téléphonique"), ("ambiance", "Ambiance"), ("autre", "Autre"),
+    ("etape", "Changement d'étape"), ("appel", "Appel téléphonique"), ("reunion", "Réunion"), ("ambiance", "Ambiance"), ("autre", "Autre"),
 ]
 
 

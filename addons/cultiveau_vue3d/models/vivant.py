@@ -112,6 +112,7 @@ class Map(models.AbstractModel):
         statuts = SECTEUR["statuts"]
         compte_postes = {}
         resultat = []
+        reunions = self._reunions_en_cours(company, users)
         for u in users:
             role = self._role(u)
             statut, depuis, arrivee = Pointage.statut_depuis_pointages(par_user.get(u.id, []))
@@ -126,7 +127,18 @@ class Map(models.AbstractModel):
                     statut = "au_poste"
                 else:
                     statut = "pas_arrive" if local.hour < 12 else "absent"
-            if not arrivee and statut in ("au_poste", "en_pause", "en_reunion", "en_intervention", "sur_chantier") and u.login_date and u.login_date.date() == maintenant.date():
+            reunion = reunions.get(u.id)
+            if reunion and statut not in ("en_intervention", "sur_chantier", "en_pause", "parti", "en_route", "en_reunion"):
+                # une réunion de l'agenda en ce moment : dans la salle, en visio depuis son poste, ou dehors
+                present = statut == "au_poste" or u.im_status in ("online", "away")
+                if reunion.get("salle"):
+                    statut = "en_reunion"
+                elif reunion.get("visio") and present:
+                    statut = "en_visio"
+                else:
+                    statut = "en_rendez_vous"
+                depuis = fields.Datetime.to_datetime(reunion["debut"]) if reunion.get("debut") else depuis
+            if not arrivee and statut in ("au_poste", "en_pause", "en_reunion", "en_visio", "en_intervention", "sur_chantier") and u.login_date and u.login_date.date() == maintenant.date():
                 arrivee = u.login_date
             zone = roles.get(role, roles["commercial"])["zone"]
             compte_postes[zone] = compte_postes.get(zone, 0) + 1
@@ -138,9 +150,14 @@ class Map(models.AbstractModel):
                 "tache": tache and {"id": tache.id, "nom": tache.name, "client": tache.partner_id.name or "", "installation": tache.cultiveau_installation_id.id} or None,
                 "chantier": chantier and {"id": chantier.id, "nom": chantier.display_name, "client": chantier.partner_id.name or "", "installation": chantier.installation_id.id} or None,
                 "camion": u.id if role == "technicien" else 0, "tenue": roles.get(role, roles["commercial"])["tenue"],
+                "reunion": reunion or None,
                 "moi": u.id == self.env.user.id,
             })
         return resultat
+
+    def _reunions_en_cours(self, company, users):
+        """{user_id: {titre, debut, fin, salle, visio, lien}} : les réunions de l'agenda en ce moment (le module Réunions le remplit)."""
+        return {}
 
     # ---------------------------------------------------------------- les camions et les voitures
 

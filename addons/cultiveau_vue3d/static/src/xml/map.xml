@@ -203,6 +203,88 @@
                     </div>
                 </div>
 
+                <!-- le planificateur de réunion -->
+                <div class="o_cv_voile" t-if="state.planif" t-on-click="fermerPlanif">
+                    <div class="o_cv_complete o_cv_planif" t-on-click.stop="">
+                        <t t-set="p" t-value="state.planif"/>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="o_cv_fiche_icone"><i class="fa fa-calendar-plus-o"/></span>
+                            <h3 class="m-0 flex-grow-1">Planifier une réunion</h3>
+                            <button class="o_cv_bouton rond" t-on-click="fermerPlanif"><i class="fa fa-times"/></button>
+                        </div>
+                        <t t-if="p.fait">
+                            <div class="alert alert-success"><b t-esc="p.fait.titre"/> est planifiée <t t-esc="p.fait.quand"/>. Les participants reçoivent l'invitation.</div>
+                            <div class="small mb-2" t-if="p.fait.note" t-esc="p.fait.note"/>
+                            <div class="d-flex gap-2">
+                                <button class="o_cv_bouton accent" t-if="p.fait.lien" t-on-click="() => this.ouvrirUrl(p.fait.lien)"><i class="fa fa-video-camera me-1"/>Lien de la visio</button>
+                                <button class="o_cv_bouton" t-on-click="() => this.ouvrirBackOffice('calendar.event', p.fait.id)"><i class="fa fa-external-link me-1"/>Ouvrir dans l'agenda</button>
+                                <button class="o_cv_bouton ms-auto" t-on-click="fermerPlanif">Fermer</button>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <h6>Objet</h6>
+                                    <input class="form-control form-control-sm mb-3" t-model="p.titre" placeholder="Ex. Point chantier, Rendez-vous client"/>
+                                    <h6>Avec l'équipe</h6>
+                                    <div class="o_cv_choix mb-3">
+                                        <button t-foreach="equipePlanif" t-as="e" t-key="e.id" t-att-class="{ actif: p.participants.includes(e.id) }" t-on-click="() => this.basculerParticipant(e.id)">
+                                            <i t-att-class="'fa fa-fw ' + (p.participants.includes(e.id) ? 'fa-check-square' : 'fa-square-o')"/><t t-esc="e.nom"/>
+                                        </button>
+                                    </div>
+                                    <h6>Avec un client</h6>
+                                    <div t-if="p.client" class="small mb-3"><i class="fa fa-user me-1"/><b t-esc="p.client.nom"/> <a href="#" t-on-click.prevent="() => p.client = null">retirer</a></div>
+                                    <div t-else="" class="position-relative mb-3">
+                                        <input class="form-control form-control-sm" placeholder="Chercher un client…" t-model="p.rechercheClient" t-on-input="chercherClientPlanif"/>
+                                        <div class="o_cv_resultats_lien" t-if="p.resultatsClient.length">
+                                            <button t-foreach="p.resultatsClient" t-as="c" t-key="c.id" t-on-click="() => this.choisirClientPlanif(c)"><t t-esc="c.nom"/> <small class="text-muted" t-esc="c.sous"/></button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Durée</h6>
+                                    <div class="o_cv_choix ligne mb-3">
+                                        <button t-foreach="[30, 45, 60, 90, 120]" t-as="d" t-key="d" t-att-class="{ actif: p.duree === d }" t-on-click="() => { p.duree = d; p.creneaux = null; }" t-esc="d &lt; 60 ? d + ' min' : (d / 60) + ' h'"/>
+                                    </div>
+                                    <h6>Où</h6>
+                                    <div class="o_cv_choix ligne mb-3">
+                                        <button t-att-class="{ actif: p.lieu === 'salle' }" t-on-click="() => { p.lieu = 'salle'; p.creneaux = null; }"><i class="fa fa-users me-1"/><t t-esc="state.v.reunion.salle_nom"/></button>
+                                        <button t-att-class="{ actif: p.lieu === 'visio' }" t-on-click="() => { p.lieu = 'visio'; p.creneaux = null; }"><i class="fa fa-video-camera me-1"/>En visio</button>
+                                        <button t-att-class="{ actif: p.lieu === 'exterieur' }" t-on-click="() => { p.lieu = 'exterieur'; p.creneaux = null; }"><i class="fa fa-map-marker me-1"/>Chez le client</button>
+                                    </div>
+                                    <t t-if="p.lieu !== 'exterieur'">
+                                        <h6>Visio</h6>
+                                        <div class="o_cv_choix ligne mb-2">
+                                            <button t-att-class="{ actif: p.visio === 'erp' }" t-on-click="() => p.visio = 'erp'">Visio intégrée</button>
+                                            <button t-att-class="{ actif: p.visio === 'google_meet' }" t-on-click="() => p.visio = 'google_meet'" t-att-title="state.v.reunion.synchro.google.connecte ? '' : 'Connectez d\'abord votre agenda Google'">Google Meet</button>
+                                            <button t-att-class="{ actif: p.visio === 'teams' }" t-on-click="() => p.visio = 'teams'" t-att-title="state.v.reunion.synchro.outlook.connecte ? '' : 'Connectez d\'abord votre agenda Outlook'">Teams</button>
+                                            <button t-att-class="{ actif: p.visio === 'lien' }" t-on-click="() => p.visio = 'lien'">Mon lien</button>
+                                            <button t-if="p.lieu === 'salle'" t-att-class="{ actif: p.visio === 'aucune' }" t-on-click="() => p.visio = 'aucune'">Sans visio</button>
+                                        </div>
+                                        <input class="form-control form-control-sm mb-2" t-if="p.visio === 'lien'" t-model="p.lien" placeholder="https://… (Zoom, Meet, Teams, Whereby…)"/>
+                                        <div class="small text-muted mb-3" t-if="p.visio === 'google_meet' and !state.v.reunion.synchro.google.connecte">Votre agenda Google n'est pas connecté : la visio intégrée sera utilisée à la place.</div>
+                                        <div class="small text-muted mb-3" t-if="p.visio === 'teams' and !state.v.reunion.synchro.outlook.connecte">Votre agenda Outlook n'est pas connecté : la visio intégrée sera utilisée à la place.</div>
+                                    </t>
+                                </div>
+                            </div>
+                            <h6>Créneaux libres pour tout le monde</h6>
+                            <div class="d-flex gap-2 align-items-start flex-wrap mb-3">
+                                <button class="o_cv_bouton" t-on-click="proposerCreneaux" t-att-disabled="p.occupe"><i t-att-class="'fa me-1 ' + (p.occupe ? 'fa-circle-o-notch fa-spin' : 'fa-magic')"/>Proposer des créneaux</button>
+                                <t t-if="p.creneaux">
+                                    <div class="text-muted small align-self-center" t-if="!p.creneaux.length">Aucun créneau commun sur les deux semaines à venir.</div>
+                                    <button t-foreach="p.creneaux" t-as="c" t-key="c_index" class="o_cv_creneau" t-att-class="{ actif: p.choisi === c_index }" t-on-click="() => p.choisi = c_index">
+                                        <b t-esc="c.jour"/><span t-esc="c.heures"/>
+                                    </button>
+                                </t>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button class="o_cv_bouton accent" t-on-click="planifier" t-att-disabled="p.occupe or p.choisi === null or !p.creneaux or !p.titre"><i class="fa fa-check me-1"/>Planifier et inviter</button>
+                                <button class="o_cv_bouton ms-auto" t-on-click="fermerPlanif">Annuler</button>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+
                 <!-- la fiche complète, au-dessus de la map -->
                 <div class="o_cv_voile" t-if="state.complete" t-on-click="() => state.complete = null">
                     <div class="o_cv_complete" t-on-click.stop="">
@@ -279,7 +361,7 @@
         <div class="o_cv_fiche_entete">
             <span class="o_cv_fiche_icone"><i t-att-class="'fa ' + (f.icone || icone(f.genre))"/></span>
             <div class="flex-grow-1 min-w-0">
-                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet', article: 'Article', assistant: 'Assistant', appel: 'Appel'}[f.genre] || f.genre"/>
+                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet', article: 'Article', assistant: 'Assistant', appel: 'Appel', salle: 'Salle de réunion'}[f.genre] || f.genre"/>
                 <div class="o_cv_fiche_nom text-truncate" t-esc="f.nom"/>
             </div>
             <button class="o_cv_bouton rond petit" t-if="f.genre !== 'zone' and f.genre !== 'objet'" t-on-click="suivre" t-att-class="{ actif: state.suivi === state.selection }" title="Suivre"><i class="fa fa-crosshairs"/></button>
@@ -295,6 +377,10 @@
                     <div><small>Présence du jour</small><b t-esc="f.presence_min ? Math.floor(f.presence_min / 60) + ' h ' + String(f.presence_min % 60).padStart(2, '0') : '—'"/></div>
                     <div><small>Connexion</small><b t-esc="f.en_ligne ? 'En ligne' : 'Hors ligne'"/></div>
                     <div><small>Téléphone</small><b t-esc="f.telephone || '—'"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.reunion"><small>Réunion en cours</small>
+                    <div class="small"><b t-esc="f.reunion.titre"/> · jusqu'à <t t-esc="heure(f.reunion.fin)"/></div>
+                    <button class="o_cv_lien" t-if="f.reunion.lien" t-on-click="() => this.ouvrirUrl(f.reunion.lien)"><i class="fa fa-video-camera me-1"/>Rejoindre la visio</button>
                 </div>
                 <div class="o_cv_bloc" t-if="f.tache"><small>Intervention en cours</small><button class="o_cv_lien" t-on-click="() => this.aller('intervention:' + f.tache.id)"><i class="fa fa-bolt me-1"/><t t-esc="f.tache.nom"/> <span class="text-muted">· <t t-esc="f.tache.client"/></span></button></div>
                 <div class="o_cv_bloc" t-if="f.chantier"><small>Chantier en cours</small><button class="o_cv_lien" t-on-click="() => this.aller('chantier:' + f.chantier.id)"><i class="fa fa-wrench me-1"/><t t-esc="f.chantier.nom"/></button></div>
@@ -368,6 +454,35 @@
                 <div class="o_cv_bloc" t-if="f.devis.length"><small>Devis récents</small><button t-foreach="f.devis.slice(0, 3)" t-as="d" t-key="d.id" class="o_cv_lien d-flex" t-on-click="() => this.ouvrirBackOffice('sale.order', d.id)"><span t-esc="d.nom"/><b class="ms-auto" t-esc="euros(d.montant) + ' €'"/></button></div>
                 <div class="o_cv_bloc" t-if="f.installations.length"><small>Installations</small><button t-foreach="f.installations" t-as="i" t-key="i.id" class="o_cv_lien d-block" t-on-click="() => this.aller('dossier:' + i.id)"><i class="fa fa-leaf me-1"/><t t-esc="i.nom"/></button></div>
                 <div class="o_cv_bloc" t-if="f.note"><small>Note interne</small><div class="small" t-out="f.note"/></div>
+            </t>
+            <!-- la salle de réunion -->
+            <t t-elif="f.genre === 'salle'">
+                <t t-set="sl" t-value="f.salle"/>
+                <div class="o_cv_statut"><span t-att-class="'badge ' + (sl.en_cours ? 'rouge' : 'vert')" t-esc="sl.en_cours ? 'Occupée' : 'Libre'"/><span class="ms-auto small" t-if="sl.prochaine and !sl.en_cours">Prochaine : <t t-esc="heure(sl.prochaine.debut)"/></span></div>
+                <div class="o_cv_bloc" t-if="sl.en_cours">
+                    <small>En ce moment</small>
+                    <div class="fw-bold" t-esc="sl.en_cours.titre"/>
+                    <div class="small text-muted"><t t-esc="heure(sl.en_cours.debut)"/> – <t t-esc="heure(sl.en_cours.fin)"/> · <t t-esc="sl.en_cours.organisateur"/></div>
+                    <div class="small" t-esc="sl.en_cours.participants.join(', ')"/>
+                    <button class="o_cv_action principal mt-2" t-if="sl.en_cours.lien" t-on-click="() => this.ouvrirUrl(sl.en_cours.lien)"><i class="fa fa-video-camera fa-fw me-2"/>Rejoindre la visio</button>
+                </div>
+                <div class="o_cv_bloc"><small>Aujourd'hui dans la salle</small>
+                    <div class="text-muted small" t-if="!sl.aujourdhui.length">Aucune réunion prévue.</div>
+                    <div t-foreach="sl.aujourdhui" t-as="r" t-key="r.id" class="small d-flex gap-2 align-items-center">
+                        <b t-esc="heure(r.debut)"/><span class="text-truncate" t-esc="r.titre"/>
+                        <a class="ms-auto" href="#" t-if="r.lien" t-on-click.prevent="() => this.ouvrirUrl(r.lien)"><i class="fa fa-video-camera"/></a>
+                    </div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.mes and f.mes.length"><small>Mes réunions du jour</small>
+                    <div t-foreach="f.mes" t-as="r" t-key="r.id" class="small d-flex gap-2 align-items-center">
+                        <b t-esc="heure(r.debut)"/><span class="text-truncate" t-esc="r.titre"/>
+                        <a class="ms-auto" href="#" t-if="r.lien" t-on-click.prevent="() => this.ouvrirUrl(r.lien)">Rejoindre</a>
+                    </div>
+                </div>
+                <div class="o_cv_bloc"><small>Mes agendas</small>
+                    <div class="small d-flex gap-2"><i t-att-class="'fa fa-fw ' + (f.synchro.google.connecte ? 'fa-check-circle text-success' : 'fa-circle-o text-muted')"/>Google Agenda<span class="ms-auto text-muted" t-esc="f.synchro.google.connecte ? 'synchronisé' : (f.synchro.google.configure ? 'à connecter' : 'non configuré')"/></div>
+                    <div class="small d-flex gap-2"><i t-att-class="'fa fa-fw ' + (f.synchro.outlook.connecte ? 'fa-check-circle text-success' : 'fa-circle-o text-muted')"/>Outlook<span class="ms-auto text-muted" t-esc="f.synchro.outlook.connecte ? 'synchronisé' : (f.synchro.outlook.configure ? 'à connecter' : 'non configuré')"/></div>
+                </div>
             </t>
             <!-- l'assistant -->
             <t t-elif="f.genre === 'assistant'">

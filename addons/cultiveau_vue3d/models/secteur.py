@@ -48,6 +48,7 @@ SECTEUR = {
     "statuts": {
         "au_poste": {"nom": "Au poste", "couleur": "vert"}, "en_reunion": {"nom": "En réunion", "couleur": "bleu"},
         "en_pause": {"nom": "En pause", "couleur": "ambre"}, "en_intervention": {"nom": "En intervention", "couleur": "accent"},
+        "en_visio": {"nom": "En visio", "couleur": "bleu"}, "en_rendez_vous": {"nom": "En rendez-vous", "couleur": "bleu"},
         "sur_chantier": {"nom": "Sur chantier", "couleur": "accent"}, "en_route": {"nom": "En route", "couleur": "ambre"},
         "absent": {"nom": "Absent", "couleur": "ardoise"}, "pas_arrive": {"nom": "Pas encore arrivé", "couleur": "ardoise"},
         "parti": {"nom": "Parti", "couleur": "ardoise"},

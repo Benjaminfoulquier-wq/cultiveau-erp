@@ -72,6 +72,15 @@ class Plan(models.Model):
             p.sudo().write({"layout": self.generer(p.company_id), "note": "Plan régénéré"})
 
     @api.model
+    def regenerer_non_modifies(self):
+        """À chaque mise à jour : les plans jamais retouchés dans l'éditeur suivent le générateur (nouvelles pièces, nouveaux objets).
+        Un plan modifié par le gérant n'est jamais écrasé."""
+        plans = self.sudo().search([("note", "in", ("Plan initial généré", "Plan régénéré"))])
+        for p in plans:
+            p.write({"layout": self.generer(p.company_id)})
+        return len(plans)
+
+    @api.model
     def _verifier(self, layout):
         """Le plan est un dictionnaire avec au moins un contour et des listes là où on les attend."""
         if not isinstance(layout, dict):
@@ -135,16 +144,18 @@ class Plan(models.Model):
         obj("armoire", 33, 25, 90, "atelier"); obj("armoire", 33, 26.5, 90, "atelier")
         place("poste-atelier", "poste", 35, 16, 0, "atelier")
         obj("panneau", 36, 8.6, 0, "atelier", {"texte": "ATELIER · SAV"})
-        # --- l'aile des bureaux (x 40..54, z 8..20)
-        obj("bureau", 43.5, 10.5, 0, "bureau", {"ecran": "cao"}); place("poste-bureau-1", "poste", 43.5, 11.5, 180, "bureau")
-        obj("bureau", 43.5, 13, 0, "bureau", {"ecran": "tableur"}); place("poste-bureau-2", "poste", 43.5, 14, 180, "bureau")
-        obj("plans", 41, 9, 0, "bureau"); obj("armoire", 46.5, 9.2, 0, "bureau"); obj("plante", 46.5, 13.3, 0, "bureau")
-        obj("imprimante", 46.3, 11.3, -90, "bureau")
-        obj("table", 43.5, 17, 0, "reunion", {"l": 3.2, "p": 1.3})
-        for i in range(3):
-            place(f"reunion-{i + 1}", "reunion", 42.4 + i * 1.1, 16.1, 0, "reunion")
-            place(f"reunion-{i + 4}", "reunion", 42.4 + i * 1.1, 17.9, 180, "reunion")
-        obj("ecran_mural", 40.3, 17, 90, "reunion", {"contenu": "presentation"})
+        # --- l'aile des bureaux (x 40..54, z 8..20) : le bureau d'étude, la salle de réunion, l'administratif, la pause
+        obj("bureau", 42.3, 10.2, 0, "bureau", {"ecran": "cao"}); place("poste-bureau-1", "poste", 42.3, 11.2, 180, "bureau")
+        obj("bureau", 45.3, 10.2, 0, "bureau", {"ecran": "tableur"}); place("poste-bureau-2", "poste", 45.3, 11.2, 180, "bureau")
+        obj("plans", 41.6, 12.6, 0, "bureau"); obj("armoire", 46.5, 12.8, -90, "bureau")
+        obj("imprimante", 44.6, 12.9, 0, "bureau"); obj("plante", 40.6, 8.6, 0, "bureau")
+        # la salle de réunion : table de huit, écran de visio au mur, réservée par l'agenda
+        obj("table", 43.5, 16.8, 0, "reunion", {"l": 3.6, "p": 1.4})
+        for i, x in enumerate((42.3, 43.5, 44.7)):
+            place(f"reunion-{i + 1}", "reunion", x, 15.85, 0, "reunion")
+            place(f"reunion-{i + 4}", "reunion", x, 17.75, 180, "reunion")
+        obj("ecran_mural", 40.25, 16.8, 0, "reunion", {"contenu": "presentation", "salle": True})
+        obj("plante", 46.5, 19.4, 0, "reunion"); obj("plante", 46.5, 14.2, 0, "reunion")
         obj("bureau", 50.5, 10.5, 0, "administratif", {"ecran": "compta"}); place("poste-admin-1", "poste", 50.5, 11.5, 180, "administratif")
         obj("bureau", 50.5, 13, 0, "administratif", {"ecran": "crm"}); place("poste-admin-2", "poste", 50.5, 14, 180, "administratif")
         obj("armoire", 53.2, 9.2, -90, "administratif"); obj("dossiers", 52.8, 12.6, 0, "administratif"); obj("serveur", 53.3, 15.5, -90, "administratif")
@@ -179,15 +190,15 @@ class Plan(models.Model):
                          {"a": [20, 20], "b": [32, 20], "ouvertures": [[0.1, 0.35], [0.6, 0.85]], "basse": True},
                          {"a": [40, 8], "b": [40, 20], "ouvertures": [[0.3, 0.45], [0.78, 0.92]]},
                          {"a": [47, 8], "b": [47, 20], "ouvertures": [[0.35, 0.5], [0.8, 0.95]]},
-                         {"a": [40, 14.6], "b": [47, 14.6], "ouvertures": [[0.1, 0.3]]},
+                         {"a": [40, 13.5], "b": [47, 13.5], "ouvertures": [[0.72, 0.9]]},
                          {"a": [47, 15.5], "b": [54, 15.5], "ouvertures": [[0.65, 0.85]]}],
             "zones": [
                 {"cle": "accueil", "nom": "Accueil", "type": "accueil", "polygone": [[10, 20], [20, 20], [20, 28], [10, 28]], "sol": "carrelage"},
                 {"cle": "magasin", "nom": "Magasin", "type": "magasin", "polygone": [[20, 20], [32, 20], [32, 28], [20, 28]], "sol": "carrelage"},
                 {"cle": "stockage", "nom": "Stockage", "type": "stockage", "polygone": [[10, 8], [32, 8], [32, 20], [10, 20]], "sol": "beton"},
                 {"cle": "atelier", "nom": "Atelier", "type": "atelier", "polygone": [[32, 8], [40, 8], [40, 28], [32, 28]], "sol": "beton_marque"},
-                {"cle": "bureau", "nom": "Bureau d'étude", "type": "bureau", "polygone": [[40, 8], [47, 8], [47, 14.6], [40, 14.6]], "sol": "parquet"},
-                {"cle": "reunion", "nom": "Réunion", "type": "reunion", "polygone": [[40, 14.6], [47, 14.6], [47, 20], [40, 20]], "sol": "moquette"},
+                {"cle": "bureau", "nom": "Bureau d'étude", "type": "bureau", "polygone": [[40, 8], [47, 8], [47, 13.5], [40, 13.5]], "sol": "parquet"},
+                {"cle": "reunion", "nom": "Salle de réunion", "type": "reunion", "polygone": [[40, 13.5], [47, 13.5], [47, 20], [40, 20]], "sol": "moquette"},
                 {"cle": "administratif", "nom": "Administratif", "type": "bureau", "polygone": [[47, 8], [54, 8], [54, 15.5], [47, 15.5]], "sol": "parquet"},
                 {"cle": "pause", "nom": "Pause", "type": "pause", "polygone": [[47, 15.5], [54, 15.5], [54, 20], [47, 20]], "sol": "carrelage_chaud"},
                 {"cle": "parking", "nom": "Parking clients", "type": "parking", "polygone": [[3, 30], [21, 30], [21, 40], [3, 40]], "sol": "enrobe", "exterieur": True},

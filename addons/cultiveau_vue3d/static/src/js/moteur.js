@@ -756,10 +756,10 @@ export class Moteur {
                 tenue: p.tenue, casquette: p.role === "technicien", gilet: false, accessoire: p.role === "technicien" ? "outil" : (p.role === "comptoir" ? null : "tablette"),
                 cheveuxLongs: (p.id * 7) % 3 === 0, peau: undefined }), p);
             o.groupe.userData.phase = (p.id * 1.7) % 6.28;
-            const visible = !["pas_arrive", "absent", "parti", "en_route"].includes(p.statut);
+            const visible = !["pas_arrive", "absent", "parti", "en_route", "en_rendez_vous"].includes(p.statut);
             const dehors = ["en_intervention", "sur_chantier"].includes(p.statut);
             let cible = null, pose = "debout", orientation = 0;
-            if (p.statut === "au_poste" || p.statut === "en_reunion" || p.statut === "en_pause") {
+            if (p.statut === "au_poste" || p.statut === "en_reunion" || p.statut === "en_pause" || p.statut === "en_visio") {
                 const usage = p.statut === "en_reunion" ? "reunion" : p.statut === "en_pause" ? "pause" : "poste";
                 let place = null;
                 if (usage === "poste") {
@@ -776,6 +776,7 @@ export class Moteur {
                     cible = [place.x, place.z];
                     orientation = ((place.rot || 0) * Math.PI) / 180;
                     pose = usage === "reunion" ? "assis_reunion" : usage === "pause" ? (place.cle.endsWith("3") ? "babyfoot" : "cafe")
+                        : p.statut === "en_visio" ? (p.zone === "atelier" || p.zone === "accueil" ? "telephone" : "assis_reunion")
                         : (p.zone === "atelier" ? "outil" : p.zone === "accueil" ? "comptoir" : "assis_bureau");
                     if (usage === "poste") {
                         postes[place.cle] = p;
@@ -973,11 +974,24 @@ export class Moteur {
             if (o.statique && o.plan?.type === "bureau") {
                 const poste = [...this.places.values()].find((p) => p.usage === "poste" && Math.hypot(p.x - o.plan.x, p.z - o.plan.z) < 1.6);
                 const pers = poste && postes[poste.cle];
-                kit.allumerEcran(o.groupe, pers ? (o.plan.params?.ecran || "crm") : "verrouille");
+                kit.allumerEcran(o.groupe, pers ? (pers.statut === "en_visio" ? "visio" : (o.plan.params?.ecran || "crm")) : "verrouille");
                 o.genre = "poste";
                 o.id = pers ? pers.id : 0;
                 o.nom = pers ? `Poste de ${pers.nom}` : "Poste libre";
                 o.sousTitre = pers ? (o.plan.params?.ecran || "crm").toUpperCase() : "Verrouillé";
+            }
+        }
+        // --- l'écran de la salle de réunion : la visio quand une réunion s'y tient
+        const salleOccupee = !!(v.reunion && v.reunion.salle && v.reunion.salle.en_cours);
+        for (const o of this.objets.values()) {
+            if (o.statique && o.plan?.type === "ecran_mural" && o.plan.params?.salle) {
+                if (o.salleOccupee !== salleOccupee) {
+                    kit.allumerEcran(o.groupe, salleOccupee ? "visio" : "presentation");
+                    o.salleOccupee = salleOccupee;
+                }
+                o.nom = (v.reunion && v.reunion.salle_nom) || "Salle de réunion";
+                o.sousTitre = salleOccupee ? `Occupée · ${v.reunion.salle.en_cours.titre}` : "Libre";
+                o.genre = "salle";
             }
         }
         // --- ce qui n'est plus là

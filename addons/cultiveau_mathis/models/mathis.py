@@ -75,6 +75,13 @@ class Mathis(models.AbstractModel):
 
     # ---------------------------------------------------------------- les outils
 
+    def _ecritures(self):
+        """Les outils qui écrivent : jamais exécutés sans un clic de confirmation."""
+        return set(ECRITURE)
+
+    def _titres(self):
+        return dict(TITRES)
+
     def _outils(self):
         """Les outils de l'API (avec les droits de la personne) et ceux de la map, au format du modèle."""
         moteur = self.env["cultiveau.api.moteur"]
@@ -227,8 +234,8 @@ class Mathis(models.AbstractModel):
                     args = json.loads(a["function"]["arguments"] or "{}") if isinstance(a["function"]["arguments"], str) else (a["function"]["arguments"] or {})
                 except ValueError:
                     args = {}
-                if nom in ECRITURE:
-                    attente.append({"id": a["id"], "nom": nom, "titre": TITRES.get(nom, nom), "arguments": args, "resume": self._resumer(nom, args)})
+                if nom in self._ecritures():
+                    attente.append({"id": a["id"], "nom": nom, "titre": self._titres().get(nom, nom), "arguments": args, "resume": self._resumer(nom, args)})
                     messages.append({"role": "tool", "name": nom, "tool_call_id": a["id"], "content": json.dumps({"statut": "en attente de la confirmation de la personne"}, ensure_ascii=False)})
                     arret = True
                     continue
