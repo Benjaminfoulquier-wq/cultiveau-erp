@@ -15,7 +15,7 @@ Le jumeau de l'entreprise de l'adhérent, dessiné en isométrie à partir des d
 C'est la page d'accueil de l'ERP : le parcours client s'y lit station par station (accueil et comptoir, bureau
 d'étude, magasin et cour, chantiers, atelier et SAV, parcelles en service, caisse) et chaque élément s'ouvre d'un clic.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.0.1",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",

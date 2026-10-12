@@ -167,7 +167,6 @@ class Plan(models.Model):
         for i in range(5):
             place(f"parking-{i + 1}", "parking", 5.5 + i * 2.9, 33.5, 0, "parking")
         obj("lampadaire", 3.5, 31, 0, "parking"); obj("totem", 20.5, 30.5, 0, "parking", {"logo": True})
-        obj("quai", 44, 21.2, 0, "cour")
         for i in range(4):
             place(f"camion-{i + 1}", "camion", 43 + i * 3.4, 33, 0, "cour")
         place("livraison", "livraison", 46, 25.5, 90, "cour")

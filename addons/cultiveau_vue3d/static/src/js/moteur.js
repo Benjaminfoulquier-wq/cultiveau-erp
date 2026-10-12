@@ -914,7 +914,7 @@ export class Moteur {
                 o.pose3d = true;
             }
         }
-        // --- les livraisons : un camion fournisseur à quai
+        // --- les livraisons : un camion fournisseur dans la cour
         for (const l of v.livraisons) {
             const cle = `livraison:${l.id}`;
             const o = this._objetVivant(cle, "livraison", l.id, `${l.fournisseur}`, l.recue ? `${l.nom} · reçue` : `${l.nom} · ${l.lignes} ligne(s) attendues`, () => {
@@ -1187,10 +1187,10 @@ export class Moteur {
         g.visible = true;
         this.vehicules.set(cle, { cle, o, courbe, s: 0, longueur: courbe.getLength(), vitesse: 0, vmax: 7, recule: sens === "rentrer", rappel: () => { if (sens === "sortir") { g.visible = false; } } });
     }
-    /** Un camion fournisseur qui arrive de la route, se gare à quai, puis repart. */
+    /** Un camion fournisseur qui arrive de la route, se gare dans la cour, puis repart. */
     livrer(cle, rappel) {
         const { THREE, kit } = this;
-        const o = this._objetVivant(cle, "livraison", 0, "Livraison", "Fournisseur à quai", () => { const g = kit.M.plateau({ couleur: 0xf28c28, charge: "vert" }); g.add(kit.ombreContact(3)); return g; }, {});
+        const o = this._objetVivant(cle, "livraison", 0, "Livraison", "Fournisseur dans la cour", () => { const g = kit.M.plateau({ couleur: 0xf28c28, charge: "vert" }); g.add(kit.ombreContact(3)); return g; }, {});
         const place = this.place("livraison") || { x: 46, z: 25.5, rot: 90 };
         const route = this.route || { a: [-6, 44.5], b: [70, 44.5] };
         const acces = (this.plan.exterieur?.acces || [])[1] || [[place.x, place.z + 8], [place.x, route.a[1]]];

@@ -22,7 +22,7 @@ l'ERP, et un changement dans l'un se voit dans l'autre en moins d'une seconde.
 - **Le stock** : six rayonnages, un par famille, remplis selon le stock réel ; une épingle orange quand une règle de réassort est
   en négatif.
 - **L'atelier** : une pompe sur un établi par intervention d'atelier ; des étincelles quand un technicien y est.
-- **Les livraisons** : un camion fournisseur à quai pour une réception du jour.
+- **Les livraisons** : un camion fournisseur dans la cour pour une réception du jour.
 
 ## L'écran autour de la map
 
