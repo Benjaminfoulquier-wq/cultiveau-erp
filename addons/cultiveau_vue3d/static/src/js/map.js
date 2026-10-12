@@ -617,6 +617,13 @@ export class MapVivante extends Component {
         for (const v3 of v.vehicules) {
             ok(v3.nom, v3.conducteur) && r.push({ groupe: "Camions", nom: v3.nom, sous: v3.conducteur, cle: `camion:${v3.id}`, icone: "fa-truck" });
         }
+        // les écrans du back-office, par la zone qui les ouvre (« TVA », « bilan », « réassort »…)
+        for (const [zone, portes] of Object.entries(v.portes || {})) {
+            const z = this.state.zones.find((x) => x.cle === zone);
+            for (const p of portes) {
+                ok(p.nom) && !r.some((x) => x.porte === p.cle) && r.push({ groupe: "Écrans", nom: p.nom, sous: z ? z.nom : zone, porte: p.cle, zone, icone: p.icone });
+            }
+        }
         this.state.resultats = r.slice(0, 12);
         this.state.curseur = 0;
         clearTimeout(this._rechercheServeur);
@@ -641,6 +648,10 @@ export class MapVivante extends Component {
         if (this.rechercheRef.el) {
             this.rechercheRef.el.value = "";
             this.rechercheRef.el.blur();
+        }
+        if (r.porte) {
+            this.lancer(r.porte);
+            return;
         }
         if (r.genre === "article") {
             this.ouvrirArticle(r.id, r.rayon);

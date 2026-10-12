@@ -96,6 +96,18 @@ class TestMap(TransactionCase):
         d = Map.vivant()
         self.assertTrue(any(c["id"] == self.agri.id for c in d["onglets"]["clients"]))
 
+    def test_portes(self):
+        Map = self.env["cultiveau.map"]
+        d = Map.vivant()
+        self.assertIn("administratif", d["portes"])
+        cles = [p["cle"] for p in d["portes"]["administratif"]]
+        self.assertIn("factures_a_encaisser", cles)
+        self.assertIn("tableau_de_bord", cles)  # le pilotage est installé sur la base de test
+        f = Map.fiche("zone", 0, cle="atelier")
+        self.assertTrue(any(a["cle"] == "interventions" for a in f["actions"]))
+        action = self.env["cultiveau.scene"].action("tva")
+        self.assertEqual(action["type"], "ir.actions.act_window")
+
     def test_demo(self):
         Map = self.env["cultiveau.map"]
         self.societe.cultiveau_map_demo = False

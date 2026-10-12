@@ -411,6 +411,7 @@
                     <div class="text-muted small" t-if="!f.presents.length">Personne en ce moment.</div>
                     <button t-foreach="f.presents" t-as="p" t-key="p.id" class="o_cv_lien d-flex gap-2" t-on-click="() => this.aller('personne:' + p.id)"><span t-esc="p.nom"/><span class="ms-auto text-muted small"><t t-esc="p.statut"/><t t-if="p.depuis"> · <t t-esc="duree(p.depuis)"/></t></span></button>
                 </div>
+                <div class="o_cv_bloc" t-if="f.actions.length"><small>Ce qu'on y fait</small></div>
                 <div class="o_cv_bloc" t-if="f.clients.length"><small>Clients sur place</small><button t-foreach="f.clients" t-as="c" t-key="c.id" class="o_cv_lien d-flex gap-2" t-on-click="() => this.aller('client:' + c.id)"><span t-esc="c.nom"/><span class="ms-auto text-muted small" t-esc="c.devis ? c.devis.nom : ''"/></button></div>
             </t>
             <!-- la badgeuse -->
@@ -436,7 +437,7 @@
             </t>
             <div class="o_cv_actions" t-if="f.actions and f.actions.length">
                 <button t-foreach="f.actions" t-as="a" t-key="a_index" class="o_cv_action" t-att-class="{ principal: a_index === 0 }" t-on-click="() => this.lancerAction(a)">
-                    <i t-att-class="'fa fa-fw me-2 ' + (a.cle === 'fiche' ? 'fa-external-link' : a.cle === 'appeler' ? 'fa-phone' : a.cle === 'badger' ? 'fa-id-card-o' : 'fa-angle-right')"/><t t-esc="a.nom"/>
+                    <i t-att-class="'fa fa-fw me-2 ' + (a.icone || (a.cle === 'fiche' ? 'fa-external-link' : a.cle === 'appeler' ? 'fa-phone' : a.cle === 'badger' ? 'fa-id-card-o' : 'fa-angle-right'))"/><t t-esc="a.nom"/>
                 </button>
             </div>
         </div>

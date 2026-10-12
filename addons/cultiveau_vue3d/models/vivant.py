@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
-from .secteur import ROLES_GROUPES, SECTEUR
+from .secteur import PORTES, ROLES_GROUPES, SECTEUR
 
 CLOTURES = ("1_done", "1_canceled")
 ATELIER = ("depannage", "entretien", "remise_en_service", "hivernage", "diagnostic", "autre")
@@ -51,7 +51,7 @@ class Map(models.AbstractModel):
             "interventions": taches, "dossiers": dossiers, "chantiers": chantiers, "stock": stock, "parcelles": self._parcelles(company, dossiers),
             "atelier": self._atelier(company, taches), "livraisons": self._livraisons(company, local),
             "kpi": self._kpi(company, taches, chantiers, local), "onglets": self._onglets(personnes, taches, dossiers, chantiers, stock, self._clients_recents(company)),
-            "evenements": self.env["cultiveau.evenement"].recents(company, 20), "actions": sorted(self.env["cultiveau.scene"]._actions_disponibles()),
+            "evenements": self.env["cultiveau.evenement"].recents(company, 20), "actions": sorted(self.env["cultiveau.scene"]._actions_disponibles()), "portes": self._portes(),
             "canal": self.env["cultiveau.evenement"].canal(company),
         }
 
@@ -353,6 +353,11 @@ class Map(models.AbstractModel):
                        "couleur": "ambre" if s["bas"] else "vert", "progression": round(100 * s["taux"]), "cible": "rayon"} for i, s in enumerate(stock)],
         }
 
+    def _portes(self):
+        """Les écrans que chaque zone ouvre, parmi ceux qui existent dans cet ERP."""
+        dispo = self.env["cultiveau.scene"]._actions_disponibles()
+        return {zone: [{"cle": cle, "nom": nom, "icone": icone} for cle, nom, icone in portes if cle in dispo] for zone, portes in PORTES.items()}
+
     # ---------------------------------------------------------------- la recherche
 
     @api.model
@@ -386,12 +391,14 @@ class Map(models.AbstractModel):
     # ---------------------------------------------------------------- les fiches
 
     @api.model
-    def fiche(self, genre, res_id):
-        """La fiche résumée d'un objet de la map."""
+    def fiche(self, genre, res_id, cle=None):
+        """La fiche résumée d'un objet de la map (une zone se désigne par sa clé)."""
         company = self.env.company
         methode = getattr(self, f"_fiche_{genre}", None)
         if not methode:
             raise UserError(f"Pas de fiche pour « {genre} ».")
+        if genre == "zone":
+            return methode(company, 0, cle=cle)
         return methode(company, int(res_id or 0))
 
     def _fiche_personne(self, company, uid):
@@ -567,7 +574,7 @@ class Map(models.AbstractModel):
         presents = [p for p in personnes if (p["zone"] == cle and p["statut"] == "au_poste") or (cle == "pause" and p["statut"] == "en_pause") or (cle == "reunion" and p["statut"] == "en_reunion")]
         return {"genre": "zone", "cle": cle, "nom": zone["nom"] if zone else cle, "presents": [{"id": p["id"], "nom": p["nom"], "statut": p["statut_nom"], "depuis": p["depuis"]} for p in presents],
                 "clients": self._clients_presents(company, local) if cle in ("accueil", "parking") else [],
-                "actions": []}
+                "actions": [{"cle": p["cle"], "nom": p["nom"], "icone": p["icone"]} for p in self._portes().get(cle, [])]}
 
     def _fiche_borne(self, company, _id):
         pointages = self.env["cultiveau.pointage"].du_jour(company)

@@ -79,6 +79,42 @@ SECTEUR = {
     ],
 }
 
+# Les portes : ce que chaque zone de la map ouvre dans le back-office (clé de cultiveau.scene._actions, libellé, icône).
+PORTES = {
+    "accueil": [("comptoir", "Vente au comptoir", "fa-shopping-basket"), ("agriculteurs", "Mes clients", "fa-users"), ("agriculteur_nouveau", "Nouveau client", "fa-user-plus"),
+                ("a_contacter", "À contacter ce mois-ci", "fa-phone"), ("ventes_comptoir", "Ventes au comptoir", "fa-list"), ("import_clients", "Importer mes clients", "fa-upload"),
+                ("pipeline", "Demandes et opportunités", "fa-filter"), ("rendez_vous", "Rendez-vous", "fa-calendar")],
+    "magasin": [("mon_catalogue", "Mon catalogue", "fa-book"), ("catalogue", "Catalogue Cultiveau", "fa-globe"), ("fiches", "Fiches techniques", "fa-file-pdf-o"),
+                ("comparateur", "Comparer des articles", "fa-columns"), ("grille_remises", "Ma grille de remises", "fa-percent"), ("import_articles", "Importer des articles", "fa-upload"),
+                ("occasion", "Occasion et reprises", "fa-recycle")],
+    "stockage": [("inventaire", "Inventaire", "fa-archive"), ("reappro", "Règles de réassort", "fa-refresh"), ("mouvements", "Mouvements de stock", "fa-exchange"),
+                 ("achats", "Commandes fournisseurs", "fa-shopping-cart"), ("achat_nouveau", "Nouvelle commande fournisseur", "fa-plus"), ("tarifs_fournisseurs", "Tarifs fournisseurs", "fa-tags"),
+                 ("commandes_groupees", "Commandes groupées réseau", "fa-cubes"), ("fournisseurs", "Fournisseurs", "fa-truck")],
+    "atelier": [("interventions", "Interventions", "fa-bolt"), ("depannage_nouveau", "Nouveau dépannage", "fa-plus"), ("depannages", "Dépannages en cours", "fa-wrench"),
+                ("entretiens", "Entretiens et diagnostics", "fa-calendar-check-o"), ("bons", "Bons d'intervention", "fa-pencil-square-o"), ("bons_a_facturer", "Bons à facturer", "fa-euro"),
+                ("contrats", "Contrats d'entretien", "fa-file-text-o"), ("equipements_a_renouveler", "Équipements à renouveler", "fa-cogs"), ("registre", "Registre des installations", "fa-book"),
+                ("techniciens", "Techniciens et camions", "fa-id-badge")],
+    "bureau": [("etudes", "Études en cours", "fa-pencil"), ("etude_nouvelle", "Nouvelle étude", "fa-plus"), ("installations", "Installations", "fa-leaf"), ("devis", "Devis", "fa-file-text"),
+               ("devis_nouveau", "Nouveau devis", "fa-plus"), ("commandes", "Commandes", "fa-check"), ("usages", "Simulateur irrigation à l'usage", "fa-calculator"),
+               ("matrice_pose", "Matrice de pose", "fa-clock-o"), ("schema3d", "Cultiveau 3D", "fa-cube")],
+    "reunion": [("planning", "Planning des chantiers", "fa-calendar"), ("planning_techniciens", "Planning des techniciens", "fa-calendar-o"), ("rendez_vous", "Rendez-vous", "fa-calendar-check-o"),
+                ("crm_analyse", "Analyse commerciale", "fa-bar-chart"), ("ventes_analyse", "Analyse des ventes", "fa-line-chart")],
+    "administratif": [("tableau_de_bord", "Tableau de bord", "fa-dashboard"), ("factures_a_encaisser", "Factures à encaisser", "fa-euro"), ("facture_nouvelle", "Nouvelle facture", "fa-plus"),
+                      ("factures", "Factures clients", "fa-file-text-o"), ("factures_fournisseurs", "Factures fournisseurs", "fa-file-o"), ("a_payer", "Fournisseurs à payer", "fa-money"),
+                      ("banque_a_rapprocher", "Relevés à rapprocher", "fa-university"), ("banque_import", "Importer un relevé", "fa-upload"), ("a_lettrer", "Écritures à lettrer", "fa-link"),
+                      ("lettrage_auto", "Lettrage automatique", "fa-magic"), ("tva", "Déclaration de TVA", "fa-percent"), ("bilan", "Bilan et compte de résultat", "fa-balance-scale"),
+                      ("cloture", "Clôture d'exercice", "fa-lock"), ("immobilisations", "Immobilisations", "fa-building-o"), ("export_comptable", "Export pour le comptable", "fa-download"),
+                      ("paiements", "Paiements", "fa-credit-card"), ("reglages", "Réglages Cultiveau", "fa-cog"), ("utilisateurs", "Utilisateurs", "fa-users"),
+                      ("nouvel_adherent", "Nouvel adhérent", "fa-user-plus")],
+    "pause": [("a_contacter", "Qui appeler ce mois-ci", "fa-phone"), ("cultures", "Les cultures et la frise", "fa-leaf"), ("personas", "Les personas", "fa-smile-o")],
+    "parking": [("agriculteurs", "Mes clients", "fa-users"), ("clients_type", "Clients par type", "fa-sitemap"), ("a_contacter", "À contacter", "fa-phone")],
+    "cour": [("receptions", "Réceptions fournisseurs", "fa-sign-in"), ("livraisons", "Livraisons", "fa-sign-out"), ("demandes_prix", "Demandes de prix", "fa-question-circle"),
+             ("achats", "Commandes fournisseurs", "fa-shopping-cart"), ("commandes_groupees", "Commandes groupées", "fa-cubes")],
+    "champs": [("chantiers", "Chantiers", "fa-wrench"), ("chantier_nouveau", "Nouveau chantier", "fa-plus"), ("planning", "Planning des chantiers", "fa-calendar"),
+               ("parc", "Parc installé", "fa-leaf"), ("parcelles", "Parcelles et conseil d'eau", "fa-tint"), ("alertes_parcelles", "Alertes irrigation", "fa-exclamation-triangle"),
+               ("ma_journee", "Ma journée (technicien)", "fa-sun-o"), ("registre", "Registre", "fa-book")],
+}
+
 ROLES_GROUPES = [  # dans l'ordre de priorité : le premier groupe trouvé donne le rôle
     ("gerant", "sales_team.group_sale_manager"), ("comptable", "account.group_account_readonly"), ("technicien", "project.group_project_user"),
     ("commercial", "sales_team.group_sale_salesman_all_leads"), ("comptoir", "sales_team.group_sale_salesman"),
