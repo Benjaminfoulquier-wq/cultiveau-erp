@@ -1,0 +1,25 @@
+// Mathis : l'icône en haut à droite et le panneau de conversation, aux couleurs de l'ERP.
+.o_mathis_avatar { width: 26px; height: 26px; border-radius: 50%; background: #0b9bb8; color: #fff; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; font-size: 13px;
+    &.grand { width: 38px; height: 38px; font-size: 17px; border-radius: 12px; } }
+.o_mathis_systray { display: flex; align-items: center; padding: 0 10px; cursor: pointer; font-weight: 600; color: #fff; height: 100%; &:hover { background: rgba(255, 255, 255, 0.1); } }
+.o_mathis_panneau { position: fixed; right: 16px; bottom: 16px; width: 400px; max-width: calc(100vw - 32px); height: 620px; max-height: calc(100vh - 80px); z-index: 1050; display: flex; flex-direction: column;
+    background: #fff; border-radius: 18px; box-shadow: 0 1px 2px rgba(24, 40, 50, 0.06), 0 16px 48px rgba(24, 40, 50, 0.22); overflow: hidden; font-family: Inter, "Segoe UI", system-ui, sans-serif; font-size: 13px; color: #1d2f38;
+    animation: mathis-monte 0.25s ease;
+    .o_mathis_entete { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #ede9e0; }
+    .o_mathis_btn { height: 30px; border-radius: 15px; border: 1px solid #e7e2d8; background: #fff; color: #1d2f38; font-size: 12.5px; font-weight: 600; padding: 0 12px; display: inline-flex; align-items: center;
+        &:hover { background: #f4f1ea; } &.accent { background: #0b9bb8; color: #fff; border-color: #0b9bb8; } &.rond { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; } &:disabled { opacity: 0.45; } }
+    .o_mathis_fil { flex: 1; overflow-y: auto; padding: 12px 14px; background: #f7f5f0; }
+    .o_mathis_accueil { background: #fff; border-radius: 14px; padding: 12px 14px; color: #5d6b78; }
+    .o_mathis_msg { display: flex; margin-bottom: 8px; &.user { justify-content: flex-end; .bulle { background: #0b9bb8; color: #fff; border-bottom-right-radius: 4px; } }
+        &.assistant .bulle { background: #fff; border-bottom-left-radius: 4px; }
+        .bulle { max-width: 86%; padding: 9px 12px; border-radius: 14px; line-height: 1.4; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); word-wrap: break-word; ul { margin: 4px 0 0 16px; padding: 0; } a { color: #0b8aa3; font-weight: 600; } }
+        .attente { display: inline-flex; gap: 4px; span { width: 7px; height: 7px; border-radius: 50%; background: #9aa4ad; animation: mathis-pt 1s infinite; &:nth-child(2) { animation-delay: 0.15s; } &:nth-child(3) { animation-delay: 0.3s; } } } }
+    .o_mathis_lien_btn { border: 1px solid #e7e2d8; background: #fff; border-radius: 12px; padding: 6px 10px; font-weight: 600; color: #0b8aa3; }
+    .o_mathis_proposition { background: #fff; border: 1px solid #0b9bb8; border-radius: 14px; padding: 10px 12px; margin-bottom: 8px; }
+    .o_mathis_suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 14px; border-top: 1px solid #ede9e0;
+        button { border: 1px solid #e7e2d8; background: #fff; border-radius: 14px; padding: 4px 10px; font-size: 12px; color: #1d2f38; &:hover { background: #eef6f8; border-color: #0b9bb8; } } }
+    .o_mathis_saisie { display: flex; gap: 8px; align-items: flex-end; padding: 10px 14px; border-top: 1px solid #ede9e0;
+        textarea { flex: 1; resize: none; border: 1px solid #e7e2d8; border-radius: 14px; padding: 8px 12px; font-size: 13px; max-height: 120px; &:focus { outline: none; border-color: #0b9bb8; } } }
+}
+@keyframes mathis-monte { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes mathis-pt { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }

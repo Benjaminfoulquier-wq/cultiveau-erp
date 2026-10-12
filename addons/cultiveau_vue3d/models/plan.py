@@ -109,6 +109,7 @@ class Plan(models.Model):
         # --- l'accueil et le comptoir (x 10..20, z 20..28), entrée en façade
         obj("comptoir", 15, 23.2, 0, "accueil")
         place("poste-comptoir", "poste", 15, 22.1, 180, "accueil")
+        place("mathis", "mathis", 12.6, 22.4, 160, "accueil")
         obj("plante", 11, 27, 0, "accueil"); obj("plante", 19, 27, 0, "accueil")
         obj("borne", 12.2, 26.6, 0, "accueil", {"badgeuse": True})
         obj("table", 17.5, 26.3, 0, "accueil", {"l": 1.1, "p": 0.7, "basse": True}); obj("canape", 17.5, 27.3, 180, "accueil")

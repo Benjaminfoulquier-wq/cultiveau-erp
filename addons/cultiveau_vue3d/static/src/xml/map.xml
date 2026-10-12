@@ -45,6 +45,7 @@
                             </button>
                         </div>
                     </div>
+                    <button class="o_cv_bouton accent" t-if="state.v.assistant" t-on-click="() => this.ouvrirMathis()" title="Demander à Mathis"><i class="fa fa-comments-o me-1"/><t t-esc="state.v.assistant.prenom"/></button>
                     <button class="o_cv_bouton" t-on-click="visiteGuidee" t-att-class="{ actif: state.visite }" title="Visite guidée (T)"><i class="fa fa-play me-1"/>Visite</button>
                     <button class="o_cv_bouton" t-if="state.v.utilisateur.editeur" t-on-click="basculerEdition" t-att-class="{ actif: state.edition }" title="Modifier le plan"><i class="fa fa-pencil me-1"/>Plan</button>
                     <div class="position-relative">
@@ -278,7 +279,7 @@
         <div class="o_cv_fiche_entete">
             <span class="o_cv_fiche_icone"><i t-att-class="'fa ' + (f.icone || icone(f.genre))"/></span>
             <div class="flex-grow-1 min-w-0">
-                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet', article: 'Article'}[f.genre] || f.genre"/>
+                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet', article: 'Article', assistant: 'Assistant', appel: 'Appel'}[f.genre] || f.genre"/>
                 <div class="o_cv_fiche_nom text-truncate" t-esc="f.nom"/>
             </div>
             <button class="o_cv_bouton rond petit" t-if="f.genre !== 'zone' and f.genre !== 'objet'" t-on-click="suivre" t-att-class="{ actif: state.suivi === state.selection }" title="Suivre"><i class="fa fa-crosshairs"/></button>
@@ -367,6 +368,27 @@
                 <div class="o_cv_bloc" t-if="f.devis.length"><small>Devis récents</small><button t-foreach="f.devis.slice(0, 3)" t-as="d" t-key="d.id" class="o_cv_lien d-flex" t-on-click="() => this.ouvrirBackOffice('sale.order', d.id)"><span t-esc="d.nom"/><b class="ms-auto" t-esc="euros(d.montant) + ' €'"/></button></div>
                 <div class="o_cv_bloc" t-if="f.installations.length"><small>Installations</small><button t-foreach="f.installations" t-as="i" t-key="i.id" class="o_cv_lien d-block" t-on-click="() => this.aller('dossier:' + i.id)"><i class="fa fa-leaf me-1"/><t t-esc="i.nom"/></button></div>
                 <div class="o_cv_bloc" t-if="f.note"><small>Note interne</small><div class="small" t-out="f.note"/></div>
+            </t>
+            <!-- l'assistant -->
+            <t t-elif="f.genre === 'assistant'">
+                <div class="o_cv_statut"><span class="badge accent">Au téléphone et dans l'ERP</span></div>
+                <p class="small">Je réponds au téléphone pour les clients, et ici je réponds sur vos données et j'agis avec votre accord.</p>
+                <button class="o_cv_action principal mb-2" t-on-click="() => this.ouvrirMathis()"><i class="fa fa-comments-o fa-fw me-2"/>Demander à <t t-esc="f.nom"/></button>
+                <div class="o_cv_bloc" t-if="f.appels.length"><small>Derniers appels</small>
+                    <button t-foreach="f.appels" t-as="a" t-key="a.id" class="o_cv_lien d-flex gap-2" t-on-click="() => this.aller('appel:' + a.id)"><b t-esc="heure(a.date)"/><span class="text-truncate" t-esc="a.client + ' · ' + a.sujet"/></button>
+                </div>
+                <div class="text-muted small" t-if="!f.appels.length">Aucun appel enregistré pour l'instant.</div>
+            </t>
+            <!-- un appel -->
+            <t t-elif="f.genre === 'appel'">
+                <div class="o_cv_statut"><span t-att-class="'badge ' + (f.urgence === 'immediate' ? 'rouge' : f.urgence === 'journee' ? 'ambre' : 'accent')" t-esc="f.sens === 'entrant' ? 'Appel reçu' : 'Appel passé'"/><span class="ms-auto small" t-esc="heure(f.date) + (f.duree ? ' · ' + f.duree : '')"/></div>
+                <div class="o_cv_grille">
+                    <div><small>Client</small><button class="o_cv_lien" t-if="f.client_id" t-on-click="() => this.ouvrirBackOffice('res.partner', f.client_id)" t-esc="f.client"/><b t-else="" t-esc="f.numero || '—'"/></div>
+                    <div><small>Catégorie</small><b t-esc="f.categorie || '—'"/></div>
+                    <div t-if="f.intervention"><small>Intervention créée</small><button class="o_cv_lien" t-on-click="() => this.aller('intervention:' + f.intervention)" t-esc="f.intervention_nom"/></div>
+                    <div t-if="f.opportunite"><small>Opportunité créée</small><button class="o_cv_lien" t-on-click="() => this.ouvrirBackOffice('crm.lead', f.opportunite)" t-esc="f.opportunite_nom"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.resume"><small>Résumé</small><div class="small" t-esc="f.resume"/></div>
             </t>
             <!-- un article -->
             <t t-elif="f.genre === 'article'">

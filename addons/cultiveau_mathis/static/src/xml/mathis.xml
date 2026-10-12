@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_mathis.Systray">
+        <div class="o_mathis_systray" t-on-click="() => this.mathis.basculer()" title="Mathis, l'assistant">
+            <span class="o_mathis_avatar">M</span><span class="d-none d-md-inline ms-1">Mathis</span>
+        </div>
+    </t>
+    <t t-name="cultiveau_mathis.Panneau">
+        <div class="o_mathis_panneau" t-if="etat.ouvert" t-att-class="{ occupe: state.occupe }">
+            <t t-esc="questionInitiale"/>
+            <div class="o_mathis_entete">
+                <span class="o_mathis_avatar grand">M</span>
+                <div class="flex-grow-1 min-w-0">
+                    <div class="fw-bold" t-esc="state.prenom"/>
+                    <div class="small text-muted">Assistant Cultiveau · dans vos droits</div>
+                </div>
+                <button class="o_mathis_btn" title="Nouvelle conversation" t-on-click="nouvelle"><i class="fa fa-plus"/></button>
+                <button class="o_mathis_btn" title="Fermer" t-on-click="() => this.mathis.fermer()"><i class="fa fa-times"/></button>
+            </div>
+            <div class="o_mathis_fil" t-ref="fil" t-on-click="onClicFil">
+                <div class="alert alert-warning small m-2" t-if="state.charge and !state.pret">La clé Mistral manque : Réglages → Cultiveau → Fiches techniques et IA. Sans elle, Mathis n'a pas de voix dans l'ERP.</div>
+                <div class="o_mathis_accueil" t-if="!state.messages.length">
+                    <p>Bonjour, je suis <b t-esc="state.prenom"/>. Je réponds sur vos clients, interventions, chantiers, devis, factures, stock et équipe, et je peux créer une intervention, un client, une note ou un courriel avec votre accord.</p>
+                </div>
+                <t t-foreach="state.messages" t-as="m" t-key="m_index">
+                    <div t-if="m.texte" t-att-class="'o_mathis_msg ' + m.role"><div class="bulle" t-out="m.html"/></div>
+                    <div t-if="m.action and m.action.type === 'lien'" class="o_mathis_msg assistant"><button class="o_mathis_lien_btn" t-on-click="() => this.ouvrirLien(m.action)"><i class="fa fa-external-link me-1"/><t t-esc="m.action.libelle"/></button></div>
+                </t>
+                <div t-foreach="state.propositions" t-as="p" t-key="p.id" class="o_mathis_proposition">
+                    <div class="fw-bold"><i class="fa fa-question-circle me-1"/><t t-esc="p.titre"/></div>
+                    <div class="small text-muted" t-esc="p.resume"/>
+                    <div class="d-flex gap-2 mt-2">
+                        <button class="o_mathis_btn accent" t-on-click="() => this.confirmer(p, true)" t-att-disabled="state.occupe"><i class="fa fa-check me-1"/>Confirmer</button>
+                        <button class="o_mathis_btn" t-on-click="() => this.confirmer(p, false)" t-att-disabled="state.occupe">Non</button>
+                    </div>
+                </div>
+                <div class="o_mathis_msg assistant" t-if="state.occupe"><div class="bulle attente"><span/><span/><span/></div></div>
+            </div>
+            <div class="o_mathis_suggestions" t-if="!state.messages.length and state.suggestions.length">
+                <button t-foreach="state.suggestions" t-as="s" t-key="s_index" t-on-click="() => this.envoyer(s)" t-esc="s"/>
+            </div>
+            <div class="o_mathis_saisie">
+                <textarea t-ref="champ" rows="1" placeholder="Demandez à Mathis… (Entrée pour envoyer)" t-model="state.saisie" t-on-keydown="onTouche" t-att-disabled="state.occupe"/>
+                <button class="o_mathis_btn accent rond" t-on-click="() => this.envoyer()" t-att-disabled="state.occupe or !state.saisie.trim()"><i class="fa fa-paper-plane"/></button>
+            </div>
+        </div>
+    </t>
+</templates>

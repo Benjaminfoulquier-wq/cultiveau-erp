@@ -12,13 +12,15 @@ import { Moteur } from "./moteur";
 
 const LIB = "/cultiveau_vue3d/static/lib/three/three.min.js";
 const ICONES = { personne: "fa-user", camion: "fa-truck", client: "fa-car", dossier: "fa-leaf", chantier: "fa-wrench", intervention: "fa-bolt", rayon: "fa-archive", rayon_fixe: "fa-archive",
-                 zone: "fa-map-o", borne: "fa-id-card-o", livraison: "fa-truck", poste: "fa-desktop", machine: "fa-cog", objet: "fa-cube", comptoir: "fa-shopping-basket", etabli: "fa-wrench", article: "fa-cube" };
+                 zone: "fa-map-o", borne: "fa-id-card-o", livraison: "fa-truck", poste: "fa-desktop", machine: "fa-cog", objet: "fa-cube", comptoir: "fa-shopping-basket", etabli: "fa-wrench", article: "fa-cube",
+                 assistant: "fa-comments-o", appel: "fa-phone" };
 const GENRES_FICHE = { personne: "personne", camion: "camion", client: "client", dossier: "dossier", chantier: "chantier", intervention: "intervention", rayon: "rayon", zone: "zone", borne: "borne",
-                       livraison: "livraison", poste: "poste", machine: "intervention", article: "article" };
+                       livraison: "livraison", poste: "poste", machine: "intervention", article: "article", appel: "appel" };
 const ICONES_EVENEMENT = { arrivee: "fa-sign-in", depart: "fa-sign-out", pause_debut: "fa-coffee", pause_fin: "fa-coffee", depart_intervention: "fa-truck", retour_intervention: "fa-truck",
                            depart_chantier: "fa-truck", retour_chantier: "fa-truck", bon_signe: "fa-pencil", devis_signe: "fa-check-circle", devis_envoye: "fa-paper-plane", facture_payee: "fa-euro",
                            livraison: "fa-dropbox", sortie_stock: "fa-cube", stock_bas: "fa-exclamation-triangle", intervention_creee: "fa-bolt", intervention_terminee: "fa-check",
-                           chantier_demarre: "fa-wrench", chantier_termine: "fa-flag-checkered", mise_en_service: "fa-tint", alerte_irrigation: "fa-tint", ambiance: "fa-bell-o", etape: "fa-arrow-right" };
+                           chantier_demarre: "fa-wrench", chantier_termine: "fa-flag-checkered", mise_en_service: "fa-tint", alerte_irrigation: "fa-tint", ambiance: "fa-bell-o", etape: "fa-arrow-right",
+                           appel: "fa-phone" };
 const sansAccents = (t) => (t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const heure = (iso) => {
     if (!iso) {
@@ -47,6 +49,7 @@ export class MapVivante extends Component {
         this.action = useService("action");
         this.notification = useService("notification");
         this.bus = useService("bus_service");
+        this.mathis = this.env.services.mathis || null;
         this.hote = useRef("hote");
         this.calque = useRef("calque");
         this.rechercheRef = useRef("recherche");
@@ -297,6 +300,10 @@ export class MapVivante extends Component {
             case "livraison":
                 m.livrer(`livraison:${charge.picking_id || "demo"}`, () => this.rafraichir());
                 break;
+            case "appel":
+                m.assistantDecroche(25);
+                this.rafraichir();
+                break;
             case "ambiance":
                 break;
             default:
@@ -319,6 +326,7 @@ export class MapVivante extends Component {
         if (c.technicien_id) { return `personne:${c.technicien_id}`; }
         if (c.installation_id) { return `dossier:${c.installation_id}`; }
         if (c.picking_id) { return `livraison:${c.picking_id}`; }
+        if (c.appel_id) { return `appel:${c.appel_id}`; }
         if (ev.modele === "project.task") { return `intervention:${ev.res_id}`; }
         if (ev.modele === "cultiveau.installation") { return `dossier:${ev.res_id}`; }
         if (ev.modele === "res.users") { return `personne:${ev.res_id}`; }
@@ -355,6 +363,10 @@ export class MapVivante extends Component {
         if (this.state.edition && o.statique && o.plan) {
             this.state.objetEdite = { cle, id: o.plan.id, type: o.plan.type, rot: o.plan.rot || 0, entite: o.plan.entite, zone: o.plan.zone };
             this.state.fiche = null;
+            return;
+        }
+        if (o.genre === "assistant") {
+            this.state.fiche = { genre: "assistant", nom: o.nom, sousTitre: o.sousTitre, cle, appels: (this.state.v.assistant || {}).appels || [], actions: [] };
             return;
         }
         if (o.genre === "porte" || o.genre === "objet" || o.genre === "comptoir" || o.genre === "etabli" || o.genre === "rayon_fixe") {
@@ -580,6 +592,15 @@ export class MapVivante extends Component {
             return (this.state.v.dossiers || []).find((d) => d.id === f.installation) || (this.state.v.parcelles || []).map((p) => ({ ...p, etapes: null })).find((d) => d.id === f.installation && d.etapes) || null;
         }
         return null;
+    }
+
+    // ------------------------------------------------------------------ Mathis
+    ouvrirMathis(question = "") {
+        if (!this.mathis) {
+            this.notification.add("Mathis n'est pas installé sur cet ERP.", { type: "warning" });
+            return;
+        }
+        this.mathis.ouvrir(question);
     }
 
     // ------------------------------------------------------------------ la barre : recherche, zones, création

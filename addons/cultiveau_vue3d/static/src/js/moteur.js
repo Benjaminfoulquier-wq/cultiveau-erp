@@ -802,6 +802,32 @@ export class Moteur {
             }
             o.statut = p.statut;
         }
+        // --- l'assistant (Mathis) à l'accueil, s'il est installé
+        if (v.assistant) {
+            const place = this.place("mathis");
+            if (place) {
+                const o = this._objetVivant("assistant", "assistant", 0, v.assistant.prenom, "Assistant Cultiveau · au téléphone et dans l'ERP", () => {
+                    const g = kit.personnage({ tenue: "polo", haut: new THREE.Color(this.accent).getHex(), accessoire: "tablette", cheveux: 0x3a2b24 });
+                    const badge = kit.epingle(this.accent);
+                    badge.scale.setScalar(0.45);
+                    badge.position.set(0, 2.1, 0);
+                    badge.name = "badge";
+                    g.add(badge);
+                    return g;
+                }, v.assistant);
+                o.groupe.userData.phase = 2.4;
+                o.groupe.visible = true;
+                if (!o.pose3d) {
+                    o.groupe.position.set(place.x, 0, place.z);
+                    o.groupe.rotation.y = ((place.rot || 0) * Math.PI) / 180;
+                    o.pose3d = true;
+                }
+                const m = this.marcheurs.get("assistant");
+                if (!m) {
+                    this.marcheurs.set("assistant", { cle: "assistant", o, chemin: [], i: 0, pose: "comptoir", orientation: ((place.rot || 0) * Math.PI) / 180, arrive: true });
+                }
+            }
+        }
         // --- les camions
         for (const c of v.vehicules) {
             const cle = `camion:${c.id}`;
@@ -1116,6 +1142,16 @@ export class Moteur {
         } });
         this._ouvrirPorte(porte);
     }
+    /** L'assistant décroche : la pose « téléphone » pendant quelques secondes, puis retour au comptoir. */
+    assistantDecroche(secondes = 25) {
+        const m = this.marcheurs.get("assistant");
+        if (!m) {
+            return;
+        }
+        m.pose = "telephone";
+        clearTimeout(this._assistantMinuterie);
+        this._assistantMinuterie = setTimeout(() => { m.pose = "comptoir"; }, secondes * 1000);
+    }
     _ouvrirPorte(nom) {
         const p = this.objets.get(`porte:${nom}`);
         if (p) {
@@ -1262,6 +1298,7 @@ export class Moteur {
             if (u.jet) { u.jet.userData.animer(dt, t); }
             if (u.jets) { o.groupe.traverse((j) => j.userData.animer && j.userData.animer(dt, t)); }
             if (o.epingle) { o.epingle.position.y = 4.2 + Math.sin(t * 2) * 0.12; o.epingle.rotation.y = t * 0.8; }
+            if (o.genre === "assistant") { const b = o.groupe.getObjectByName("badge"); if (b) { b.position.y = 2.1 + Math.sin(t * 2.2) * 0.06; b.rotation.y = t; } }
             if (o.genre === "porte") {
                 const ouverte = o.ouverte && o.ouverte > t;
                 const v = o.vantail;

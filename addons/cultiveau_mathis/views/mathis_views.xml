@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_conversation_list" model="ir.ui.view">
+        <field name="name">cultiveau.mathis.conversation.list</field>
+        <field name="model">cultiveau.mathis.conversation</field>
+        <field name="arch" type="xml"><list create="false"><field name="write_date" string="Le"/><field name="name"/><field name="nb_messages"/><field name="company_id" groups="base.group_multi_company"/></list></field>
+    </record>
+    <record id="action_conversations" model="ir.actions.act_window">
+        <field name="name">Mes conversations avec Mathis</field>
+        <field name="res_model">cultiveau.mathis.conversation</field>
+        <field name="view_mode">list</field>
+    </record>
+    <menuitem id="menu_conversations" name="Conversations avec Mathis" parent="cultiveau_vue3d.menu_map_reglages" action="action_conversations" sequence="9"/>
+    <record id="res_config_settings_view_form_mathis" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.mathis</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Mathis, l'assistant" name="cultiveau_mathis">
+                    <setting string="Mathis dans l'ERP" help="L'assistant du réseau répond sur vos données (dans les droits de chacun) et agit avec votre accord. Il utilise la clé Mistral du bloc « Fiches techniques et IA ». Au téléphone, il reste le standard IA.">
+                        <div class="row mt8"><label for="cultiveau_mathis_prenom" class="col-lg-4 o_light_label"/><field name="cultiveau_mathis_prenom"/></div>
+                        <div class="row mt8"><label for="cultiveau_mathis_modele" class="col-lg-4 o_light_label"/><field name="cultiveau_mathis_modele"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

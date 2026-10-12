@@ -53,7 +53,19 @@ class Map(models.AbstractModel):
             "kpi": self._kpi(company, taches, chantiers, local), "onglets": self._onglets(personnes, taches, dossiers, chantiers, stock, self._clients_recents(company)),
             "evenements": self.env["cultiveau.evenement"].recents(company, 20), "actions": sorted(self.env["cultiveau.scene"]._actions_disponibles()), "portes": self._portes(),
             "canal": self.env["cultiveau.evenement"].canal(company),
+            "assistant": self._assistant(company),
         }
+
+    def _assistant(self, company):
+        """Mathis, s'il est installé : son prénom, ses derniers appels pour la société."""
+        if "cultiveau.mathis" not in self.env:
+            return None
+        prenom = self.env["cultiveau.mathis"].prenom()
+        appels = []
+        if "cultiveau.appel" in self.env:
+            for a in self.env["cultiveau.appel"].sudo().search([("company_id", "=", company.id)], order="date desc", limit=5):
+                appels.append({"id": a.id, "sujet": a.sujet, "client": a.partner_id.name or a.numero or "", "date": fields.Datetime.to_string(a.date), "urgence": a.urgence or ""})
+        return {"prenom": prenom, "pret": self.env["cultiveau.mathis"].pret(), "appels": appels}
 
     @api.model
     def _date_fr(self, d):
@@ -600,6 +612,20 @@ class Map(models.AbstractModel):
         return {"genre": "poste", "id": uid, "nom": f"Poste de {u.name}", "personne": u.name, "session": "active" if u.im_status == "online" else ("inactive" if u.im_status == "away" else "verrouillee"),
                 "depuis": fields.Datetime.to_string(u.login_date) if u.login_date else "", "ouverts": [{"id": o.id, "nom": o.name, "client": o.partner_id.name} for o in recents],
                 "actions": [{"cle": "fiche", "nom": "La personne", "modele": "res.users", "id": uid}]}
+
+    def _fiche_appel(self, company, aid):
+        if "cultiveau.appel" not in self.env:
+            raise UserError("Les appels ne sont pas installés.")
+        a = self.env["cultiveau.appel"].browse(aid)
+        if not a.exists():
+            raise UserError("Appel introuvable.")
+        return {"genre": "appel", "id": aid, "nom": a.sujet, "client": a.partner_id.name or "", "client_id": a.partner_id.id, "numero": a.numero or "", "date": fields.Datetime.to_string(a.date),
+                "duree": a.duree, "sens": a.sens, "urgence": a.urgence or "", "categorie": a.categorie or "", "resume": a.resume or "", "lien": a.lien_assistant or "",
+                "intervention": a.task_id.id, "intervention_nom": a.task_id.name or "", "opportunite": a.lead_id.id, "opportunite_nom": a.lead_id.name or "",
+                "actions": [{"cle": "fiche", "nom": "L'appel (résumé, transcription, audio)", "modele": "cultiveau.appel", "id": aid}] +
+                           ([{"cle": "client", "nom": "Le client", "modele": "res.partner", "id": a.partner_id.id}] if a.partner_id else []) +
+                           ([{"cle": "intervention", "nom": "L'intervention créée", "modele": "project.task", "id": a.task_id.id}] if a.task_id else []) +
+                           ([{"cle": "opportunite", "nom": "L'opportunité créée", "modele": "crm.lead", "id": a.lead_id.id}] if a.lead_id else [])}
 
     def _fiche_machine(self, company, tid):
         return self._fiche_intervention(company, tid)

@@ -34,7 +34,7 @@ echo "Attente de PostgreSQL…"; sleep 8
 if ! $COMPOSE run --rm odoo odoo shell -d "$BASE" --no-http -c /etc/odoo/odoo.conf </dev/null >/dev/null 2>&1; then
   echo "Création de la base « $BASE » et installation des modules (quelques minutes la première fois)…"
   $COMPOSE run --rm odoo odoo -d "$BASE" -c /etc/odoo/odoo.conf --without-demo=all --load-language=fr_FR \
-    -i contacts,sale_management,account,l10n_fr,crm,stock,purchase,project,mass_mailing,calendar,cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles,cultiveau_compta,cultiveau_efacture,cultiveau_adhesion,cultiveau_dimensionnement,cultiveau_tarifs,cultiveau_pilotage,cultiveau_grille,cultiveau_presentation,cultiveau_pose,cultiveau_fiches \
+    -i contacts,sale_management,account,l10n_fr,crm,stock,purchase,project,mass_mailing,calendar,cultiveau_base,cultiveau_frise,cultiveau_persona,cultiveau_catalogue,cultiveau_installation,cultiveau_ventes,cultiveau_interventions,cultiveau_connecteurs,cultiveau_marque,cultiveau_vue3d,cultiveau_chantier,cultiveau_comptoir,cultiveau_api,cultiveau_site,cultiveau_terrain,cultiveau_documents,cultiveau_parcelles,cultiveau_compta,cultiveau_efacture,cultiveau_adhesion,cultiveau_dimensionnement,cultiveau_tarifs,cultiveau_pilotage,cultiveau_grille,cultiveau_presentation,cultiveau_pose,cultiveau_fiches,cultiveau_mathis \
     --stop-after-init
   $COMPOSE run --rm odoo odoo shell -d "$BASE" -c /etc/odoo/odoo.conf --no-http < scripts/reglages_initiaux.py
 fi
