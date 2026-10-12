@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_boite_user,boite utilisateur,model_cultiveau_boite,base.group_user,1,0,0,0
+access_boite_admin,boite administrateur,model_cultiveau_boite,base.group_system,1,1,1,1
+access_courriel_user,courriel utilisateur,model_cultiveau_courriel,base.group_user,1,1,1,0
+access_courriel_gerant,courriel gérant,model_cultiveau_courriel,sales_team.group_sale_manager,1,1,1,1

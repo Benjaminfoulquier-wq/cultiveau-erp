@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- les courriels -->
+    <record id="courriel_view_list" model="ir.ui.view">
+        <field name="name">cultiveau.courriel.list</field>
+        <field name="model">cultiveau.courriel</field>
+        <field name="arch" type="xml">
+            <list string="Courriels" decoration-danger="sans_reponse" decoration-bf="etat == 'a_traiter'" decoration-muted="etat == 'classe'" default_order="sans_reponse desc, date_reception desc">
+                <field name="date_reception" widget="remaining_days" optional="hide"/>
+                <field name="date_reception" string="Reçu"/>
+                <field name="expediteur_nom"/>
+                <field name="partner_id" optional="show"/>
+                <field name="name"/>
+                <field name="resume" optional="show"/>
+                <field name="document_nom" string="Dossier" optional="show"/>
+                <field name="categorie" optional="show"/>
+                <field name="urgent" widget="boolean_toggle" optional="hide"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="sans_reponse" column_invisible="1"/>
+                <field name="etat" widget="badge" decoration-warning="etat == 'a_traiter'" decoration-success="etat == 'repondu'"/>
+                <field name="activity_ids" widget="list_activity" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="courriel_view_form" model="ir.ui.view">
+        <field name="name">cultiveau.courriel.form</field>
+        <field name="model">cultiveau.courriel</field>
+        <field name="arch" type="xml">
+            <form string="Courriel">
+                <header>
+                    <button name="action_brouillon_mathis" type="object" string="Préparer la réponse avec Mathis" icon="fa-magic" class="btn-primary" invisible="etat != 'a_traiter'"/>
+                    <button name="action_repondre" type="object" string="Répondre" icon="fa-reply"/>
+                    <button name="action_classer" type="object" string="Classer" icon="fa-check" invisible="etat != 'a_traiter'"/>
+                    <button name="action_rouvrir" type="object" string="Rouvrir" invisible="etat == 'a_traiter'"/>
+                    <field name="etat" widget="statusbar" statusbar_visible="a_traiter,repondu"/>
+                </header>
+                <div class="alert alert-danger mb-0" role="alert" invisible="not sans_reponse or etat != 'a_traiter'">
+                    <i class="fa fa-hourglass-half me-1" title="Sans réponse"/>Sans réponse depuis <field name="attente_jours" class="d-inline"/> jours ouvrés.
+                </div>
+                <sheet>
+                    <div class="oe_title">
+                        <h2><field name="name"/></h2>
+                        <div class="text-muted"><field name="expediteur" readonly="1"/></div>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="document"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                        </group>
+                        <group>
+                            <field name="date_reception"/>
+                            <field name="date_reponse" invisible="not date_reponse"/>
+                            <field name="categorie"/>
+                            <field name="urgent"/>
+                            <field name="boite_id" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="status" invisible="not resume"><i class="fa fa-magic me-1" title="Résumé"/><field name="resume" readonly="1" class="d-inline"/></div>
+                    <field name="sans_reponse" invisible="1"/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="courriel_view_search" model="ir.ui.view">
+        <field name="name">cultiveau.courriel.search</field>
+        <field name="model">cultiveau.courriel</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="expediteur"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <field name="boite_id"/>
+                <filter name="a_traiter" string="À traiter" domain="[('etat', '=', 'a_traiter')]"/>
+                <filter name="sans_reponse" string="Sans réponse" domain="[('etat', '=', 'a_traiter'), ('sans_reponse', '=', True)]"/>
+                <filter name="urgents" string="Urgents" domain="[('urgent', '=', True)]"/>
+                <filter name="les_miens" string="Les miens" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="repondus" string="Répondus" domain="[('etat', '=', 'repondu')]"/>
+                <filter name="classes" string="Classés" domain="[('etat', '=', 'classe')]"/>
+                <group>
+                    <filter name="par_categorie" string="Catégorie" context="{'group_by': 'categorie'}"/>
+                    <filter name="par_responsable" string="Responsable" context="{'group_by': 'user_id'}"/>
+                    <filter name="par_client" string="Client" context="{'group_by': 'partner_id'}"/>
+                    <filter name="par_boite" string="Boîte" context="{'group_by': 'boite_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_courriels" model="ir.actions.act_window">
+        <field name="name">Courriels</field>
+        <field name="res_model">cultiveau.courriel</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_a_traiter': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun courriel à traiter</p>
+            <p>Branchez la boîte de l'entreprise (Gmail, Outlook ou autre) dans Boîtes mail : chaque courriel arrive ici, rangé sur son client et son dossier.</p>
+        </field>
+    </record>
+
+    <!-- les boîtes -->
+    <record id="boite_view_list" model="ir.ui.view">
+        <field name="name">cultiveau.boite.list</field>
+        <field name="model">cultiveau.boite</field>
+        <field name="arch" type="xml">
+            <list string="Boîtes mail">
+                <field name="name"/>
+                <field name="adresse"/>
+                <field name="fournisseur"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="partagee"/>
+                <field name="nb_a_traiter"/>
+                <field name="nb_sans_reponse"/>
+                <field name="derniere_releve"/>
+                <field name="etat" widget="badge" decoration-success="etat == 'connectee'" decoration-danger="etat == 'erreur'" decoration-warning="etat == 'a_connecter'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="boite_view_form" model="ir.ui.view">
+        <field name="name">cultiveau.boite.form</field>
+        <field name="model">cultiveau.boite</field>
+        <field name="arch" type="xml">
+            <form string="Boîte mail">
+                <header>
+                    <button name="action_connecter" type="object" string="Connecter" class="btn-primary" icon="fa-plug" invisible="etat == 'connectee'" groups="base.group_system"/>
+                    <button name="action_connecter" type="object" string="Reconnecter" icon="fa-plug" invisible="etat != 'connectee'" groups="base.group_system"/>
+                    <button name="action_relever" type="object" string="Relever maintenant" icon="fa-refresh" invisible="etat != 'connectee'"/>
+                    <field name="etat" widget="statusbar"/>
+                </header>
+                <div class="alert alert-info mb-0" role="status" invisible="not message"><field name="message" readonly="1"/></div>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="%(action_courriels)d" type="action" class="oe_stat_button" icon="fa-envelope" context="{'search_default_boite_id': id}">
+                            <field name="nb_a_traiter" widget="statinfo" string="À traiter"/>
+                        </button>
+                        <button name="%(action_courriels)d" type="action" class="oe_stat_button" icon="fa-hourglass-half" context="{'search_default_boite_id': id, 'search_default_sans_reponse': 1}">
+                            <field name="nb_sans_reponse" widget="statinfo" string="Sans réponse"/>
+                        </button>
+                    </div>
+                    <div class="oe_title"><h1><field name="name" placeholder="Contact"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="adresse" widget="email" placeholder="contact@mon-entreprise.fr"/>
+                            <field name="fournisseur" widget="radio"/>
+                            <field name="user_id" widget="many2one_avatar_user"/>
+                            <field name="partagee"/>
+                            <field name="ranger_sur_fiches"/>
+                        </group>
+                        <group>
+                            <field name="depuis_jours"/>
+                            <field name="derniere_releve"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <group string="Serveurs de la messagerie" invisible="fournisseur != 'imap'">
+                        <group>
+                            <field name="imap_hote" placeholder="ssl0.ovh.net"/>
+                            <field name="imap_port"/>
+                            <field name="identifiant"/>
+                        </group>
+                        <group>
+                            <field name="smtp_hote" placeholder="ssl0.ovh.net"/>
+                            <field name="smtp_port"/>
+                            <field name="mot_de_passe" password="True" groups="base.group_system"/>
+                        </group>
+                    </group>
+                    <div class="text-muted" invisible="fournisseur == 'imap'">
+                        « Connecter » ouvre la page d'autorisation de Google ou de Microsoft : connectez-vous avec cette adresse et acceptez.
+                        La boîte n'est jamais modifiée : les courriels restent non lus, à leur place.
+                    </div>
+                    <field name="fetchmail_id" invisible="1"/>
+                    <field name="mail_server_id" invisible="1"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_boites" model="ir.actions.act_window">
+        <field name="name">Boîtes mail</field>
+        <field name="res_model">cultiveau.boite</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Branchez une boîte mail</p>
+            <p>contact@, devis@ ou la boîte de chacun : Gmail, Outlook ou toute messagerie. Les courriels arrivent rangés par client.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_courriels_racine" name="Courriels" parent="cultiveau_base.menu_cultiveau_root" sequence="8"/>
+    <menuitem id="menu_courriels" name="Courriels" parent="menu_courriels_racine" action="action_courriels" sequence="10"/>
+    <menuitem id="menu_boites" name="Boîtes mail" parent="menu_courriels_racine" action="action_boites" sequence="20"/>
+
+    <!-- les réglages -->
+    <record id="res_config_settings_view_form_messagerie" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.messagerie</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Messagerie" name="cultiveau_messagerie">
+                    <setting string="Les boîtes mail" help="Branchez contact@, devis@ ou la boîte de chacun : chaque courriel arrive rangé sur son client et son dossier.">
+                        <div class="row mt8"><label for="cultiveau_courriel_jours" class="col-lg-4 o_light_label"/><field name="cultiveau_courriel_jours"/></div>
+                        <div class="mt8"><field name="cultiveau_nb_boites" class="d-inline"/> boîte(s) connectée(s) · <button name="%(action_boites)d" type="action" string="Boîtes mail" icon="fa-inbox" class="btn-link p-0"/></div>
+                    </setting>
+                    <setting string="Gmail" help="Dans la console Google Cloud (le même projet que l'agenda convient) : activez l'API Gmail, ajoutez cette adresse de retour à l'identifiant OAuth. Sans identifiant ici, celui de l'agenda est repris.">
+                        <div class="row mt8"><label for="cultiveau_url_retour_gmail" class="col-lg-4 o_light_label"/><field name="cultiveau_url_retour_gmail" readonly="1"/></div>
+                        <div class="row mt8"><label for="google_gmail_client_identifier" string="Identifiant client" class="col-lg-4 o_light_label"/><field name="google_gmail_client_identifier"/></div>
+                        <div class="row mt8"><label for="google_gmail_client_secret" string="Secret client" class="col-lg-4 o_light_label"/><field name="google_gmail_client_secret" password="True"/></div>
+                    </setting>
+                    <setting string="Outlook" help="Dans le portail Microsoft Entra (la même application que l'agenda convient) : autorisations IMAP.AccessAsUser.All et SMTP.Send, et cette adresse de retour. Sans identifiant ici, celui de l'agenda est repris.">
+                        <div class="row mt8"><label for="cultiveau_url_retour_outlook" class="col-lg-4 o_light_label"/><field name="cultiveau_url_retour_outlook" readonly="1"/></div>
+                        <div class="row mt8"><label for="microsoft_outlook_client_identifier" string="Identifiant client" class="col-lg-4 o_light_label"/><field name="microsoft_outlook_client_identifier"/></div>
+                        <div class="row mt8"><label for="microsoft_outlook_client_secret" string="Secret client" class="col-lg-4 o_light_label"/><field name="microsoft_outlook_client_secret" password="True"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

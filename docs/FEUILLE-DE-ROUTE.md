@@ -54,6 +54,8 @@
 - **Le réseau** : Cultiveau, Agrifusion Holding et Solution Magnus, l'équipe, les 16 adhérents et leurs équipes, les prospects, les 39
   fournisseurs référencés et leurs contacts, importés d'un fichier (Réglages → Importer le réseau).
 - **Marque** : l'ERP est aux couleurs de Cultiveau, sans mention de l'éditeur ; déploiement en un push sur erp.cultiveau.fr.
+- **La messagerie** : Gmail, Outlook ou toute boîte branchée sans rien y changer ; chaque courriel rangé sur son client et son
+  dossier, trié par l'IA, suivi jusqu'à la réponse (repère « sans réponse »), réponse préparée par Mathis.
 - **L'équipe** : congés et notes de frais depuis le téléphone (`/moi`), validés en un clic par le gérant ; jours fériés et congés
   payés posés tout seuls ; le ticket photographié est lu par l'IA ; les absences sur la map, dans les réunions et chez Mathis.
 - **Réunions et agendas** : la salle de réunion de la map suit les agendas ; créneaux libres proposés, invitations, visio intégrée,
