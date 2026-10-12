@@ -400,6 +400,7 @@ class Scene(models.AbstractModel):
         action["display_name"] = action["name"]
         action["domain"] = domaine
         action["context"] = contexte
+        action.pop("help", None)  # en texte dans un dictionnaire, l'aide s'afficherait avec ses balises : l'écran garde son message standard
         if r.get("form"):
             formulaire = next((v for v in action.get("views") or [] if v[1] == "form"), [False, "form"])
             action.update({"views": [formulaire], "view_mode": "form", "res_id": False, "target": "current"})
