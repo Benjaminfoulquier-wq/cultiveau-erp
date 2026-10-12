@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_voir_chantier_map" model="ir.actions.server">
+        <field name="name">Voir sur la map</field>
+        <field name="model_id" ref="model_cultiveau_chantier"/>
+        <field name="binding_model_id" ref="model_cultiveau_chantier"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env["cultiveau.map"].action_voir_sur_la_map("cultiveau.chantier", record.id) if record else None</field>
+    </record>
+    <record id="view_chantier_form_map" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.form.map</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="inherit_id" ref="view_chantier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_voir_chantier_map)d" type="action" string="Voir sur la map" icon="fa-cube" class="btn-secondary"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

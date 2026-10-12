@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_plan_user,cultiveau.plan lecture,model_cultiveau_plan,base.group_user,1,0,0,0
+access_plan_manager,cultiveau.plan gestion,model_cultiveau_plan,sales_team.group_sale_manager,1,1,1,1
+access_plan_system,cultiveau.plan admin,model_cultiveau_plan,base.group_system,1,1,1,1
+access_pointage_user,cultiveau.pointage,model_cultiveau_pointage,base.group_user,1,0,1,0
+access_pointage_manager,cultiveau.pointage gestion,model_cultiveau_pointage,sales_team.group_sale_manager,1,1,1,1
+access_evenement_user,cultiveau.evenement,model_cultiveau_evenement,base.group_user,1,0,0,0
+access_evenement_manager,cultiveau.evenement gestion,model_cultiveau_evenement,sales_team.group_sale_manager,1,1,1,1

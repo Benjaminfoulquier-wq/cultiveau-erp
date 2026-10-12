@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Les plans du site -->
+    <record id="view_plan_list" model="ir.ui.view">
+        <field name="name">cultiveau.plan.list</field>
+        <field name="model">cultiveau.plan</field>
+        <field name="arch" type="xml">
+            <list default_order="version desc">
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="name"/><field name="version"/><field name="publie"/><field name="note"/><field name="write_date" string="Modifié le"/>
+                <button name="action_publier" type="object" string="Publier" icon="fa-check" invisible="publie"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_plan_form" model="ir.ui.view">
+        <field name="name">cultiveau.plan.form</field>
+        <field name="model">cultiveau.plan</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_publier" type="object" string="Publier cette version" class="btn-primary" invisible="publie"/>
+                    <button name="action_regenerer" type="object" string="Régénérer le plan initial" confirm="Le plan de cette version sera remplacé par le plan généré. Continuer ?"/>
+                </header>
+                <sheet>
+                    <group><group><field name="name"/><field name="company_id" groups="base.group_multi_company"/><field name="version"/></group>
+                           <group><field name="publie"/><field name="note"/></group></group>
+                    <notebook><page string="Plan (JSON)"><field name="layout" widget="json" nolabel="1"/></page></notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_plans" model="ir.actions.act_window">
+        <field name="name">Plans du site</field>
+        <field name="res_model">cultiveau.plan</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <!-- Le flux d'activité -->
+    <record id="view_evenement_list" model="ir.ui.view">
+        <field name="name">cultiveau.evenement.list</field>
+        <field name="model">cultiveau.evenement</field>
+        <field name="arch" type="xml">
+            <list create="false" default_order="horodatage desc">
+                <field name="horodatage"/><field name="genre"/><field name="titre"/><field name="texte"/><field name="acteur_id"/><field name="demo" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_evenements" model="ir.actions.act_window">
+        <field name="name">Fil d'activité</field>
+        <field name="res_model">cultiveau.evenement</field>
+        <field name="view_mode">list</field>
+    </record>
+    <!-- Les pointages -->
+    <record id="view_pointage_list" model="ir.ui.view">
+        <field name="name">cultiveau.pointage.list</field>
+        <field name="model">cultiveau.pointage</field>
+        <field name="arch" type="xml">
+            <list default_order="horodatage desc" editable="bottom">
+                <field name="horodatage"/><field name="user_id"/><field name="genre"/><field name="source"/><field name="task_id" optional="hide"/><field name="note" optional="hide"/>
+            </list>
+        </field>
+    </record>
+    <record id="action_pointages" model="ir.actions.act_window">
+        <field name="name">Pointages</field>
+        <field name="res_model">cultiveau.pointage</field>
+        <field name="view_mode">list</field>
+    </record>
+    <menuitem id="menu_map_reglages" name="Map vivante" parent="cultiveau_base.menu_cultiveau_reglages" sequence="60"/>
+    <menuitem id="menu_plans" name="Plans du site" parent="menu_map_reglages" action="action_plans" sequence="1"/>
+    <menuitem id="menu_evenements" name="Fil d'activité" parent="menu_map_reglages" action="action_evenements" sequence="2"/>
+    <menuitem id="menu_pointages" name="Pointages" parent="menu_map_reglages" action="action_pointages" sequence="3"/>
+
+    <!-- Les réglages -->
+    <record id="res_config_settings_view_form_map" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.map</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Map vivante" name="cultiveau_map">
+                    <setting string="Le site en 3D" help="La page d'accueil : le dépôt, l'équipe, les camions, les chantiers et les parcelles, reliés aux données. Le plan se modifie dans la map (mode édition, gérant) ; il se régénère ici si besoin.">
+                        <div class="mt8">
+                            <button name="action_cultiveau_ouvrir_map" type="object" string="Ouvrir la map" class="btn-link" icon="fa-cube"/>
+                            <button name="%(action_plans)d" type="action" string="Les plans du site" class="btn-link" icon="fa-map-o"/>
+                            <button name="action_cultiveau_regenerer_plan" type="object" string="Régénérer le plan initial" class="btn-link" icon="fa-refresh"
+                                    confirm="Le plan publié sera remplacé par le plan généré (vos modifications dans l'éditeur seront perdues). Continuer ?"/>
+                        </div>
+                    </setting>
+                    <setting string="Mode démonstration" help="Pour présenter l'ERP : la map rejoue un scénario de 75 secondes (arrivée, départ en dépannage, livraison, pause, bon et devis signés) et des notifications d'ambiance, sur les données de cette société. Les pointages et événements joués sont marqués « démonstration ».">
+                        <field name="cultiveau_map_demo"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- « Voir sur la map » depuis le back-office -->
+    <record id="action_voir_installation" model="ir.actions.server">
+        <field name="name">Voir sur la map</field>
+        <field name="model_id" ref="cultiveau_installation.model_cultiveau_installation"/>
+        <field name="binding_model_id" ref="cultiveau_installation.model_cultiveau_installation"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env["cultiveau.map"].action_voir_sur_la_map("cultiveau.installation", record.id) if record else None</field>
+    </record>
+    <record id="action_voir_task" model="ir.actions.server">
+        <field name="name">Voir sur la map</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="binding_model_id" ref="project.model_project_task"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env["cultiveau.map"].action_voir_sur_la_map("project.task", record.id) if record else None</field>
+    </record>
+    <record id="action_voir_partner" model="ir.actions.server">
+        <field name="name">Voir sur la map</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env["cultiveau.map"].action_voir_sur_la_map("res.partner", record.id) if record else None</field>
+    </record>
+    <record id="action_voir_user" model="ir.actions.server">
+        <field name="name">Voir sur la map</field>
+        <field name="model_id" ref="base.model_res_users"/>
+        <field name="binding_model_id" ref="base.model_res_users"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">action = env["cultiveau.map"].action_voir_sur_la_map("res.users", record.id) if record else None</field>
+    </record>
+    <record id="view_installation_form_map" model="ir.ui.view">
+        <field name="name">cultiveau.installation.form.map</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="inherit_id" ref="cultiveau_installation.view_installation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(action_voir_installation)d" type="action" string="Voir sur la map" icon="fa-cube" class="btn-secondary"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,1 +1,1 @@
-from . import test_scene
+from . import test_scene, test_map

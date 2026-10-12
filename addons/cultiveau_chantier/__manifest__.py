@@ -26,7 +26,6 @@ réservé au magasin et sorti pour le chantier, un journal avec les photos, puis
         "views/chantier_views.xml",
         "views/sale_order_views.xml",
         "views/installation_views.xml",
-        "views/menus.xml",
-    ],
+        "views/menus.xml", "views/map_views.xml"],
     "installable": True,
 }

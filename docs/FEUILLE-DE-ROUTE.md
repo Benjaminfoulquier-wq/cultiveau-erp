@@ -54,7 +54,9 @@
 - **Le réseau** : Cultiveau, Agrifusion Holding et Solution Magnus, l'équipe, les 16 adhérents et leurs équipes, les prospects, les 39
   fournisseurs référencés et leurs contacts, importés d'un fichier (Réglages → Importer le réseau).
 - **Marque** : l'ERP est aux couleurs de Cultiveau, sans mention de l'éditeur ; déploiement en un push sur erp.cultiveau.fr.
-- **La vue d'ensemble** : la page d'accueil est le magasin en 3D (accueil et comptoir, bureau d'étude, magasin et cour, chantiers,
+- **La Map vivante** : la page d'accueil est le site de l'adhérent en 3D, relié aux données en temps réel (équipe, camions, clients,
+  chantiers, parcelles, stock), avec fiches, suivi d'installation, visite guidée, mode démonstration et éditeur de plan.
+- **La vue d'ensemble** (remplacée par la map) : le magasin en 3D (accueil et comptoir, bureau d'étude, magasin et cour, chantiers,
   atelier et SAV, parcelles en service, caisse) ; chaque objet s'ouvre sur ce qu'il représente.
 - **Le comptoir** : un écran pour la vente au magasin ; la douchette ou le clavier trouve l'article (code-barres, référence, nom),
   le panier, le client ou « client de passage », puis « Encaisser » (espèces, carte, chèque, virement) : commande confirmée, sortie de

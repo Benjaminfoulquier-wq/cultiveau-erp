@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_vue3d.Map">
+        <div class="o_cv_map d-flex flex-column h-100" t-att-style="state.v ? '--accent:' + state.v.societe.accent : ''">
+            <!-- la barre supérieure -->
+            <div class="o_cv_barre d-flex align-items-center gap-2 px-3" t-if="state.v">
+                <div class="o_cv_logo" t-esc="(state.v.societe.nom || 'C')[0].toUpperCase()"/>
+                <div class="o_cv_titre">
+                    <div class="o_cv_nom" t-esc="state.v.societe.nom"/>
+                    <div class="o_cv_sous"><t t-esc="state.v.plan.site and state.v.plan.site.nom or 'Dépôt'"/> · <t t-esc="state.v.date"/></div>
+                </div>
+                <div class="o_cv_recherche position-relative ms-2">
+                    <i class="fa fa-search"/>
+                    <input type="text" t-ref="recherche" class="form-control form-control-sm" placeholder="Rechercher équipe, camions, installations, clients, stock, zones…  /"
+                           t-model="state.recherche" t-on-input="chercher" t-on-keydown="onToucheRecherche"/>
+                    <div class="o_cv_resultats" t-if="state.resultats.length">
+                        <button t-foreach="state.resultats" t-as="r" t-key="r_index" class="o_cv_resultat" t-att-class="{ actif: r_index === (state.curseur || 0) }" t-on-click="() => this.choisir(r)">
+                            <i t-att-class="'fa fa-fw ' + r.icone"/><b t-esc="r.nom"/><small t-esc="r.sous"/><span class="o_cv_groupe" t-esc="r.groupe"/>
+                        </button>
+                    </div>
+                </div>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    <div class="position-relative">
+                        <button class="o_cv_bouton" t-on-click="() => state.zoneOuverte = !state.zoneOuverte"><i class="fa fa-map-o me-1"/>Vue d'ensemble <i class="fa fa-caret-down ms-1"/></button>
+                        <div class="o_cv_menu" t-if="state.zoneOuverte">
+                            <button class="o_cv_menu_ligne" t-on-click="() => { state.zoneOuverte = false; moteur and moteur.vueEnsemble(); }"><span class="code">ALL</span><span class="nom">Tout le site</span></button>
+                            <button t-foreach="state.zones" t-as="z" t-key="z.cle" class="o_cv_menu_ligne" t-on-click="() => this.allerZone(z)">
+                                <span class="code" t-esc="z.cle.slice(0, 3).toUpperCase()"/>
+                                <span class="nom"><t t-esc="z.nom"/><small><t t-esc="z.presents"/> présent(s)</small></span>
+                                <span class="jauge"><span t-att-style="'width:' + z.taux + '%'"/></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="o_cv_live"><span class="point"/>Live <b t-esc="state.heure"/></div>
+                    <div class="o_cv_live demo" t-if="state.demo.actif and state.demo.etape &lt; state.demo.n" title="Mode démonstration : scénario en cours"><span class="point"/>Démo</div>
+                    <div class="position-relative">
+                        <button class="o_cv_bouton rond" t-on-click="ouvrirCloche"><i class="fa fa-bell"/><span class="o_cv_compteur" t-if="evenementsNonLus" t-esc="evenementsNonLus"/></button>
+                        <div class="o_cv_menu large" t-if="state.cloche">
+                            <div class="o_cv_menu_titre">Fil d'activité</div>
+                            <div class="text-muted small px-3 py-2" t-if="!state.v.evenements.length">Rien pour l'instant.</div>
+                            <button t-foreach="state.v.evenements" t-as="e" t-key="e.id" class="o_cv_menu_ligne" t-on-click="() => this.allerEvenement(e)">
+                                <span class="code"><i t-att-class="'fa ' + iconeEvenement(e.genre)"/></span>
+                                <span class="nom"><t t-esc="e.titre"/><small t-esc="e.texte"/></span>
+                                <span class="heure" t-esc="heure(e.horodatage)"/>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="o_cv_bouton" t-on-click="visiteGuidee" t-att-class="{ actif: state.visite }" title="Visite guidée (T)"><i class="fa fa-play me-1"/>Visite</button>
+                    <button class="o_cv_bouton" t-if="state.v.utilisateur.editeur" t-on-click="basculerEdition" t-att-class="{ actif: state.edition }" title="Modifier le plan"><i class="fa fa-pencil me-1"/>Plan</button>
+                    <div class="position-relative">
+                        <button class="o_cv_bouton accent" t-on-click="() => state.creerOuvert = !state.creerOuvert"><i class="fa fa-plus me-1"/>Créer</button>
+                        <div class="o_cv_menu" t-if="state.creerOuvert">
+                            <button class="o_cv_menu_ligne" t-if="state.v.actions.includes('comptoir')" t-on-click="() => this.lancer('comptoir')"><span class="nom">Une vente au comptoir</span></button>
+                            <button class="o_cv_menu_ligne" t-on-click="() => this.creer('sale.order', {})"><span class="nom">Un devis</span></button>
+                            <button class="o_cv_menu_ligne" t-on-click="() => this.lancer('facture_nouvelle')"><span class="nom">Une facture</span></button>
+                            <button class="o_cv_menu_ligne" t-on-click="() => this.creer('res.partner', {default_cultiveau_type: 'agriculteur', default_is_company: false})"><span class="nom">Un agriculteur</span></button>
+                            <button class="o_cv_menu_ligne" t-on-click="() => this.creer('crm.lead', {default_type: 'opportunity'})"><span class="nom">Une demande (appel, visite)</span></button>
+                            <button class="o_cv_menu_ligne" t-on-click="() => this.creer('cultiveau.installation', {default_etat: 'etude'})"><span class="nom">Une étude d'installation</span></button>
+                            <button class="o_cv_menu_ligne" t-on-click="() => this.creer('project.task', {default_cultiveau_nature: 'depannage'})"><span class="nom">Un dépannage</span></button>
+                            <button class="o_cv_menu_ligne" t-if="state.v.actions.includes('chantier_nouveau')" t-on-click="() => this.creer('cultiveau.chantier', {})"><span class="nom">Un chantier</span></button>
+                            <button class="o_cv_menu_ligne" t-on-click="() => this.creer('purchase.order', {})"><span class="nom">Une commande fournisseur</span></button>
+                        </div>
+                    </div>
+                    <div class="o_cv_utilisateur">
+                        <span class="o_cv_avatar" t-esc="state.v.utilisateur.nom.split(' ').map(m => m[0]).join('').slice(0, 2).toUpperCase()"/>
+                        <span class="d-none d-lg-block"><b t-esc="state.v.utilisateur.nom"/><small t-esc="state.v.secteur.roles.find(r => r.cle === state.v.utilisateur.role) ? state.v.secteur.roles.find(r => r.cle === state.v.utilisateur.role).nom : ''"/></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="o_cv_scene flex-grow-1 position-relative">
+                <div class="alert alert-danger m-3" t-if="state.erreur" t-esc="state.erreur"/>
+                <div class="alert alert-warning m-3" t-if="state.sans3d and !state.erreur">La 3D n'est pas disponible sur cet appareil (WebGL). Les listes et les fiches restent accessibles par le menu.</div>
+                <div t-ref="hote" class="o_cv_hote"/>
+                <div t-ref="calque" class="o_cv_calque"/>
+
+                <!-- l'écran de chargement -->
+                <div class="o_cv_chargement" t-if="!state.pret and !state.sans3d and state.v">
+                    <div class="o_cv_logo grand" t-esc="(state.v.societe.nom || 'C')[0].toUpperCase()"/>
+                    <div class="o_cv_barre_chargement"><span t-att-style="'width:' + state.chargement + '%'"/></div>
+                    <div class="texte">Construction du site…</div>
+                </div>
+
+                <!-- les trois KPI -->
+                <div class="o_cv_kpis" t-if="state.v and state.pret and !state.edition">
+                    <button t-foreach="state.kpi" t-as="k" t-key="k.cle" class="o_cv_kpi" t-att-class="{ flash: state.flash[k.cle] }" t-on-click="() => this.kpiClic(k)">
+                        <div class="nom" t-esc="k.nom"/>
+                        <div class="valeur"><t t-esc="k.unite === '€' ? euros(k.valeur) : k.valeur"/><small t-if="k.unite" t-esc="' ' + k.unite"/></div>
+                        <div class="sous" t-esc="k.sous_titre"/>
+                    </button>
+                </div>
+
+                <!-- les notifications volantes -->
+                <div class="o_cv_notifs" t-if="state.notifs.length">
+                    <button t-foreach="state.notifs" t-as="n" t-key="n.id" class="o_cv_notif" t-on-click="() => this.allerEvenement(n)">
+                        <span class="ic"><i t-att-class="'fa ' + iconeEvenement(n.genre)"/></span>
+                        <span class="corps"><b t-esc="n.titre"/><span t-esc="n.texte"/></span>
+                        <span class="duree"><span/></span>
+                    </button>
+                </div>
+
+                <!-- les commandes de la caméra -->
+                <div class="o_cv_commandes" t-if="state.pret">
+                    <button title="Rapprocher" t-on-click="() => moteur.zoomer(0.75)"><i class="fa fa-plus"/></button>
+                    <button title="Éloigner" t-on-click="() => moteur.zoomer(1.33)"><i class="fa fa-minus"/></button>
+                    <button title="Pivoter à gauche" t-on-click="() => moteur.tourner(-1)"><i class="fa fa-rotate-left"/></button>
+                    <button title="Pivoter à droite" t-on-click="() => moteur.tourner(1)"><i class="fa fa-rotate-right"/></button>
+                    <button title="Vue d'ensemble (H)" t-on-click="() => moteur.vueEnsemble()"><i class="fa fa-home"/></button>
+                </div>
+
+                <!-- la visite guidée -->
+                <div class="o_cv_visite" t-if="state.visite">
+                    <span class="point"/> Visite guidée — <b t-esc="state.visite.titre"/> · <t t-esc="state.visite.i"/>/<t t-esc="state.visite.n"/>
+                    <span class="progression"><span t-att-style="'width:' + (100 * state.visite.i / state.visite.n) + '%'"/></span>
+                </div>
+
+                <!-- la fiche détaillée -->
+                <div class="o_cv_fiche" t-if="state.fiche or state.ficheChargement" t-on-pointerdown.stop="">
+                    <div class="o_cv_fiche_chargement" t-if="state.ficheChargement and !state.fiche"><i class="fa fa-circle-o-notch fa-spin"/></div>
+                    <t t-if="state.fiche" t-call="cultiveau_vue3d.Fiche"><t t-set="f" t-value="state.fiche"/></t>
+                </div>
+
+                <!-- le suivi du dossier -->
+                <div class="o_cv_suivi" t-if="suiviDossier and !state.edition">
+                    <t t-set="d" t-value="suiviDossier"/>
+                    <div class="o_cv_suivi_titre"><i class="fa fa-leaf me-1"/>Suivi de l'installation <span class="ms-auto text-muted" t-esc="d.nom"/></div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="o_cv_stepper">
+                            <div t-foreach="d.etapes" t-as="e" t-key="e.cle" class="etape" t-att-class="e.etat">
+                                <span class="rond"><i t-if="e.etat === 'faite'" class="fa fa-check"/></span>
+                                <span class="nom" t-esc="e.nom"/>
+                            </div>
+                        </div>
+                        <button class="o_cv_mini" t-on-click="() => this.ouvrirBackOffice('cultiveau.installation', d.id)">
+                            <span class="anneau" t-att-style="'--p:' + (d.avancement || 0)"><b><t t-esc="d.avancement || 0"/>%</b></span>
+                            <span class="texte"><b t-esc="d.nom"/><small t-esc="d.client + (d.responsable ? ' · ' + d.responsable : '')"/><small t-if="d.devis and d.devis.montant" t-esc="'Devis ' + euros(d.devis.montant) + ' €'"/></span>
+                            <i class="fa fa-angle-right"/>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- le tableau à onglets -->
+                <div class="o_cv_tableau" t-if="state.v and state.pret and !state.edition" t-on-pointerdown.stop="">
+                    <div class="o_cv_onglets">
+                        <button t-foreach="onglets" t-as="o" t-key="o.cle" t-att-class="{ actif: state.onglet === o.cle }" t-on-click="() => state.onglet = o.cle"><t t-esc="o.nom"/> <small t-esc="o.n"/></button>
+                    </div>
+                    <div class="o_cv_lignes">
+                        <div class="text-muted small px-3 py-2" t-if="!lignesOnglet.length">Rien pour l'instant.</div>
+                        <button t-foreach="lignesOnglet" t-as="l" t-key="l.cible + '-' + (l.res_id || l.id)" class="o_cv_ligne" t-on-click="() => this.allerLigne(l)">
+                            <span class="code"><b t-esc="l.code"/><small t-if="l.heure" t-esc="heure(l.heure)"/></span>
+                            <span class="nom"><t t-esc="l.nom"/><small t-esc="l.sous"/></span>
+                            <span t-att-class="'badge ' + l.couleur" t-esc="l.badge"/>
+                            <span class="jauge" t-if="l.progression !== undefined"><span t-att-style="'width:' + l.progression + '%'"/></span>
+                            <i class="fa fa-angle-right"/>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- l'éditeur de plan -->
+                <div class="o_cv_editeur" t-if="state.edition" t-on-pointerdown.stop="">
+                    <div class="o_cv_editeur_titre"><i class="fa fa-pencil me-1"/>Édition du plan
+                        <span class="ms-auto d-flex gap-1">
+                            <button class="o_cv_bouton petit" t-on-click="annuler" t-att-disabled="!state.historique.length" title="Annuler (Ctrl+Z)"><i class="fa fa-undo"/></button>
+                            <button class="o_cv_bouton petit" t-on-click="retablir" t-att-disabled="!state.futur.length" title="Rétablir"><i class="fa fa-repeat"/></button>
+                        </span>
+                    </div>
+                    <div class="small text-muted mb-2">Glissez un objet pour le déplacer (grille de 0,5 m), <b>R</b> le tourne de 15°, <b>Suppr</b> l'enlève. Les disques sont les places que les données remplissent.</div>
+                    <button class="o_cv_bouton w-100 mb-2" t-on-click="() => state.palette = !state.palette"><i class="fa fa-plus me-1"/>Ajouter un objet</button>
+                    <div class="o_cv_palette" t-if="state.palette">
+                        <t t-foreach="paletteParCategorie" t-as="cat" t-key="cat[0]">
+                            <div class="cat" t-esc="cat[0]"/>
+                            <button t-foreach="cat[1]" t-as="p" t-key="p.type" t-on-click="() => this.ajouterObjet(p.type)" t-esc="p.nom"/>
+                        </t>
+                    </div>
+                    <div class="o_cv_proprietes" t-if="state.objetEdite">
+                        <div class="fw-bold mb-1"><i class="fa fa-cube me-1"/><t t-esc="state.objetEdite.type"/> <small class="text-muted" t-esc="state.objetEdite.id"/></div>
+                        <div class="d-flex gap-1 mb-2">
+                            <button class="o_cv_bouton petit" t-on-click="() => this.tournerObjet(-15)"><i class="fa fa-rotate-left"/></button>
+                            <span class="align-self-center small"><t t-esc="state.objetEdite.rot"/>°</span>
+                            <button class="o_cv_bouton petit" t-on-click="() => this.tournerObjet(15)"><i class="fa fa-rotate-right"/></button>
+                            <button class="o_cv_bouton petit ms-auto text-danger" t-on-click="supprimerObjet"><i class="fa fa-trash"/></button>
+                        </div>
+                        <div class="small fw-bold">Relié à</div>
+                        <div class="small mb-1" t-if="state.objetEdite.entite"><i class="fa fa-link me-1"/><t t-esc="state.objetEdite.entite.nom"/> <a href="#" t-on-click.prevent="delier">retirer</a></div>
+                        <div class="d-flex gap-1">
+                            <select class="form-select form-select-sm" t-model="state.lien.modele">
+                                <option value="">— choisir —</option>
+                                <option value="res.users">Une personne (poste)</option>
+                                <option value="product.category">Une famille (rayon)</option>
+                                <option value="stock.location">Un camion (emplacement)</option>
+                                <option value="cultiveau.installation">Une installation</option>
+                            </select>
+                        </div>
+                        <input type="text" class="form-control form-control-sm mt-1" placeholder="Chercher…" t-model="state.lien.recherche" t-on-input="chercherLien" t-if="state.lien.modele"/>
+                        <div class="o_cv_resultats_lien" t-if="state.lien.resultats.length">
+                            <button t-foreach="state.lien.resultats" t-as="r" t-key="r[0]" t-on-click="() => this.lier(r)" t-esc="r[1]"/>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-1 mt-2">
+                        <button class="o_cv_bouton flex-grow-1" t-on-click="() => this.enregistrerPlan(false)"><i class="fa fa-save me-1"/>Brouillon</button>
+                        <button class="o_cv_bouton accent flex-grow-1" t-on-click="() => this.enregistrerPlan(true)"><i class="fa fa-check me-1"/>Publier</button>
+                    </div>
+                </div>
+
+                <!-- la fiche complète, au-dessus de la map -->
+                <div class="o_cv_voile" t-if="state.complete" t-on-click="() => state.complete = null">
+                    <div class="o_cv_complete" t-on-click.stop="">
+                        <t t-set="f" t-value="state.complete"/>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="o_cv_fiche_icone"><i t-att-class="'fa ' + (f.icone || 'fa-cube')"/></span>
+                            <h3 class="m-0 flex-grow-1" t-esc="f.nom"/>
+                            <button class="o_cv_bouton accent" t-if="f.actions and f.actions.length and f.actions[0].modele" t-on-click="() => this.ouvrirBackOffice(f.actions[0].modele, f.actions[0].id)"><i class="fa fa-external-link me-1"/>Ouvrir dans le back-office</button>
+                            <button class="o_cv_bouton rond" t-on-click="() => state.complete = null"><i class="fa fa-times"/></button>
+                        </div>
+                        <t t-if="f.genre === 'personne'">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <h6>Agenda du jour</h6>
+                                    <div class="o_cv_agenda grand">
+                                        <t t-foreach="[8,9,10,11,12,13,14,15,16,17,18]" t-as="h" t-key="h"><div class="heure" t-att-style="'left:' + ((h - 7) / 11 * 100) + '%'"><t t-esc="h"/>h</div></t>
+                                        <div t-foreach="f.agenda" t-as="a" t-key="a.id" class="rdv" t-att-class="{ fait: a.fait }" t-att-style="'left:' + Math.max(0, (new Date(a.debut.replace(' ', 'T') + 'Z').getHours() + new Date(a.debut.replace(' ', 'T') + 'Z').getMinutes() / 60 - 7) / 11 * 100) + '%;width:' + (a.fin ? Math.max(4, (new Date(a.fin.replace(' ', 'T') + 'Z') - new Date(a.debut.replace(' ', 'T') + 'Z')) / 3600000 / 11 * 100) : 8) + '%'" t-att-title="a.titre"><t t-esc="a.titre"/></div>
+                                        <div class="maintenant" t-att-style="'left:' + ((new Date().getHours() + new Date().getMinutes() / 60 - 7) / 11 * 100) + '%'"/>
+                                    </div>
+                                    <div class="text-muted small mt-1" t-if="!f.agenda.length">Rien de planifié aujourd'hui.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Pointage de la semaine</h6>
+                                    <div class="o_cv_semaine">
+                                        <div t-foreach="f.semaine" t-as="j" t-key="j.jour" class="jour"><span class="barre" t-att-style="'height:' + Math.min(100, j.heures / 10 * 100) + '%'"/><small t-esc="j.jour"/><b t-esc="j.heures ? j.heures + ' h' : '—'"/></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Pointages du jour</h6>
+                                    <div class="text-muted small" t-if="!f.pointages.length">Aucun pointage.</div>
+                                    <div t-foreach="f.pointages" t-as="p" t-key="p_index" class="small d-flex gap-2"><b t-esc="heure(p.heure)"/><span t-esc="p.nom"/></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Contact</h6>
+                                    <div class="small"><i class="fa fa-phone me-1"/><t t-esc="f.telephone || '—'"/></div>
+                                    <div class="small"><i class="fa fa-envelope-o me-1"/><t t-esc="f.courriel || '—'"/></div>
+                                    <div class="small"><i class="fa fa-briefcase me-1"/><t t-esc="f.role_nom"/></div>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-elif="f.genre === 'dossier'">
+                            <div class="row g-3">
+                                <div class="col-md-6"><h6>Devis</h6>
+                                    <div class="text-muted small" t-if="!f.devis.length">Aucun devis.</div>
+                                    <button t-foreach="f.devis" t-as="d" t-key="d.id" class="o_cv_ligne" t-on-click="() => this.ouvrirBackOffice('sale.order', d.id)"><span class="nom"><t t-esc="d.nom"/><small t-esc="d.date"/></span><b class="ms-auto" t-esc="euros(d.montant) + ' €'"/><span class="badge ardoise" t-esc="d.etat"/></button>
+                                </div>
+                                <div class="col-md-6"><h6>Historique des interventions</h6>
+                                    <div class="text-muted small" t-if="!f.historique.length">Aucune intervention.</div>
+                                    <button t-foreach="f.historique" t-as="h" t-key="h.id" class="o_cv_ligne" t-on-click="() => this.ouvrirBackOffice('project.task', h.id)"><span class="nom"><t t-esc="h.nom"/><small t-esc="h.date + (h.technicien ? ' · ' + h.technicien : '')"/></span><span t-att-class="'badge ' + (h.fait ? 'vert' : 'ardoise')" t-esc="h.fait ? 'Faite' : 'À faire'"/></button>
+                                </div>
+                                <div class="col-md-6"><h6>Équipements</h6>
+                                    <div class="text-muted small" t-if="!f.equipements.length">Aucun équipement renseigné.</div>
+                                    <div t-foreach="f.equipements" t-as="e" t-key="e.id" class="small"><i class="fa fa-cog me-1"/><t t-esc="e.nom"/></div>
+                                </div>
+                                <div class="col-md-6"><h6>Mise en service</h6>
+                                    <div class="small" t-if="f.pv.date">PV du <b t-esc="f.pv.date"/><t t-if="f.pv.intervenant"> par <t t-esc="f.pv.intervenant"/></t></div>
+                                    <div class="text-muted small" t-else="">Pas encore mise en service.</div>
+                                    <div class="small mt-2"><t t-esc="f.type_nom"/> · <t t-esc="f.surface"/> ha<t t-if="f.commune"> · <t t-esc="f.commune"/></t><t t-if="f.ressource"> · <t t-esc="f.ressource"/></t></div>
+                                </div>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="text-muted">Le détail complet est dans le back-office.</div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+            <div class="o_cv_aide" t-if="state.pret">clic : ouvrir · glisser : déplacer · clic droit : pivoter · molette : zoomer · <b>/</b> rechercher · <b>T</b> visite · <b>H</b> vue d'ensemble · <b>Échap</b> fermer</div>
+        </div>
+    </t>
+
+    <!-- la fiche résumée, selon le genre -->
+    <t t-name="cultiveau_vue3d.Fiche">
+        <div class="o_cv_fiche_entete">
+            <span class="o_cv_fiche_icone"><i t-att-class="'fa ' + (f.icone || icone(f.genre))"/></span>
+            <div class="flex-grow-1 min-w-0">
+                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet'}[f.genre] || f.genre"/>
+                <div class="o_cv_fiche_nom text-truncate" t-esc="f.nom"/>
+            </div>
+            <button class="o_cv_bouton rond petit" t-if="f.genre !== 'zone' and f.genre !== 'objet'" t-on-click="suivre" t-att-class="{ actif: state.suivi === state.selection }" title="Suivre"><i class="fa fa-crosshairs"/></button>
+            <button class="o_cv_bouton rond petit" t-if="f.genre === 'personne' or f.genre === 'dossier'" t-on-click="ficheComplete" title="Fiche complète"><i class="fa fa-expand"/></button>
+            <button class="o_cv_bouton rond petit" t-on-click="fermerFiche" title="Fermer (Échap)"><i class="fa fa-times"/></button>
+        </div>
+        <div class="o_cv_fiche_corps">
+            <!-- une personne -->
+            <t t-if="f.genre === 'personne'">
+                <div class="o_cv_statut"><span t-att-class="'badge ' + f.couleur" t-esc="f.statut_nom"/><span class="ms-2 small text-muted" t-if="f.depuis">depuis <t t-esc="duree(f.depuis)"/></span><span class="ms-auto small" t-esc="f.role_nom"/></div>
+                <div class="o_cv_grille">
+                    <div><small>Arrivé à</small><b t-esc="f.arrivee ? heure(f.arrivee) : '—'"/></div>
+                    <div><small>Présence du jour</small><b t-esc="f.presence_min ? Math.floor(f.presence_min / 60) + ' h ' + String(f.presence_min % 60).padStart(2, '0') : '—'"/></div>
+                    <div><small>Connexion</small><b t-esc="f.en_ligne ? 'En ligne' : 'Hors ligne'"/></div>
+                    <div><small>Téléphone</small><b t-esc="f.telephone || '—'"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.tache"><small>Intervention en cours</small><button class="o_cv_lien" t-on-click="() => this.aller('intervention:' + f.tache.id)"><i class="fa fa-bolt me-1"/><t t-esc="f.tache.nom"/> <span class="text-muted">· <t t-esc="f.tache.client"/></span></button></div>
+                <div class="o_cv_bloc" t-if="f.chantier"><small>Chantier en cours</small><button class="o_cv_lien" t-on-click="() => this.aller('chantier:' + f.chantier.id)"><i class="fa fa-wrench me-1"/><t t-esc="f.chantier.nom"/></button></div>
+                <div class="o_cv_bloc"><small>Agenda du jour</small>
+                    <div class="o_cv_agenda">
+                        <t t-foreach="[8,10,12,14,16,18]" t-as="h" t-key="h"><div class="heure" t-att-style="'left:' + ((h - 7) / 11 * 100) + '%'"><t t-esc="h"/>h</div></t>
+                        <div t-foreach="f.agenda" t-as="a" t-key="a.id" class="rdv" t-att-class="{ fait: a.fait }" t-att-style="'left:' + Math.max(0, (new Date(a.debut.replace(' ', 'T') + 'Z').getHours() + new Date(a.debut.replace(' ', 'T') + 'Z').getMinutes() / 60 - 7) / 11 * 100) + '%;width:' + (a.fin ? Math.max(4, (new Date(a.fin.replace(' ', 'T') + 'Z') - new Date(a.debut.replace(' ', 'T') + 'Z')) / 3600000 / 11 * 100) : 8) + '%'" t-att-title="a.titre + ' · ' + a.client"/>
+                        <div class="maintenant" t-att-style="'left:' + ((new Date().getHours() + new Date().getMinutes() / 60 - 7) / 11 * 100) + '%'"/>
+                    </div>
+                    <div t-foreach="f.agenda.slice(0, 3)" t-as="a" t-key="a.id" class="small d-flex gap-2 mt-1"><b t-esc="heure(a.debut)"/><span class="text-truncate" t-esc="a.titre + (a.client ? ' · ' + a.client : '')"/></div>
+                    <div class="text-muted small" t-if="!f.agenda.length">Rien de planifié.</div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.pointages.length"><small>Pointages</small><div t-foreach="f.pointages.slice(0, 4)" t-as="p" t-key="p_index" class="small d-flex gap-2"><b t-esc="heure(p.heure)"/><span t-esc="p.nom"/></div></div>
+            </t>
+            <!-- un dossier (installation) -->
+            <t t-elif="f.genre === 'dossier'">
+                <div class="o_cv_statut"><span class="badge accent" t-esc="f.etapes[f.etape].nom"/><span class="ms-auto small" t-esc="f.type_nom"/></div>
+                <div class="o_cv_grille">
+                    <div><small>Client</small><button class="o_cv_lien" t-on-click="() => this.ouvrirBackOffice('res.partner', f.client_id)" t-esc="f.client"/></div>
+                    <div><small>Surface</small><b t-esc="(f.surface || 0) + ' ha'"/></div>
+                    <div><small>Suivi par</small><b t-esc="f.responsable || '—'"/></div>
+                    <div><small>Commune</small><b t-esc="f.commune || '—'"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.devis and f.devis.length"><small>Devis</small>
+                    <button t-foreach="f.devis.slice(0, 2)" t-as="d" t-key="d.id" class="o_cv_lien d-flex" t-on-click="() => this.ouvrirBackOffice('sale.order', d.id)"><span t-esc="d.nom"/><b class="ms-auto" t-esc="euros(d.montant) + ' € TTC'"/></button>
+                </div>
+                <div class="o_cv_bloc" t-if="f.eau"><small>État d'eau</small><div class="small"><b t-esc="f.eau.etat"/> · déficit <t t-esc="f.eau.deficit"/> mm · dose <t t-esc="f.eau.dose"/> mm</div><div class="small text-muted" t-esc="f.eau.conseil"/></div>
+                <div class="o_cv_bloc" t-if="f.echeance"><small>À faire</small><div class="small"><i class="fa fa-calendar me-1"/><t t-esc="f.echeance"/></div></div>
+                <div class="o_cv_bloc" t-if="f.historique and f.historique.length"><small>Historique</small>
+                    <div t-foreach="f.historique.slice(0, 4)" t-as="h" t-key="h.id" class="small d-flex gap-2"><i t-att-class="'fa ' + (h.fait ? 'fa-check text-success' : 'fa-clock-o text-muted')"/><span class="text-truncate" t-esc="h.nom"/><span class="ms-auto text-muted" t-esc="h.date"/></div>
+                </div>
+            </t>
+            <!-- un chantier -->
+            <t t-elif="f.genre === 'chantier'">
+                <div class="o_cv_statut"><span class="badge accent" t-esc="f.etat_nom || f.etat"/><span class="ms-auto small"><t t-esc="f.avancement"/> %</span></div>
+                <div class="o_cv_jauge"><span t-att-style="'width:' + f.avancement + '%'"/></div>
+                <div class="o_cv_grille">
+                    <div><small>Client</small><button class="o_cv_lien" t-on-click="() => this.ouvrirBackOffice('res.partner', f.client_id)" t-esc="f.client"/></div>
+                    <div><small>Chef de chantier</small><b t-esc="f.chef || '—'"/></div>
+                    <div><small>Équipe</small><b t-esc="(f.equipe || []).join(', ') || '—'"/></div>
+                    <div><small>Dates</small><b t-esc="(f.debut || '—') + ' → ' + (f.fin || '—')"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.lignes and f.lignes.length"><small>Matériel (posé / prévu)</small>
+                    <div t-foreach="f.lignes.slice(0, 6)" t-as="l" t-key="l_index" class="small d-flex gap-2"><i t-att-class="'fa ' + (l.pose >= l.prevu ? 'fa-check-square-o text-success' : l.pose ? 'fa-minus-square-o text-warning' : 'fa-square-o text-muted')"/><span class="text-truncate" t-esc="l.nom"/><span class="ms-auto" t-esc="l.pose + ' / ' + l.prevu"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.reserves"><small>Réserves</small><div class="small" t-esc="f.reserves"/></div>
+            </t>
+            <!-- une intervention -->
+            <t t-elif="f.genre === 'intervention'">
+                <div class="o_cv_statut"><span t-att-class="'badge ' + {a_faire: 'ardoise', en_cours: 'accent', faite: 'vert'}[f.etat]" t-esc="{a_faire: 'À faire', en_cours: 'En cours', faite: 'Faite'}[f.etat]"/><span class="ms-2 badge rouge" t-if="f.urgence === 'immediate'">Urgent</span><span class="ms-auto small" t-esc="f.nature_nom"/></div>
+                <div class="o_cv_grille">
+                    <div><small>Client</small><button class="o_cv_lien" t-on-click="() => this.ouvrirBackOffice('res.partner', f.client_id)" t-esc="f.client"/></div>
+                    <div><small>Technicien</small><button class="o_cv_lien" t-if="f.technicien_id" t-on-click="() => this.aller('personne:' + f.technicien_id)" t-esc="f.technicien"/><b t-else="">—</b></div>
+                    <div><small>Prévu à</small><b t-esc="f.debut ? heure(f.debut) : '—'"/></div>
+                    <div><small>Installation</small><button class="o_cv_lien" t-if="f.installation" t-on-click="() => this.aller('dossier:' + f.installation)" t-esc="f.installation_nom"/><b t-else="" t-esc="f.equipement || '—'"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.adresse"><small>Adresse</small><div class="small" t-esc="f.adresse"/></div>
+                <div class="o_cv_bloc" t-if="f.pieces and f.pieces.length"><small>Pièces prévues</small><div t-foreach="f.pieces" t-as="p" t-key="p_index" class="small d-flex"><span class="text-truncate" t-esc="p.nom"/><span class="ms-auto" t-esc="p.quantite"/></div></div>
+                <div class="o_cv_bloc" t-if="f.bons and f.bons.length"><small>Bons d'intervention</small><div t-foreach="f.bons" t-as="b" t-key="b.id" class="small d-flex gap-2"><i t-att-class="'fa ' + (b.signe ? 'fa-check text-success' : 'fa-pencil text-muted')"/><span t-esc="b.nom"/><span class="ms-auto" t-if="b.montant" t-esc="euros(b.montant) + ' €'"/></div></div>
+                <div class="o_cv_bloc" t-if="f.description"><small>Description</small><div class="small" t-out="f.description"/></div>
+            </t>
+            <!-- un client -->
+            <t t-elif="f.genre === 'client'">
+                <div class="o_cv_statut"><span class="badge accent" t-esc="f.type || 'client'"/><span class="ms-auto small" t-esc="f.commune"/></div>
+                <div class="o_cv_grille">
+                    <div><small>CA cumulé</small><b t-esc="euros(f.ca) + ' €'"/></div>
+                    <div><small>Impayés</small><b t-att-class="{ 'text-danger': f.impayes }" t-esc="euros(f.impayes) + ' €'"/></div>
+                    <div><small>Téléphone</small><b t-esc="f.telephone || '—'"/></div>
+                    <div><small>Persona</small><b t-esc="f.persona || '—'"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.devis.length"><small>Devis récents</small><button t-foreach="f.devis.slice(0, 3)" t-as="d" t-key="d.id" class="o_cv_lien d-flex" t-on-click="() => this.ouvrirBackOffice('sale.order', d.id)"><span t-esc="d.nom"/><b class="ms-auto" t-esc="euros(d.montant) + ' €'"/></button></div>
+                <div class="o_cv_bloc" t-if="f.installations.length"><small>Installations</small><button t-foreach="f.installations" t-as="i" t-key="i.id" class="o_cv_lien d-block" t-on-click="() => this.aller('dossier:' + i.id)"><i class="fa fa-leaf me-1"/><t t-esc="i.nom"/></button></div>
+                <div class="o_cv_bloc" t-if="f.note"><small>Note interne</small><div class="small" t-out="f.note"/></div>
+            </t>
+            <!-- un camion -->
+            <t t-elif="f.genre === 'camion'">
+                <div class="o_cv_statut"><span t-att-class="'badge ' + (f.parti ? 'accent' : 'vert')" t-esc="f.parti ? 'En tournée' : 'Au dépôt'"/><span class="ms-auto small" t-if="f.destination" t-esc="f.destination"/></div>
+                <div class="o_cv_grille">
+                    <div><small>Conducteur</small><button class="o_cv_lien" t-on-click="() => this.aller('personne:' + f.conducteur_id)" t-esc="f.conducteur"/></div>
+                    <div><small>À bord</small><b t-esc="f.a_bord + ' référence(s)'"/></div>
+                    <div><small>Manque à la dotation</small><b t-att-class="{ 'text-warning': f.manques }" t-esc="f.manques"/></div>
+                    <div><small>Tournée du jour</small><b t-esc="f.tournee.length + ' intervention(s)'"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.tournee.length"><small>Tournée</small><button t-foreach="f.tournee" t-as="t" t-key="t.id" class="o_cv_lien d-flex gap-2" t-on-click="() => this.aller('intervention:' + t.id)"><b t-esc="t.debut ? heure(t.debut) : '—'"/><span class="text-truncate" t-esc="t.nom + ' · ' + t.client"/></button></div>
+                <div class="o_cv_bloc" t-if="f.a_bord_detail.length"><small>Dans le camion</small><div t-foreach="f.a_bord_detail" t-as="q" t-key="q_index" class="small d-flex"><span class="text-truncate" t-esc="q.nom"/><span class="ms-auto" t-esc="q.quantite"/></div></div>
+            </t>
+            <!-- un rayon -->
+            <t t-elif="f.genre === 'rayon'">
+                <div class="o_cv_statut"><span t-att-class="'badge ' + (f.bas ? 'ambre' : 'vert')" t-esc="f.bas ? f.bas + ' référence(s) en alerte' : 'Stock normal'"/><span class="ms-auto small" t-esc="(f.mien || 0) + ' article(s)'"/></div>
+                <div class="o_cv_grille">
+                    <div><small>En stock</small><b t-esc="(f.stock || 0).toLocaleString('fr-FR')"/></div>
+                    <div><small>Valeur</small><b t-esc="euros(f.valeur) + ' €'"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.manquants.length"><small>À commander</small><div t-foreach="f.manquants" t-as="m" t-key="m_index" class="small d-flex"><span class="text-truncate" t-esc="m.nom"/><span class="ms-auto text-warning" t-esc="'−' + m.manque"/></div></div>
+                <div class="o_cv_bloc" t-if="f.articles.length"><small>Les plus en stock</small><div t-foreach="f.articles.slice(0, 6)" t-as="a" t-key="a.id" class="small d-flex"><span class="text-truncate" t-esc="a.nom"/><span class="ms-auto" t-esc="a.quantite"/></div></div>
+            </t>
+            <!-- une zone -->
+            <t t-elif="f.genre === 'zone'">
+                <div class="o_cv_statut"><span class="badge accent" t-esc="f.presents.length + ' présent(s)'"/></div>
+                <div class="o_cv_bloc"><small>Qui est là</small>
+                    <div class="text-muted small" t-if="!f.presents.length">Personne en ce moment.</div>
+                    <button t-foreach="f.presents" t-as="p" t-key="p.id" class="o_cv_lien d-flex gap-2" t-on-click="() => this.aller('personne:' + p.id)"><span t-esc="p.nom"/><span class="ms-auto text-muted small"><t t-esc="p.statut"/><t t-if="p.depuis"> · <t t-esc="duree(p.depuis)"/></t></span></button>
+                </div>
+                <div class="o_cv_bloc" t-if="f.clients.length"><small>Clients sur place</small><button t-foreach="f.clients" t-as="c" t-key="c.id" class="o_cv_lien d-flex gap-2" t-on-click="() => this.aller('client:' + c.id)"><span t-esc="c.nom"/><span class="ms-auto text-muted small" t-esc="c.devis ? c.devis.nom : ''"/></button></div>
+            </t>
+            <!-- la badgeuse -->
+            <t t-elif="f.genre === 'borne'">
+                <div class="o_cv_bloc"><small>Journal du jour</small>
+                    <div class="text-muted small" t-if="!f.journal.length">Aucun pointage aujourd'hui.</div>
+                    <div t-foreach="f.journal" t-as="j" t-key="j_index" class="small d-flex gap-2"><b t-esc="heure(j.heure)"/><span class="text-truncate" t-esc="j.nom"/><span class="ms-auto text-muted" t-esc="j.genre"/></div>
+                </div>
+            </t>
+            <!-- une livraison -->
+            <t t-elif="f.genre === 'livraison'">
+                <div class="o_cv_statut"><span t-att-class="'badge ' + (f.etat === 'done' ? 'vert' : 'ambre')" t-esc="f.etat === 'done' ? 'Reçue' : 'Attendue'"/><span class="ms-auto small" t-esc="f.origine"/></div>
+                <div class="o_cv_bloc"><small>Lignes</small><div t-foreach="f.lignes" t-as="l" t-key="l_index" class="small d-flex"><span class="text-truncate" t-esc="l.nom"/><span class="ms-auto" t-esc="l.recue + ' / ' + l.quantite"/></div></div>
+            </t>
+            <!-- un poste de travail -->
+            <t t-elif="f.genre === 'poste'">
+                <div class="o_cv_statut" t-if="f.personne"><span t-att-class="'badge ' + {active: 'vert', inactive: 'ambre', verrouillee: 'ardoise'}[f.session]" t-esc="{active: 'Session active', inactive: 'Inactif', verrouillee: 'Verrouillé'}[f.session]"/><span class="ms-auto small" t-if="f.depuis">depuis <t t-esc="heure(f.depuis)"/></span></div>
+                <div class="o_cv_bloc" t-if="f.ouverts and f.ouverts.length"><small>Ouverts récemment</small><button t-foreach="f.ouverts" t-as="o" t-key="o.id" class="o_cv_lien d-flex gap-2" t-on-click="() => this.ouvrirBackOffice('sale.order', o.id)"><span t-esc="o.nom"/><span class="ms-auto text-muted small" t-esc="o.client"/></button></div>
+                <div class="text-muted small" t-if="!f.personne">Personne n'est à ce poste.</div>
+            </t>
+            <t t-else="">
+                <div class="small text-muted" t-esc="f.sousTitre"/>
+            </t>
+            <div class="o_cv_actions" t-if="f.actions and f.actions.length">
+                <button t-foreach="f.actions" t-as="a" t-key="a_index" class="o_cv_action" t-att-class="{ principal: a_index === 0 }" t-on-click="() => this.lancerAction(a)">
+                    <i t-att-class="'fa fa-fw me-2 ' + (a.cle === 'fiche' ? 'fa-external-link' : a.cle === 'appeler' ? 'fa-phone' : a.cle === 'badger' ? 'fa-id-card-o' : 'fa-angle-right')"/><t t-esc="a.nom"/>
+                </button>
+            </div>
+        </div>
+    </t>
+</templates>

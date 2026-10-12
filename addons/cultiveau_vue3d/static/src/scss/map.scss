@@ -1,0 +1,163 @@
+// La Map vivante : une mise en page « contrôle » autour de la scène 3D. Fond légèrement teinté, cartes blanches à 16 px,
+// ombres douces, la couleur d'accent de l'adhérent (--accent), les couleurs de statut réservées à l'interface.
+.o_cv_map {
+    --accent: #0b9bb8;
+    --encre: #1d2f38;
+    --gris: #5d6b78;
+    --fond: #f4f1ea;
+    --carte: rgba(255, 255, 255, 0.96);
+    --ombre: 0 1px 2px rgba(24, 40, 50, 0.06), 0 8px 24px rgba(24, 40, 50, 0.12);
+    --vert: #2f9e5b; --ambre: #e3a21a; --rouge: #d94f45; --ardoise: #6c7883; --bleu: #2a63b0;
+    background: var(--fond);
+    color: var(--encre);
+    font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+    &::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0.035;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+    // ---------------------------------------------------------------- la barre
+    .o_cv_barre { height: 58px; background: #fff; border-bottom: 1px solid #e7e2d8; z-index: 40; position: relative; }
+    .o_cv_logo { width: 36px; height: 36px; border-radius: 10px; background: var(--accent); color: #fff; font-weight: 900; font-size: 18px; display: flex; align-items: center; justify-content: center; flex: none;
+        &.grand { width: 72px; height: 72px; border-radius: 20px; font-size: 36px; animation: cv-pulse 1.4s ease-in-out infinite; } }
+    .o_cv_titre { line-height: 1.15; .o_cv_nom { font-weight: 700; font-size: 15px; } .o_cv_sous { font-size: 11px; color: var(--gris); } }
+    .o_cv_recherche { width: 440px; max-width: 38vw;
+        > .fa { position: absolute; left: 12px; top: 9px; color: #9aa4ad; font-size: 12px; }
+        input { padding-left: 32px; height: 32px; border-radius: 16px; background: var(--fond); border-color: #e7e2d8; font-size: 12.5px; &:focus { background: #fff; border-color: var(--accent); box-shadow: none; } }
+        .o_cv_resultats { position: absolute; top: 110%; left: 0; right: 0; z-index: 60; background: #fff; border: 1px solid #e7e2d8; border-radius: 12px; box-shadow: var(--ombre); overflow: hidden; }
+        .o_cv_resultat { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none; padding: 7px 12px; font-size: 12.5px; color: var(--encre);
+            .fa { color: var(--accent); } small { color: var(--gris); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+            .o_cv_groupe { font-size: 10px; color: var(--gris); text-transform: uppercase; letter-spacing: 0.06em; }
+            &:hover, &.actif { background: #eef6f8; } } }
+    .o_cv_bouton { height: 32px; border-radius: 16px; border: 1px solid #e7e2d8; background: #fff; color: var(--encre); font-size: 12.5px; font-weight: 600; padding: 0 12px; display: inline-flex; align-items: center; white-space: nowrap;
+        &:hover { background: var(--fond); } &.actif { background: var(--encre); color: #fff; border-color: var(--encre); }
+        &.accent { background: var(--accent); color: #fff; border-color: var(--accent); &:hover { filter: brightness(1.08); } }
+        &.rond { width: 32px; padding: 0; justify-content: center; position: relative; } &.petit { height: 26px; font-size: 11.5px; padding: 0 9px; &.rond { width: 26px; } }
+        &:disabled { opacity: 0.4; } }
+    .o_cv_compteur { position: absolute; top: -5px; right: -5px; min-width: 18px; height: 18px; border-radius: 9px; background: var(--rouge); color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 5px; animation: cv-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    .o_cv_live { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 16px; background: #e8f6ee; color: #1f7a45; font-size: 12.5px; font-weight: 600;
+        .point { width: 8px; height: 8px; border-radius: 50%; background: #2f9e5b; animation: cv-pulse 1.6s ease-in-out infinite; }
+        &.demo { background: #fdf1d6; color: #8a5b00; .point { background: var(--ambre); } } }
+    .o_cv_utilisateur { display: flex; align-items: center; gap: 8px; line-height: 1.1; font-size: 12.5px; small { display: block; color: var(--gris); font-size: 10.5px; }
+        .o_cv_avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--encre); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; } }
+    .o_cv_menu { position: absolute; right: 0; top: 110%; z-index: 60; width: 300px; background: #fff; border: 1px solid #e7e2d8; border-radius: 14px; box-shadow: var(--ombre); overflow: hidden; max-height: 70vh; overflow-y: auto;
+        &.large { width: 380px; }
+        .o_cv_menu_titre { padding: 10px 14px 6px; font-size: 11px; font-weight: 700; color: var(--gris); text-transform: uppercase; letter-spacing: 0.08em; }
+        .o_cv_menu_ligne { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; text-align: left; padding: 8px 14px; font-size: 12.5px; color: var(--encre);
+            .code { width: 34px; font-size: 10.5px; font-weight: 700; color: var(--gris); flex: none; } .nom { flex: 1; min-width: 0; small { display: block; color: var(--gris); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+            .heure { font-size: 11px; color: var(--gris); } .jauge { width: 54px; height: 4px; border-radius: 2px; background: #eceae4; overflow: hidden; span { display: block; height: 100%; background: var(--accent); } }
+            &:hover { background: #eef6f8; } } }
+
+    // ---------------------------------------------------------------- la scène
+    .o_cv_scene { overflow: hidden; user-select: none; touch-action: none; background: radial-gradient(ellipse at 50% 35%, #fbf8f1 0%, #ece6d8 70%, #e2dac8 100%); }
+    .o_cv_hote { position: absolute; inset: 0; canvas { display: block; cursor: grab; width: 100% !important; height: 100% !important; } }
+    .o_cv_calque { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5;
+        .o_cv_etiquette { position: absolute; left: 0; top: 0; will-change: transform; white-space: nowrap; }
+        .o_cv_etiq { translate: -50% -110%; display: inline-block; background: rgba(255, 255, 255, 0.95); border-radius: 10px; padding: 4px 10px; font-size: 11.5px; color: var(--encre); box-shadow: var(--ombre); }
+        .o_cv_etiq_plein { translate: -50% -120%; display: inline-block; background: var(--accent); color: #fff; border-radius: 10px; padding: 5px 11px; font-size: 12px; box-shadow: var(--ombre); position: relative;
+            span { opacity: 0.6; margin: 0 2px; }
+            &::after { content: ""; position: absolute; left: 50%; bottom: -6px; translate: -50%; border: 6px solid transparent; border-top-color: var(--accent); border-bottom: 0; } } }
+    .o_cv_chargement { position: absolute; inset: 0; z-index: 30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: var(--fond);
+        .o_cv_barre_chargement { width: 220px; height: 6px; border-radius: 3px; background: #e7e2d8; overflow: hidden; span { display: block; height: 100%; background: var(--accent); transition: width 0.4s ease; } }
+        .texte { font-size: 12.5px; color: var(--gris); } }
+    .o_cv_commandes { position: absolute; right: 16px; top: 16px; z-index: 10; display: flex; flex-direction: column; gap: 4px; background: var(--carte); border-radius: 12px; padding: 4px; box-shadow: var(--ombre);
+        button { width: 32px; height: 32px; border: 0; background: none; border-radius: 8px; color: var(--encre); &:hover { background: var(--fond); } } }
+    .o_cv_aide { font-size: 11px; color: var(--gris); padding: 3px 14px; background: #fff; border-top: 1px solid #e7e2d8; b { color: var(--encre); } }
+
+    // ---------------------------------------------------------------- les KPI
+    .o_cv_kpis { position: absolute; left: 16px; top: 16px; z-index: 10; display: flex; gap: 10px; }
+    .o_cv_kpi { background: var(--carte); border: 0; border-radius: 16px; padding: 10px 16px; min-width: 150px; text-align: left; box-shadow: var(--ombre); transition: transform 0.15s ease;
+        .nom { font-size: 11px; color: var(--gris); font-weight: 600; } .valeur { font-size: 24px; font-weight: 800; line-height: 1.15; small { font-size: 13px; font-weight: 600; color: var(--gris); } }
+        .sous { font-size: 11px; color: var(--gris); }
+        &:hover { transform: translateY(-1px); } &.flash { animation: cv-flash 1.4s ease; } }
+
+    // ---------------------------------------------------------------- les notifications volantes
+    .o_cv_notifs { position: absolute; left: 16px; top: 112px; z-index: 20; display: flex; flex-direction: column; gap: 8px; width: 380px; max-width: 60vw; }
+    .o_cv_notif { display: flex; align-items: center; gap: 10px; background: var(--carte); border: 0; border-radius: 14px; padding: 9px 12px; text-align: left; box-shadow: var(--ombre); position: relative; overflow: hidden;
+        animation: cv-arrivee 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        .ic { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; display: inline-flex; align-items: center; justify-content: center; flex: none; font-size: 13px; }
+        .corps { flex: 1; min-width: 0; font-size: 12px; line-height: 1.25; b { display: block; } span { color: var(--gris); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+        .duree { position: absolute; left: 0; bottom: 0; right: 0; height: 3px; background: #eceae4; span { display: block; height: 100%; background: var(--accent); animation: cv-duree 6s linear forwards; } } }
+
+    // ---------------------------------------------------------------- la fiche détaillée
+    .o_cv_fiche { position: absolute; right: 16px; top: 16px; bottom: 16px; width: 340px; max-width: 46vw; z-index: 15; background: var(--carte); border-radius: 18px; box-shadow: var(--ombre); display: flex; flex-direction: column; overflow: hidden;
+        animation: cv-glisse 0.3s ease; pointer-events: auto; }
+    .o_cv_fiche_chargement { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 22px; }
+    .o_cv_fiche_entete { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid #ede9e0; }
+    .o_cv_fiche_icone { width: 38px; height: 38px; border-radius: 12px; background: var(--accent); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; flex: none; }
+    .o_cv_fiche_genre { font-size: 10.5px; color: var(--gris); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+    .o_cv_fiche_nom { font-size: 15px; font-weight: 700; }
+    .o_cv_fiche_corps { flex: 1; overflow-y: auto; padding: 12px 14px; font-size: 12.5px; }
+    .o_cv_statut { display: flex; align-items: center; margin-bottom: 10px; }
+    .badge { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 10px; color: #fff; background: var(--ardoise);
+        &.vert { background: var(--vert); } &.ambre { background: var(--ambre); } &.accent { background: var(--accent); } &.ardoise { background: var(--ardoise); } &.rouge { background: var(--rouge); } &.bleu { background: var(--bleu); } }
+    .o_cv_grille { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-bottom: 10px; > div { min-width: 0; small { display: block; color: var(--gris); font-size: 10.5px; } b { font-size: 12.5px; } } }
+    .o_cv_bloc { margin-bottom: 10px; > small { display: block; color: var(--gris); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; } }
+    .o_cv_lien { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; text-align: left; font-size: 12.5px; width: 100%; &:hover { text-decoration: underline; } .text-muted { font-weight: 400; } }
+    .o_cv_jauge { height: 6px; border-radius: 3px; background: #eceae4; overflow: hidden; margin-bottom: 10px; span { display: block; height: 100%; background: var(--accent); } }
+    .o_cv_agenda { position: relative; height: 34px; background: #f1efe8; border-radius: 8px; overflow: hidden; margin-top: 10px;
+        .heure { position: absolute; top: 1px; font-size: 9px; color: var(--gris); translate: -50%; }
+        .rdv { position: absolute; top: 13px; height: 16px; border-radius: 4px; background: var(--accent); color: #fff; font-size: 9.5px; line-height: 16px; padding: 0 4px; overflow: hidden; white-space: nowrap; &.fait { background: var(--vert); } }
+        .maintenant { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--rouge); }
+        &.grand { height: 70px; .heure { font-size: 10px; } .rdv { top: 24px; height: 28px; line-height: 28px; font-size: 11px; } } }
+    .o_cv_semaine { display: flex; gap: 8px; height: 110px; align-items: flex-end; .jour { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 2px;
+        .barre { width: 60%; background: var(--accent); border-radius: 4px 4px 0 0; min-height: 2px; } small { color: var(--gris); } b { font-size: 11px; } } }
+    .o_cv_actions { display: grid; gap: 6px; margin-top: 6px; }
+    .o_cv_action { display: flex; align-items: center; border: 1px solid #e7e2d8; background: #fff; border-radius: 10px; padding: 7px 10px; font-size: 12.5px; font-weight: 600; color: var(--encre); text-align: left;
+        &:hover { background: var(--fond); } &.principal { background: var(--accent); color: #fff; border-color: var(--accent); } }
+
+    // ---------------------------------------------------------------- le suivi du dossier
+    .o_cv_suivi { position: absolute; left: 16px; bottom: 16px; z-index: 12; background: var(--carte); border-radius: 16px; box-shadow: var(--ombre); padding: 10px 14px; animation: cv-monte 0.3s ease; max-width: calc(100% - 420px); }
+    .o_cv_suivi_titre { display: flex; align-items: center; font-size: 11px; font-weight: 700; color: var(--gris); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; gap: 10px; }
+    .o_cv_stepper { display: flex; align-items: flex-start; gap: 0;
+        .etape { display: flex; flex-direction: column; align-items: center; width: 92px; position: relative; font-size: 10.5px; color: var(--gris); text-align: center;
+            .rond { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #d8d3c8; background: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; color: #fff; margin-bottom: 4px; z-index: 1; }
+            &::before { content: ""; position: absolute; top: 10px; left: -50%; width: 100%; height: 2px; background: #d8d3c8; } &:first-child::before { display: none; }
+            &.faite { color: var(--encre); .rond { background: var(--accent); border-color: var(--accent); } &::before { background: var(--accent); } }
+            &.en_cours { color: var(--encre); font-weight: 700; .rond { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(11, 155, 184, 0.2); animation: cv-anneau 1.6s ease-in-out infinite; &::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); } } &::before { background: var(--accent); } } } }
+    .o_cv_mini { display: flex; align-items: center; gap: 10px; border: 1px solid #e7e2d8; background: #fff; border-radius: 12px; padding: 6px 10px; text-align: left; min-width: 220px;
+        .anneau { width: 44px; height: 44px; border-radius: 50%; background: conic-gradient(var(--accent) calc(var(--p) * 1%), #e7e2d8 0); display: inline-flex; align-items: center; justify-content: center; flex: none; position: relative;
+            &::before { content: ""; position: absolute; inset: 5px; background: #fff; border-radius: 50%; } b { position: relative; font-size: 10.5px; } }
+        .texte { flex: 1; min-width: 0; line-height: 1.2; b { display: block; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } small { display: block; color: var(--gris); font-size: 11px; } }
+        &:hover { background: var(--fond); } }
+
+    // ---------------------------------------------------------------- le tableau à onglets
+    .o_cv_tableau { position: absolute; right: 16px; bottom: 16px; z-index: 12; width: 360px; max-width: 46vw; max-height: 42%; background: var(--carte); border-radius: 16px; box-shadow: var(--ombre); display: flex; flex-direction: column; overflow: hidden;
+        pointer-events: auto; }
+    .o_cv_fiche ~ .o_cv_tableau { display: none; }
+    .o_cv_onglets { display: flex; gap: 4px; padding: 8px; background: #f1efe8; margin: 8px; border-radius: 10px;
+        button { flex: 1; border: 0; background: none; border-radius: 8px; padding: 5px 4px; font-size: 11.5px; font-weight: 600; color: var(--gris); small { font-weight: 500; }
+            &.actif { background: #fff; color: var(--encre); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); } } }
+    .o_cv_lignes { overflow-y: auto; padding: 0 8px 8px; }
+    .o_cv_ligne { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; border-radius: 10px; padding: 7px 8px; text-align: left; font-size: 12px; color: var(--encre);
+        .code { width: 40px; flex: none; line-height: 1.1; b { font-size: 11px; color: var(--gris); display: block; } small { font-size: 10px; color: var(--gris); } }
+        .nom { flex: 1; min-width: 0; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; small { display: block; color: var(--gris); font-size: 11px; overflow: hidden; text-overflow: ellipsis; } }
+        .jauge { width: 46px; height: 5px; border-radius: 3px; background: #eceae4; overflow: hidden; flex: none; span { display: block; height: 100%; background: var(--accent); } }
+        .fa-angle-right { color: #b9b3a6; } &:hover { background: #eef6f8; } }
+
+    // ---------------------------------------------------------------- la visite, la démo
+    .o_cv_visite, .o_cv_demo { position: absolute; left: 50%; bottom: 16px; translate: -50%; z-index: 25; background: var(--encre); color: #fff; border-radius: 16px; padding: 8px 16px; font-size: 12.5px; display: flex; align-items: center; gap: 6px; box-shadow: var(--ombre);
+        .point { width: 8px; height: 8px; border-radius: 50%; background: var(--rouge); animation: cv-pulse 1.2s ease-in-out infinite; margin-right: 4px; }
+        .progression { width: 90px; height: 4px; border-radius: 2px; background: rgba(255, 255, 255, 0.25); margin-left: 10px; overflow: hidden; span { display: block; height: 100%; background: #fff; transition: width 0.5s ease; } } }
+
+    // ---------------------------------------------------------------- l'éditeur
+    .o_cv_editeur { position: absolute; right: 16px; top: 16px; bottom: 16px; width: 320px; z-index: 15; background: var(--carte); border-radius: 18px; box-shadow: var(--ombre); padding: 12px 14px; overflow-y: auto; font-size: 12.5px; pointer-events: auto; }
+    .o_cv_editeur_titre { display: flex; align-items: center; font-weight: 700; margin-bottom: 6px; }
+    .o_cv_palette { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 10px; .cat { width: 100%; font-size: 10.5px; font-weight: 700; color: var(--gris); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 6px; }
+        button { border: 1px solid #e7e2d8; background: #fff; border-radius: 8px; padding: 3px 8px; font-size: 11.5px; &:hover { background: var(--fond); } } }
+    .o_cv_proprietes { border-top: 1px solid #ede9e0; padding-top: 10px; }
+    .o_cv_resultats_lien { display: grid; gap: 2px; margin-top: 4px; button { border: 1px solid #e7e2d8; background: #fff; border-radius: 8px; padding: 4px 8px; text-align: left; font-size: 11.5px; &:hover { background: #eef6f8; } } }
+
+    // ---------------------------------------------------------------- la fiche complète
+    .o_cv_voile { position: absolute; inset: 0; z-index: 50; background: rgba(24, 40, 50, 0.35); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .o_cv_complete { background: #fff; border-radius: 20px; box-shadow: var(--ombre); padding: 20px 22px; width: 860px; max-width: 100%; max-height: 100%; overflow-y: auto; font-size: 12.5px; h6 { font-size: 11px; font-weight: 700; color: var(--gris); text-transform: uppercase; letter-spacing: 0.06em; } }
+
+    @keyframes cv-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.25); opacity: 0.7; } }
+    @keyframes cv-pop { from { transform: scale(0.4); } to { transform: scale(1); } }
+    @keyframes cv-flash { 0% { box-shadow: 0 0 0 0 rgba(11, 155, 184, 0.6); } 100% { box-shadow: 0 0 0 18px rgba(11, 155, 184, 0); } }
+    @keyframes cv-arrivee { from { transform: translateY(-16px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes cv-duree { from { width: 100%; } to { width: 0; } }
+    @keyframes cv-glisse { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes cv-monte { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes cv-anneau { 0%, 100% { box-shadow: 0 0 0 4px rgba(11, 155, 184, 0.2); } 50% { box-shadow: 0 0 0 8px rgba(11, 155, 184, 0.08); } }
+}

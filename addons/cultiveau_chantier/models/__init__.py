@@ -1,1 +1,1 @@
-from . import chantier, sale_order, installation, scene, phases
+from . import chantier, sale_order, installation, scene, phases, map

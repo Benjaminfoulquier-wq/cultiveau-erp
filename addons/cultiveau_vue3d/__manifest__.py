@@ -1,6 +1,6 @@
 {
-    "name": "Cultiveau — vue d'ensemble 3D",
-    "summary": "L'entreprise en un coup d'œil, en vue isométrique : magasin et stock, accueil et devis, atelier et interventions, parcelles et installations.",
+    "name": "Cultiveau — Map vivante",
+    "summary": "Le site de l'adhérent en 3D, vivant : l'équipe, les camions, les chantiers, le stock et les parcelles bougent avec les données ; tout est cliquable",
     "description": """
 La vue d'ensemble 3D
 ====================
@@ -19,14 +19,16 @@ d'étude, magasin et cour, chantiers, atelier et SAV, parcelles en service, cais
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
-    "depends": ["cultiveau_interventions", "stock"],
-    "data": ["views/menus.xml", "data/accueil.xml"],
+    "depends": ["cultiveau_interventions", "stock", "bus"],
+    "data": ["security/ir.model.access.csv", "security/regles.xml", "views/menus.xml", "views/map_views.xml", "data/accueil.xml"],
     "assets": {
         "web.assets_backend": [
             "cultiveau_vue3d/static/src/js/modeles.js",
-            "cultiveau_vue3d/static/src/js/vue3d.js",
-            "cultiveau_vue3d/static/src/xml/vue3d.xml",
-            "cultiveau_vue3d/static/src/scss/vue3d.scss",
+            "cultiveau_vue3d/static/src/js/kit.js",
+            "cultiveau_vue3d/static/src/js/moteur.js",
+            "cultiveau_vue3d/static/src/js/map.js",
+            "cultiveau_vue3d/static/src/xml/map.xml",
+            "cultiveau_vue3d/static/src/scss/map.scss",
         ],
     },
     "installable": True,

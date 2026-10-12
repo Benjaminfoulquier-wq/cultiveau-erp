@@ -1,1 +1,1 @@
-from . import bon, intervention, camion, contrat
+from . import bon, intervention, camion, contrat, map
