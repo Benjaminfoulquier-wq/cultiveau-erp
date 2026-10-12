@@ -12,9 +12,9 @@ import { Moteur } from "./moteur";
 
 const LIB = "/cultiveau_vue3d/static/lib/three/three.min.js";
 const ICONES = { personne: "fa-user", camion: "fa-truck", client: "fa-car", dossier: "fa-leaf", chantier: "fa-wrench", intervention: "fa-bolt", rayon: "fa-archive", rayon_fixe: "fa-archive",
-                 zone: "fa-map-o", borne: "fa-id-card-o", livraison: "fa-truck", poste: "fa-desktop", machine: "fa-cog", objet: "fa-cube", comptoir: "fa-shopping-basket", etabli: "fa-wrench" };
+                 zone: "fa-map-o", borne: "fa-id-card-o", livraison: "fa-truck", poste: "fa-desktop", machine: "fa-cog", objet: "fa-cube", comptoir: "fa-shopping-basket", etabli: "fa-wrench", article: "fa-cube" };
 const GENRES_FICHE = { personne: "personne", camion: "camion", client: "client", dossier: "dossier", chantier: "chantier", intervention: "intervention", rayon: "rayon", zone: "zone", borne: "borne",
-                       livraison: "livraison", poste: "poste", machine: "intervention" };
+                       livraison: "livraison", poste: "poste", machine: "intervention", article: "article" };
 const ICONES_EVENEMENT = { arrivee: "fa-sign-in", depart: "fa-sign-out", pause_debut: "fa-coffee", pause_fin: "fa-coffee", depart_intervention: "fa-truck", retour_intervention: "fa-truck",
                            depart_chantier: "fa-truck", retour_chantier: "fa-truck", bon_signe: "fa-pencil", devis_signe: "fa-check-circle", devis_envoye: "fa-paper-plane", facture_payee: "fa-euro",
                            livraison: "fa-dropbox", sortie_stock: "fa-cube", stock_bas: "fa-exclamation-triangle", intervention_creee: "fa-bolt", intervention_terminee: "fa-check",
@@ -451,6 +451,26 @@ export class MapVivante extends Component {
             this.moteur.volerVers(cle, 0);
         }
     }
+    /** Un article : sa fiche, et la caméra sur le rayon de sa famille s'il est sur la map. */
+    async ouvrirArticle(id, rayon) {
+        const rack = rayon && [...this.moteur.objets.entries()].find(([k, o]) => o.genre === "rayon" && o.id === rayon);
+        if (rack) {
+            this.moteur.volerVers(rack[0], 1);
+        }
+        this.state.selection = `article:${id}`;
+        this.state.fiche = null;
+        this.state.ficheChargement = true;
+        try {
+            const f = await this.orm.call("cultiveau.map", "fiche", ["article", id]);
+            f.cle = `article:${id}`;
+            f.icone = ICONES.article;
+            this.state.fiche = f;
+        } catch (e) {
+            this.notification.add(e.data?.message || e.message, { type: "warning" });
+        } finally {
+            this.state.ficheChargement = false;
+        }
+    }
     allerLigne(l) {
         const cle = l.cible === "intervention" ? `intervention:${l.res_id}` : `${l.cible}:${l.id}`;
         if (l.cible === "rayon") {
@@ -502,6 +522,10 @@ export class MapVivante extends Component {
                 } else {
                     this.notification.add("Pas de numéro de téléphone.", { type: "warning" });
                 }
+                return;
+            }
+            if (a.url) {
+                window.open(a.url, "_blank");
                 return;
             }
             if (a.cle === "notifier") {
@@ -595,6 +619,21 @@ export class MapVivante extends Component {
         }
         this.state.resultats = r.slice(0, 12);
         this.state.curseur = 0;
+        clearTimeout(this._rechercheServeur);
+        const demande = this.state.recherche;
+        this._rechercheServeur = setTimeout(async () => {
+            try {
+                const distants = await this.orm.call("cultiveau.map", "chercher", [demande]);
+                if (this.state.recherche !== demande) {
+                    return;
+                }
+                const deja = new Set(this.state.resultats.map((x) => x.cle));
+                const ajouts = distants.map((d) => ({ ...d, cle: `${d.genre}:${d.id}` })).filter((d) => !deja.has(d.cle));
+                this.state.resultats = [...this.state.resultats, ...ajouts].slice(0, 18);
+            } catch {
+                /* la recherche locale suffit */
+            }
+        }, 250);
     }
     choisir(r) {
         this.state.recherche = "";
@@ -602,6 +641,10 @@ export class MapVivante extends Component {
         if (this.rechercheRef.el) {
             this.rechercheRef.el.value = "";
             this.rechercheRef.el.blur();
+        }
+        if (r.genre === "article") {
+            this.ouvrirArticle(r.id, r.rayon);
+            return;
         }
         if (r.rayon) {
             const rack = [...this.moteur.objets.entries()].find(([k, o]) => o.genre === "rayon" && o.id === r.rayon);

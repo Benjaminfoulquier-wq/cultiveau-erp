@@ -50,7 +50,7 @@ class Map(models.AbstractModel):
             "personnes": personnes, "vehicules": self._vehicules(company, personnes, taches), "clients": self._clients_presents(company, local),
             "interventions": taches, "dossiers": dossiers, "chantiers": chantiers, "stock": stock, "parcelles": self._parcelles(company, dossiers),
             "atelier": self._atelier(company, taches), "livraisons": self._livraisons(company, local),
-            "kpi": self._kpi(company, taches, chantiers, local), "onglets": self._onglets(personnes, taches, dossiers, chantiers, stock),
+            "kpi": self._kpi(company, taches, chantiers, local), "onglets": self._onglets(personnes, taches, dossiers, chantiers, stock, self._clients_recents(company)),
             "evenements": self.env["cultiveau.evenement"].recents(company, 20), "actions": sorted(self.env["cultiveau.scene"]._actions_disponibles()),
             "canal": self.env["cultiveau.evenement"].canal(company),
         }
@@ -321,8 +321,26 @@ class Map(models.AbstractModel):
              "sous_titre": f"{len(chantiers)} planifié(s) · {heures:.0f} h pointées cette semaine", "action": "chantiers"},
         ]
 
-    def _onglets(self, personnes, taches, dossiers, chantiers, stock):
+    def _clients_recents(self, company, limite=40):
+        """Les clients de l'adhérent, les derniers touchés d'abord : ceux d'avant la map comme ceux d'aujourd'hui."""
+        Partner = self.env["res.partner"].sudo()
+        domaine = [("company_id", "in", [company.id, False]), ("parent_id", "=", False)]
+        if "cultiveau_est_client" in Partner._fields:
+            domaine.append(("cultiveau_est_client", "=", True))
+        Inst = self.env["cultiveau.installation"].sudo()
+        types = dict(Partner._fields["cultiveau_type"].selection) if "cultiveau_type" in Partner._fields else {}
+        resultat = []
+        for p in Partner.search(domaine, order="write_date desc", limit=limite):
+            n = Inst.search_count([("partner_id", "child_of", p.id), ("company_id", "=", company.id)])
+            resultat.append({"id": p.id, "nom": p.name, "commune": p.city or "", "type": types.get(getattr(p, "cultiveau_type", ""), ""), "installations": n,
+                             "a_contacter": bool(getattr(p, "cultiveau_a_contacter", False)), "telephone": p.mobile or p.phone or ""})
+        return resultat
+
+    def _onglets(self, personnes, taches, dossiers, chantiers, stock, clients=()):
         return {
+            "clients": [{"id": c["id"], "code": _initiales(c["nom"]), "nom": c["nom"], "sous": " · ".join(x for x in (c["type"], c["commune"]) if x),
+                         "badge": "À contacter" if c["a_contacter"] else (f"{c['installations']} install." if c["installations"] else "Client"),
+                         "couleur": "ambre" if c["a_contacter"] else ("accent" if c["installations"] else "ardoise"), "cible": "client"} for c in clients],
             "equipe": [{"id": p["id"], "code": p["initiales"], "nom": p["nom"], "sous": p["role_nom"], "badge": p["statut_nom"], "couleur": p["couleur"],
                         "heure": p["arrivee"], "cible": "personne"} for p in personnes],
             "camions": [{"id": t["technicien_id"] or t["id"], "code": "INT", "nom": t["nom"], "sous": t["client"], "badge": {"a_faire": "À faire", "en_cours": "En cours", "faite": "Faite"}[t["etat"]],
@@ -334,6 +352,36 @@ class Map(models.AbstractModel):
             "stock": [{"id": s["id"], "code": f"R{i + 1}", "nom": s["nom"], "sous": f"{s['mien']} article(s)", "badge": f"{s['bas']} en alerte" if s["bas"] else "OK",
                        "couleur": "ambre" if s["bas"] else "vert", "progression": round(100 * s["taux"]), "cible": "rayon"} for i, s in enumerate(stock)],
         }
+
+    # ---------------------------------------------------------------- la recherche
+
+    @api.model
+    def chercher(self, q, limite=6):
+        """Ce que la map ne tient pas sous la main : tous les clients, tous les articles, toutes les installations de l'adhérent."""
+        q = (q or "").strip()
+        company = self.env.company
+        if len(q) < 2:
+            return []
+        resultat = []
+        Partner = self.env["res.partner"].sudo()
+        domaine = [("company_id", "in", [company.id, False]), ("parent_id", "=", False), "|", "|", ("name", "ilike", q), ("city", "ilike", q), ("phone", "ilike", q)]
+        if "cultiveau_est_client" in Partner._fields:
+            domaine = [("cultiveau_est_client", "=", True)] + domaine
+        for p in Partner.search(domaine, limit=limite):
+            resultat.append({"groupe": "Clients", "genre": "client", "id": p.id, "nom": p.name, "sous": " · ".join(x for x in (p.city or "", p.mobile or p.phone or "") if x), "icone": "fa-user-o"})
+        Produit = self.env["product.template"].sudo().with_company(company)
+        dom_p = [("sale_ok", "=", True), ("company_id", "in", [company.id, False]), "|", ("name", "ilike", q), ("default_code", "ilike", q)]
+        for a in Produit.search(dom_p, limit=limite, order="company_id desc, name"):
+            ids = [int(i) for i in (a.categ_id.parent_path or "").split("/") if i]
+            resultat.append({"groupe": "Articles", "genre": "article", "id": a.id, "nom": a.display_name, "sous": f"{a.categ_id.name} · {a.qty_available:g} en stock" if "qty_available" in a._fields else a.categ_id.name,
+                             "icone": "fa-cube", "rayon": ids[0] if ids else 0})
+        Inst = self.env["cultiveau.installation"].sudo()
+        for i in Inst.search([("company_id", "=", company.id), "|", "|", ("name", "ilike", q), ("partner_id.name", "ilike", q), ("commune", "ilike", q)], limit=limite):
+            resultat.append({"groupe": "Installations", "genre": "dossier", "id": i.id, "nom": i.name, "sous": f"{i.partner_id.name} · {dict(Inst._fields['etat'].selection).get(i.etat, '')}", "icone": "fa-leaf"})
+        Task = self.env["project.task"].sudo()
+        for t in Task.search([("company_id", "=", company.id), ("cultiveau_intervention", "=", True), ("state", "not in", CLOTURES), "|", ("name", "ilike", q), ("partner_id.name", "ilike", q)], limit=limite):
+            resultat.append({"groupe": "Interventions", "genre": "intervention", "id": t.id, "nom": t.name, "sous": t.partner_id.name or "", "icone": "fa-bolt"})
+        return resultat
 
     # ---------------------------------------------------------------- les fiches
 
@@ -454,6 +502,29 @@ class Map(models.AbstractModel):
                 "installations": [{"id": i.id, "nom": i.name, "etat": i.etat} for i in inst[:6]], "note": (p.comment and str(p.comment)[:300]) or "",
                 "actions": [{"cle": "fiche", "nom": "Fiche complète", "modele": "res.partner", "id": pid}, {"cle": "devis_nouveau", "nom": "Nouveau devis", "contexte": {"default_partner_id": pid}},
                             {"cle": "appeler", "nom": "Appeler", "tel": p.mobile or p.phone or ""}]}
+
+    def _fiche_article(self, company, pid):
+        a = self.env["product.template"].sudo().with_company(company).browse(pid)
+        if not a.exists():
+            raise UserError("Article introuvable.")
+        ids = [int(i) for i in (a.categ_id.parent_path or "").split("/") if i]
+        famille = self.env["product.category"].sudo().browse(ids[0]) if ids else a.categ_id
+        fournisseur = a.seller_ids[:1]
+        carac = []
+        if "cultiveau_caracteristiques" in a._fields and a.cultiveau_caracteristiques:
+            libelles = dict(a.cultiveau_famille_carac_id.liste()) if "cultiveau_famille_carac_id" in a._fields and a.cultiveau_famille_carac_id else {}
+            for cle, v in list(a.cultiveau_caracteristiques.items())[:8]:
+                valeur = v.get("valeur") if isinstance(v, dict) else v
+                if valeur not in (None, ""):
+                    carac.append({"nom": libelles.get(cle, cle.replace("_", " ")), "valeur": str(valeur)})
+        return {"genre": "article", "id": pid, "nom": a.name, "code": a.default_code or "", "famille": famille.name, "famille_id": famille.id, "categorie": a.categ_id.name,
+                "stock": a.qty_available if "qty_available" in a._fields else 0.0, "prix_vente": a.list_price, "prix_achat": fournisseur.price if fournisseur else a.standard_price,
+                "fournisseur": fournisseur.partner_id.name if fournisseur else "", "dn": getattr(a, "cultiveau_dn", 0) or 0, "pn": getattr(a, "cultiveau_pn", 0) or 0,
+                "matiere": getattr(a, "cultiveau_matiere", "") or "", "reseau": bool(getattr(a, "cultiveau_reseau", False)), "mien": bool(getattr(a, "cultiveau_mon_catalogue", False)),
+                "fiche_technique": bool(getattr(a, "cultiveau_fiche_id", False) and a.cultiveau_fiche_id.fichier), "fiche_id": a.cultiveau_fiche_id.id if getattr(a, "cultiveau_fiche_id", False) else 0,
+                "caracteristiques": carac,
+                "actions": [{"cle": "fiche", "nom": "Fiche complète", "modele": "product.template", "id": pid}, {"cle": "famille_stock", "nom": "Le rayon en stock", "parametre": famille.id}] +
+                           ([{"cle": "fiche_technique", "nom": "Fiche technique (PDF)", "url": f"/web/content/cultiveau.fiche/{a.cultiveau_fiche_id.id}/fichier?download=false"}] if getattr(a, "cultiveau_fiche_id", False) and a.cultiveau_fiche_id.fichier else [])}
 
     def _fiche_camion(self, company, uid):
         local = fields.Datetime.context_timestamp(self.with_context(tz=company.partner_id.tz or "Europe/Paris"), fields.Datetime.now())

@@ -60,7 +60,7 @@ SECTEUR = {
     ],
     # Les onglets du tableau en direct.
     "onglets": [
-        {"cle": "equipe", "nom": "Équipe"}, {"cle": "camions", "nom": "Camions"}, {"cle": "dossiers", "nom": "Dossiers"}, {"cle": "stock", "nom": "Stock"},
+        {"cle": "equipe", "nom": "Équipe"}, {"cle": "camions", "nom": "Camions"}, {"cle": "dossiers", "nom": "Dossiers"}, {"cle": "clients", "nom": "Clients"}, {"cle": "stock", "nom": "Stock"},
     ],
     # Les événements du scénario de démonstration (rejoués dans les 75 premières secondes).
     "evenements_demo": [

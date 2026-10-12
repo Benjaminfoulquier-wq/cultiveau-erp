@@ -81,6 +81,21 @@ class TestMap(TransactionCase):
         with self.assertRaises(Exception):
             Map.fiche("inconnu", 1)
 
+    def test_recherche_et_article(self):
+        Map = self.env["cultiveau.map"]
+        categ = self.env["product.category"].create({"name": "Pompes map"})
+        article = self.env["product.template"].create({"name": "Pompe immergée Map 30", "default_code": "PMAP30", "categ_id": categ.id, "list_price": 1200, "company_id": self.societe.id})
+        r = Map.chercher("map")
+        self.assertIn("Clients", [x["groupe"] for x in r])
+        self.assertTrue(any(x["genre"] == "client" and x["id"] == self.agri.id for x in r))
+        self.assertTrue(any(x["genre"] == "article" and x["id"] == article.id for x in r))
+        self.assertTrue(any(x["genre"] == "dossier" and x["id"] == self.inst.id for x in r))
+        self.assertEqual(Map.chercher("x"), [])
+        f = Map.fiche("article", article.id)
+        self.assertEqual((f["code"], f["famille"], f["prix_vente"]), ("PMAP30", "Pompes map", 1200))
+        d = Map.vivant()
+        self.assertTrue(any(c["id"] == self.agri.id for c in d["onglets"]["clients"]))
+
     def test_demo(self):
         Map = self.env["cultiveau.map"]
         self.societe.cultiveau_map_demo = False

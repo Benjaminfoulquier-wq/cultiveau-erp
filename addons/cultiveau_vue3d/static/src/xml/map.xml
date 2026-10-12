@@ -278,7 +278,7 @@
         <div class="o_cv_fiche_entete">
             <span class="o_cv_fiche_icone"><i t-att-class="'fa ' + (f.icone || icone(f.genre))"/></span>
             <div class="flex-grow-1 min-w-0">
-                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet'}[f.genre] || f.genre"/>
+                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet', article: 'Article'}[f.genre] || f.genre"/>
                 <div class="o_cv_fiche_nom text-truncate" t-esc="f.nom"/>
             </div>
             <button class="o_cv_bouton rond petit" t-if="f.genre !== 'zone' and f.genre !== 'objet'" t-on-click="suivre" t-att-class="{ actif: state.suivi === state.selection }" title="Suivre"><i class="fa fa-crosshairs"/></button>
@@ -367,6 +367,20 @@
                 <div class="o_cv_bloc" t-if="f.devis.length"><small>Devis récents</small><button t-foreach="f.devis.slice(0, 3)" t-as="d" t-key="d.id" class="o_cv_lien d-flex" t-on-click="() => this.ouvrirBackOffice('sale.order', d.id)"><span t-esc="d.nom"/><b class="ms-auto" t-esc="euros(d.montant) + ' €'"/></button></div>
                 <div class="o_cv_bloc" t-if="f.installations.length"><small>Installations</small><button t-foreach="f.installations" t-as="i" t-key="i.id" class="o_cv_lien d-block" t-on-click="() => this.aller('dossier:' + i.id)"><i class="fa fa-leaf me-1"/><t t-esc="i.nom"/></button></div>
                 <div class="o_cv_bloc" t-if="f.note"><small>Note interne</small><div class="small" t-out="f.note"/></div>
+            </t>
+            <!-- un article -->
+            <t t-elif="f.genre === 'article'">
+                <div class="o_cv_statut"><span t-att-class="'badge ' + (f.stock > 0 ? 'vert' : 'ardoise')" t-esc="f.stock > 0 ? f.stock + ' en stock' : 'Pas en stock'"/><span class="ms-auto small" t-esc="f.famille"/></div>
+                <div class="o_cv_grille">
+                    <div><small>Référence</small><b t-esc="f.code || '—'"/></div>
+                    <div><small>Catégorie</small><b t-esc="f.categorie"/></div>
+                    <div><small>Prix de vente HT</small><b t-esc="euros(f.prix_vente) + ' €'"/></div>
+                    <div><small>Prix d'achat</small><b t-esc="f.prix_achat ? euros(f.prix_achat) + ' €' : '—'"/></div>
+                    <div t-if="f.fournisseur"><small>Fournisseur</small><b t-esc="f.fournisseur"/></div>
+                    <div t-if="f.dn or f.pn or f.matiere"><small>Cotes</small><b t-esc="[f.dn ? 'DN ' + f.dn : '', f.pn ? 'PN ' + f.pn : '', f.matiere].filter(x => x).join(' · ')"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.caracteristiques.length"><small>Caractéristiques</small><div t-foreach="f.caracteristiques" t-as="c" t-key="c_index" class="small d-flex"><span class="text-muted" t-esc="c.nom"/><span class="ms-auto" t-esc="c.valeur"/></div></div>
+                <div class="small text-muted" t-if="f.reseau and !f.mien">Au catalogue Cultiveau, pas encore dans votre catalogue.</div>
             </t>
             <!-- un camion -->
             <t t-elif="f.genre === 'camion'">

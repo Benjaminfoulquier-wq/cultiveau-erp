@@ -32,8 +32,9 @@ l'ERP, et un changement dans l'un se voit dans l'autre en moins d'une seconde.
   pièces, bons), client (CA, impayés, devis, installations), camion (tournée, stock à bord), rayon (stock, manquants), zone
   (qui est là), badgeuse (journal), livraison, poste de travail. Boutons : suivre, fiche complète, ouvrir dans le back-office.
 - **Le suivi de l'installation** : Demande → Étude → Devis → Pose → Mise en service → Entretien, avec l'avancement.
-- **Le tableau à onglets** : Équipe, Camions (les interventions du jour), Dossiers, Stock ; chaque ligne vole vers l'objet.
-- **La recherche** (`/`), le sélecteur de zone avec le nombre de présents, le badge Live, la cloche et le fil d'activité, les
+- **Le tableau à onglets** : Équipe, Camions (les interventions du jour), Dossiers, Clients (les derniers touchés), Stock ; chaque ligne vole vers l'objet.
+- **La recherche** (`/`) : ce qui est sur la map, puis tous les clients, articles, installations et interventions de l'adhérent
+  (un article ouvre sa fiche et vole vers le rayon de sa famille) ; le sélecteur de zone avec le nombre de présents, le badge Live, la cloche et le fil d'activité, les
   notifications volantes, la visite guidée (`T`), la vue d'ensemble (`H`), `Échap` pour fermer.
 - **Les gestes** : clic gauche glissé déplace la carte, clic droit pivote, molette zoome.
 
