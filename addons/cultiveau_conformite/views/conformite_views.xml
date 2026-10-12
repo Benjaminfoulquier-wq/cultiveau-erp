@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="audit_view_list" model="ir.ui.view">
+        <field name="name">cultiveau.audit.list</field>
+        <field name="model">cultiveau.audit</field>
+        <field name="arch" type="xml">
+            <list string="Journal d'audit" create="0" edit="0" decoration-danger="operation == 'suppression'" decoration-info="operation == 'rgpd'" decoration-muted="operation == 'creation'">
+                <field name="create_date" string="Le"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="operation" widget="badge"/>
+                <field name="modele_nom"/>
+                <field name="document"/>
+                <field name="resume"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="audit_view_form" model="ir.ui.view">
+        <field name="name">cultiveau.audit.form</field>
+        <field name="model">cultiveau.audit</field>
+        <field name="arch" type="xml">
+            <form string="Modification" create="0" edit="0">
+                <sheet>
+                    <div class="oe_title"><h2><field name="document"/></h2><div class="text-muted"><field name="modele_nom"/></div></div>
+                    <group>
+                        <group><field name="operation"/><field name="user_id"/></group>
+                        <group><field name="create_date" string="Le"/><field name="company_id" groups="base.group_multi_company"/></group>
+                    </group>
+                    <field name="resume"/>
+                    <field name="changements_html"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="audit_view_search" model="ir.ui.view">
+        <field name="name">cultiveau.audit.search</field>
+        <field name="model">cultiveau.audit</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="document"/>
+                <field name="user_id"/>
+                <field name="modele_nom"/>
+                <field name="resume"/>
+                <filter name="modifications" string="Modifications" domain="[('operation', '=', 'modification')]"/>
+                <filter name="suppressions" string="Suppressions" domain="[('operation', '=', 'suppression')]"/>
+                <filter name="rgpd" string="RGPD" domain="[('operation', '=', 'rgpd')]"/>
+                <separator/>
+                <filter name="aujourdhui" string="Aujourd'hui" domain="[('create_date', '>=', context_today().strftime('%Y-%m-%d'))]"/>
+                <group>
+                    <filter name="par_personne" string="Personne" context="{'group_by': 'user_id'}"/>
+                    <filter name="par_type" string="Type de document" context="{'group_by': 'modele_nom'}"/>
+                    <filter name="par_jour" string="Jour" context="{'group_by': 'create_date:day'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_audit" model="ir.actions.act_window">
+        <field name="name">Journal d'audit</field>
+        <field name="res_model">cultiveau.audit</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Rien n'a encore été modifié</p>
+            <p>Chaque création, modification et suppression d'un document du métier est notée ici, avec l'avant et l'après.</p>
+        </field>
+    </record>
+    <menuitem id="menu_audit" name="Journal d'audit" parent="cultiveau_base.menu_cultiveau_reglages" action="action_audit" sequence="30" groups="sales_team.group_sale_manager"/>
+
+    <record id="effacement_view_form" model="ir.ui.view">
+        <field name="name">cultiveau.rgpd.effacement.form</field>
+        <field name="model">cultiveau.rgpd.effacement</field>
+        <field name="arch" type="xml">
+            <form string="Effacer les données d'un client">
+                <field name="mode" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="mode != 'limiter'">
+                    Ce client a <field name="pieces_comptables" class="d-inline"/> pièce(s) comptable(s), que la loi impose de garder dix ans : ses coordonnées de contact,
+                    ses échanges et ses courriels seront supprimés, son nom et son adresse de facturation resteront, la fiche sera archivée.
+                </div>
+                <div class="alert alert-danger" role="alert" invisible="mode != 'anonymiser'">
+                    La fiche et ses contacts seront anonymisés, leurs échanges et courriels supprimés. C'est définitif.
+                </div>
+                <div class="alert alert-danger" role="alert" invisible="not en_cours">Dossiers en cours : <field name="en_cours" class="d-inline"/>. Soldez-les d'abord.</div>
+                <group>
+                    <field name="partner_id"/>
+                    <field name="confirmation" placeholder="EFFACER"/>
+                </group>
+                <footer>
+                    <button name="action_effacer" type="object" string="Effacer" class="btn-danger"/>
+                    <button string="Annuler" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_conformite" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.conformite</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_vue3d.res_config_settings_view_form_map"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cultiveau_map_demo']" position="after">
+                <button name="action_cultiveau_reinitialiser_demo" type="object" string="Remettre la démonstration à zéro" icon="fa-undo" class="btn-link"
+                        confirm="Effacer les pointages et événements joués par la démonstration ?"/>
+            </xpath>
+            <xpath expr="//block[@name='cultiveau_map']" position="after">
+                <block title="Conformité" name="cultiveau_conformite">
+                    <setting string="Journal d'audit" help="Qui a créé, modifié ou supprimé quoi, avec l'avant et l'après. Aussi dans le menu Action de chaque document : « Historique des modifications ».">
+                        <div class="row mt8"><label for="cultiveau_audit_annees" class="col-lg-6 o_light_label"/><field name="cultiveau_audit_annees"/></div>
+                        <button name="%(action_audit)d" type="action" string="Ouvrir le journal" icon="fa-history" class="btn-link"/>
+                    </setting>
+                    <setting string="RGPD" help="Sur la fiche d'un client, menu Action : « RGPD : exporter ses données » (un fichier lisible) et « RGPD : effacer ses données » (anonymisation, ou limitation quand des factures doivent être gardées)."/>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -4,6 +4,7 @@ Le cerveau est le modèle de langue du réseau (clé Mistral des réglages). Les
 lire, chercher, créer…) plus ceux de la map (qui est où, le stock d'un article, ouvrir un écran, un brouillon de courriel,
 badger). Une action qui écrit n'est jamais faite sans un clic de confirmation.
 """
+import base64
 import json
 import logging
 
@@ -72,6 +73,29 @@ class Mathis(models.AbstractModel):
     @api.model
     def pret(self):
         return bool(self._cle())
+
+    @api.model
+    def transcrire(self, audio_b64, mimetype="audio/webm"):
+        """La dictée : l'enregistrement du micro → le texte (Voxtral de Mistral, comme l'assistant téléphonique)."""
+        cle = self._cle()
+        if not cle:
+            raise UserError("La dictée a besoin de la clé Mistral (Réglages → Cultiveau → Fiches techniques et IA).")
+        audio = base64.b64decode(audio_b64 or "")
+        if not audio:
+            raise UserError("Aucun son enregistré.")
+        if len(audio) > 10 * 1024 * 1024:
+            raise UserError("Dictée trop longue : une minute au plus.")
+        extension = {"audio/ogg": "ogg", "audio/mp4": "m4a", "audio/mpeg": "mp3", "audio/wav": "wav"}.get((mimetype or "").split(";")[0], "webm")
+        try:
+            r = requests.post(f"{MISTRAL}/audio/transcriptions", headers={"Authorization": f"Bearer {cle}"}, timeout=120,
+                              data={"model": "voxtral-mini-latest", "language": "fr"}, files={"file": (f"dictee.{extension}", audio, (mimetype or "audio/webm").split(";")[0])})
+            r.raise_for_status()
+            texte = (r.json().get("text") or "").strip()
+        except Exception as e:  # noqa: BLE001
+            raise UserError(f"La dictée n'a pas pu être transcrite : {str(e)[:200]}") from e
+        if not texte:
+            raise UserError("Je n'ai rien entendu : parlez un peu plus près du micro.")
+        return {"texte": texte}
 
     # ---------------------------------------------------------------- les outils
 

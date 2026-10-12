@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="rdv_type_view_list" model="ir.ui.view">
+        <field name="name">cultiveau.rdv.type.list</field>
+        <field name="model">cultiveau.rdv.type</field>
+        <field name="arch" type="xml">
+            <list string="Rendez-vous en ligne">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="duree_min"/>
+                <field name="lieu"/>
+                <field name="user_ids" widget="many2many_avatar_user"/>
+                <field name="nb_rdv"/>
+                <field name="url" widget="CopyClipboardChar"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="rdv_type_view_form" model="ir.ui.view">
+        <field name="name">cultiveau.rdv.type.form</field>
+        <field name="model">cultiveau.rdv.type</field>
+        <field name="arch" type="xml">
+            <form string="Motif de rendez-vous">
+                <header>
+                    <button name="action_ouvrir_page" type="object" string="Voir la page" icon="fa-external-link"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="Visite conseil irrigation"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="duree_min"/>
+                            <field name="lieu"/>
+                            <field name="user_ids" widget="many2many_avatar_user"/>
+                        </group>
+                        <group>
+                            <field name="jours"/>
+                            <field name="delai_heures"/>
+                            <field name="url" widget="CopyClipboardChar"/>
+                            <field name="nb_rdv"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Ce que le client lit avant de choisir un créneau."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_rdv_types" model="ir.actions.act_window">
+        <field name="name">Rendez-vous en ligne</field>
+        <field name="res_model">cultiveau.rdv.type</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Les motifs de rendez-vous</p>
+            <p>Chaque motif a son lien, à mettre dans vos courriels ou sur votre site : le client choisit un créneau libre.</p>
+        </field>
+    </record>
+    <menuitem id="menu_rdv_types" name="Rendez-vous en ligne" parent="cultiveau_base.menu_cultiveau_reglages" action="action_rdv_types" sequence="25"/>
+
+    <record id="res_config_settings_view_form_rdv" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.rdv</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_reunion.res_config_settings_view_form_reunion"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_reunion']" position="inside">
+                <setting string="Rendez-vous en ligne" help="Le lien à mettre dans vos courriels et sur votre site : le client choisit un motif et un créneau libre de l'équipe.">
+                    <field name="cultiveau_url_rdv" widget="CopyClipboardChar" readonly="1"/>
+                    <button name="%(action_rdv_types)d" type="action" string="Les motifs" icon="fa-list" class="btn-link"/>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+</odoo>

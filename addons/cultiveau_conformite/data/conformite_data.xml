@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="cron_purger_audit" model="ir.cron">
+            <field name="name">Cultiveau : purge du journal d'audit</field>
+            <field name="model_id" ref="model_cultiveau_audit"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_purger()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">months</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+
+    <record id="action_historique_res_partner" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_sale_order" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="sale.model_sale_order"/>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_account_move" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_account_payment" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="account.model_account_payment"/>
+        <field name="binding_model_id" ref="account.model_account_payment"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_product_template" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_purchase_order" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_model_id" ref="purchase.model_purchase_order"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_project_task" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="binding_model_id" ref="project.model_project_task"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_cultiveau_installation" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="cultiveau_installation.model_cultiveau_installation"/>
+        <field name="binding_model_id" ref="cultiveau_installation.model_cultiveau_installation"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_cultiveau_chantier" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="cultiveau_chantier.model_cultiveau_chantier"/>
+        <field name="binding_model_id" ref="cultiveau_chantier.model_cultiveau_chantier"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_hr_leave" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="binding_model_id" ref="hr_holidays.model_hr_leave"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+    <record id="action_historique_hr_expense" model="ir.actions.server">
+        <field name="name">Historique des modifications</field>
+        <field name="model_id" ref="hr_expense.model_hr_expense"/>
+        <field name="binding_model_id" ref="hr_expense.model_hr_expense"/>
+        <field name="binding_view_types">form,list</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_cultiveau_historique()</field>
+    </record>
+
+    <record id="action_rgpd_export" model="ir.actions.server">
+        <field name="name">RGPD : exporter ses données</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = record.action_cultiveau_rgpd_export()</field>
+    </record>
+    <record id="action_rgpd_effacer" model="ir.actions.server">
+        <field name="name">RGPD : effacer ses données</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="binding_model_id" ref="base.model_res_partner"/>
+        <field name="binding_view_types">form</field>
+        <field name="groups_id" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = record.action_cultiveau_rgpd_effacer()</field>
+    </record>
+</odoo>

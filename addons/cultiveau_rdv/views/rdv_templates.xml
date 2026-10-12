@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="cadre" name="Rendez-vous : cadre">&lt;!DOCTYPE html&gt;
+        <html lang="fr">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <meta name="robots" content="noindex"/>
+                <title>Prendre rendez-vous — <t t-esc="societe.name"/></title>
+                <link rel="stylesheet" href="/web/static/src/libs/fontawesome/css/font-awesome.css"/>
+                <link rel="stylesheet" href="/cultiveau_rdv/static/src/css/rdv.css"/>
+            </head>
+            <body>
+                <header class="entete">
+                    <div>
+                        <div class="petit">Prendre rendez-vous</div>
+                        <h1 t-esc="societe.name"/>
+                        <div class="petit" t-esc="', '.join(x for x in (societe.city, societe.phone) if x)"/>
+                    </div>
+                    <img t-if="societe.logo" class="logo" t-att-src="'/logo.png?company=%s' % societe.id" alt="Logo"/>
+                </header>
+                <main><t t-out="0"/></main>
+            </body>
+        </html>
+    </template>
+
+    <template id="page" name="Rendez-vous : choisir">
+        <t t-call="cultiveau_rdv.cadre">
+            <div t-if="erreur" class="bandeau ko"><i class="fa fa-exclamation-triangle"/> <t t-esc="erreur"/></div>
+            <!-- les motifs de la société -->
+            <section class="carte" t-if="not motif">
+                <h2><i class="fa fa-calendar-plus-o"/> Pour quoi souhaitez-vous nous voir ?</h2>
+                <a t-foreach="motifs" t-as="m" class="motif" t-att-href="'/rdv/%s' % m.jeton">
+                    <b t-esc="m.name"/><span class="petit gris"><t t-esc="m.duree_min"/> min · <t t-esc="dict(m._fields['lieu'].selection)[m.lieu].lower()"/></span>
+                    <div class="petit" t-if="m.description" t-esc="m.description"/>
+                </a>
+                <div class="petit gris" t-if="not motifs">La prise de rendez-vous en ligne n'est pas encore ouverte : appelez-nous.</div>
+            </section>
+            <!-- un motif : ses créneaux -->
+            <t t-if="motif">
+                <section class="carte">
+                    <h2><i class="fa fa-calendar"/> <t t-esc="motif.name"/></h2>
+                    <div class="petit gris"><t t-esc="motif.duree_min"/> min · <t t-esc="dict(motif._fields['lieu'].selection)[motif.lieu]"/></div>
+                    <div class="petit" t-if="motif.description" t-esc="motif.description"/>
+                    <t t-foreach="jours" t-as="j">
+                        <div class="jour" t-esc="j['jour']"/>
+                        <div class="creneaux">
+                            <a t-foreach="j['creneaux']" t-as="c" t-attf-class="creneau #{'choisi' if c['debut_utc'] == choisi else ''}"
+                               t-att-href="'/rdv/%s?creneau=%s#coordonnees' % (jeton, c['debut_utc'])" t-esc="c['heures'].split(' – ')[0]"/>
+                        </div>
+                    </t>
+                    <div class="petit gris" t-if="not jours">Pas de créneau libre dans les prochaines semaines : appelez-nous<t t-if="societe.phone"> au <t t-esc="societe.phone"/></t>.</div>
+                </section>
+                <section class="carte" id="coordonnees" t-if="creneau">
+                    <h2><i class="fa fa-user"/> <t t-esc="creneau['jour']"/>, <t t-esc="creneau['heures']"/></h2>
+                    <form method="post" t-att-action="'/rdv/%s/reserver' % jeton" class="formulaire">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="debut_utc" t-att-value="creneau['debut_utc']"/>
+                        <label class="piege">Site web <input type="text" name="site_web" tabindex="-1" autocomplete="off"/></label>
+                        <label>Nom et exploitation <input type="text" name="nom" required="required" placeholder="Jean Dupont — EARL du Moulin"/></label>
+                        <div class="deux">
+                            <label>Téléphone <input type="tel" name="telephone" placeholder="06 12 34 56 78"/></label>
+                            <label>Courriel <input type="email" name="email" placeholder="vous@exemple.fr"/></label>
+                        </div>
+                        <label t-if="motif.lieu == 'chez_client'">Adresse de l'exploitation <input type="text" name="adresse" placeholder="Lieu-dit, commune"/></label>
+                        <label>Votre message (facultatif) <input type="text" name="message" maxlength="300" placeholder="Culture, surface, ce qui ne va pas…"/></label>
+                        <button class="bouton plein"><i class="fa fa-check"/> Confirmer le rendez-vous</button>
+                        <div class="petit gris">Vos coordonnées servent uniquement à ce rendez-vous et à son suivi.</div>
+                    </form>
+                </section>
+                <div class="pied"><a t-att-href="'/rdv/%s' % societe.sudo().cultiveau_rdv_jeton"><i class="fa fa-angle-left"/> Les autres motifs</a></div>
+            </t>
+        </t>
+    </template>
+
+    <template id="confirme" name="Rendez-vous : confirmé">
+        <t t-call="cultiveau_rdv.cadre">
+            <div class="bandeau ok"><i class="fa fa-check-circle"/> Rendez-vous confirmé, merci <t t-esc="nom"/> !</div>
+            <section class="carte">
+                <h2><i class="fa fa-calendar-check-o"/> <t t-esc="motif.name"/></h2>
+                <div><b t-esc="quand"/></div>
+                <div class="petit">Avec <t t-esc="evenement.user_id.name"/><t t-if="evenement.location"> · <t t-esc="evenement.location"/></t></div>
+                <div class="petit" t-if="evenement.videocall_location">Lien de la visio : <a t-att-href="evenement.videocall_location" t-esc="evenement.videocall_location"/></div>
+                <p class="petit gris">Vous recevez l'invitation par courriel si vous nous avez laissé votre adresse. Un empêchement ? Appelez-nous<t t-if="societe.phone"> au <t t-esc="societe.phone"/></t>.</p>
+            </section>
+        </t>
+    </template>
+</odoo>

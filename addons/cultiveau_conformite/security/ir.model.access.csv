@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_audit_gerant,audit gerant,model_cultiveau_audit,sales_team.group_sale_manager,1,0,0,0
+access_audit_admin,audit admin,model_cultiveau_audit,base.group_system,1,0,0,1
+access_effacement_gerant,effacement gerant,model_cultiveau_rgpd_effacement,sales_team.group_sale_manager,1,1,1,1

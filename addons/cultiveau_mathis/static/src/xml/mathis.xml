@@ -41,6 +41,10 @@
             </div>
             <div class="o_mathis_saisie">
                 <textarea t-ref="champ" rows="1" placeholder="Demandez à Mathis… (Entrée pour envoyer)" t-model="state.saisie" t-on-keydown="onTouche" t-att-disabled="state.occupe"/>
+                <button t-if="dicteePossible" class="o_mathis_btn rond o_mathis_micro" t-att-class="{ enregistre: state.enregistre }" t-on-click="dicter"
+                        t-att-disabled="state.occupe or state.transcrit" t-att-title="state.enregistre ? 'Arrêter et envoyer' : 'Dicter à ' + state.prenom">
+                    <i t-attf-class="fa {{ state.transcrit ? 'fa-circle-o-notch fa-spin' : (state.enregistre ? 'fa-stop' : 'fa-microphone') }}"/>
+                </button>
                 <button class="o_mathis_btn accent rond" t-on-click="() => this.envoyer()" t-att-disabled="state.occupe or !state.saisie.trim()"><i class="fa fa-paper-plane"/></button>
             </div>
         </div>

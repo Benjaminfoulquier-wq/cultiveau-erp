@@ -50,7 +50,7 @@ export class MathisPanneau extends Component {
         this.action = useService("action");
         this.notification = useService("notification");
         this.etat = useState(this.mathis.etat);
-        this.state = useState({ conversation: null, messages: [], propositions: [], suggestions: [], prenom: "Mathis", pret: true, saisie: "", occupe: false, charge: false });
+        this.state = useState({ conversation: null, messages: [], propositions: [], suggestions: [], prenom: "Mathis", pret: true, saisie: "", occupe: false, charge: false, enregistre: false, transcrit: false });
         this.fil = useRef("fil");
         this.champ = useRef("champ");
         onWillStart(() => this.charger());
@@ -81,6 +81,53 @@ export class MathisPanneau extends Component {
     }
     defiler() {
         setTimeout(() => { if (this.fil.el) { this.fil.el.scrollTop = this.fil.el.scrollHeight; } }, 50);
+    }
+    // ---------------------------------------------------------------- la dictée
+    get dicteePossible() {
+        return Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+    }
+    async dicter() {
+        if (this.state.enregistre) {
+            this.enregistreur && this.enregistreur.state !== "inactive" && this.enregistreur.stop();
+            return;
+        }
+        let flux;
+        try {
+            flux = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } catch {
+            this.notification.add("Le micro n'est pas autorisé : autorisez-le dans le navigateur pour dicter.", { type: "warning" });
+            return;
+        }
+        const morceaux = [];
+        this.enregistreur = new MediaRecorder(flux);
+        this.enregistreur.ondataavailable = (e) => e.data && e.data.size && morceaux.push(e.data);
+        this.enregistreur.onstop = async () => {
+            clearTimeout(this.minuteur);
+            flux.getTracks().forEach((t) => t.stop());
+            this.state.enregistre = false;
+            const blob = new Blob(morceaux, { type: this.enregistreur.mimeType || "audio/webm" });
+            if (!blob.size) {
+                return;
+            }
+            this.state.transcrit = true;
+            try {
+                const b64 = await new Promise((ok, ko) => {
+                    const lecteur = new FileReader();
+                    lecteur.onload = () => ok(String(lecteur.result).split(",")[1]);
+                    lecteur.onerror = ko;
+                    lecteur.readAsDataURL(blob);
+                });
+                const r = await this.orm.call("cultiveau.mathis", "transcrire", [b64, blob.type]);
+                this.state.transcrit = false;
+                await this.envoyer(r.texte);
+            } catch (e) {
+                this.state.transcrit = false;
+                this.notification.add(e.data?.message || e.message || String(e), { type: "danger" });
+            }
+        };
+        this.enregistreur.start();
+        this.state.enregistre = true;
+        this.minuteur = setTimeout(() => this.enregistreur.state !== "inactive" && this.enregistreur.stop(), 60000);
     }
     async envoyer(texte = null) {
         const q = (texte ?? this.state.saisie).trim();

@@ -54,6 +54,8 @@
 - **Le réseau** : Cultiveau, Agrifusion Holding et Solution Magnus, l'équipe, les 16 adhérents et leurs équipes, les prospects, les 39
   fournisseurs référencés et leurs contacts, importés d'un fichier (Réglages → Importer le réseau).
 - **Marque** : l'ERP est aux couleurs de Cultiveau, sans mention de l'éditeur ; déploiement en un push sur erp.cultiveau.fr.
+- **Flotte, rendez-vous en ligne, conformité** : les échéances des camions avec alertes, la prise de rendez-vous par le client,
+  le journal d'audit et le RGPD ; la dictée à Mathis.
 - **Au quotidien** : l'écran « Aujourd'hui », le rapport du lundi, le budget d'heures des chantiers avec ses alertes, dix
   automatisations du métier à activer d'un clic.
 - **La messagerie** : Gmail, Outlook ou toute boîte branchée sans rien y changer ; chaque courriel rangé sur son client et son

@@ -68,3 +68,19 @@ class TestMathis(TransactionCase):
         self.assertEqual(f["client"], "Agriculteur Mathis")
         d = self.env["cultiveau.map"].vivant()
         self.assertEqual(d["assistant"]["appels"][0]["id"], a.id)
+
+    def test_dictee(self):
+        import base64
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mistral_cle", "cle-test")
+        reponse = mock.Mock(status_code=200, raise_for_status=lambda: None, json=lambda: {"text": " Qui est en intervention cet après-midi ? "})
+        with mock.patch.object(mathis.requests, "post", return_value=reponse) as post:
+            r = self.env["cultiveau.mathis"].transcrire(base64.b64encode(b"son").decode(), "audio/webm;codecs=opus")
+        self.assertEqual(r["texte"], "Qui est en intervention cet après-midi ?")
+        self.assertIn("/audio/transcriptions", post.call_args.args[0])
+        self.assertEqual(post.call_args.kwargs["data"]["model"], "voxtral-mini-latest")
+        self.assertEqual(post.call_args.kwargs["files"]["file"][0], "dictee.webm")
+        with self.assertRaises(UserError):
+            self.env["cultiveau.mathis"].transcrire("", "audio/webm")
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mistral_cle", "")
+        with self.assertRaises(UserError):
+            self.env["cultiveau.mathis"].transcrire(base64.b64encode(b"son").decode())

@@ -38,3 +38,9 @@ d'un clic. Le fil d'activité le garde.
 - Mathis parle de ce que l'ERP sait ; pas d'accès à Internet ni à des documents extérieurs.
 - Les écritures passent par les mêmes règles que l'ERP : une personne sans droit d'écriture obtient un refus clair.
 - La voix (dictée, lecture) reste au téléphone ; dans l'ERP, il écrit.
+
+## La dictée
+
+Le bouton micro du panneau de Mathis enregistre la question (une minute au plus) ; elle est transcrite par Voxtral, le modèle
+de transcription de Mistral déjà utilisé par l'assistant téléphonique (même clé), puis envoyée à Mathis. Un second appui
+arrête l'enregistrement. Le navigateur demande l'autorisation du micro la première fois.

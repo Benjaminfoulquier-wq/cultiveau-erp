@@ -23,3 +23,6 @@
 }
 @keyframes mathis-monte { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes mathis-pt { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+.o_mathis_micro.enregistre { background: #c9473d !important; border-color: #c9473d !important; color: #fff !important; animation: o_mathis_pulse 1.2s infinite; }
+@keyframes o_mathis_pulse { 0% { box-shadow: 0 0 0 0 rgba(201, 71, 61, 0.5); } 70% { box-shadow: 0 0 0 9px rgba(201, 71, 61, 0); } 100% { box-shadow: 0 0 0 0 rgba(201, 71, 61, 0); } }
