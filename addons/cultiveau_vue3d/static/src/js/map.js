@@ -21,7 +21,7 @@ const ICONES_EVENEMENT = { arrivee: "fa-sign-in", depart: "fa-sign-out", pause_d
                            depart_chantier: "fa-truck", retour_chantier: "fa-truck", bon_signe: "fa-pencil", devis_signe: "fa-check-circle", devis_envoye: "fa-paper-plane", facture_payee: "fa-euro",
                            livraison: "fa-dropbox", sortie_stock: "fa-cube", stock_bas: "fa-exclamation-triangle", intervention_creee: "fa-bolt", intervention_terminee: "fa-check",
                            chantier_demarre: "fa-wrench", chantier_termine: "fa-flag-checkered", mise_en_service: "fa-tint", alerte_irrigation: "fa-tint", ambiance: "fa-bell-o", etape: "fa-arrow-right",
-                           appel: "fa-phone", reunion: "fa-calendar" };
+                           appel: "fa-phone", reunion: "fa-calendar", conge: "fa-plane", frais: "fa-ticket", courriel: "fa-envelope", courriel_relance: "fa-envelope-o" };
 const sansAccents = (t) => (t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 const heure = (iso) => {
     if (!iso) {
@@ -550,6 +550,21 @@ export class MapVivante extends Component {
             }
             if (a.url) {
                 window.open(a.url, "_blank");
+                return;
+            }
+            if (a.appel) {
+                // un bouton de bloc : une méthode du serveur (valider, refuser…), puis la fiche se met à jour
+                const res = await this.orm.call(a.appel.modele, a.appel.methode, a.appel.args || [], a.appel.kwargs || {});
+                if (res && res.type) {
+                    await this.action.doAction(res);
+                } else if (a.message || (res && res.message)) {
+                    this.notification.add((res && res.message) || a.message, { type: "success" });
+                }
+                f.cle && this.ouvrirFiche(f.cle, false);
+                return;
+            }
+            if (a.doaction) {
+                await this.action.doAction(a.doaction);
                 return;
             }
             if (a.cle === "planifier_reunion") {

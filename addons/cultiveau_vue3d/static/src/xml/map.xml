@@ -572,6 +572,21 @@
             <t t-else="">
                 <div class="small text-muted" t-esc="f.sousTitre"/>
             </t>
+            <!-- les blocs ajoutés par les autres modules (congés, notes de frais, courriels…) -->
+            <div class="o_cv_bloc" t-foreach="f.blocs or []" t-as="b" t-key="b_index"><small t-esc="b.titre"/>
+                <div t-foreach="b.lignes or []" t-as="l" t-key="l_index" class="o_cv_ligne_bloc">
+                    <i t-if="l.icone" t-att-class="'fa fa-fw ' + l.icone"/>
+                    <div class="corps">
+                        <button t-if="l.ouvrir" class="o_cv_lien" t-on-click="() => this.lancerAction(l.ouvrir)" t-esc="l.texte"/>
+                        <span t-else="" t-esc="l.texte"/>
+                        <div class="detail" t-if="l.detail" t-esc="l.detail"/>
+                    </div>
+                    <span t-if="l.badge" t-att-class="'badge ' + (l.couleur || 'ardoise')" t-esc="l.badge"/>
+                    <button t-foreach="l.boutons or []" t-as="bt" t-key="bt_index" class="o_cv_bouton rond petit" t-att-class="{ accent: bt.principal }"
+                            t-att-title="bt.nom" t-on-click="() => this.lancerAction(bt)"><i t-att-class="'fa ' + (bt.icone || 'fa-angle-right')"/></button>
+                </div>
+                <div class="text-muted small" t-if="b.vide and !(b.lignes or []).length" t-esc="b.vide"/>
+            </div>
             <div class="o_cv_actions" t-if="f.actions and f.actions.length">
                 <button t-foreach="f.actions" t-as="a" t-key="a_index" class="o_cv_action" t-att-class="{ principal: a_index === 0 }" t-on-click="() => this.lancerAction(a)">
                     <i t-att-class="'fa fa-fw me-2 ' + (a.icone || (a.cle === 'fiche' ? 'fa-external-link' : a.cle === 'appeler' ? 'fa-phone' : a.cle === 'badger' ? 'fa-id-card-o' : 'fa-angle-right'))"/><t t-esc="a.nom"/>

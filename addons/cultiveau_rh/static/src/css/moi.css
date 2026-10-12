@@ -1,0 +1,56 @@
+/* Mon espace : la page du téléphone (couleurs Cultiveau) */
+:root { --nuit: #183840; --accent: #0b8aa3; --fond: #f2f5f6; --carte: #ffffff; --texte: #1d2a30; --gris: #6b7a83; --ligne: #e3e9eb;
+        --vert: #2e9d63; --ambre: #d99a1e; --rouge: #c9473d; --bleu: #3b7dd8; --ardoise: #8796a0; }
+@media (prefers-color-scheme: dark) {
+  :root { --fond: #0f1d21; --carte: #172a30; --texte: #e8eef0; --gris: #9fb0b8; --ligne: #24393f; }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: var(--fond); color: var(--texte); font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+.entete { background: var(--nuit); color: #fff; padding: calc(18px + env(safe-area-inset-top)) 16px 18px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.entete h1 { margin: 2px 0; font-size: 22px; }
+.entete .petit { opacity: .75; }
+main { padding: 12px 12px calc(24px + env(safe-area-inset-bottom)); max-width: 640px; margin: 0 auto; }
+.carte { background: var(--carte); border-radius: 14px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.carte.accent { border: 2px solid var(--accent); }
+.carte h2 { margin: 0 0 10px; font-size: 16px; display: flex; gap: 8px; align-items: center; }
+.carte h2 .fa { color: var(--accent); }
+.petit { font-size: 12.5px; }
+.gris { color: var(--gris); }
+.bandeau { border-radius: 12px; padding: 11px 13px; margin-bottom: 12px; font-weight: 600; }
+.bandeau.ok { background: #e3f4ea; color: #1f6e44; }
+.bandeau.ko { background: #fbe6e3; color: #92302a; }
+.boutons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.bouton { appearance: none; border: 1px solid var(--ligne); background: var(--fond); color: var(--texte); border-radius: 11px; padding: 11px 6px; font: inherit; font-size: 13.5px;
+          display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
+.bouton .fa { font-size: 18px; color: var(--accent); }
+.bouton.plein { width: 100%; flex-direction: row; justify-content: center; background: var(--accent); color: #fff; border: 0; font-weight: 700; padding: 13px; margin-top: 4px; }
+.bouton.plein .fa { color: #fff; font-size: 15px; }
+.bouton.accent { background: var(--nuit); }
+.formulaire { display: flex; flex-direction: column; gap: 9px; margin-bottom: 10px; }
+.formulaire label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--gris); font-weight: 600; }
+.formulaire input, .formulaire select { font: inherit; font-size: 16px; color: var(--texte); background: var(--fond); border: 1px solid var(--ligne); border-radius: 10px; padding: 10px; width: 100%; }
+.deux { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.photo { flex-direction: row !important; align-items: center; justify-content: center; gap: 10px !important; border: 2px dashed var(--accent); border-radius: 12px; padding: 18px;
+         color: var(--accent) !important; font-size: 15px !important; cursor: pointer; text-align: center; }
+.photo .fa { font-size: 24px; }
+.photo input { display: none; }
+.soldes { display: flex; gap: 8px; margin-bottom: 12px; overflow-x: auto; }
+.solde { flex: 1; min-width: 110px; background: var(--fond); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; }
+.solde b { font-size: 24px; color: var(--accent); line-height: 1; }
+.solde span { font-size: 12px; color: var(--gris); }
+.solde small { font-weight: 600; margin-top: 4px; }
+.liste { border-top: 1px solid var(--ligne); margin-top: 6px; }
+.ligne { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--ligne); }
+.ligne:last-child { border-bottom: 0; }
+.ligne .texte { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.ligne .droite { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.ligne .droite form { margin: 0; }
+.pastille { display: inline-block; border-radius: 99px; padding: 2px 9px; font-size: 11.5px; font-weight: 700; color: #fff; background: var(--ardoise); white-space: nowrap; }
+.pastille.vert { background: var(--vert); } .pastille.ambre { background: var(--ambre); } .pastille.rouge { background: var(--rouge); }
+.pastille.bleu { background: var(--bleu); } .pastille.accent { background: var(--accent); } .pastille.ardoise { background: var(--ardoise); }
+.decision { display: flex; gap: 8px; margin: 0; }
+.rond { width: 40px; height: 40px; border-radius: 50%; border: 0; color: #fff; font-size: 17px; cursor: pointer; }
+.rond.vert { background: var(--vert); } .rond.rouge { background: var(--rouge); }
+.lien { background: none; border: 0; color: var(--gris); padding: 2px; font-size: 15px; cursor: pointer; }
+.pied { display: flex; justify-content: space-around; padding: 12px 0; }
+.pied a { color: var(--gris); text-decoration: none; font-size: 13px; display: flex; gap: 6px; align-items: center; }

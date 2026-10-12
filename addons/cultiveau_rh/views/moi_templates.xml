@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="moi" name="Mon espace (téléphone)">&lt;!DOCTYPE html&gt;
+        <html lang="fr">
+            <head>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+                <meta name="theme-color" content="#183840"/>
+                <meta name="apple-mobile-web-app-capable" content="yes"/>
+                <title>Mon espace — <t t-esc="d['societe']"/></title>
+                <link rel="apple-touch-icon" href="/cultiveau_marque/static/src/img/icone-192.png"/>
+                <link rel="icon" href="/cultiveau_marque/static/src/img/favicon.png"/>
+                <link rel="stylesheet" href="/web/static/src/libs/fontawesome/css/font-awesome.css"/>
+                <link rel="stylesheet" href="/cultiveau_rh/static/src/css/moi.css"/>
+            </head>
+            <body>
+                <header class="entete">
+                    <div>
+                        <div class="petit" t-esc="d['date']"/>
+                        <h1>Bonjour <t t-esc="d['prenom']"/></h1>
+                        <div class="petit" t-esc="d['societe']"/>
+                    </div>
+                    <span t-if="d['statut']" t-attf-class="pastille #{d['statut']['couleur']}" t-esc="d['statut']['nom']"/>
+                </header>
+                <main>
+                    <div t-if="message" class="bandeau ok"><i class="fa fa-check-circle"/> <t t-esc="message"/></div>
+                    <div t-if="erreur" class="bandeau ko"><i class="fa fa-exclamation-triangle"/> <t t-esc="erreur"/></div>
+
+                    <!-- le pointage -->
+                    <section class="carte">
+                        <h2><i class="fa fa-id-card-o"/> Pointage</h2>
+                        <form method="post" action="/moi/badger" class="boutons">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <button name="genre" value="arrivee" class="bouton"><i class="fa fa-sign-in"/> Arrivée</button>
+                            <button name="genre" value="pause_debut" class="bouton"><i class="fa fa-coffee"/> Pause</button>
+                            <button name="genre" value="pause_fin" class="bouton"><i class="fa fa-play"/> Reprise</button>
+                            <button name="genre" value="depart_intervention" class="bouton"><i class="fa fa-truck"/> En intervention</button>
+                            <button name="genre" value="retour_intervention" class="bouton"><i class="fa fa-home"/> Retour</button>
+                            <button name="genre" value="depart" class="bouton"><i class="fa fa-sign-out"/> Départ</button>
+                        </form>
+                    </section>
+
+                    <!-- à valider (gérant) -->
+                    <section class="carte accent" id="valider" t-if="d['a_valider']['conges'] or d['a_valider']['frais']">
+                        <h2><i class="fa fa-check-square-o"/> À valider</h2>
+                        <div t-foreach="d['a_valider']['conges']" t-as="c" class="ligne">
+                            <div class="texte"><b t-esc="c['employe']"/><div class="petit"><t t-esc="c['type']"/> · <t t-esc="c['periode']"/> · <t t-esc="'%g' % c['jours']"/> j</div>
+                                <div class="petit gris" t-if="c['motif']" t-esc="c['motif']"/></div>
+                            <form method="post" action="/moi/decider" class="decision">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="genre" value="conge"/><input type="hidden" name="res_id" t-att-value="c['id']"/>
+                                <button name="oui" value="1" class="rond vert" title="Valider"><i class="fa fa-check"/></button>
+                                <button name="oui" value="0" class="rond rouge" title="Refuser"><i class="fa fa-times"/></button>
+                            </form>
+                        </div>
+                        <div t-foreach="d['a_valider']['frais']" t-as="f" class="ligne">
+                            <div class="texte"><b t-esc="f['employe']"/> · <t t-esc="f['montant_texte']"/>
+                                <div class="petit" t-foreach="f['lignes'][:4]" t-as="x"><t t-esc="x['categorie']"/> · <t t-esc="x['nom']"/> · <t t-esc="x['montant_texte']"/></div></div>
+                            <form method="post" action="/moi/decider" class="decision">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <input type="hidden" name="genre" value="frais"/><input type="hidden" name="res_id" t-att-value="f['id']"/>
+                                <button name="oui" value="1" class="rond vert" title="Valider"><i class="fa fa-check"/></button>
+                                <button name="oui" value="0" class="rond rouge" title="Refuser"><i class="fa fa-times"/></button>
+                            </form>
+                        </div>
+                    </section>
+
+                    <!-- les congés -->
+                    <section class="carte" id="conges">
+                        <h2><i class="fa fa-plane"/> Mes congés</h2>
+                        <div class="soldes" t-if="d['soldes']">
+                            <div t-foreach="d['soldes']" t-as="s" class="solde"><b t-esc="'%g' % s['restant']"/><span>j restants</span><small t-esc="s['nom']"/></div>
+                        </div>
+                        <form method="post" action="/moi/conge" class="formulaire">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <label>Type
+                                <select name="type_conge"><option t-foreach="d['types']" t-as="t" t-att-value="t['cle']" t-esc="t['nom']"/></select>
+                            </label>
+                            <div class="deux">
+                                <label>Du <input type="date" name="du" required="required" t-att-min="d['aujourd_hui']"/></label>
+                                <label>Au <input type="date" name="au"/></label>
+                            </div>
+                            <label>Durée
+                                <select name="demi"><option value="">Journées entières</option><option value="am">Une matinée (le premier jour)</option><option value="pm">Un après-midi (le premier jour)</option></select>
+                            </label>
+                            <label>Motif (facultatif) <input type="text" name="motif" maxlength="200" placeholder="Vacances, mariage…"/></label>
+                            <button class="bouton plein"><i class="fa fa-paper-plane"/> Demander</button>
+                        </form>
+                        <div class="liste" t-if="d['demandes']">
+                            <div t-foreach="d['demandes']" t-as="c" class="ligne">
+                                <div class="texte"><t t-esc="c['type']"/><div class="petit"><t t-esc="c['periode']"/> · <t t-esc="'%g' % c['jours']"/> j</div></div>
+                                <span t-attf-class="pastille #{c['couleur']}" t-esc="c['etat_nom']"/>
+                            </div>
+                        </div>
+                        <div class="petit gris" t-if="d['feries']">Prochains jours fériés : <t t-foreach="d['feries']" t-as="f"><t t-esc="f['nom']"/> (<t t-esc="f['date']"/>)<t t-if="not f_last">, </t></t></div>
+                    </section>
+
+                    <!-- les notes de frais -->
+                    <section class="carte" id="frais">
+                        <h2><i class="fa fa-ticket"/> Notes de frais</h2>
+                        <form method="post" action="/moi/frais" enctype="multipart/form-data" class="formulaire">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <label class="photo"><i class="fa fa-camera"/> <span>Photographier le ticket</span>
+                                <input type="file" name="ticket" accept="image/*,application/pdf" capture="environment" onchange="this.parentNode.querySelector('span').textContent = this.files[0] ? this.files[0].name : 'Photographier le ticket'"/>
+                            </label>
+                            <div class="petit gris">L'IA lit la date, le montant, la TVA et la catégorie. Sans ticket : un montant ou des kilomètres.</div>
+                            <div class="deux">
+                                <label>Montant TTC <input type="text" inputmode="decimal" name="montant" placeholder="auto"/></label>
+                                <label>Kilomètres <input type="text" inputmode="decimal" name="kilometres" placeholder="0"/></label>
+                            </div>
+                            <label>Catégorie
+                                <select name="categorie"><option value="">Lue sur le ticket</option><option t-foreach="d['categories']" t-as="c" t-att-value="c['cle']" t-esc="c['nom']"/></select>
+                            </label>
+                            <label>Note (facultatif) <input type="text" name="note" maxlength="120" placeholder="Chantier Martin, déjeuner équipe…"/></label>
+                            <button class="bouton plein"><i class="fa fa-plus"/> Ajouter la dépense</button>
+                        </form>
+                        <t t-set="a_envoyer" t-value="[x for x in d['frais'] if x['etat'] in ('draft', 'reported')]"/>
+                        <div class="liste" t-if="d['frais']">
+                            <div t-foreach="d['frais']" t-as="x" class="ligne">
+                                <div class="texte"><t t-esc="x['nom']"/><div class="petit"><t t-esc="x['categorie']"/> · <t t-esc="x['date_texte']"/><t t-if="x['tva']"> · TVA <t t-esc="('%.2f' % x['tva']).replace('.', ',')"/> €</t></div>
+                                    <div class="petit gris" t-if="x['lecture'] == 'echec'" t-esc="x['lecture_message']"/></div>
+                                <div class="droite"><b t-esc="x['montant_texte']"/><span t-attf-class="pastille #{x['couleur']}" t-esc="x['etat_nom']"/>
+                                    <form t-if="x['etat'] in ('draft', 'reported')" method="post" action="/moi/frais/supprimer">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/><input type="hidden" name="expense_id" t-att-value="x['id']"/>
+                                        <button class="lien" title="Supprimer"><i class="fa fa-trash-o"/></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <form t-if="a_envoyer" method="post" action="/moi/frais/envoyer">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <button class="bouton plein accent"><i class="fa fa-paper-plane"/> Envoyer au gérant (<t t-esc="len(a_envoyer)"/>)</button>
+                        </form>
+                    </section>
+
+                    <!-- l'équipe -->
+                    <section class="carte" t-if="d['absents']">
+                        <h2><i class="fa fa-users"/> Absents cette semaine</h2>
+                        <div t-foreach="d['absents']" t-as="c" class="ligne"><div class="texte"><b t-esc="c['employe']"/><div class="petit"><t t-esc="c['periode']"/></div></div>
+                            <span t-attf-class="pastille #{c['couleur']}" t-esc="c['type'] if c['etat'] == 'validate' else c['etat_nom']"/></div>
+                    </section>
+
+                    <nav class="pied"><a href="/odoo"><i class="fa fa-th"/> L'ERP</a><a href="/odoo/action-cultiveau_vue3d.action_vue3d"><i class="fa fa-map-o"/> La map</a><a href="/web/session/logout"><i class="fa fa-power-off"/> Quitter</a></nav>
+                </main>
+            </body>
+        </html>
+    </template>
+</odoo>

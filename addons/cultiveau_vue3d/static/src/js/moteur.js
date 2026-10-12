@@ -756,7 +756,7 @@ export class Moteur {
                 tenue: p.tenue, casquette: p.role === "technicien", gilet: false, accessoire: p.role === "technicien" ? "outil" : (p.role === "comptoir" ? null : "tablette"),
                 cheveuxLongs: (p.id * 7) % 3 === 0, peau: undefined }), p);
             o.groupe.userData.phase = (p.id * 1.7) % 6.28;
-            const visible = !["pas_arrive", "absent", "parti", "en_route", "en_rendez_vous"].includes(p.statut);
+            const visible = !["pas_arrive", "absent", "parti", "en_route", "en_rendez_vous", "en_conges"].includes(p.statut);
             const dehors = ["en_intervention", "sur_chantier"].includes(p.statut);
             let cible = null, pose = "debout", orientation = 0;
             if (p.statut === "au_poste" || p.statut === "en_reunion" || p.statut === "en_pause" || p.statut === "en_visio") {

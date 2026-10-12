@@ -51,7 +51,7 @@ SECTEUR = {
         "en_visio": {"nom": "En visio", "couleur": "bleu"}, "en_rendez_vous": {"nom": "En rendez-vous", "couleur": "bleu"},
         "sur_chantier": {"nom": "Sur chantier", "couleur": "accent"}, "en_route": {"nom": "En route", "couleur": "ambre"},
         "absent": {"nom": "Absent", "couleur": "ardoise"}, "pas_arrive": {"nom": "Pas encore arrivé", "couleur": "ardoise"},
-        "parti": {"nom": "Parti", "couleur": "ardoise"},
+        "parti": {"nom": "Parti", "couleur": "ardoise"}, "en_conges": {"nom": "En congés", "couleur": "ardoise"},
     },
     # Les trois indicateurs d'en-tête.
     "kpi": [

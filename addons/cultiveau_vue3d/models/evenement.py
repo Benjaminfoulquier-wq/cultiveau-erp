@@ -38,14 +38,14 @@ class Evenement(models.Model):
     @api.model
     def publier(self, genre, record=None, titre="", texte="", charge=None, company=None, demo=False):
         """Écrit l'événement et le pousse sur le canal de la société."""
-        genres = {g for g, _l in GENRES}
+        genres = dict(self._fields["genre"].selection)  # avec les genres ajoutés par les autres modules
         if genre not in genres:
             genre = "autre"
         company = company or (record is not None and getattr(record, "company_id", None)) or self.env.company
         if not company:
             company = self.env.company
         e = self.sudo().create({"company_id": company.id, "genre": genre, "modele": record is not None and record._name or False,
-                                "res_id": record is not None and record.id or 0, "titre": titre or dict(GENRES)[genre], "texte": texte,
+                                "res_id": record is not None and record.id or 0, "titre": titre or genres[genre], "texte": texte,
                                 "acteur_id": self.env.user.id, "charge": charge or {}, "demo": demo})
         self.env["bus.bus"].sudo()._sendone(self.canal(company), "cultiveau_map", e.charge_utile())
         return e

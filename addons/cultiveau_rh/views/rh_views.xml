@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- la note de frais : le ticket lu par l'IA -->
+    <record id="hr_expense_view_form_cultiveau" model="ir.ui.view">
+        <field name="name">hr.expense.form.cultiveau</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.hr_expense_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_cultiveau_lire_ticket" type="object" string="Lire le ticket" icon="fa-magic" invisible="state not in ('draft', 'reported') or nb_attachment &lt; 1"/>
+            </xpath>
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-info mb-0" role="status" invisible="cultiveau_lecture != 'lu'">
+                    <i class="fa fa-magic me-1" title="Lu par l'IA"/><field name="cultiveau_lecture_message" readonly="1" class="d-inline"/>
+                    <span invisible="cultiveau_confiance != 'basse'"> — lecture incertaine, vérifiez le montant et la TVA.</span>
+                </div>
+                <div class="alert alert-warning mb-0" role="alert" invisible="cultiveau_lecture not in ('echec', 'sans_cle')">
+                    <field name="cultiveau_lecture_message" readonly="1" class="d-inline"/>
+                </div>
+                <field name="cultiveau_lecture" invisible="1"/>
+                <field name="cultiveau_confiance" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="hr_expense_view_tree_cultiveau" model="ir.ui.view">
+        <field name="name">hr.expense.list.cultiveau</field>
+        <field name="model">hr.expense</field>
+        <field name="inherit_id" ref="hr_expense.view_expenses_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='total_amount_currency']" position="after">
+                <field name="cultiveau_lecture" optional="show" string="Ticket" widget="badge" decoration-success="cultiveau_lecture == 'lu'" decoration-warning="cultiveau_lecture != 'lu'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- les réglages -->
+    <record id="res_config_settings_view_form_rh" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.rh</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Équipe : congés et notes de frais" name="cultiveau_rh">
+                    <setting string="Congés" help="Chaque salarié reçoit ses congés payés le 1er juin ; les jours fériés français sont posés tout seuls. Le gérant valide les demandes en un clic (map, téléphone, Mathis).">
+                        <div class="row mt8"><label for="cultiveau_conges_jours_an" class="col-lg-4 o_light_label"/><field name="cultiveau_conges_jours_an"/></div>
+                        <button name="action_cultiveau_preparer_equipe" type="object" string="Mettre l'équipe à jour" icon="fa-refresh" class="btn-link mt8"/>
+                    </setting>
+                    <setting string="Notes de frais" help="Le ticket photographié est lu par l'IA (clé Mistral des fiches techniques) : date, montant, TVA, fournisseur et catégorie.">
+                        <div class="row mt8"><label for="cultiveau_frais_km" class="col-lg-4 o_light_label"/><field name="cultiveau_frais_km"/></div>
+                        <div class="row mt8"><label for="cultiveau_frais_comptabiliser" class="col-lg-4 o_light_label"/><field name="cultiveau_frais_comptabiliser"/></div>
+                    </setting>
+                    <setting string="Sur le téléphone" help="La page à ouvrir sur le téléphone (et à ajouter à l'écran d'accueil) : badger, demander un congé, photographier un ticket, valider.">
+                        <field name="cultiveau_url_moi" readonly="1" widget="url"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

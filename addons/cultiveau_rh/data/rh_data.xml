@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="type_familial" model="hr.leave.type">
+            <field name="name">Événement familial</field>
+            <field name="requires_allocation">no</field>
+            <field name="leave_validation_type">manager</field>
+            <field name="request_unit">day</field>
+            <field name="leave_notif_subtype_id" ref="hr_holidays.mt_leave"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <record id="cron_equipe" model="ir.cron">
+            <field name="name">Cultiveau : équipe (fiches salarié, jours fériés, congés payés de la période)</field>
+            <field name="model_id" ref="model_cultiveau_equipe"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_equipe()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="active" eval="True"/>
+        </record>
+
+        <record id="cron_lire_tickets" model="ir.cron">
+            <field name="name">Cultiveau : lecture des tickets des notes de frais</field>
+            <field name="model_id" ref="model_cultiveau_frais"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_lire()</field>
+            <field name="interval_number">15</field>
+            <field name="interval_type">minutes</field>
+            <field name="active" eval="True"/>
+        </record>
+    </data>
+
+    <!-- à chaque installation ou mise à jour : la mise en place (idempotente) -->
+    <function model="cultiveau.equipe" name="preparer"/>
+</odoo>
