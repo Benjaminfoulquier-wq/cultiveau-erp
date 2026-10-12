@@ -1,1 +1,1 @@
-from . import ir_http, vues
+from . import ir_http, vues, assistant
