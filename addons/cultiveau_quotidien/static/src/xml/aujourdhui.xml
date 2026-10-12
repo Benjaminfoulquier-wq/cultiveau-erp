@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_quotidien.Aujourdhui">
+        <div class="o_cv_aujourdhui">
+            <div class="entete">
+                <div>
+                    <div class="date"><t t-esc="state.date"/> · <t t-esc="state.societe"/></div>
+                    <h1 t-esc="state.bonjour"/>
+                    <div class="resume" t-if="state.charge" t-esc="resume"/>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-light" t-on-click="charger" title="Actualiser"><i class="fa fa-refresh"/></button>
+                    <button class="btn btn-primary" t-on-click="demanderMathis"><i class="fa fa-comments-o me-1"/>Par quoi je commence ?</button>
+                </div>
+            </div>
+            <div class="grille">
+                <div t-foreach="state.tuiles" t-as="t" t-key="t.cle" t-attf-class="tuile {{ t.couleur }}">
+                    <div class="haut" t-on-click="() => this.toutVoir(t)">
+                        <span class="icone"><i t-attf-class="fa {{ t.icone }}"/></span>
+                        <div class="titre"><t t-esc="t.titre"/><div class="detail" t-if="t.detail" t-esc="t.detail"/></div>
+                        <span class="nombre" t-esc="t.nombre"/>
+                    </div>
+                    <div class="lignes">
+                        <button t-foreach="t.lignes" t-as="l" t-key="l_index" class="ligne" t-on-click="() => this.ouvrir(l)">
+                            <span class="texte" t-esc="l.texte"/><span class="info" t-if="l.detail" t-esc="l.detail"/>
+                        </button>
+                    </div>
+                    <button class="tout" t-on-click="() => this.toutVoir(t)" t-if="t.nombre > t.lignes.length">Tout voir (<t t-esc="t.nombre"/>) <i class="fa fa-angle-right"/></button>
+                </div>
+                <div class="vide" t-if="state.charge and !state.tuiles.length"><i class="fa fa-sun-o"/><div>Rien en retard, rien à valider.</div></div>
+            </div>
+        </div>
+    </t>
+</templates>

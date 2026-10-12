@@ -94,7 +94,9 @@
     .o_cv_grille { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-bottom: 10px; > div { min-width: 0; small { display: block; color: var(--gris); font-size: 10.5px; } b { font-size: 12.5px; } } }
     .o_cv_ligne_bloc { display: flex; align-items: center; gap: 7px; padding: 4px 0; font-size: 12px; text-transform: none; letter-spacing: normal; font-weight: 500; color: var(--encre, #1d2a30);
         > .fa { color: var(--accent); flex: none; } .corps { flex: 1; min-width: 0; line-height: 1.25; .detail { color: var(--gris); font-size: 11px; } .o_cv_lien { text-align: left; padding: 0; } }
-        .badge { flex: none; font-size: 10px; } .o_cv_bouton { flex: none; } }
+        .badge { flex: none; font-size: 10px; } .o_cv_bouton { flex: none; }
+        .o_cv_jauge { height: 5px; border-radius: 3px; background: rgba(0, 0, 0, 0.08); margin-top: 3px; overflow: hidden;
+            span { display: block; height: 100%; border-radius: 3px; background: var(--bleu); &.vert { background: var(--vert); } &.ambre { background: var(--ambre); } &.rouge { background: var(--rouge); } } } }
     .o_cv_bloc { margin-bottom: 10px; > small { display: block; color: var(--gris); font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; } }
     .o_cv_lien { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; text-align: left; font-size: 12.5px; width: 100%; &:hover { text-decoration: underline; } .text-muted { font-weight: 400; } }
     .o_cv_jauge { height: 6px; border-radius: 3px; background: #eceae4; overflow: hidden; margin-bottom: 10px; span { display: block; height: 100%; background: var(--accent); } }

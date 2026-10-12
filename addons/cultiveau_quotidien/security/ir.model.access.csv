@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_regle_user,regle utilisateur,model_cultiveau_regle,base.group_user,1,0,0,0
+access_regle_gerant,regle gerant,model_cultiveau_regle,sales_team.group_sale_manager,1,1,0,0
+access_regle_admin,regle admin,model_cultiveau_regle,base.group_system,1,1,1,1
+access_trace_user,trace utilisateur,model_cultiveau_regle_trace,base.group_user,1,0,0,0
+access_trace_admin,trace admin,model_cultiveau_regle_trace,base.group_system,1,1,1,1

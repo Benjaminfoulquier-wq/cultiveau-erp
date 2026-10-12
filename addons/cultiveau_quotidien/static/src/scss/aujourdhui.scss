@@ -1,0 +1,21 @@
+.o_cv_aujourdhui {
+    --rouge: #c9473d; --ambre: #d99a1e; --bleu: #3b7dd8; --vert: #2e9d63; --encre: #1d2f38; --gris: #5d6b78;
+    height: 100%; overflow-y: auto; background: #f2f5f6; padding: 24px 28px; color: var(--encre);
+    .entete { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;
+        h1 { font-size: 28px; font-weight: 800; margin: 2px 0; } .date { color: var(--gris); font-weight: 600; } .resume { color: var(--gris); font-size: 15px; } }
+    .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 16px; }
+    .tuile { background: #fff; border-radius: 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); border-top: 4px solid var(--bleu); display: flex; flex-direction: column; overflow: hidden;
+        &.rouge { border-top-color: var(--rouge); .icone, .nombre { color: var(--rouge); } }
+        &.ambre { border-top-color: var(--ambre); .icone, .nombre { color: var(--ambre); } }
+        &.bleu { border-top-color: var(--bleu); .icone, .nombre { color: var(--bleu); } }
+        &.vert { border-top-color: var(--vert); .icone, .nombre { color: var(--vert); } }
+        .haut { display: flex; align-items: center; gap: 12px; padding: 14px 16px 8px; cursor: pointer;
+            .icone { font-size: 20px; width: 26px; text-align: center; } .titre { flex: 1; font-weight: 700; font-size: 15px; .detail { font-weight: 500; font-size: 12.5px; color: var(--gris); } }
+            .nombre { font-size: 30px; font-weight: 800; line-height: 1; } }
+        .lignes { padding: 0 8px 6px; }
+        .ligne { display: flex; width: 100%; gap: 8px; border: 0; background: none; text-align: left; padding: 7px 8px; border-radius: 8px; font-size: 13px; color: var(--encre);
+            &:hover { background: #f2f5f6; } .texte { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .info { color: var(--gris); white-space: nowrap; } }
+        .tout { border: 0; border-top: 1px solid #e3e9eb; background: none; padding: 9px; font-weight: 600; color: var(--gris); font-size: 13px; &:hover { color: var(--encre); } } }
+    .vide { grid-column: 1 / -1; text-align: center; padding: 60px 0; color: var(--vert); font-size: 18px; font-weight: 600; .fa { font-size: 48px; margin-bottom: 10px; } }
+}
+@media (max-width: 600px) { .o_cv_aujourdhui { padding: 16px; .grille { grid-template-columns: 1fr; } } }

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Aujourd'hui -->
+    <record id="action_aujourdhui" model="ir.actions.client">
+        <field name="name">Aujourd'hui</field>
+        <field name="tag">cultiveau_quotidien.aujourdhui</field>
+    </record>
+    <menuitem id="menu_aujourdhui" name="Aujourd'hui" parent="cultiveau_base.menu_cultiveau_root" action="action_aujourdhui" sequence="1"/>
+
+    <!-- le budget d'heures sur le chantier -->
+    <record id="view_chantier_form_budget" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.form.budget</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="inherit_id" ref="cultiveau_chantier.view_chantier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning mb-0" role="alert" invisible="budget_etat != 'attention'">
+                    <i class="fa fa-hourglass-half me-1" title="Budget"/>Plus de 80 % des heures prévues sont consommées (<field name="budget_pct" class="d-inline"/> %).
+                </div>
+                <div class="alert alert-danger mb-0" role="alert" invisible="budget_etat != 'depasse'">
+                    <i class="fa fa-hourglass-end me-1" title="Budget"/>Budget d'heures dépassé : <field name="heures_reelles" class="d-inline"/> h pointées pour <field name="budget_heures" class="d-inline"/> h prévues.
+                </div>
+                <field name="budget_etat" invisible="1"/>
+            </xpath>
+            <xpath expr="//page[@name='rentabilite']//field[@name='heures_reelles']" position="after">
+                <field name="budget_heures"/>
+                <field name="budget_pct" widget="progressbar"/>
+                <button name="action_voir_poseurs" type="object" string="Heures par poseur" icon="fa-users" class="btn-link" colspan="2"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_chantier_list_budget" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.list.budget</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="inherit_id" ref="cultiveau_chantier.view_chantier_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="budget_pct" widget="progressbar" string="Heures" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- les automatisations -->
+    <record id="regle_view_list" model="ir.ui.view">
+        <field name="name">cultiveau.regle.list</field>
+        <field name="model">cultiveau.regle</field>
+        <field name="arch" type="xml">
+            <list string="Automatisations" editable="bottom" create="0" delete="0" decoration-muted="not actif">
+                <field name="sequence" widget="handle"/>
+                <field name="actif" widget="boolean_toggle"/>
+                <field name="name" readonly="1" string="Si… alors…"/>
+                <field name="description" string="En détail" optional="hide"/>
+                <field name="jours" invisible="not a_un_delai"/>
+                <field name="envoi_auto" widget="boolean_toggle" invisible="not peut_envoyer"/>
+                <field name="responsable_id" widget="many2one_avatar_user" optional="show"/>
+                <field name="derniere_execution" optional="show"/>
+                <field name="dernier_resultat" optional="show"/>
+                <field name="nb_total" optional="hide"/>
+                <field name="a_un_delai" column_invisible="1"/>
+                <field name="peut_envoyer" column_invisible="1"/>
+                <field name="company_id" column_invisible="1"/>
+                <button name="action_executer" type="object" string="Lancer" icon="fa-play" title="Lancer maintenant"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="regle_view_form" model="ir.ui.view">
+        <field name="name">cultiveau.regle.form</field>
+        <field name="model">cultiveau.regle</field>
+        <field name="arch" type="xml">
+            <form string="Automatisation" create="0">
+                <header>
+                    <button name="action_executer" type="object" string="Lancer maintenant" icon="fa-play"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h2><field name="name" readonly="1"/></h2><div class="text-muted"><field name="description"/></div></div>
+                    <group>
+                        <group>
+                            <field name="actif" widget="boolean_toggle"/>
+                            <field name="jours" invisible="not a_un_delai"/>
+                            <field name="envoi_auto" invisible="not peut_envoyer"/>
+                            <field name="responsable_id" widget="many2one_avatar_user"/>
+                        </group>
+                        <group>
+                            <field name="derniere_execution"/>
+                            <field name="dernier_resultat"/>
+                            <field name="nb_total"/>
+                        </group>
+                    </group>
+                    <field name="a_un_delai" invisible="1"/>
+                    <field name="peut_envoyer" invisible="1"/>
+                    <field name="trace_ids" readonly="1">
+                        <list>
+                            <field name="create_date" string="Le"/>
+                            <field name="document"/>
+                            <field name="note"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_regles" model="ir.actions.act_window">
+        <field name="name">Automatisations</field>
+        <field name="res_model">cultiveau.regle</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Les automatisations du métier</p>
+            <p>Activez une règle d'un clic : elle passe toutes les heures et agit une seule fois par document.</p>
+        </field>
+    </record>
+    <menuitem id="menu_regles" name="Automatisations" parent="cultiveau_base.menu_cultiveau_reglages" action="action_regles" sequence="20"/>
+
+    <!-- les réglages -->
+    <record id="res_config_settings_view_form_quotidien" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.quotidien</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Pilotage au quotidien" name="cultiveau_quotidien">
+                    <setting string="Le rapport du lundi" help="Chaque lundi à 7 h, chaque gérant reçoit la semaine écoulée en chiffres et ce qui attend.">
+                        <field name="cultiveau_rapport_lundi"/>
+                        <button name="action_cultiveau_rapport_maintenant" type="object" string="Me l'envoyer maintenant" icon="fa-paper-plane" class="btn-link"/>
+                    </setting>
+                    <setting string="Aujourd'hui" help="Un devis envoyé passe « à relancer » après ce délai sans réponse.">
+                        <div class="row mt8"><label for="cultiveau_jours_relance_devis" class="col-lg-6 o_light_label"/><field name="cultiveau_jours_relance_devis"/></div>
+                    </setting>
+                    <setting string="Automatisations" help="Dix règles du métier à activer d'un clic : relances, réassort, chantier préparé, entretien proposé…">
+                        <button name="%(action_regles)d" type="action" string="Voir les automatisations" icon="fa-magic" class="btn-link"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
