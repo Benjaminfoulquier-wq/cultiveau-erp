@@ -64,6 +64,11 @@ jobs:
       - name: Code et conteneurs sur le serveur
         env:
           RCLONE_CONF: ${{ secrets.CULTIVEAU_RCLONE_CONF }}
+          # facultatifs : les applications Google et Microsoft du réseau (docs/REUNIONS.md)
+          CULTIVEAU_GOOGLE_CLIENT_ID: ${{ secrets.CULTIVEAU_GOOGLE_CLIENT_ID }}
+          CULTIVEAU_GOOGLE_CLIENT_SECRET: ${{ secrets.CULTIVEAU_GOOGLE_CLIENT_SECRET }}
+          CULTIVEAU_MICROSOFT_CLIENT_ID: ${{ secrets.CULTIVEAU_MICROSOFT_CLIENT_ID }}
+          CULTIVEAU_MICROSOFT_CLIENT_SECRET: ${{ secrets.CULTIVEAU_MICROSOFT_CLIENT_SECRET }}
         run: sh deploy/deployer.sh
       - name: Première installation (base, modules, réglages)
         if: ${{ github.event.inputs.etape == 'premiere-installation' }}

@@ -23,6 +23,11 @@ services:
       HOST: db
       USER: odoo
       PASSWORD: ${POSTGRES_PASSWORD}
+      # les applications Google et Microsoft du réseau (agendas, Meet, Teams, Gmail, Outlook) : un clic pour chacun
+      CULTIVEAU_GOOGLE_CLIENT_ID: ${CULTIVEAU_GOOGLE_CLIENT_ID:-}
+      CULTIVEAU_GOOGLE_CLIENT_SECRET: ${CULTIVEAU_GOOGLE_CLIENT_SECRET:-}
+      CULTIVEAU_MICROSOFT_CLIENT_ID: ${CULTIVEAU_MICROSOFT_CLIENT_ID:-}
+      CULTIVEAU_MICROSOFT_CLIENT_SECRET: ${CULTIVEAU_MICROSOFT_CLIENT_SECRET:-}
     volumes:
       - ./addons:/mnt/extra-addons:ro
       - ./odoo.conf:/etc/odoo/odoo.conf:ro

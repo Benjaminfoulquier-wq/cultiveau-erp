@@ -73,3 +73,16 @@ class TestReunion(TransactionCase):
         res, action = Mathis._executer("planifier_reunion", {"titre": "Point Mathis", "debut_utc": "2026-06-11 08:00:00", "duree_min": 30, "lieu": "visio", "visio": "erp"})
         self.assertEqual(action["modele"], "calendar.event")
         self.assertTrue(self.env["calendar.event"].browse(res["id"]).videocall_location)
+
+    def test_identifiants_reseau(self):
+        R = self.env["cultiveau.reunion"]
+        ICP = self.env["ir.config_parameter"].sudo()
+        appliques = R.appliquer_identifiants_reseau({"CULTIVEAU_GOOGLE_CLIENT_ID": "id-reseau.apps.googleusercontent.com", "CULTIVEAU_GOOGLE_CLIENT_SECRET": "secret-g",
+                                                     "CULTIVEAU_MICROSOFT_CLIENT_ID": "", "AUTRE": "x"})
+        self.assertEqual(set(appliques), {"CULTIVEAU_GOOGLE_CLIENT_ID", "CULTIVEAU_GOOGLE_CLIENT_SECRET"})
+        self.assertEqual(ICP.get_param("google_calendar_client_id"), "id-reseau.apps.googleusercontent.com")
+        self.assertEqual(ICP.get_param("google_gmail_client_id"), "id-reseau.apps.googleusercontent.com", "la messagerie Gmail aussi")
+        self.assertEqual(ICP.get_param("google_gmail_client_secret"), "secret-g")
+        self.assertTrue(R.synchro()["google"]["configure"])
+        ICP.set_param("microsoft_calendar_client_id", "")
+        self.assertFalse(R.synchro()["outlook"]["configure"], "une variable vide ne touche à rien")

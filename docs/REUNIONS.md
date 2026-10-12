@@ -50,3 +50,55 @@ Durand », « mes réunions du jour » : Mathis cherche les créneaux, propose l
 ## Réglages
 
 Nom de la salle, heures des réunions (`8:30-12:00,13:30-18:00` par défaut), visio par défaut.
+
+## Connecter Google et Outlook d'un clic, pour tout le réseau
+
+Pour que chacun connecte son agenda (et sa messagerie) en cliquant sur « Connecter mon agenda Google » ou « Connecter mon
+agenda Outlook », sans aucun réglage chez l'adhérent, le réseau Cultiveau inscrit **une fois** une application chez Google et
+une chez Microsoft, et en donne les identifiants au serveur.
+
+### 1. L'application Google (Google Cloud Console)
+
+1. https://console.cloud.google.com → créer un projet « Cultiveau ERP ».
+2. API et services → Bibliothèque : activer **Google Calendar API** (et **Gmail API** pour la messagerie).
+3. Écran de consentement OAuth : type **Externe**, nom « Cultiveau ERP », logo, domaine `cultiveau.fr`, adresse de contact ;
+   portées : `…/auth/calendar` (et `https://mail.google.com/` pour la messagerie).
+4. Identifiants → Créer → **ID client OAuth**, type **Application Web**, URI de redirection autorisés :
+   - `https://erp.cultiveau.fr/google_account/authentication` (agenda)
+   - `https://erp.cultiveau.fr/google_gmail/confirm` (messagerie)
+5. Noter l'**ID client** et le **code secret**.
+6. Publier l'application (« En production ») et demander la **validation Google** : sans elle, Google affiche « application
+   non validée » et limite à 100 comptes. La portée agenda est « sensible » (validation en quelques jours à quelques semaines) ;
+   la portée Gmail complète est « restreinte » et demande en plus un audit de sécurité payant : tant qu'il n'est pas fait, les
+   boîtes Gmail se branchent en IMAP avec un mot de passe d'application.
+
+### 2. L'application Microsoft (portail Entra)
+
+1. https://entra.microsoft.com → Applications → Inscriptions d'applications → Nouvelle inscription « Cultiveau ERP ».
+2. Types de comptes : **comptes de tout annuaire organisationnel et comptes Microsoft personnels**.
+3. URI de redirection (Web) :
+   - `https://erp.cultiveau.fr/microsoft_account/authentication` (agenda)
+   - `https://erp.cultiveau.fr/microsoft_outlook/confirm` (messagerie)
+4. Autorisations d'API (déléguées) : `offline_access`, `openid`, `Calendars.ReadWrite`, `OnlineMeetings.ReadWrite`, et pour la
+   messagerie `IMAP.AccessAsUser.All`, `SMTP.Send` (Office 365 Exchange Online).
+5. Certificats et secrets → Nouveau secret client (24 mois). Noter l'**ID d'application (client)** et la **valeur** du secret.
+6. Recommandé : la vérification de l'éditeur (Microsoft Partner Network), pour que l'écran d'accord affiche « éditeur vérifié ».
+   Certaines entreprises imposent l'accord de leur administrateur Microsoft 365 avant le premier branchement.
+
+### 3. Les donner au serveur (une fois)
+
+Dans le dépôt GitHub de l'ERP : Settings → Secrets and variables → Actions → New repository secret :
+
+| Secret | Valeur |
+|---|---|
+| `CULTIVEAU_GOOGLE_CLIENT_ID` | l'ID client Google |
+| `CULTIVEAU_GOOGLE_CLIENT_SECRET` | le code secret Google |
+| `CULTIVEAU_MICROSOFT_CLIENT_ID` | l'ID d'application Microsoft |
+| `CULTIVEAU_MICROSOFT_CLIENT_SECRET` | la valeur du secret Microsoft |
+
+Puis Actions → « Déployer l'ERP » → Run workflow (ou le prochain push). Les identifiants vont dans `/srv/erp/.env` du serveur
+(jamais dans le dépôt ni dans le journal), l'ERP les reprend au démarrage et à chaque mise à jour, pour l'agenda **et** pour la
+messagerie (Gmail, Outlook). Ils l'emportent sur une saisie locale dans les réglages.
+
+Ensuite, pour chacun : la salle de réunion de la map → « Connecter mon agenda Google » (ou Outlook) → l'écran d'accord de
+Google ou Microsoft → retour dans l'ERP, agenda synchronisé dans les deux sens.

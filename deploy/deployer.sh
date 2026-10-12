@@ -23,6 +23,26 @@ $SSH "$SERVEUR" "
     } > /srv/erp/.env
   fi
 "
+# Les identifiants Google et Microsoft du réseau (secrets GitHub) : rangés dans /srv/erp/.env, jamais dans le dépôt ni
+# dans le journal (ils passent par l'entrée standard de ssh, pas par la ligne de commande).
+identifiants=""
+for v in CULTIVEAU_GOOGLE_CLIENT_ID CULTIVEAU_GOOGLE_CLIENT_SECRET CULTIVEAU_MICROSOFT_CLIENT_ID CULTIVEAU_MICROSOFT_CLIENT_SECRET; do
+  eval "valeur=\${$v:-}"
+  if [ -n "$valeur" ]; then identifiants="${identifiants}${v}=${valeur}
+"; fi
+done
+if [ -n "$identifiants" ]; then
+  printf '%s' "$identifiants" | $SSH "$SERVEUR" '
+    umask 077
+    while IFS= read -r ligne; do
+      [ -n "$ligne" ] || continue
+      nom=${ligne%%=*}
+      grep -v "^${nom}=" /srv/erp/.env > /srv/erp/.env.nouveau || true
+      printf "%s\n" "$ligne" >> /srv/erp/.env.nouveau
+      mv /srv/erp/.env.nouveau /srv/erp/.env
+    done'
+  echo "Identifiants Google / Microsoft du réseau à jour sur le serveur."
+fi
 # La configuration du stockage hors serveur voyage avec le code, puis est rangée hors du dépôt (jamais commitée : .gitignore).
 if [ -n "${RCLONE_CONF:-}" ]; then umask 077; printf '%s\n' "$RCLONE_CONF" > deploy/rclone.conf.tmp; fi
 rsync -az --delete -e "$SSH" --exclude=/.git --exclude=/data --exclude=/.env --exclude=__pycache__ ./ "$SERVEUR:/srv/erp/app/"

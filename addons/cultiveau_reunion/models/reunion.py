@@ -4,6 +4,7 @@ Les réunions sont des événements de l'agenda de l'ERP. Quand l'organisateur a
 Google, qui crée le lien Meet et le renvoie ; avec Outlook, Microsoft crée le lien Teams. Sans agenda connecté, la visio intégrée
 de l'ERP sert à tout le monde (un lien que les clients ouvrent dans leur navigateur).
 """
+import os
 from datetime import datetime, time, timedelta
 
 import pytz
@@ -97,14 +98,51 @@ class Reunion(models.AbstractModel):
 
     # ---------------------------------------------------------------- les agendas connectés
 
+    # ---------------------------------------------------------------- les identifiants du réseau
+
+    # Les applications Google et Microsoft du réseau Cultiveau, fournies au serveur (variables d'environnement, depuis les
+    # secrets GitHub) : chaque personne connecte alors son agenda et sa messagerie d'un clic, sans réglage chez l'adhérent.
+    IDENTIFIANTS_RESEAU = {
+        "CULTIVEAU_GOOGLE_CLIENT_ID": ("google_calendar_client_id", "google_gmail_client_id"),
+        "CULTIVEAU_GOOGLE_CLIENT_SECRET": ("google_calendar_client_secret", "google_gmail_client_secret"),
+        "CULTIVEAU_MICROSOFT_CLIENT_ID": ("microsoft_calendar_client_id", "microsoft_outlook_client_id"),
+        "CULTIVEAU_MICROSOFT_CLIENT_SECRET": ("microsoft_calendar_client_secret", "microsoft_outlook_client_secret"),
+    }
+
+    @api.model
+    def appliquer_identifiants_reseau(self, environ=None):
+        """Recopie les identifiants du réseau dans les réglages de l'ERP (ils l'emportent sur une saisie locale). Renvoie les
+        variables appliquées."""
+        environ = os.environ if environ is None else environ
+        ICP = self.env["ir.config_parameter"].sudo()
+        appliques = []
+        for variable, parametres in self.IDENTIFIANTS_RESEAU.items():
+            valeur = (environ.get(variable) or "").strip()
+            if not valeur:
+                continue
+            for p in parametres:
+                if ICP.get_param(p) != valeur:
+                    ICP.set_param(p, valeur)
+            appliques.append(variable)
+        return appliques
+
+    def _register_hook(self):
+        super()._register_hook()
+        if any(os.environ.get(v) for v in self.IDENTIFIANTS_RESEAU):
+            try:
+                with self.env.cr.savepoint():
+                    self.sudo().appliquer_identifiants_reseau()
+            except Exception:  # noqa: BLE001 — base pas encore prête : la mise à jour du module les appliquera
+                pass
+
     @api.model
     def synchro(self):
         """Pour la personne connectée : Google Agenda et Outlook sont-ils configurés (par l'administrateur) et connectés (par elle) ?"""
         u = self.env.user.sudo()
         ICP = self.env["ir.config_parameter"].sudo()
-        google = {"configure": bool(ICP.get_param("google_calendar_client_id")), "connecte": bool(getattr(u, "google_calendar_rtoken", False)) and not getattr(u, "google_synchronization_stopped", False)}
-        outlook = {"configure": bool(ICP.get_param("microsoft_calendar_client_id")), "connecte": bool(getattr(u, "microsoft_calendar_rtoken", False)) and not getattr(u, "microsoft_synchronization_stopped", False)}
-        return {"google": google, "outlook": outlook}
+        google = {"configure": bool(ICP.get_param("google_calendar_client_id") and ICP.get_param("google_calendar_client_secret")), "connecte": bool(getattr(u, "google_calendar_rtoken", False)) and not getattr(u, "google_synchronization_stopped", False)}
+        outlook = {"configure": bool(ICP.get_param("microsoft_calendar_client_id") and ICP.get_param("microsoft_calendar_client_secret")), "connecte": bool(getattr(u, "microsoft_calendar_rtoken", False)) and not getattr(u, "microsoft_synchronization_stopped", False)}
+        return {"google": google, "outlook": outlook, "admin": self.env.user.has_group("base.group_system")}
 
     # ---------------------------------------------------------------- l'occupation
 

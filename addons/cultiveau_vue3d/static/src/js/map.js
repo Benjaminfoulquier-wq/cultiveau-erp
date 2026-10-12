@@ -742,7 +742,14 @@ export class MapVivante extends Component {
             if (r.status === "need_auth" && r.url) {
                 window.location.href = r.url;
             } else if (r.status === "need_config_from_admin") {
-                this.notification.add(`La connexion ${fournisseur === "google" ? "Google Agenda" : "Outlook"} n'est pas encore configurée : l'administrateur renseigne les identifiants dans Réglages → Cultiveau → Réunions et agendas.`, { type: "warning", sticky: true });
+                const nom = fournisseur === "google" ? "Google Agenda" : "Outlook";
+                if ((this.state.v?.reunion?.synchro || {}).admin) {
+                    // l'administrateur arrive directement sur les réglages à compléter
+                    this.notification.add(`${nom} n'est pas encore branché sur l'ERP : collez l'identifiant et le secret de l'application ${fournisseur === "google" ? "Google" : "Microsoft"} du réseau (ou fournissez-les au serveur une fois pour tous).`, { type: "warning", sticky: true });
+                    await this.action.doAction("cultiveau_base.action_cultiveau_config_settings");
+                } else {
+                    this.notification.add(`${nom} n'est pas encore branché sur l'ERP : prévenez l'administrateur, c'est un réglage à faire une seule fois pour tout le monde.`, { type: "warning", sticky: true });
+                }
             } else {
                 this.notification.add(`Votre agenda ${fournisseur === "google" ? "Google" : "Outlook"} est synchronisé.`, { type: "success" });
                 this.rafraichir();

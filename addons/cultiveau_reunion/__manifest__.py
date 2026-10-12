@@ -20,7 +20,7 @@ dans les deux sens.
     "website": "https://cultiveau.fr",
     "license": "LGPL-3",
     "depends": ["cultiveau_mathis", "cultiveau_vue3d", "calendar", "google_calendar", "microsoft_calendar"],
-    "data": ["views/reunion_views.xml"],
+    "data": ["views/reunion_views.xml", "data/identifiants.xml"],
     "installable": True,
     "auto_install": False,
 }

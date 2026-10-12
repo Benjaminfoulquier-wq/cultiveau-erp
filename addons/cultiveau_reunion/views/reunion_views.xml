@@ -12,12 +12,12 @@
                         <div class="row mt8"><label for="cultiveau_heures_reunion" class="col-lg-4 o_light_label"/><field name="cultiveau_heures_reunion"/></div>
                         <div class="row mt8"><label for="cultiveau_visio_defaut" class="col-lg-4 o_light_label"/><field name="cultiveau_visio_defaut"/></div>
                     </setting>
-                    <setting string="Google Agenda et Google Meet" help="Créez un identifiant OAuth « Application Web » dans la console Google Cloud (API Google Calendar activée), avec cette adresse de retour, puis collez l'identifiant et le secret. Chacun connecte ensuite son agenda depuis la salle de réunion de la map.">
+                    <setting string="Google Agenda et Google Meet" help="Fournis une fois pour tout le réseau (secrets du serveur) : rien à saisir, chacun connecte son agenda d'un clic depuis la salle de réunion de la map. Sinon : un identifiant OAuth « Application Web » de la console Google Cloud, avec cette adresse de retour.">
                         <div class="row mt8"><label for="cultiveau_url_retour_google" class="col-lg-4 o_light_label"/><field name="cultiveau_url_retour_google" readonly="1"/></div>
                         <div class="row mt8"><label for="cal_client_id" string="Identifiant client" class="col-lg-4 o_light_label"/><field name="cal_client_id"/></div>
                         <div class="row mt8"><label for="cal_client_secret" string="Secret client" class="col-lg-4 o_light_label"/><field name="cal_client_secret" password="True"/></div>
                     </setting>
-                    <setting string="Outlook et Teams" help="Inscrivez une application dans le portail Microsoft Entra (autorisations Calendars.ReadWrite et OnlineMeetings.ReadWrite), avec cette adresse de retour, puis collez l'identifiant et le secret.">
+                    <setting string="Outlook et Teams" help="Fournis une fois pour tout le réseau (secrets du serveur) : rien à saisir. Sinon : une application du portail Microsoft Entra (Calendars.ReadWrite, OnlineMeetings.ReadWrite), avec cette adresse de retour.">
                         <div class="row mt8"><label for="cultiveau_url_retour_microsoft" class="col-lg-4 o_light_label"/><field name="cultiveau_url_retour_microsoft" readonly="1"/></div>
                         <div class="row mt8"><label for="cal_microsoft_client_id" string="Identifiant client" class="col-lg-4 o_light_label"/><field name="cal_microsoft_client_id"/></div>
                         <div class="row mt8"><label for="cal_microsoft_client_secret" string="Secret client" class="col-lg-4 o_light_label"/><field name="cal_microsoft_client_secret" password="True"/></div>
