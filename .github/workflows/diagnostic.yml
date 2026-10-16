@@ -1,0 +1,33 @@
+# État du serveur de l'ERP, lu depuis GitHub : Actions → « Diagnostic du serveur » → Run workflow.
+# N'écrit rien sur le serveur. Les adresses e-mail et IP sont masquées dans le journal (le dépôt est public).
+name: Diagnostic du serveur
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    env:
+      SERVEUR: root@82.25.116.36
+      CLE: /home/runner/.ssh/cultiveau_vps
+    steps:
+      - name: Clé SSH du serveur
+        run: |
+          if [ -z "${{ secrets.CULTIVEAU_VPS_CLE }}" ]; then echo "::error::Le secret CULTIVEAU_VPS_CLE manque."; exit 1; fi
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.CULTIVEAU_VPS_CLE }}" | sed 's/\r$//' > "$CLE" && chmod 600 "$CLE"
+          for essai in 1 2 3 4; do ssh-keyscan -T 15 -H 82.25.116.36 >> ~/.ssh/known_hosts 2>/dev/null && break; sleep $((essai * 5)); done
+      - name: État du serveur
+        run: |
+          ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" '
+            masquer() { sed -E "s/[[:alnum:]._%+-]+@[[:alnum:].-]+/<courriel>/g; s/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/<adresse>/g"; }
+            echo "== Machine"; uptime; df -h / | tail -1; free -m | head -2
+            echo; echo "== Conteneurs"; docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | masquer
+            echo; echo "== Réponse de l ERP depuis le serveur"
+            cd /srv/erp/app
+            docker compose exec -T odoo python3 -c "import urllib.request as u; r=u.urlopen(\"http://127.0.0.1:8069/web/login\", timeout=10); print(\"ERP :\", r.status)" 2>&1 | masquer || echo "ERP : ne répond pas"
+            echo "Site public :" $(curl -s -o /dev/null -w "%{http_code}" --max-time 15 https://erp.cultiveau.fr/web/login || echo injoignable)
+            echo; echo "== Journal de l ERP (60 dernières lignes)"; docker compose logs --tail 60 odoo 2>&1 | masquer
+            echo; echo "== Journal de Caddy (20 dernières lignes)"; docker logs --tail 20 caddy 2>&1 | masquer
+          '

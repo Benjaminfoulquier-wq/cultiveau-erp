@@ -79,6 +79,18 @@ $SSH "$SERVEUR" '
       tail -25 /tmp/erp-maj.log; docker compose up -d odoo; echo "ÉCHEC de la mise à jour des modules (journal ci-dessus)."; exit 1
     fi
     docker compose up -d odoo
+    # On attend que l ERP réponde vraiment (jusqu à deux minutes) : sinon le déploiement est en échec et montre le journal.
+    i=0
+    until docker compose exec -T odoo python3 -c "import urllib.request as u; u.urlopen(\"http://127.0.0.1:8069/web/login\", timeout=5)" > /dev/null 2>&1; do
+      i=$((i + 1))
+      if [ "$i" -ge 24 ]; then
+        echo "L ERP ne répond pas deux minutes après son redémarrage. Dernières lignes de son journal :"
+        docker compose logs --tail 60 odoo 2>&1 | sed -E "s/[[:alnum:]._%+-]+@[[:alnum:].-]+/<courriel>/g; s/[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/<adresse>/g"
+        exit 1
+      fi
+      sleep 5
+    done
+    echo "L ERP répond."
   else
     echo "Base « $ODOO_DB » pas encore installée : lancer scripts/installer.sh (première installation)."
   fi

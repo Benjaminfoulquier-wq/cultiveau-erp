@@ -9,7 +9,7 @@ name: Déployer l'ERP
 on:
   push:
     branches: [main, erp]
-    paths-ignore: ["docs/**", "README.md"]
+    paths-ignore: ["docs/**", "README.md", ".github/workflows/diagnostic.yml"]
   workflow_dispatch:
     inputs:
       etape:
@@ -61,7 +61,7 @@ jobs:
           echo "Clé lue : $lignes lignes, empreinte $(ssh-keygen -l -f "$CLE" | cut -d' ' -f1-2)"
           for essai in 1 2 3 4; do ssh-keyscan -T 15 -H 82.25.116.36 >> ~/.ssh/known_hosts 2>/dev/null && break; echo "Empreinte du serveur : nouvel essai ($essai)"; sleep $((essai * 5)); done
           grep -q . ~/.ssh/known_hosts || { echo "::error::Le serveur 82.25.116.36 ne répond pas (empreinte SSH illisible après 4 essais)."; exit 1; }
-      - name: Code et conteneurs sur le serveur
+      - name: Code, conteneurs et site erp.cultiveau.fr (Caddy)
         env:
           RCLONE_CONF: ${{ secrets.CULTIVEAU_RCLONE_CONF }}
           # facultatifs : les applications Google et Microsoft du réseau (docs/REUNIONS.md)
@@ -69,12 +69,10 @@ jobs:
           CULTIVEAU_GOOGLE_CLIENT_SECRET: ${{ secrets.CULTIVEAU_GOOGLE_CLIENT_SECRET }}
           CULTIVEAU_MICROSOFT_CLIENT_ID: ${{ secrets.CULTIVEAU_MICROSOFT_CLIENT_ID }}
           CULTIVEAU_MICROSOFT_CLIENT_SECRET: ${{ secrets.CULTIVEAU_MICROSOFT_CLIENT_SECRET }}
-        run: sh deploy/deployer.sh
+        run: sh deploy/deployer.sh domaine
       - name: Première installation (base, modules, réglages)
         if: ${{ github.event.inputs.etape == 'premiere-installation' }}
         run: ssh -i "$CLE" -o IdentitiesOnly=yes "$SERVEUR" 'cd /srv/erp/app && sh scripts/installer.sh'
-      - name: Site erp.cultiveau.fr (Caddy)
-        run: sh deploy/deployer.sh domaine
       - name: Données (catalogue, démonstration)
         if: ${{ github.event.inputs.donnees != '' && github.event.inputs.donnees != 'aucune' }}
         run: ssh -i "$CLE" -o IdentitiesOnly=yes -o ServerAliveInterval=60 "$SERVEUR" 'cd /srv/erp/app && sh scripts/donnees.sh ${{ github.event.inputs.donnees }}'
