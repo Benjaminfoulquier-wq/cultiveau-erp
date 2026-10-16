@@ -283,7 +283,7 @@ def folio_puissance(d, cartouche, numero, total):
         f.texte(x, y_bus - 16, dep["nom"], 11, ancre="middle", gras=True)
         x += pas
     # la légende
-    yl = HAUTEUR - MARGE - CARTOUCHE_H - 60
+    yl = HAUTEUR - MARGE - CARTOUCHE_H - 92
     f.texte(x0, yl, "Représentation unifilaire : « 3 » = trois phases, « 2 » = phase + neutre. Sections en cuivre, pose en conduit ou enterrée.", 10, GRIS)
     f.texte(x0, yl + 16, f"Courant total {g['courant_total']:.1f} A · calibre général {g['calibre']} A · " + (f"{len(d['departs'])} départs"), 10, GRIS)
     for k, a in enumerate(d["alertes"][:3]):
@@ -326,7 +326,7 @@ def folio_commande(d, cartouche, numero, total):
     xa = MARGE + 900
     f.texte(xa - 130, yh - 14, f"24 V AC — transformateur T1 {g['transfo_va']} VA (230/24 V, Q1.0)", 11, gras=True)
     pil = d["commande"]["pilotage"]
-    hauteur = max(190, 34 + 22 * len(d["sorties"]))
+    hauteur = max(190, 34 + 22 * len(d["sorties"]), 70 + 40 * len(d["commande"]["entrees"]))
     f.rect(xa, yh + 10, 210, hauteur, rayon=4, epaisseur=2)
     f.texte(xa + 105, yh + 32, pil["repere"], 13, ancre="middle", gras=True)
     f.texte(xa + 105, yh + 48, pil["nom"], 10, GRIS, ancre="middle")
