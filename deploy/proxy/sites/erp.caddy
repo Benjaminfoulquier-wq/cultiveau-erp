@@ -1,7 +1,17 @@
 erp.cultiveau.fr {
 	encode gzip
-	# Les connexions longues d'Odoo (chat, notifications) passent par /websocket sur le port 8072.
+	# Les connexions longues de l'ERP (chat, notifications) passent par /websocket sur le port 8072.
 	@websocket path /websocket*
 	reverse_proxy @websocket erp:8072
 	reverse_proxy erp:8069
+	# Pendant une mise à jour (deux à trois minutes), le serveur de l'ERP est arrêté : une page claire plutôt qu'une erreur,
+	# qui se recharge toute seule.
+	handle_errors {
+		@indisponible expression `{http.error.status_code} in [502, 503, 504]`
+		handle @indisponible {
+			header Content-Type "text/html; charset=utf-8"
+			header Retry-After 60
+			respond "<!doctype html><html lang='fr'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><meta http-equiv='refresh' content='30'><title>Mise à jour en cours</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#183840;color:#fff;font-family:-apple-system,Segoe UI,Roboto,sans-serif;text-align:center}main{max-width:460px;padding:32px}h1{font-size:26px;margin:0 0 10px}p{color:#cfe3e8;line-height:1.5}b{color:#fff}</style></head><body><main><h1>L'ERP Cultiveau se met à jour</h1><p>Une nouvelle version s'installe : cela prend <b>deux à trois minutes</b>.<br>Cette page se recharge toute seule ; vos données ne bougent pas.</p></main></body></html>" 503
+		}
+	}
 }

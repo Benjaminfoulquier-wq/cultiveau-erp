@@ -23,6 +23,14 @@
                         <h1><field name="name" readonly="1" class="d-inline"/> <span class="text-muted">· indice <field name="indice" readonly="1" class="d-inline"/></span></h1>
                         <h2><field name="titre" placeholder="Armoire de pompage"/></h2>
                     </div>
+                    <group string="Concevoir avec Mathis" name="conception">
+                        <field name="cahier_des_charges" nolabel="1" colspan="2"
+                               placeholder="Décrivez l'armoire en français. Exemple : deux pompes de 15 kW en alternance avec secours sur défaut, variateur pour tenir 4 bar, flotteurs haut et bas sur le bassin, pompe doseuse, 8 secteurs, télégestion GSM, marche en heures creuses."/>
+                        <div colspan="2">
+                            <button name="action_concevoir" type="object" string="Mathis conçoit l'armoire et compile" class="btn btn-primary" icon="fa-magic" invisible="not cahier_des_charges"/>
+                        </div>
+                        <field name="conception_notes" nolabel="1" colspan="2" readonly="1" invisible="not conception_notes"/>
+                    </group>
                     <group>
                         <group string="L'installation">
                             <field name="installation_id"/>

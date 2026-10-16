@@ -6,7 +6,11 @@ vérifie les chutes de tension, pose les repères (IEC 81346 : Q, KM, U, T, M, Y
 nomenclature, puis trace les folios. Une modification recompile en indice suivant.
 """
 import base64
+import json
+import logging
 from datetime import date
+
+import requests
 
 from markupsafe import Markup
 
@@ -14,6 +18,9 @@ from odoo import Command, api, fields, models
 from odoo.exceptions import UserError
 
 from . import folios, regles
+
+_logger = logging.getLogger(__name__)
+MISTRAL = "https://api.mistral.ai/v1"
 
 PUISSANCES_MOTEUR = [0.37, 0.55, 0.75, 1.1, 1.5, 2.2, 3, 4, 5.5, 7.5, 9.2, 11, 15, 18.5, 22, 30, 37, 45, 55, 75, 90]
 GENRES = [("pompe", "Pompe principale"), ("surpresseur", "Surpresseur"), ("doseuse", "Pompe doseuse (fertirrigation)"), ("filtration", "Filtration (contre-lavage)"),
@@ -80,6 +87,11 @@ class Armoire(models.Model):
     apercu_html = fields.Html("Folios", compute="_compute_apercu", sanitize=False)
     nb_folios = fields.Integer(compute="_compute_apercu")
     note = fields.Text("Notes pour l'électricien")
+    # la conception par Mathis
+    cahier_des_charges = fields.Text("Décrivez l'armoire", help="En français : les pompes, leur rôle, les sécurités voulues, les sondes, la télégestion, les contraintes du site. Mathis conçoit.")
+    conception_notes = fields.Text("Choix de conception (Mathis)", readonly=True)
+    entrees_json = fields.Text(readonly=True, help="Entrées ajoutées par la conception (JSON).")
+    echelons_json = fields.Text(readonly=True, help="Échelons de commande ajoutés par la conception (JSON).")
 
     _sql_constraints = [("simultaneite_positive", "check(simultaneite >= 1)", "Au moins un secteur ouvert à la fois.")]
 
@@ -283,7 +295,17 @@ class Armoire(models.Model):
             res.append({"repere": "B3", "nom": "Pluviomètre / sonde de pluie", "ferme": False, "entree": "SENSOR", "note": "pluie"})
         if self.compteur_impulsions:
             res.append({"repere": "B4", "nom": "Compteur d'eau à impulsions", "ferme": False, "entree": "IN2 · impulsions", "note": "compteur"})
+        for k, e in enumerate(self._json("entrees_json")):
+            res.append({"repere": e.get("repere") or f"B{5 + k}", "nom": (e.get("nom") or "Entrée")[:80], "ferme": bool(e.get("ferme")), "entree": (e.get("entree") or f"IN{3 + k}")[:40],
+                        "note": (e.get("note") or e.get("nom") or "")[:30]})
         return res
+
+    def _json(self, champ):
+        try:
+            v = json.loads(self[champ] or "[]")
+            return v if isinstance(v, list) else []
+        except ValueError:
+            return []
 
     def _construire_nomenclature(self, ddr, transfo, voies, commun):
         self.ligne_ids.unlink()
@@ -330,6 +352,18 @@ class Armoire(models.Model):
         ajouter("H1, H2", "Voyants marche (vert) et défaut (rouge)", "230 V", 2, folio="02", mots=("voyant",))
         for e in self._entrees():
             ajouter(e["repere"], e["nom"], "contact " + ("NC" if e.get("ferme") else "NO / 4–20 mA"), folio="02", mots=(e["note"],))
+        vus = set()
+        for e in self._json("echelons_json"):
+            for x in e.get("elements") or []:
+                rep = (x.get("repere") or "").strip()
+                if x.get("type") in ("bobine", "voyant") and rep and rep not in vus and not any(rep == l["repere"] for l in lignes):
+                    vus.add(rep)
+                    if x.get("type") == "voyant":
+                        ajouter(rep, f"Voyant — {x.get('note') or e.get('nom') or ''}", "230 V", folio="02", mots=("voyant",))
+                    elif rep.startswith("KT"):
+                        ajouter(rep, f"Temporisateur — {x.get('note') or e.get('nom') or ''}", "bobine 230 V AC", folio="02", mots=("temporisateur",))
+                    elif rep.startswith("KA"):
+                        ajouter(rep, f"Relais — {x.get('note') or e.get('nom') or ''}", "bobine 230 V AC · 2 contacts", folio="02", mots=("relais",))
         for s in self.sortie_ids.sorted("sequence"):
             ajouter(s.repere, f"Électrovanne 24 V AC — {s.name}", f"sortie {s.voie} · câble 2×{s.section_mm2:g} mm² · {s.longueur_m:g} m", folio="02", mots=("électrovanne",))
         if self.vanne_maitre:
@@ -386,6 +420,11 @@ class Armoire(models.Model):
             if dep.genre in MOTEURS and dep != pompe:
                 echelons.append({"nom": f"Marche {dep.name}", "elements": [{"type": "contact", "repere": "S1", "note": "Auto"}, {"type": "contact", "repere": f"A1·{dep.repere}", "note": "ordre pilotage"},
                                                                            {"type": "bobine", "repere": dep.repere_km, "note": dep.name}]})
+        for e in self._json("echelons_json"):
+            elements = [{"type": x.get("type") if x.get("type") in ("contact", "bobine", "voyant") else "contact", "repere": (x.get("repere") or "?")[:10],
+                         "ferme": bool(x.get("ferme")), "bouton": bool(x.get("bouton")), "note": (x.get("note") or "")[:18]} for x in (e.get("elements") or [])[:7]]
+            if elements:
+                echelons.append({"nom": (e.get("nom") or "Échelon")[:40], "elements": elements})
         sorties = [{"nom": s.name, "repere": s.repere, "sortie": f"{s.voie}", "borne": s.borne or "", "cable": f"2×{s.section_mm2:g} mm²", "longueur_m": s.longueur_m, "chute_v": s.chute_v}
                    for s in self.sortie_ids.sorted("sequence")]
         if self.vanne_maitre:
@@ -401,6 +440,103 @@ class Armoire(models.Model):
                             "ddr": self.ddr_type.replace("300 mA type ", ""), "parafoudre": self.parafoudre, "courant_total": self.courant_total_a, "transfo_va": self.transfo_va},
                 "departs": departs, "commande": {"echelons": echelons, "entrees": [{**e, "note": e["note"]} for e in self._entrees()], "pilotage": pilotage, "commun": f"{commun:g} mm²"},
                 "sorties": sorties, "borniers": borniers, "nomenclature": nomenclature, "alertes": (self.alertes or "").split("\n") if self.alertes else []}
+
+    # ---------------------------------------------------------------- la conception par Mathis
+
+    SYSTEME_CONCEPTION = """Tu es un électricien concepteur d'armoires de pompage pour l'irrigation agricole (basse tension, NF C 15-100, IEC 60617,
+repères IEC 81346). On te décrit une armoire ; tu conçois la solution et tu réponds UNIQUEMENT en JSON, avec ces clés :
+{"reseau": "tri"|"mono", "regime_neutre": "TT"|"TN"|"IT", "source": "reseau"|"coffret"|"groupe"|"solaire", "parafoudre": bool,
+ "pilotage": "programmateur"|"automate", "vanne_maitre": bool, "simultaneite": int, "regulation_pression": bool,
+ "manque_eau": bool, "pluviometre": bool, "compteur_impulsions": bool,
+ "departs": [{"genre": "pompe"|"surpresseur"|"doseuse"|"filtration"|"agitateur"|"auxiliaire"|"autre", "name": str, "puissance_kw": num,
+              "demarrage": "auto"|"direct"|"etoile_triangle"|"variateur"|"progressif", "longueur_cable_m": num, "regulation": bool}],
+ "sorties": [{"name": str, "longueur_m": num}]  (les électrovannes 24 V ; [] pour garder celles de l'étude),
+ "entrees": [{"repere": "B5", "nom": str, "ferme": bool, "entree": str}]  (capteurs en plus : niveau, pression, portes, débit…),
+ "echelons": [{"nom": str, "elements": [{"type": "contact"|"bobine"|"voyant", "repere": str, "ferme": bool, "bouton": bool, "note": str}]}],
+ "notes": str, "alertes": [str]}
+Règles : le compilateur numérote lui-même Q, KM, U, F et M dans l'ordre des départs (le premier départ moteur = Q1/KM1/M1/F1, le deuxième = Q2/KM2…).
+L'échelle de commande standard existe déjà (S0 arrêt d'urgence, S1 Auto/0/Manu, F thermique, B1 manque d'eau, KA1 ordre du pilotage → KM1 ;
+marche manuelle ; voyants H1 marche et H2 défaut ; un échelon par moteur supplémentaire). N'ajoute dans « echelons » que ce qui manque :
+alternance ou secours de deux pompes (KA2, KT1), niveaux de bassin ou de forage (flotteurs B5, B6 en NC pour les sécurités), pressostat
+haute pression, heures creuses (relais horaire KT2), télégestion GSM (relais KA3, voyant H3), défaut regroupé, etc. Repères libres : KA2 et
+au-delà, KT1 et au-delà, H3 et au-delà, B5 et au-delà. Un échelon : 2 à 6 éléments, contacts puis une bobine ou un voyant en dernier.
+Dimensionne avec les usages du métier (direct ≤ 5,5 kW, étoile-triangle ≤ 30 kW, variateur au-delà ou pour réguler la pression ; monophasé
+jusqu'à 2,2 kW). « notes » : 3 à 8 phrases qui expliquent tes choix à l'électricien ; « alertes » : ce qu'il doit vérifier sur place."""
+
+    def action_concevoir(self):
+        for a in self:
+            a.concevoir(a.cahier_des_charges or "")
+        return True
+
+    def concevoir(self, texte):
+        """Mathis conçoit l'armoire d'après la description (et l'étude), remplit le dossier, puis compile."""
+        self.ensure_one()
+        Mathis = self.env["cultiveau.mathis"]
+        cle = Mathis._cle()
+        if not cle:
+            raise UserError("La conception a besoin de la clé Mistral (Réglages → Cultiveau → Fiches techniques et IA).")
+        texte = (texte or "").strip()
+        if not texte:
+            raise UserError("Décrivez l'armoire voulue : pompes, sécurités, sondes, contraintes.")
+        i = self.installation_id
+        etude = {"installation": i.name, "type": dict(i._fields["type_systeme"].selection).get(i.type_systeme, ""), "pompe_kw_calculee": i.puissance_kw,
+                 "debit_m3h": getattr(i, "debit_equipement_m3_h", 0), "hmt_m": getattr(i, "hmt_m", 0), "energie": getattr(i, "energie", ""), "puissance_souscrite_kva": getattr(i, "puissance_souscrite_kva", 0),
+                 "niveau_automatisme": getattr(i, "niveau_automatisme", ""), "secteurs_simultanes": getattr(i, "simultaneite", 1),
+                 "secteurs": [{"nom": s.name, "longueur_cable_estimee_m": s.longueur_m or 0} for s in self.sortie_ids] or
+                             [{"nom": s.name, "longueur_cable_estimee_m": (getattr(i, "longueur_principale_m", 0) or 0) + (s.longueur_m or 0) + 20} for s in (i.secteur_ids if "secteur_ids" in i._fields else [])],
+                 "departs_actuels": [{"genre": d.genre, "name": d.name, "puissance_kw": d.puissance_kw, "longueur_cable_m": d.longueur_cable_m} for d in self.depart_ids]}
+        demande = f"Étude de l'installation (JSON) :\n{json.dumps(etude, ensure_ascii=False)}\n\nDescription de l'armoire voulue :\n{texte[:4000]}"
+        try:
+            r = requests.post(f"{MISTRAL}/chat/completions", headers={"Authorization": f"Bearer {cle}"}, timeout=120, json={
+                "model": Mathis._modele(), "temperature": 0.2, "response_format": {"type": "json_object"},
+                "messages": [{"role": "system", "content": self.SYSTEME_CONCEPTION}, {"role": "user", "content": demande}]})
+            r.raise_for_status()
+            spec = json.loads(r.json()["choices"][0]["message"]["content"])
+        except Exception as e:  # noqa: BLE001
+            raise UserError(f"Mathis n'a pas pu concevoir l'armoire : {str(e)[:200]}") from e
+        self._appliquer_conception(spec, texte)
+        self._compiler()
+        return self.resume()
+
+    def _appliquer_conception(self, spec, texte=""):
+        """La réponse de Mathis → le dossier (champs, départs, électrovannes, entrées et échelons en plus)."""
+        vals = {"cahier_des_charges": texte or self.cahier_des_charges}
+        for cle, choix in (("reseau", ("tri", "mono")), ("regime_neutre", ("TT", "TN", "IT")), ("source", ("reseau", "coffret", "groupe", "solaire")), ("pilotage", ("programmateur", "automate"))):
+            if spec.get(cle) in choix:
+                vals[cle] = spec[cle]
+        for cle in ("parafoudre", "vanne_maitre", "regulation_pression", "manque_eau", "pluviometre", "compteur_impulsions"):
+            if cle in spec:
+                vals[cle] = bool(spec[cle])
+        if isinstance(spec.get("simultaneite"), (int, float)) and spec["simultaneite"] >= 1:
+            vals["simultaneite"] = int(spec["simultaneite"])
+        genres = {g for g, _n in GENRES}
+        departs = []
+        for k, d in enumerate((spec.get("departs") or [])[:12]):
+            if not isinstance(d, dict) or not d.get("name"):
+                continue
+            kw = float(d.get("puissance_kw") or 0)
+            departs.append(Command.create({"genre": d.get("genre") if d.get("genre") in genres else "autre", "name": str(d["name"])[:60],
+                                           "puissance_kw": _puissance_standard(kw) if d.get("genre") in MOTEURS and kw else kw,
+                                           "demarrage": d.get("demarrage") if d.get("demarrage") in dict(DEMARRAGES) else "auto", "regulation": bool(d.get("regulation")),
+                                           "longueur_cable_m": float(d.get("longueur_cable_m") or 10), "sequence": (k + 1) * 10}))
+        if departs:
+            self.depart_ids.unlink()
+            vals["depart_ids"] = departs
+        sorties = []
+        for k, so in enumerate((spec.get("sorties") or [])[:48]):
+            if isinstance(so, dict) and so.get("name"):
+                sorties.append(Command.create({"name": str(so["name"])[:60], "longueur_m": float(so.get("longueur_m") or 100), "sequence": (k + 1) * 10}))
+        if sorties:
+            self.sortie_ids.unlink()
+            vals["sortie_ids"] = sorties
+        vals["entrees_json"] = json.dumps([e for e in (spec.get("entrees") or [])[:8] if isinstance(e, dict) and e.get("nom")], ensure_ascii=False)
+        vals["echelons_json"] = json.dumps([e for e in (spec.get("echelons") or [])[:8] if isinstance(e, dict) and e.get("elements")], ensure_ascii=False)
+        notes = (spec.get("notes") or "").strip()
+        alertes = [str(a) for a in (spec.get("alertes") or []) if a]
+        vals["conception_notes"] = notes + ("\n\nÀ vérifier sur place :\n- " + "\n- ".join(alertes) if alertes else "")
+        self.with_context(cultiveau_compilation=True).write(vals)
+        self.message_post(body=f"Armoire conçue par Mathis : {len(departs) or len(self.depart_ids)} départ(s), {len(sorties) or len(self.sortie_ids)} électrovanne(s), "
+                          f"{len(self._json('entrees_json'))} entrée(s) et {len(self._json('echelons_json'))} échelon(s) ajoutés.")
 
     # ---------------------------------------------------------------- les suites
 

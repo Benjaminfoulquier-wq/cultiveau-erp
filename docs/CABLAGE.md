@@ -16,6 +16,22 @@ On ajuste : réseau (triphasé 400 V ou monophasé 230 V), régime de neutre, so
 pompe doseuse, filtration à contre-lavage, agitateur), longueurs de câble, démarrage imposé ou conseillé, régulation de
 pression, entrées (manque d'eau, pluviomètre, compteur à impulsions). « Reprendre l'étude » recharge pompe et secteurs.
 
+## Concevoir avec Mathis
+
+Au-dessus du dossier, **Décrivez l'armoire** en français, puis « Mathis conçoit l'armoire et compile » :
+
+> Deux pompes de 15 kW en alternance avec secours sur défaut, variateur pour tenir 4 bar, flotteurs haut et bas sur le bassin,
+> pompe doseuse, 8 secteurs, télégestion GSM, marche en heures creuses.
+
+Mathis conçoit comme un électricien : il choisit le réseau, le pilotage, le démarrage de chaque moteur, ajoute les capteurs (B5,
+B6…) et les échelons de commande qui manquent au schéma standard (alternance et secours KA2/KT1, horloge heures creuses KT2,
+alarme GSM H3, pressostat haute pression, niveaux de bassin), explique ses choix dans **Choix de conception** et liste ce que
+l'électricien doit vérifier sur place. Le dossier est rempli puis compilé ; les relais, temporisateurs et voyants ajoutés sont
+dans la nomenclature, les échelons dans le folio commande.
+
+Depuis Mathis directement : « conçois l'armoire du Mas Neuf : deux pompes de 15 kW en alternance… » (confirmation demandée).
+Il faut la clé Mistral (Réglages → Cultiveau → Fiches techniques et IA).
+
 ## Ce que la compilation calcule
 
 | Quoi | Règle |

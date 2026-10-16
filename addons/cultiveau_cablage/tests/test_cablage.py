@@ -1,8 +1,11 @@
+import json
+from unittest import mock
+
 from odoo import Command
 from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
-from ..models import regles
+from ..models import armoire as module_armoire, regles
 
 
 @tagged("post_install", "-at_install")
@@ -126,3 +129,53 @@ class TestCablage(TransactionCase):
         self.assertIn("compiler_cablage", M._ecritures())
         self.assertEqual(self.inst.nb_armoires, 1)
         self.assertEqual(self.inst.action_cablage()["res_id"], a.id)
+
+    def test_conception_par_mathis(self):
+        a = self.env["cultiveau.armoire"].depuis_installation(self.inst)
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mistral_cle", "")
+        with self.assertRaises(UserError):
+            a.concevoir("deux pompes")
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mistral_cle", "cle-test")
+        spec = {"reseau": "tri", "pilotage": "automate", "simultaneite": 2, "regulation_pression": True, "vanne_maitre": True, "source": "reseau",
+                "departs": [{"genre": "pompe", "name": "Pompe P1", "puissance_kw": 15, "demarrage": "variateur", "longueur_cable_m": 20, "regulation": True},
+                            {"genre": "pompe", "name": "Pompe P2 (secours)", "puissance_kw": 15, "demarrage": "etoile_triangle", "longueur_cable_m": 20},
+                            {"genre": "doseuse", "name": "Pompe doseuse", "puissance_kw": 0.37, "demarrage": "auto", "longueur_cable_m": 6},
+                            {"genre": "auxiliaire", "name": "Prise et éclairage", "puissance_kw": 2.5, "longueur_cable_m": 4}],
+                "sorties": [{"name": f"Secteur {k}", "longueur_m": 100 * k} for k in range(1, 9)],
+                "entrees": [{"repere": "B5", "nom": "Flotteur niveau bas bassin", "ferme": True, "entree": "IN3 · arrêt pompes"},
+                            {"repere": "B6", "nom": "Pressostat haute pression 6 bar", "ferme": True, "entree": "IN4 · arrêt"}],
+                "echelons": [{"nom": "Alternance / secours P1-P2", "elements": [{"type": "contact", "repere": "KA1"}, {"type": "contact", "repere": "U1", "ferme": True, "note": "défaut variateur"},
+                                                                                {"type": "contact", "repere": "KT1", "note": "tempo 10 s"}, {"type": "bobine", "repere": "KA2", "note": "secours P2"}]},
+                             {"nom": "Heures creuses", "elements": [{"type": "contact", "repere": "KT2", "note": "horloge 22h-6h"}, {"type": "bobine", "repere": "KA3", "note": "autorisation"}]},
+                             {"nom": "Alarme GSM", "elements": [{"type": "contact", "repere": "H2", "note": "défaut"}, {"type": "voyant", "repere": "H3", "note": "GSM"}]}],
+                "notes": "Deux pompes identiques : P1 régulée par variateur, P2 en secours sur défaut variateur via KA2 temporisé.", "alertes": ["Vérifier la puissance souscrite (2 × 15 kW)."]}
+        reponse = mock.Mock(status_code=200, raise_for_status=lambda: None, json=lambda: {"choices": [{"message": {"content": json.dumps(spec)}}]})
+        with mock.patch.object(module_armoire.requests, "post", return_value=reponse) as post:
+            res = a.concevoir("Deux pompes de 15 kW en alternance avec secours, régulation 4 bar, flotteur bas bassin, pressostat HP, 8 secteurs, heures creuses, alarme GSM.")
+        demande = post.call_args.kwargs["json"]["messages"][1]["content"]
+        self.assertIn("Deux pompes de 15 kW", demande)
+        self.assertIn("pompe_kw_calculee", demande)
+        self.assertEqual(a.etat, "compile")
+        self.assertEqual(len(a.depart_ids), 4)
+        self.assertEqual(len(a.sortie_ids), 8)
+        p1, p2 = a.depart_ids.sorted("sequence")[:2]
+        self.assertEqual((p1.repere_km, p1.demarrage_retenu), ("U1", "variateur"))
+        self.assertEqual((p2.repere_km, p2.demarrage_retenu, p2.repere_f), ("KM1", "etoile_triangle", "F1"))
+        self.assertEqual(a.ddr_type, "300 mA type B", "un variateur triphasé impose le type B")
+        self.assertEqual(a.voies, 12, "8 secteurs + vanne maître")
+        self.assertIn("B5", a.borne_ids.filtered(lambda b: b.bornier == "XC").mapped("repere"))
+        self.assertIn("Alternance / secours P1-P2", a.folio_commande)
+        self.assertIn("KT1", a.folio_commande)
+        self.assertIn("KA2", a.ligne_ids.mapped("repere"), "le relais conçu est dans la nomenclature")
+        self.assertIn("H3", a.ligne_ids.mapped("repere"))
+        self.assertIn("Deux pompes identiques", a.conception_notes)
+        self.assertIn("puissance souscrite", a.conception_notes)
+        self.assertEqual(res["electrovannes"], 8)
+        # par Mathis
+        M = self.env["cultiveau.mathis"]
+        self.assertIn("concevoir_cablage", M._ecritures())
+        self.assertIn("concevoir_cablage", {o["function"]["name"] for o in M._outils()})
+        with mock.patch.object(module_armoire.requests, "post", return_value=reponse):
+            res2, action = M._executer("concevoir_cablage", {"installation_id": self.inst.id, "description": "idem"})
+        self.assertEqual(action["modele"], "cultiveau.armoire")
+        self.assertEqual(a.indice, "B", "la seconde conception recompile en indice suivant")

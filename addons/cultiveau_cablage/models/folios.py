@@ -297,13 +297,17 @@ def folio_commande(d, cartouche, numero, total):
     g = d["general"]
     # ---- échelle 230 V
     xg, xd = MARGE + 70, MARGE + 640
-    yh, yb = 110, 560
+    yh = 110
+    yb = min(yh + 50 + 62 * len(d["commande"]["echelons"]) + 20, HAUTEUR - MARGE - CARTOUCHE_H - 80)
     f.ligne(xg, yh, xg, yb, epaisseur=2.4)
     f.ligne(xd, yh, xd, yb, epaisseur=2.4)
     f.texte(xg, yh - 14, "L (230 V, depuis Q1.0 commande 2 A)", 11, gras=True)
     f.texte(xd, yh - 14, "N", 11, ancre="end", gras=True)
     y = yh + 50
     for rung in d["commande"]["echelons"]:
+        if y > yb - 20:
+            f.texte(xg + 20, y, f"… {len(d['commande']['echelons'])} échelons au total : voir la nomenclature.", 10, GRIS)
+            break
         f.ligne(xg, y, xg + 20, y)
         x = xg + 20
         for el in rung["elements"]:
