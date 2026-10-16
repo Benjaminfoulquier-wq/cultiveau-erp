@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_armoire,armoire,model_cultiveau_armoire,cultiveau_base.group_adherent,1,1,1,1
+access_depart,depart,model_cultiveau_armoire_depart,cultiveau_base.group_adherent,1,1,1,1
+access_sortie,sortie,model_cultiveau_armoire_sortie,cultiveau_base.group_adherent,1,1,1,1
+access_borne,borne,model_cultiveau_armoire_borne,cultiveau_base.group_adherent,1,1,1,1
+access_ligne,ligne,model_cultiveau_armoire_ligne,cultiveau_base.group_adherent,1,1,1,1

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_armoire_form" model="ir.ui.view">
+        <field name="name">cultiveau.armoire.form</field>
+        <field name="model">cultiveau.armoire</field>
+        <field name="arch" type="xml">
+            <form string="Dossier de câblage">
+                <header>
+                    <button name="action_compiler" type="object" string="Compiler le dossier" class="btn-primary" icon="fa-cogs" invisible="etat == 'valide'"/>
+                    <button name="action_compiler" type="object" string="Recompiler (indice suivant)" icon="fa-refresh" invisible="etat != 'valide'"/>
+                    <button name="action_imprimer" type="object" string="Folios PDF" icon="fa-file-pdf-o"/>
+                    <button name="action_joindre_au_dossier" type="object" string="Joindre au dossier technique" icon="fa-paperclip" invisible="etat == 'brouillon'"/>
+                    <button name="action_ajouter_au_devis" type="object" string="Ajouter au devis" icon="fa-file-text-o" invisible="etat == 'brouillon'"/>
+                    <button name="action_valider" type="object" string="Validé par l'électricien" icon="fa-check" invisible="etat != 'compile'"/>
+                    <button name="action_reprendre_etude" type="object" string="Reprendre l'étude" icon="fa-download" confirm="Remplacer les départs et électrovannes par ceux de l'étude ?"/>
+                    <field name="etat" widget="statusbar"/>
+                </header>
+                <div class="alert alert-warning mb-0" role="alert" invisible="not alertes"><i class="fa fa-exclamation-triangle me-1" title="À vérifier"/><b>Points à vérifier :</b>
+                    <field name="alertes" readonly="1" class="d-inline-block mb-0"/>
+                </div>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="1" class="d-inline"/> <span class="text-muted">· indice <field name="indice" readonly="1" class="d-inline"/></span></h1>
+                        <h2><field name="titre" placeholder="Armoire de pompage"/></h2>
+                    </div>
+                    <group>
+                        <group string="L'installation">
+                            <field name="installation_id"/>
+                            <field name="partner_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="compile_le"/>
+                            <field name="compile_par" widget="many2one_avatar_user"/>
+                        </group>
+                        <group string="L'alimentation">
+                            <field name="reseau" widget="radio" options="{'horizontal': true}"/>
+                            <field name="regime_neutre"/>
+                            <field name="source"/>
+                            <field name="longueur_alimentation_m"/>
+                            <field name="parafoudre"/>
+                        </group>
+                        <group string="Le pilotage">
+                            <field name="pilotage" widget="radio"/>
+                            <field name="vanne_maitre"/>
+                            <field name="simultaneite"/>
+                            <field name="regulation_pression"/>
+                        </group>
+                        <group string="Les entrées">
+                            <field name="manque_eau"/>
+                            <field name="pluviometre"/>
+                            <field name="compteur_impulsions"/>
+                        </group>
+                    </group>
+                    <group string="Résultat de la compilation" invisible="etat == 'brouillon'">
+                        <group>
+                            <field name="courant_total_a"/>
+                            <field name="calibre_general_a"/>
+                            <field name="ddr_type"/>
+                        </group>
+                        <group>
+                            <field name="transfo_va"/>
+                            <field name="voies"/>
+                            <field name="nb_folios"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Départs (moteurs, auxiliaires)" name="departs">
+                            <field name="depart_ids">
+                                <list editable="bottom" decoration-danger="chute_pct > 5">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="genre"/>
+                                    <field name="name"/>
+                                    <field name="puissance_kw"/>
+                                    <field name="reseau"/>
+                                    <field name="demarrage"/>
+                                    <field name="regulation"/>
+                                    <field name="longueur_cable_m"/>
+                                    <field name="repere" readonly="1"/>
+                                    <field name="courant_a" readonly="1"/>
+                                    <field name="demarrage_retenu" readonly="1"/>
+                                    <field name="disjoncteur" readonly="1"/>
+                                    <field name="repere_km" readonly="1"/>
+                                    <field name="section_mm2" readonly="1"/>
+                                    <field name="chute_pct" readonly="1"/>
+                                    <field name="borne" readonly="1" optional="hide"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Électrovannes" name="sorties">
+                            <field name="sortie_ids">
+                                <list editable="bottom" decoration-danger="chute_v > 3">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="secteur_id" domain="[('installation_id', '=', parent.installation_id)]"/>
+                                    <field name="longueur_m"/>
+                                    <field name="repere" readonly="1"/>
+                                    <field name="voie" readonly="1"/>
+                                    <field name="section_mm2" readonly="1"/>
+                                    <field name="chute_v" readonly="1"/>
+                                    <field name="borne" readonly="1"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Folios" name="folios" invisible="etat == 'brouillon'">
+                            <field name="apercu_html" readonly="1"/>
+                        </page>
+                        <page string="Borniers" name="borniers" invisible="etat == 'brouillon'">
+                            <field name="borne_ids">
+                                <list>
+                                    <field name="bornier"/>
+                                    <field name="numero"/>
+                                    <field name="repere"/>
+                                    <field name="destination"/>
+                                    <field name="cable"/>
+                                    <field name="longueur"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Nomenclature" name="nomenclature" invisible="etat == 'brouillon'">
+                            <field name="ligne_ids">
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="repere"/>
+                                    <field name="designation"/>
+                                    <field name="caracteristiques"/>
+                                    <field name="quantite"/>
+                                    <field name="unite"/>
+                                    <field name="folio"/>
+                                    <field name="product_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Notes pour l'électricien" name="notes">
+                            <field name="note" placeholder="Contraintes du site, matériel imposé, marques, délais…"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_armoire_list" model="ir.ui.view">
+        <field name="name">cultiveau.armoire.list</field>
+        <field name="model">cultiveau.armoire</field>
+        <field name="arch" type="xml">
+            <list string="Dossiers de câblage" decoration-success="etat == 'valide'" decoration-muted="etat == 'brouillon'">
+                <field name="name"/>
+                <field name="titre"/>
+                <field name="installation_id"/>
+                <field name="partner_id"/>
+                <field name="reseau"/>
+                <field name="calibre_general_a"/>
+                <field name="indice"/>
+                <field name="compile_le"/>
+                <field name="etat" widget="badge" decoration-info="etat == 'compile'" decoration-success="etat == 'valide'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_armoires" model="ir.actions.act_window">
+        <field name="name">Dossiers de câblage</field>
+        <field name="res_model">cultiveau.armoire</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun dossier de câblage</p>
+            <p>Depuis une installation : « Câblage de l'armoire ». L'ERP reprend la pompe de l'étude et un secteur par électrovanne, puis compile les folios.</p>
+        </field>
+    </record>
+    <menuitem id="menu_armoires" name="Câblage des armoires" parent="cultiveau_installation.menu_parc" action="action_armoires" sequence="15"/>
+
+    <record id="view_installation_form_cablage" model="ir.ui.view">
+        <field name="name">cultiveau.installation.form.cablage</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="inherit_id" ref="cultiveau_installation.view_installation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_cablage" type="object" class="oe_stat_button" icon="fa-plug">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="nb_armoires"/></span><span class="o_stat_text">Câblage</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>

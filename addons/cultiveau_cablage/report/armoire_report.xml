@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_armoire" model="ir.actions.report">
+        <field name="name">Dossier de câblage</field>
+        <field name="model">cultiveau.armoire</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cultiveau_cablage.report_armoire</field>
+        <field name="report_file">cultiveau_cablage.report_armoire</field>
+        <field name="print_report_name">'%s - cablage indice %s' % (object.name, object.indice)</field>
+        <field name="paperformat_id" ref="paperformat_a3_paysage"/>
+        <field name="binding_model_id" ref="model_cultiveau_armoire"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_armoire">
+        <t t-call="web.basic_layout">
+            <t t-foreach="docs" t-as="a">
+                <t t-foreach="a.folios_svg()" t-as="svg">
+                    <div class="page" style="page-break-after: always; margin: 0; padding: 0;">
+                        <t t-out="svg"/>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

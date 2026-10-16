@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="regle_armoire_societe" model="ir.rule">
+        <field name="name">Dossiers de câblage : la société</field>
+        <field name="model_id" ref="model_cultiveau_armoire"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>
