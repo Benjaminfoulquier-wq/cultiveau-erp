@@ -76,5 +76,17 @@ if not lead:
                              ("Micro-aspersion pêchers — demande du 12/09", "cultiveau_ventes.stage_demande", None)]:
         env["crm.lead"].create({"name": nom, "type": "opportunity", "partner_id": qui.id if qui else False, "stage_id": env.ref(etape).id,
                                 "cultiveau_type_systeme": "goutte_surface", "cultiveau_origine": "assistant", "expected_revenue": 25000})
+# le dimensionnement (secteurs) et le dossier de câblage de l'armoire, pour essayer la compilation tout de suite
+if "secteur_ids" in inst._fields and not inst.secteur_ids:
+    for k, (nom, surface, longueur) in enumerate([("Les Grès nord", 2.0, 120), ("Les Grès sud", 2.0, 260), ("Le Clos", 2.0, 380), ("Vigne haute", 2.0, 520), ("Vigne basse", 2.0, 640), ("Verger", 2.0, 150)]):
+        env["cultiveau.secteur"].create({"installation_id": inst.id, "name": nom, "surface_ha": surface, "organe": "goutteur", "debit_unitaire": 2.2, "pression_organe_bar": 1.5,
+                                         "espacement_m": 0.75, "ecartement_m": 2.5, "longueur_m": longueur, "denivele_m": 3 + k, "materiau": "pe"})
+    inst.write({"longueur_principale_m": 420, "denivele_station_m": 8, "hauteur_aspiration_m": 0, "simultaneite": 2})
+    inst.action_dimensionner()
+if "cultiveau.armoire" in env and not inst.armoire_ids:
+    armoire = env["cultiveau.armoire"].depuis_installation(inst)
+    armoire.depart_ids.create({"armoire_id": armoire.id, "genre": "doseuse", "name": "Pompe doseuse engrais", "puissance_kw": 0.55, "sequence": 20, "longueur_cable_m": 8})
+    armoire.action_compiler()
+    print("câblage", armoire.name, "indice", armoire.indice, f"{armoire.calibre_general_a} A", f"{len(armoire.sortie_ids)} électrovannes")
 env.cr.commit()
 print("devis", devis.id, "installation", inst.id, "agri", agri.id)
