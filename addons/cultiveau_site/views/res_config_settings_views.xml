@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_site" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.site</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="cultiveau.fr et la logistique dans l'ERP" name="cultiveau_ecrans_site">
+                    <setting string="Secret partagé avec cultiveau.fr"
+                             help="Les menus Mon Espace et Logistique affichent les écrans du site sans nouvelle connexion. Créez le secret ici, copiez-le, puis collez-le sur cultiveau.fr dans Admin, Clés et services, « Secret partagé avec l'ERP ». L'e-mail de chaque utilisateur de l'ERP doit être celui de son compte adhérent.">
+                        <div class="row mt8"><field name="cultiveau_erp_lien_secret" widget="CopyClipboardChar"/></div>
+                        <div class="mt8"><button name="action_creer_secret_site" type="object" string="Créer un nouveau secret" class="btn-link" icon="fa-key"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
