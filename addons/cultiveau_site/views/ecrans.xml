@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Les écrans de cultiveau.fr et de la logistique, affichés tels quels dans l'ERP : une évolution du site s'y voit tout de suite. -->
+    <menuitem id="menu_espace" name="Mon Espace" parent="cultiveau_base.menu_cultiveau_root" sequence="2"/>
+    <record id="action_ecran_espace" model="ir.actions.client">
+        <field name="name">Mon Espace (accueil)</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/espace"}</field>
+    </record>
+    <menuitem id="menu_ecran_espace" name="Mon Espace (accueil)" parent="menu_espace" action="action_ecran_espace" sequence="1"/>
+    <record id="action_ecran_interventions" model="ir.actions.client">
+        <field name="name">Mes Interventions</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/espace?view=mes_interventions"}</field>
+    </record>
+    <menuitem id="menu_ecran_interventions" name="Mes Interventions" parent="menu_espace" action="action_ecran_interventions" sequence="2"/>
+    <record id="action_ecran_chantier" model="ir.actions.client">
+        <field name="name">Mon Chantier</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/chantier"}</field>
+    </record>
+    <menuitem id="menu_ecran_chantier" name="Mon Chantier" parent="menu_espace" action="action_ecran_chantier" sequence="3"/>
+    <record id="action_ecran_bons" model="ir.actions.client">
+        <field name="name">Bons d'intervention</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/sav/historique"}</field>
+    </record>
+    <menuitem id="menu_ecran_bons" name="Bons d'intervention" parent="menu_espace" action="action_ecran_bons" sequence="4"/>
+    <record id="action_ecran_equipe" model="ir.actions.client">
+        <field name="name">Mon Équipe</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/mon-equipe"}</field>
+    </record>
+    <menuitem id="menu_ecran_equipe" name="Mon Équipe" parent="menu_espace" action="action_ecran_equipe" sequence="5"/>
+    <record id="action_ecran_inventaire" model="ir.actions.client">
+        <field name="name">Mon Inventaire</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/mon-inventaire"}</field>
+    </record>
+    <menuitem id="menu_ecran_inventaire" name="Mon Inventaire" parent="menu_espace" action="action_ecran_inventaire" sequence="6"/>
+    <record id="action_ecran_dict" model="ir.actions.client">
+        <field name="name">Mes DICT</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/mes-dict"}</field>
+    </record>
+    <menuitem id="menu_ecran_dict" name="Mes DICT" parent="menu_espace" action="action_ecran_dict" sequence="7"/>
+    <record id="action_ecran_ao" model="ir.actions.client">
+        <field name="name">Appels d'offres</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/appels-offres"}</field>
+    </record>
+    <menuitem id="menu_ecran_ao" name="Appels d'offres" parent="menu_espace" action="action_ecran_ao" sequence="8"/>
+    <record id="action_ecran_logistique" model="ir.actions.client">
+        <field name="name">Logistique</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "logistique"}</field>
+    </record>
+    <menuitem id="menu_logistique" name="Logistique" parent="cultiveau_base.menu_cultiveau_root" action="action_ecran_logistique" sequence="3"/>
+</odoo>

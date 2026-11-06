@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_site.Ecran">
+        <div class="o_cultiveau_ecran">
+            <iframe t-att-src="adresse" t-att-title="props.action.name" allow="microphone; geolocation; clipboard-write"/>
+        </div>
+    </t>
+</templates>

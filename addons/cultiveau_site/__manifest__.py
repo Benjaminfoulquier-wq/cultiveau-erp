@@ -17,13 +17,28 @@ du site, page « Clés API ») :
 
 Lecture seule côté site : rien n'est écrit sur cultiveau.fr. Une tâche planifiée synchronise chaque heure ; le bouton
 « Synchroniser » le fait tout de suite. Les jetons de validation des pages publiques du site ne sont jamais conservés.
+
+Les écrans dans l'ERP
+---------------------
+
+Les menus **Mon Espace** et **Logistique** affichent les vrais écrans de cultiveau.fr et de logistique.cultiveau.fr dans le
+cadre de l'ERP, sans nouvelle connexion : l'ERP signe un laissez-passer d'une minute pour l'utilisateur (son e-mail doit
+être celui de son compte adhérent) avec le secret ``cultiveau.erp_lien_secret`` (même valeur que « ERP_LIEN_SECRET » sur
+le site). Rien n'est recopié : une évolution du site ou de la logistique se voit aussitôt dans l'ERP.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
     "depends": ["cultiveau_chantier", "cultiveau_interventions", "cultiveau_installation"],
     "external_dependencies": {"python": ["requests"]},
-    "data": ["security/ir.model.access.csv", "views/site_views.xml", "data/cron.xml"],
+    "data": ["security/ir.model.access.csv", "views/site_views.xml", "views/ecrans.xml", "data/cron.xml"],
+    "assets": {
+        "web.assets_backend": [
+            "cultiveau_site/static/src/js/ecran.js",
+            "cultiveau_site/static/src/xml/ecran.xml",
+            "cultiveau_site/static/src/scss/ecran.scss",
+        ],
+    },
     "installable": True,
 }
