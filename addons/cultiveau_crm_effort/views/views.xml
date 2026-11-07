@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- la raison de perte, obligatoire -->
+    <record id="crm_lead_lost_view_form_cultiveau" model="ir.ui.view">
+        <field name="name">crm.lead.lost.form.cultiveau</field>
+        <field name="model">crm.lead.lost</field>
+        <field name="inherit_id" ref="crm.crm_lead_lost_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='lost_reason_id']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- l'affaire : jours sans action, activités faites -->
+    <record id="crm_lead_view_form_effort" model="ir.ui.view">
+        <field name="name">crm.lead.form.cultiveau.effort</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="cultiveau_ventes.crm_lead_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning mb-0" role="alert" invisible="cultiveau_jours_sans_action &lt; 14 or probability == 100 or not active">
+                    Aucune action depuis <field name="cultiveau_jours_sans_action" class="oe_inline"/> jours sur cette affaire.
+                </div>
+            </xpath>
+            <xpath expr="//field[@name='cultiveau_origine']" position="after">
+                <field name="cultiveau_nb_activites_faites"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- le tableau de l'effort -->
+    <record id="view_effort_pivot" model="ir.ui.view">
+        <field name="name">cultiveau.effort.commercial.pivot</field>
+        <field name="model">cultiveau.effort.commercial</field>
+        <field name="arch" type="xml">
+            <pivot string="Effort commercial" disable_linking="1">
+                <field name="user_id" type="row"/>
+                <field name="activity_type_id" type="col"/>
+                <field name="nombre" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+    <record id="view_effort_graph" model="ir.ui.view">
+        <field name="name">cultiveau.effort.commercial.graph</field>
+        <field name="model">cultiveau.effort.commercial</field>
+        <field name="arch" type="xml">
+            <graph string="Effort commercial" type="bar" stacked="1">
+                <field name="mois"/>
+                <field name="activity_type_id"/>
+                <field name="nombre" type="measure"/>
+            </graph>
+        </field>
+    </record>
+    <record id="view_effort_list" model="ir.ui.view">
+        <field name="name">cultiveau.effort.commercial.list</field>
+        <field name="model">cultiveau.effort.commercial</field>
+        <field name="arch" type="xml">
+            <list create="0" edit="0" delete="0">
+                <field name="date"/>
+                <field name="user_id" widget="many2one_avatar_user"/>
+                <field name="activity_type_id"/>
+                <field name="lead_id"/>
+                <field name="partner_id"/>
+                <field name="stage_id"/>
+                <field name="gagnee" widget="boolean_toggle" readonly="1"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_effort_search" model="ir.ui.view">
+        <field name="name">cultiveau.effort.commercial.search</field>
+        <field name="model">cultiveau.effort.commercial</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="user_id"/>
+                <field name="partner_id"/>
+                <field name="activity_type_id"/>
+                <filter name="ce_mois" string="Ce mois-ci" domain="[('date', '>=', (context_today() + relativedelta(day=1)).strftime('%Y-%m-%d'))]"/>
+                <filter name="trois_mois" string="Trois derniers mois" domain="[('date', '>=', (context_today() - relativedelta(months=3)).strftime('%Y-%m-%d'))]"/>
+                <filter name="gagnees" string="Affaires gagnées" domain="[('gagnee', '=', True)]"/>
+                <group expand="0" string="Regrouper">
+                    <filter name="par_personne" string="Personne" context="{'group_by': 'user_id'}"/>
+                    <filter name="par_type" string="Type d'activité" context="{'group_by': 'activity_type_id'}"/>
+                    <filter name="par_mois" string="Mois" context="{'group_by': 'mois'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_effort" model="ir.actions.act_window">
+        <field name="name">Effort commercial</field>
+        <field name="res_model">cultiveau.effort.commercial</field>
+        <field name="view_mode">pivot,graph,list</field>
+        <field name="context">{'search_default_trois_mois': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Ce qu'on fait pour gagner les affaires</p>
+            <p>Chaque activité marquée faite sur une opportunité (appel, visite R1, R2, relance, visite de chantier) compte ici, par personne et par mois.
+            Le pipeline dit où en sont les affaires ; ce tableau dit ce qu'on a fait pour les faire avancer.</p>
+        </field>
+    </record>
+    <menuitem id="menu_effort" name="Effort commercial" parent="cultiveau_ventes.menu_ventes" action="action_effort" sequence="12"/>
+</odoo>

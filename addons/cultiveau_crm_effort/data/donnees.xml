@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Les activités comme on les nomme sur le terrain -->
+        <record id="act_appel_prospection" model="mail.activity.type">
+            <field name="name">Appel de prospection</field>
+            <field name="summary">Appeler pour qualifier le besoin</field>
+            <field name="category">phonecall</field>
+            <field name="icon">fa-phone</field>
+            <field name="delay_count">2</field>
+            <field name="delay_unit">days</field>
+            <field name="res_model">crm.lead</field>
+            <field name="sequence">11</field>
+        </record>
+        <record id="act_r1" model="mail.activity.type">
+            <field name="name">Visite R1 (découverte)</field>
+            <field name="summary">Visite sur l'exploitation : ressource, parcelles, culture de pointe, énergie (A1.1)</field>
+            <field name="category">meeting</field>
+            <field name="icon">fa-map-marker</field>
+            <field name="delay_count">3</field>
+            <field name="delay_unit">days</field>
+            <field name="res_model">crm.lead</field>
+            <field name="sequence">12</field>
+        </record>
+        <record id="act_r2" model="mail.activity.type">
+            <field name="name">Visite R2 (remise du devis)</field>
+            <field name="summary">Présenter le devis par lots et la note de dimensionnement</field>
+            <field name="category">meeting</field>
+            <field name="icon">fa-handshake-o</field>
+            <field name="delay_count">5</field>
+            <field name="delay_unit">days</field>
+            <field name="res_model">crm.lead</field>
+            <field name="sequence">13</field>
+        </record>
+        <record id="act_relance" model="mail.activity.type">
+            <field name="name">Relance du devis</field>
+            <field name="summary">Rappeler : questions, financement, date de pose</field>
+            <field name="category">phonecall</field>
+            <field name="icon">fa-repeat</field>
+            <field name="delay_count">7</field>
+            <field name="delay_unit">days</field>
+            <field name="res_model">crm.lead</field>
+            <field name="sequence">14</field>
+        </record>
+        <record id="act_visite_chantier" model="mail.activity.type">
+            <field name="name">Visite de chantier / après-vente</field>
+            <field name="summary">Passer voir l'installation, écouter, proposer l'entretien</field>
+            <field name="category">meeting</field>
+            <field name="icon">fa-wrench</field>
+            <field name="delay_count">30</field>
+            <field name="delay_unit">days</field>
+            <field name="res_model">crm.lead</field>
+            <field name="sequence">15</field>
+        </record>
+        <record id="act_reprendre" model="mail.activity.type">
+            <field name="name">Reprendre contact</field>
+            <field name="summary">Affaire sans nouvelles : rappeler ou classer</field>
+            <field name="category">phonecall</field>
+            <field name="icon">fa-bell</field>
+            <field name="delay_count">1</field>
+            <field name="delay_unit">days</field>
+            <field name="res_model">crm.lead</field>
+            <field name="sequence">16</field>
+        </record>
+        <!-- Les vraies raisons de perte d'un projet d'irrigation -->
+        <record id="perte_prix" model="crm.lost.reason"><field name="name">Prix (moins cher ailleurs)</field></record>
+        <record id="perte_concurrent" model="crm.lost.reason"><field name="name">Concurrent mieux placé (délai, relation, matériel)</field></record>
+        <record id="perte_reporte" model="crm.lost.reason"><field name="name">Projet reporté (récolte, trésorerie, saison)</field></record>
+        <record id="perte_financement" model="crm.lost.reason"><field name="name">Pas de financement ou d'aide obtenue</field></record>
+        <record id="perte_eau" model="crm.lost.reason"><field name="name">Pas de ressource en eau ou d'autorisation de prélèvement</field></record>
+        <record id="perte_sans_reponse" model="crm.lost.reason"><field name="name">Sans réponse malgré les relances</field></record>
+        <record id="perte_fait_lui_meme" model="crm.lost.reason"><field name="name">L'agriculteur fait lui-même</field></record>
+        <!-- Le revenu récurrent d'un contrat d'entretien -->
+        <record id="plan_entretien_annuel" model="crm.recurring.plan">
+            <field name="name">Contrat d'entretien annuel</field>
+            <field name="number_of_months">12</field>
+            <field name="sequence">5</field>
+        </record>
+    </data>
+</odoo>
