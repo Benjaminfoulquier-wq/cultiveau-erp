@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_roles.AideSystray">
+        <div class="o_cultiveau_aide_systray">
+            <a href="#" class="dropdown-toggle o-no-caret" role="button" title="À quoi sert cet écran ?" t-on-click.prevent="ouvrir" aria-label="Aide">
+                <i class="fa fa-question-circle-o fa-lg" role="img"/>
+            </a>
+        </div>
+    </t>
+    <t t-name="cultiveau_roles.AideDialog">
+        <Dialog title="props.aide.nom" size="'md'">
+            <p class="lead" t-esc="props.aide.resume"/>
+            <div t-out="texte"/>
+            <p t-if="props.aide.doc" class="mt-2 mb-0"><a t-att-href="props.aide.doc" target="_blank" rel="noopener"><i class="fa fa-book me-1"/>Lire la documentation</a></p>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="() => props.close()">Compris</button>
+                <button t-if="props.aide.editable" class="btn btn-secondary" t-on-click="modifier">Modifier ce texte</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

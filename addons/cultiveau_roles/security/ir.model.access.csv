@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_aide_lecture,cultiveau.aide lecture,model_cultiveau_aide,base.group_user,1,0,0,0
+access_aide_equipe,cultiveau.aide équipe,model_cultiveau_aide,cultiveau_base.group_equipe,1,1,1,1

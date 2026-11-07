@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="aide_map" model="cultiveau.aide">
+            <field name="name">Map vivante</field><field name="sequence">1</field><field name="action_xmlid">cultiveau_vue3d.action_map</field>
+            <field name="resume">Votre dépôt en 3D, vivant : l'équipe, les camions, les clients au parking, les chantiers, le stock.</field>
+            <field name="texte"><![CDATA[<ul><li>Cliquez sur n'importe quoi : une personne, un camion, un client, un rayon, une parcelle. La fiche s'ouvre à droite avec ses boutons.</li><li>Un véhicule du parking ouvre tous les clients de ce type (agriculteurs, paysagistes…) : personas, newsletter, liste.</li><li>Touches : <b>/</b> rechercher, <b>T</b> visite guidée, <b>H</b> vue d'ensemble, <b>Échap</b> fermer.</li><li>Le bouton Plan permet de déplacer les objets du dépôt.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MAP-VIVANTE.md</field>
+        </record>
+        <record id="aide_devis" model="cultiveau.aide">
+            <field name="name">Devis</field><field name="sequence">2</field><field name="res_model">sale.order</field>
+            <field name="resume">Un devis d'irrigation se construit par lots ; sa confirmation déclenche le chantier, l'acompte, les achats et la mise en service.</field>
+            <field name="texte"><![CDATA[<ul><li>Partez d'un modèle par lots (station, filtration, réseau, secteurs, automatisme, pose) ou importez l'étude Schéma 3D.</li><li>« Insérer une nomenclature » pose un ensemble d'articles d'un coup (tête de secteur × 3, protection de la station).</li><li>« Ajouter un sous-lot » sous les lignes ; l'onglet Lots et sous-totaux montre les montants par lot.</li><li>« Approvisionnement » : ce qui manque en stock, chez qui, à quel prix.</li><li>Une fois signé (en ligne avec l'acompte, ou au bureau), l'onglet Après la signature suit tout ce qui a été créé.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/DECLENCHE.md</field>
+        </record>
+        <record id="aide_interventions" model="cultiveau.aide">
+            <field name="name">Interventions</field><field name="sequence">3</field><field name="res_model">project.task</field>
+            <field name="resume">Dépannages, entretiens, mises en service : qui, quand, chez qui, avec quelles pièces ; le bon se signe sur place.</field>
+            <field name="texte"><![CDATA[<ul><li>Nature et urgence d'abord : elles choisissent la checklist et la couleur du planning.</li><li>Affectez un technicien (avec accès) ou un salarié sans accès : il reçoit sa feuille de route la veille.</li><li>« Arrivé sur place » ouvre le bon : checklist, pièces, relevés de pression, signature du client.</li><li>Une intervention terminée s'inscrit au registre de l'installation (A1.8).</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CHECKLISTS.md</field>
+        </record>
+        <record id="aide_bons" model="cultiveau.aide">
+            <field name="name">Bons d'intervention</field><field name="sequence">4</field><field name="res_model">cultiveau.bon</field>
+            <field name="resume">Le compte rendu signé par le client : checklist, pièces, temps, déplacement, relevés, puis la facture.</field>
+            <field name="texte"><![CDATA[<ul><li>Onglet Checklist : cochez, mesurez (les pressions remplissent les relevés), notez.</li><li>« Chiffrer le temps et le déplacement » ajoute la main-d'œuvre et les kilomètres.</li><li>Faites signer, puis « Facturer » : la facture reprend les lignes du bon.</li><li>Un écart aux pressions du PV de mise en service est signalé : c'est le début d'un diagnostic.</li></ul>]]></field>
+        </record>
+        <record id="aide_chantiers" model="cultiveau.aide">
+            <field name="name">Chantiers</field><field name="sequence">5</field><field name="res_model">cultiveau.chantier</field>
+            <field name="resume">La pose : phases, équipe, matériel, heures pointées, jalons de facturation, PV de mise en service.</field>
+            <field name="texte"><![CDATA[<ul><li>Le chantier naît du devis confirmé, avec ses quatre phases et son matériel.</li><li>Datez les phases : le matériel de chaque phase a sa date de besoin pour les achats ; chaque phase peut porter un jalon de facturation.</li><li>« Sortir le matériel » fait la sortie de stock ; les pointages donnent la rentabilité.</li><li>Le PV A1.3 (pressions de référence) se remplit à la mise en service : il servira à tous les dépannages.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/JALONS.md</field>
+        </record>
+        <record id="aide_installations" model="cultiveau.aide">
+            <field name="name">Installations (parc installé)</field><field name="sequence">6</field><field name="res_model">cultiveau.installation</field>
+            <field name="resume">Le site d'irrigation du client : analyse des besoins A1.1, note de dimensionnement A1.2, équipements, PV, registre.</field>
+            <field name="texte"><![CDATA[<ul><li>Validez l'analyse des besoins avec l'exploitant avant de chiffrer (le référentiel, § 3.2).</li><li>« Importer l'étude Schéma 3D » remplit A1.1 et A1.2 et construit le devis par lots.</li><li>Les secteurs et le dimensionnement calculent débits, pertes de charge, HMT, pompe.</li><li>Le registre A1.8 se remplit tout seul avec les interventions.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/SCHEMA3D.md</field>
+        </record>
+        <record id="aide_clients" model="cultiveau.aide">
+            <field name="name">Clients</field><field name="sequence">7</field><field name="res_model">res.partner</field>
+            <field name="resume">Agriculteurs, collectivités, paysagistes… : le type choisit le véhicule au parking, le persona dit comment lui parler.</field>
+            <field name="texte"><![CDATA[<ul><li>Renseignez le type de contact : c'est le premier filtre de la map, des newsletters et de la grille de remises.</li><li>L'onglet Persona : huit questions, quatre profils, les arguments et le moment pour appeler.</li><li>Les cultures du client alimentent la frise et la liste « À contacter ce mois-ci ».</li></ul>]]></field>
+        </record>
+        <record id="aide_nomenclatures" model="cultiveau.aide">
+            <field name="name">Nomenclatures</field><field name="sequence">8</field><field name="action_xmlid">cultiveau_ventes.action_nomenclatures</field>
+            <field name="resume">Des ensembles d'articles prêts à poser dans un devis : tête de secteur, protection de station, point haut, mise en service.</field>
+            <field name="texte"><![CDATA[<ul><li>Celles du réseau sont proposées ; « Adapter pour ma société » en fait une copie à vous.</li><li>Un article « × la quantité insérée » se multiplie (3 têtes = 3 vannes) ; un article fixe ne bouge pas (un compteur).</li><li>Depuis un devis, « Enregistrer en nomenclature » garde un lot bien fait pour la prochaine fois.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/NOMENCLATURES.md</field>
+        </record>
+        <record id="aide_tableaux" model="cultiveau.aide">
+            <field name="name">Mes tableaux</field><field name="sequence">9</field><field name="action_xmlid">cultiveau_tableaux.action_favoris</field>
+            <field name="resume">Vos tableaux de bord en trois choix : un sujet, une mesure, un regroupement.</field>
+            <field name="texte"><![CDATA[<ul><li>Choisissez le sujet (interventions, devis, factures…), la mesure, le regroupement, la période : « Ouvrir le tableau ».</li><li>Ou demandez à Mathis : « montre-moi les interventions par technicien ce mois, et enregistre-le ».</li><li>Partagez un tableau avec la société pour que l'équipe le voie.</li></ul>]]></field>
+        </record>
+        <record id="aide_feuilles" model="cultiveau.aide">
+            <field name="name">Feuilles de route</field><field name="sequence">10</field><field name="action_xmlid">cultiveau_feuille_route.action_feuilles_route</field>
+            <field name="resume">Chaque salarié, avec ou sans accès, a sa journée sur le téléphone par un lien, et par e-mail la veille.</field>
+            <field name="texte"><![CDATA[<ul><li>Créez le salarié dans Employés (sans utilisateur) ; affectez-le aux interventions et chantiers.</li><li>Onglet Feuille de route : copiez son lien, envoyez-le une fois par SMS. L'e-mail de la veille part tout seul.</li><li>« Lui donner un accès » crée son utilisateur avec un rôle quand il en faut un.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/FEUILLE-DE-ROUTE.md</field>
+        </record>
+        <record id="aide_checklists" model="cultiveau.aide">
+            <field name="name">Checklists par nature</field><field name="sequence">11</field><field name="action_xmlid">cultiveau_checklists.action_checklists</field>
+            <field name="resume">Une checklist par nature d'intervention, tirée du référentiel ; le bon la reçoit tout seul.</field>
+            <field name="texte"><![CDATA[<ul><li>Six modèles du réseau : remise en service, hivernage, entretien, mise en service, dépannage, diagnostic.</li><li>« Adapter pour ma société » pour ajouter vos points ; un modèle par type d'installation passe avant le général.</li><li>Un point obligatoire non fait est signalé à la signature, sans bloquer.</li></ul>]]></field>
+        </record>
+        <record id="aide_opportunites" model="cultiveau.aide">
+            <field name="name">Opportunités</field><field name="sequence">12</field><field name="res_model">crm.lead</field>
+            <field name="resume">Le projet du client en six phases ; chaque étape planifie l'activité suivante ; une affaire oubliée revient.</field>
+            <field name="texte"><![CDATA[<ul><li>Les pistes (prospection pure) sont à part ; une opportunité, c'est un signal du client.</li><li>Analyse des besoins planifie la visite R1 ; Devis envoyé planifie la relance à J+7.</li><li>Une affaire perdue demande sa raison : c'est elle qu'on lit dans Effort commercial.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CRM-EFFORT.md</field>
+        </record>
+        <record id="aide_utilisateurs" model="cultiveau.aide">
+            <field name="name">Utilisateurs et rôles</field><field name="sequence">13</field><field name="res_model">res.users</field>
+            <field name="resume">Un rôle règle les droits d'un coup : gérant, administratif, technicien, magasinier, commercial.</field>
+            <field name="texte"><![CDATA[<ul><li>Choisissez le rôle Cultiveau : les applications et les droits suivent. « Réglage à la main » ne touche à rien.</li><li>Un technicien voit ses interventions, le stock et ses notes de frais ; un administratif facture et achète ; le gérant valide tout.</li><li>Depuis Employés, « Lui donner un accès » crée l'utilisateur et envoie l'invitation.</li></ul>]]></field>
+        </record>
+    </data>
+</odoo>

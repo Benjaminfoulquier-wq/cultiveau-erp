@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_roles" model="ir.ui.view">
+        <field name="name">res.users.form.cultiveau.roles</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group string="Rôle Cultiveau" name="role_cultiveau">
+                    <field name="cultiveau_role" widget="radio" options="{'horizontal': true}"/>
+                    <div colspan="2" class="text-muted small">Gérant : tout, validations comprises. Administratif : devis, factures, achats, stock, équipe. Technicien : ses interventions, le stock, ses frais.
+                        Magasinier : stock, achats, ventes au comptoir. Commercial : clients, opportunités, devis. Le rôle pose les droits ci-dessous ; vous pouvez les affiner ensuite (ils tiennent jusqu'au prochain changement de rôle).</div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_users_list_roles" model="ir.ui.view">
+        <field name="name">res.users.list.cultiveau.roles</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='login']" position="after">
+                <field name="cultiveau_role" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_employee_form_roles" model="ir.ui.view">
+        <field name="name">hr.employee.form.cultiveau.roles</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_creer_acces" type="object" string="Lui donner un accès" class="btn-primary" invisible="user_id" groups="base.group_erp_manager,cultiveau_base.group_equipe"/>
+            </xpath>
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="cultiveau_role_propose" invisible="user_id"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_aide_list" model="ir.ui.view">
+        <field name="name">cultiveau.aide.list</field>
+        <field name="model">cultiveau.aide</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="resume"/>
+                <field name="action_xmlid" optional="show"/>
+                <field name="res_model" optional="show"/>
+                <field name="doc" optional="hide" widget="url"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_aide_form" model="ir.ui.view">
+        <field name="name">cultiveau.aide.form</field>
+        <field name="model">cultiveau.aide</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name"/></h1></div>
+                    <group>
+                        <group><field name="action_xmlid"/><field name="res_model"/></group>
+                        <group><field name="doc" widget="url"/><field name="active" invisible="1"/></group>
+                    </group>
+                    <field name="resume"/>
+                    <field name="texte"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_aides" model="ir.actions.act_window">
+        <field name="name">Aides des écrans</field>
+        <field name="res_model">cultiveau.aide</field>
+        <field name="view_mode">list,form</field>
+    </record>
+    <menuitem id="menu_aides" name="Aides des écrans" parent="cultiveau_base.menu_cultiveau_reglages" action="action_aides" sequence="90" groups="cultiveau_base.group_equipe"/>
+</odoo>
