@@ -89,3 +89,24 @@ class TestSite(TransactionCase):
         connexion._synchroniser()
         self.assertTrue(connexion.en_erreur)
         self.assertIn("clé", connexion.resultat)
+
+
+    def test_cle_sans_droit_articles_remplacee(self):
+        societe = self.env.company
+        connexion = self.env["cultiveau.site.connexion"].create({"company_id": societe.id, "cle": "vieille", "cultiveau_site_adherent_id": 77,
+                                                                 "clients": False, "interventions": False, "chantiers": False, "bons": False})
+        etat = {"cle": "vieille"}
+
+        def _appeler(self_, chemin, params=None):
+            if etat["cle"] == "vieille":
+                from odoo.exceptions import UserError
+                raise UserError("La clé n'a pas le droit nécessaire (articles) : 403")
+            return ARTICLES
+
+        def redemander(self_):
+            etat["cle"] = "neuve"
+            return True
+        with patch.object(type(connexion), "_appeler", _appeler), patch.object(type(connexion), "_cultiveau_redemander_cle", redemander):
+            connexion._synchroniser()
+        self.assertFalse(connexion.en_erreur, connexion.resultat)
+        self.assertIn("2 article(s) lus", connexion.resultat)

@@ -304,9 +304,16 @@ class SiteConnexion(models.Model):
             lus = self._pages("articles", "articles", {"updatedSince": depuis}, taille=500)
         except UserError as e:
             texte = str(e.args[0] if e.args else e)
-            if "403" in texte or "404" in texte or "droit" in texte:
-                return "articles : pas encore exposés par le site pour cette clé"
-            raise
+            if "404" in texte:
+                return "articles : pas encore exposés par le site"
+            if "403" in texte or "droit" in texte:
+                # clé remise avant le droit « articles » : on en redemande une, et on réessaie une fois
+                if hasattr(self, "_cultiveau_redemander_cle") and self._cultiveau_redemander_cle():
+                    lus = self._pages("articles", "articles", {"updatedSince": depuis}, taille=500)
+                else:
+                    return "articles : la clé du site n'a pas encore le droit « articles » (repassez par cultiveau.fr)"
+            else:
+                raise
         crees = maj = 0
         for a in lus:
             ref = self._ref(a.get("id"))
