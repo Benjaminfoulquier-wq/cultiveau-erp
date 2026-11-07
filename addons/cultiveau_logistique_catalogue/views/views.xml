@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_logistique" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.logistique</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Le catalogue de la logistique" name="cultiveau_logistique_catalogue">
+                    <setting string="Les produits de logistique.cultiveau.fr dans l'ERP" class="col-12"
+                             help="Toutes les heures, les produits mis en ligne ou modifiés sur la logistique arrivent dans le catalogue du réseau : famille, fournisseur, prix, photo, fiches techniques. Un produit retiré là-bas est archivé ici. Le secret partagé est posé sur le serveur par l'équipe Cultiveau.">
+                        <div class="mt8"><label for="cultiveau_logistique_url" class="o_light_label me-2"/><field name="cultiveau_logistique_url" class="oe_inline"/></div>
+                        <div class="mt8"><field name="cultiveau_logistique_photos"/><label for="cultiveau_logistique_photos"/></div>
+                        <div class="mt8 text-muted">Secret : <field name="cultiveau_logistique_secret_pose" class="oe_inline" readonly="1"/> · dernière synchronisation : <field name="cultiveau_logistique_bilan" class="oe_inline"/></div>
+                        <div class="mt8"><button name="action_synchroniser_logistique" type="object" string="Tout synchroniser maintenant" class="btn-link" icon="fa-refresh"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_product_template_form_logistique" model="ir.ui.view">
+        <field name="name">product.template.form.cultiveau.logistique</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" name="action_ouvrir_logistique" class="oe_stat_button" icon="fa-truck" invisible="not cultiveau_logistique_id">
+                    <div class="o_stat_info"><span class="o_stat_text">Sur la logistique</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+</odoo>
