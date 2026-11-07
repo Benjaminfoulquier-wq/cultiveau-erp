@@ -84,11 +84,22 @@ class TestSite(TransactionCase):
         self.assertEqual(self.env["cultiveau.site.bon"].search_count([("connexion_id", "=", connexion.id)]), 1)
         self.assertTrue(any(c == "clients" and p.get("updatedSince") for c, p in appels))
 
-    def test_erreur_notee(self):
+    def test_sans_cle_rien_ne_casse(self):
         connexion = self.env["cultiveau.site.connexion"].create({"company_id": self.env.company.id})
         connexion._synchroniser()
-        self.assertTrue(connexion.en_erreur)
+        self.assertFalse(connexion.en_erreur)
         self.assertIn("clé", connexion.resultat)
+
+    def test_erreur_notee(self):
+        connexion = self.env["cultiveau.site.connexion"].create({"company_id": self.env.company.id, "cle": "cle-test"})
+
+        def _appeler(self_, chemin, params=None):
+            from odoo.exceptions import UserError
+            raise UserError("Le site refuse la clé (absente, invalide ou révoquée).")
+        with patch.object(type(connexion), "_appeler", _appeler):
+            connexion._synchroniser()
+        self.assertTrue(connexion.en_erreur)
+        self.assertIn("refuse la clé", connexion.resultat)
 
 
     def test_cle_sans_droit_articles_remplacee(self):

@@ -130,7 +130,7 @@ class SiteConnexion(models.Model):
 
     def action_reinitialiser(self):
         """Tout relire au prochain passage (les curseurs « lu jusqu'au » sont effacés)."""
-        self.write({"curseur_clients": False, "curseur_bons": False})
+        self.write({"curseur_clients": False, "curseur_bons": False, "curseur_articles": False})
 
     def action_voir_bons(self):
         self.ensure_one()
@@ -159,23 +159,36 @@ class SiteConnexion(models.Model):
         if not self.env.cr.fetchone():
             _logger.info("Synchronisation cultiveau.fr de %s : déjà en cours, passage ignoré.", self.company_id.name)
             return
+        if not self.sudo().cle:
+            self.write({"resultat": "Pas de clé d'API du site : rien à synchroniser (la clé arrive quand quelqu'un de l'entreprise entre dans l'ERP depuis cultiveau.fr).", "en_erreur": False})
+            return
         debut = fields.Datetime.now()
         bilan = []
         try:
+            # pas de savepoint autour des étapes : elles acquièrent elles-mêmes leur travail page par page (un commit détruirait le savepoint)
             for actif, etape in ((self.clients, self._synchro_clients), (self.interventions, self._synchro_interventions), (self.chantiers, self._synchro_chantiers),
                                  (self.bons, self._synchro_bons), (self.articles, self._synchro_articles)):
                 if not actif:
                     continue
-                with self.env.cr.savepoint():
-                    bilan.append(etape())
+                bilan.append(etape())
                 self.write({"resultat": " · ".join(bilan) + " …", "en_erreur": False})
                 self._acquis()
             self.write({"derniere_synchro": debut, "resultat": " · ".join(bilan) or "Rien à synchroniser.", "en_erreur": False})
+            self._acquis()
         except UserError as e:
-            self.write({"derniere_synchro": debut, "resultat": str(e.args[0] if e.args else e), "en_erreur": True})
+            self._reprendre_apres_erreur()
+            self.write({"derniere_synchro": debut, "resultat": " · ".join(bilan + [str(e.args[0] if e.args else e)]), "en_erreur": True})
+            self._acquis()
         except Exception as e:  # noqa: BLE001 — une erreur inattendue est notée, la tâche continue avec l'adhérent suivant
             _logger.exception("Synchronisation cultiveau.fr de %s", self.company_id.name)
-            self.write({"derniere_synchro": debut, "resultat": f"Erreur : {e}", "en_erreur": True})
+            self._reprendre_apres_erreur()
+            self.write({"derniere_synchro": debut, "resultat": " · ".join(bilan + [f"Erreur : {e}"]), "en_erreur": True})
+            self._acquis()
+
+    def _reprendre_apres_erreur(self):
+        """Après une erreur de base de données, la transaction est inutilisable : on revient au dernier acquis pour pouvoir noter l'erreur."""
+        if not config["test_enable"]:
+            self.env.cr.rollback()
 
     def _ref(self, ident):
         return f"{self.id}:{ident}"
