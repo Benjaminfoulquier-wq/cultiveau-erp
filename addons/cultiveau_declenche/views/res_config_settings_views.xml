@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_declenche" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.declenche</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Le devis déclenche tout" name="cultiveau_declenche">
+                    <setting string="À la confirmation d'un devis d'installation" help="Signé en ligne ou confirmé au bureau, le devis met la chaîne en marche. Chaque pièce se crée en brouillon : rien ne part sans vous." class="col-12">
+                        <div class="mt8"><field name="cultiveau_decl_chantier"/><label for="cultiveau_decl_chantier"/></div>
+                        <div class="mt8"><field name="cultiveau_decl_acompte"/><label for="cultiveau_decl_acompte"/></div>
+                        <div class="mt8"><field name="cultiveau_decl_achats"/><label for="cultiveau_decl_achats"/></div>
+                        <div class="mt8"><field name="cultiveau_decl_mise_en_service"/><label for="cultiveau_decl_mise_en_service"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

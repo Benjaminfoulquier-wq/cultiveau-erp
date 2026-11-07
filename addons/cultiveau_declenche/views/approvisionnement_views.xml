@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_approvisionnement_form" model="ir.ui.view">
+        <field name="name">cultiveau.approvisionnement.form</field>
+        <field name="model">cultiveau.approvisionnement</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="order_id" readonly="1"/>
+                        <field name="nb_manquants"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="tout"/>
+                        <field name="total_a_commander" widget="monetary"/>
+                    </group>
+                </group>
+                <div class="alert alert-warning py-1" role="alert" invisible="not sans_fournisseur">Sans fournisseur connu (à choisir dans la ligne, ou à commander à la main) : <field name="sans_fournisseur" class="oe_inline"/></div>
+                <div class="alert alert-info py-1" role="alert" invisible="ligne_ids">Aucun article géré en stock sur ce devis : rien à approvisionner. Les services, la main-d'œuvre et les articles non stockables ne s'achètent pas d'ici.</div>
+                <field name="ligne_ids" invisible="not ligne_ids">
+                    <list editable="bottom" create="0" decoration-danger="manque > 0 and not fournisseur_id" decoration-warning="manque > 0 and fournisseur_id" decoration-muted="manque == 0 and a_commander == 0">
+                        <field name="product_id" readonly="1"/>
+                        <field name="qte_devis" readonly="1"/>
+                        <field name="en_stock" readonly="1"/>
+                        <field name="en_commande" readonly="1"/>
+                        <field name="manque" readonly="1"/>
+                        <field name="a_commander"/>
+                        <field name="fournisseur_id" options="{'no_create': True}"/>
+                        <field name="ref_fournisseur" optional="hide"/>
+                        <field name="prix"/>
+                        <field name="delai" optional="show"/>
+                        <field name="montant" sum="Total"/>
+                    </list>
+                </field>
+                <p class="text-muted small mt-2 mb-0">Une demande de prix brouillon par fournisseur, reliée au devis. Rien ne part avant que vous la confirmiez. Le disponible tient compte de ce que d'autres commandes attendent déjà.</p>
+                <footer>
+                    <button name="action_commander" type="object" string="Créer les demandes de prix" class="btn-primary"/>
+                    <button string="Fermer" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

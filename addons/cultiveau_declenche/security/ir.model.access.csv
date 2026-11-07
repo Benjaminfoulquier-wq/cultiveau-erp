@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_appro_user,cultiveau.approvisionnement utilisateur,model_cultiveau_approvisionnement,base.group_user,1,1,1,1
+access_appro_ligne_user,cultiveau.approvisionnement.ligne utilisateur,model_cultiveau_approvisionnement_ligne,base.group_user,1,1,1,1

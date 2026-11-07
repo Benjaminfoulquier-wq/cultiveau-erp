@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_declenche" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau.declenche</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="cultiveau_ventes.view_order_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_approvisionnement" type="object" string="Approvisionnement" invisible="not order_line or state == 'cancel'"/>
+                <button name="action_declencher" type="object" string="Relancer les déclenchements" invisible="state not in ('sale', 'done')"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_achats" type="object" class="oe_stat_button" icon="fa-shopping-cart" invisible="not cultiveau_nb_achats">
+                    <field name="cultiveau_nb_achats" widget="statinfo" string="Achats"/>
+                </button>
+            </xpath>
+            <xpath expr="//page[@name='lots_cultiveau']" position="after">
+                <page string="Après la signature" name="declenche_cultiveau">
+                    <field name="cultiveau_nb_manquants" invisible="1"/>
+                    <field name="cultiveau_declenche_le" invisible="1"/>
+                    <field name="cultiveau_mise_en_service_id" invisible="1"/>
+                    <field name="cultiveau_declenchements" nolabel="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
