@@ -2,7 +2,7 @@
 from odoo import api, models
 
 ICONES = {"project_todo.menu_todo_todos": "todo", "spreadsheet_dashboard.spreadsheet_dashboard_menu_root": "tableaux", "survey.menu_surveys": "sondages",
-          "hr.menu_hr_root": "employes", "fleet.menu_root": "flotte", "hr_holidays.menu_hr_holidays_root": "conges", "hr_expense.menu_hr_expense_root": "depenses"}
+          "hr.menu_hr_root": "employes", "fleet.menu_root": "flotte", "hr_holidays.menu_hr_holidays_root": "conges", "hr_expense.menu_hr_expense_root": "depenses", "utm.menu_link_tracker_root": "marketing", "base.menu_tests": "parametres"}
 
 
 class Menu(models.Model):
