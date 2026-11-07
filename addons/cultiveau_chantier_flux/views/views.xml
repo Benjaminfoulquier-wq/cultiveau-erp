@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_chantier_form_flux" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.form.flux</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="inherit_id" ref="cultiveau_jalons.view_chantier_form_jalons"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phase_ids']/list/field[@name='jalon_pct']" position="before">
+                <button name="action_demarrer_phase" type="object" string="Démarrer" icon="fa-play" invisible="etat != 'a_faire'" title="Démarrer la phase : son matériel sort du stock"/>
+                <button name="action_terminer_phase" type="object" string="Terminer" icon="fa-check" invisible="etat != 'en_cours'" title="Terminer la phase : posé rempli, jalon facturé"/>
+                <field name="picking_id" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
