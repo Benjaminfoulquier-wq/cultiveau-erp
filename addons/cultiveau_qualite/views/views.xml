@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_qualite_form" model="ir.ui.view">
+        <field name="name">cultiveau.qualite.form</field>
+        <field name="model">cultiveau.qualite</field>
+        <field name="arch" type="xml">
+            <form create="0" edit="1">
+                <sheet>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1>Qualité des données</h1>
+                        <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                    </div>
+                    <field name="score" invisible="1"/><field name="nb_points" invisible="1"/>
+                    <field name="html" nolabel="1" widget="cultiveau_qualite_html"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_qualite" model="ir.actions.server">
+        <field name="name">Qualité des données</field>
+        <field name="model_id" ref="model_cultiveau_qualite"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_ouvrir()</field>
+    </record>
+    <menuitem id="menu_qualite" name="Qualité des données" parent="cultiveau_base.menu_cultiveau_root" action="action_qualite" sequence="37"/>
+</odoo>

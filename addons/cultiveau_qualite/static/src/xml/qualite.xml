@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_qualite.QualiteHtmlField">
+        <div class="o_field_cultiveau_qualite_html" t-ref="root" t-out="html"/>
+    </t>
+</templates>
