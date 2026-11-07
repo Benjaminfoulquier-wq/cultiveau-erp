@@ -50,7 +50,7 @@ class Produit(models.Model):
 
     # ---------------------------------------------------------------- la lecture
     @api.model
-    def _logistique_page(self, page, depuis=None, taille=500):
+    def _logistique_page(self, page, depuis=None, taille=500, ids=None):
         P = self.env["ir.config_parameter"].sudo()
         url = (P.get_param("cultiveau.logistique_url") or "https://logistique.cultiveau.fr").rstrip("/")
         secret = (P.get_param("cultiveau.logistique_secret") or "").strip()
@@ -59,6 +59,8 @@ class Produit(models.Model):
         params = {"page": page, "taille": taille}
         if depuis:
             params["depuis"] = depuis
+        if ids:
+            params["ids"] = ",".join(str(i) for i in ids)
         r = requests.get(f"{url}/api/erp/produits", params=params, headers={"X-Erp-Secret": secret}, timeout=60)
         if r.status_code == 401:
             raise UserError("La logistique refuse le secret partagé.")
@@ -119,18 +121,30 @@ class Produit(models.Model):
         depuis = None if tout else P.get_param("cultiveau.logistique_depuis")
         copie = (P.get_param("cultiveau.logistique_copie") or "False") not in ("False", "0", "")
         debut = fields.Datetime.now()
-        page, bilan = 1, {"crees": 0, "maj": 0, "archives": 0, "fiches": 0, "photos": 0}
-        while True:
-            data = self._logistique_page(page, depuis)
-            produits = data.get("produits") or []
-            if not produits:
-                break
-            self._logistique_appliquer(produits, bilan, creer=copie or tout)
-            if not config["test_enable"]:
-                self.env.cr.commit()  # chaque page est acquise : une coupure ne perd pas tout
-            if page * data.get("taille", 500) >= data.get("total", 0):
-                break
-            page += 1
+        bilan = {"crees": 0, "maj": 0, "archives": 0, "fiches": 0, "photos": 0}
+        if copie or tout:
+            # tout le catalogue, page par page
+            page = 1
+            while True:
+                data = self._logistique_page(page, depuis)
+                produits = data.get("produits") or []
+                if not produits:
+                    break
+                self._logistique_appliquer(produits, bilan, creer=True)
+                self._logistique_acquis()
+                if page * data.get("taille", 500) >= data.get("total", 0):
+                    break
+                page += 1
+        else:
+            # seulement ce que l'ERP connaît déjà, par paquets : on ne parcourt jamais les 35 000 produits
+            connus = self.sudo().with_context(active_test=False).search([("cultiveau_logistique_id", "!=", 0)]).mapped("cultiveau_logistique_id")
+            for i in range(0, len(connus), 200):
+                paquet = connus[i:i + 200]
+                data = self._logistique_page(1, depuis, taille=len(paquet), ids=paquet)
+                produits = data.get("produits") or []
+                if produits:
+                    self._logistique_appliquer(produits, bilan, creer=False)
+                self._logistique_acquis()
         P.set_param("cultiveau.logistique_depuis", fields.Datetime.to_string(debut))
         texte = f"{fields.Datetime.context_timestamp(self, fields.Datetime.now()):%d/%m %H:%M} : {bilan['crees']} créé(s), {bilan['maj']} mis à jour, {bilan['archives']} archivé(s), {bilan['fiches']} fiche(s), {bilan['photos']} photo(s)."
         if not (copie or tout):
@@ -138,6 +152,13 @@ class Produit(models.Model):
         P.set_param("cultiveau.logistique_bilan", texte)
         _logger.info("Logistique → ERP : %s", texte)
         return texte
+
+    @api.model
+    def _logistique_acquis(self):
+        """Une page traitée est acquise (une coupure ne perd pas tout) et la mémoire est rendue."""
+        if not config["test_enable"]:
+            self.env.cr.commit()
+            self.env.invalidate_all()
 
     @api.model
     def _logistique_appliquer(self, produits, bilan, creer=True):

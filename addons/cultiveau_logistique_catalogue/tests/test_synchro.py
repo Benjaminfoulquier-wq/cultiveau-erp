@@ -23,7 +23,7 @@ class TestSynchroLogistique(TransactionCase):
 
     def test_synchro(self):
         P = self.env["product.template"]
-        with patch.object(type(P), "_logistique_page", lambda self, page, depuis=None, taille=500: PAGE if page == 1 else {"total": 3, "page": page, "taille": 500, "produits": []}), \
+        with patch.object(type(P), "_logistique_page", lambda self, page, depuis=None, taille=500, ids=None: PAGE if page == 1 else {"total": 3, "page": page, "taille": 500, "produits": []}), \
              patch.object(type(P), "_logistique_telecharger", lambda self, url: b"\x89PNG\r\n\x1a\n" + b"\x00" * 10 if url.endswith(".jpg") else None):
             bilan = P.cultiveau_synchro_logistique(tout=True)
         self.assertIn("2 créé(s)", bilan)
@@ -48,7 +48,7 @@ class TestSynchroLogistique(TransactionCase):
         self.assertFalse(P.with_context(active_test=False).search([("default_code", "=", "VIEUX-1")]))  # retiré et inconnu : pas créé
         # deuxième passage : mise à jour, et un produit retiré s'archive
         PAGE2 = {"total": 1, "page": 1, "taille": 500, "produits": [dict(PAGE["produits"][0], actif=False, nom="Gaine D5000 retirée")]}
-        with patch.object(type(P), "_logistique_page", lambda self, page, depuis=None, taille=500: PAGE2 if page == 1 else {"total": 1, "page": page, "taille": 500, "produits": []}), \
+        with patch.object(type(P), "_logistique_page", lambda self, page, depuis=None, taille=500, ids=None: PAGE2 if page == 1 else {"total": 1, "page": page, "taille": 500, "produits": []}), \
              patch.object(type(P), "_logistique_telecharger", lambda self, url: None):
             bilan2 = P.cultiveau_synchro_logistique()
         self.assertIn("1 archivé(s)", bilan2)
@@ -86,12 +86,19 @@ class TestSynchroLogistique(TransactionCase):
     def test_le_robot_ne_copie_pas_tout_sans_le_demander(self):
         P = self.env["product.template"]
         self.env["ir.config_parameter"].sudo().set_param("cultiveau.logistique_copie", "False")
-        with patch.object(type(P), "_logistique_page", lambda self, page, depuis=None, taille=500: PAGE if page == 1 else {"total": 3, "page": page, "taille": 500, "produits": []}), \
-             patch.object(type(P), "_logistique_telecharger", lambda self, url: None):
+        demandes = []
+
+        def page(self_, page, depuis=None, taille=500, ids=None):
+            demandes.append(ids)
+            produits = [p for p in PAGE["produits"] if not ids or p["id"] in ids]
+            return {"total": len(produits), "page": page, "taille": taille, "produits": produits}
+        with patch.object(type(P), "_logistique_page", page), patch.object(type(P), "_logistique_telecharger", lambda self, url: None):
             bilan = P.cultiveau_synchro_logistique(tout=False)
+            self.assertEqual(demandes, [])  # rien de connu : la logistique n'est même pas appelée
             self.assertIn("à la volée", bilan)
             self.assertFalse(P.search([("cultiveau_source", "=", "logistique")]))
             # un article déjà utilisé, lui, est rafraîchi
             connu = P.create({"name": "Gaine D5000", "default_code": "RIV-D5000-16", "cultiveau_logistique_id": 101, "cultiveau_source": "logistique", "standard_price": 0.05})
             P.cultiveau_synchro_logistique(tout=False)
+            self.assertEqual(demandes[-1], [101])  # demandé par identifiant, pas tout le catalogue
             self.assertEqual(connu.standard_price, 0.12)
