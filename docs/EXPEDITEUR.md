@@ -5,8 +5,10 @@ conversations) part de notification@cultiveau.fr au nom de l'adhérent, ou de la
 le fil de la fiche, qui est la base de tout.
 
 - **Réglages › Cultiveau › L'expéditeur des courriels**, par société :
-  - *Par le réseau* (défaut) : `De : Durand Irrigation <notification@cultiveau.fr>`, `Répondre à : Durand Irrigation <contact@durand.fr>`
-    (l'e-mail de la société ; s'il manque, l'aperçu le dit). Rien à configurer chez l'adhérent ; le serveur SMTP du réseau envoie.
+  - *Par le réseau* (défaut) : `De : Durand Irrigation <notification@cultiveau.fr>`, et l'adresse de réponse choisie toute seule, dans
+    l'ordre : la boîte partagée branchée de la société, sinon l'e-mail de la société, sinon l'e-mail de la personne qui envoie
+    (le commercial qui a fait le devis), sinon celui du gérant. La réponse du client revient donc toujours dans une vraie boîte de
+    l'adhérent ; si cette boîte est branchée dans Courriels, la réponse se range sur la fiche. Le serveur SMTP du réseau envoie.
   - *Par sa boîte* : la boîte partagée branchée dans Courriels › Boîtes mail (Gmail, Outlook ou SMTP) ; `De : Durand Irrigation
     <devis@durand.fr>` par son propre serveur d'envoi ; les envois sont dans ses « Envoyés ». Boîte pas connectée : le réseau prend le relais.
   - L'adresse du réseau est un paramètre (`cultiveau.expediteur_reseau`), visible de l'équipe Cultiveau.

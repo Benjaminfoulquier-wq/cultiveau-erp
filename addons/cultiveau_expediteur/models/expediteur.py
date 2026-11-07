@@ -1,11 +1,9 @@
 """L'expéditeur des courriels : notification@cultiveau.fr au nom de l'adhérent, ou la boîte de l'adhérent ; et chaque envoi écrit
 dans le fil de la fiche."""
-from email.utils import formataddr
-
 from markupsafe import Markup, escape
 
 from odoo import api, fields, models
-from odoo.tools import email_normalize
+from odoo.tools import formataddr
 
 ADRESSE_RESEAU_DEFAUT = "notification@cultiveau.fr"
 MODES = [("reseau", "Par le réseau : notification@cultiveau.fr, au nom de l'adhérent, réponses à son adresse"), ("boite", "Par la boîte de l'adhérent (Courriels › Boîtes mail)")]
@@ -29,16 +27,36 @@ class Societe(models.Model):
                 b = c.cultiveau_boite_envoi_id
                 c.cultiveau_expediteur_apercu = f"{c.name} <{b.adresse}>" + ("" if b.etat == "connectee" and b.mail_server_id else " (boîte pas encore connectée : le réseau prend le relais)")
             else:
-                c.cultiveau_expediteur_apercu = f"{c.name} <{c._cultiveau_adresse_reseau()}>" + (f", réponses à {c.email}" if c.email else ", sans adresse de réponse : renseignez l'e-mail de la société")
+                reponse = c.cultiveau_adresse_reponse()
+                c.cultiveau_expediteur_apercu = f"{c.name} <{c._cultiveau_adresse_reseau()}>" + (f", réponses à {reponse[1]}" if reponse else ", réponses à la personne qui envoie (renseignez l'e-mail de la société pour une adresse unique)")
 
-    def cultiveau_expediteur(self):
+    def cultiveau_adresse_reponse(self, auteur=None):
+        """Où revient la réponse du client, sans rien régler : la boîte partagée branchée, sinon l'e-mail de la société, sinon celui de la
+        personne qui envoie, sinon celui du gérant. (nom, adresse) ou None."""
+        self.ensure_one()
+        boite = self.cultiveau_boite_envoi_id if self.cultiveau_boite_envoi_id and self.cultiveau_boite_envoi_id.etat == "connectee" else \
+            self.env["cultiveau.boite"].sudo().search([("company_id", "=", self.id), ("partagee", "=", True), ("etat", "=", "connectee")], order="id", limit=1)
+        if boite and boite.adresse:
+            return self.name or "", boite.adresse
+        if self.email:
+            return self.name or "", self.email
+        if auteur is not None and auteur.email and auteur.email.strip().lower() != self._cultiveau_adresse_reseau().lower():
+            return auteur.name or self.name or "", auteur.email
+        gerants = self.env["cultiveau.equipe"].sudo().gerants(self) if "cultiveau.equipe" in self.env else self.env["res.users"]
+        g = gerants.filtered("email")[:1]
+        if g:
+            return f"{self.name} ({g.name})" if self.name else g.name, g.email
+        return None
+
+    def cultiveau_expediteur(self, auteur=None):
         """(email_from, reply_to, mail_server) pour un courriel de cette société."""
         self.ensure_one()
         nom = self.name or ""
         if self.cultiveau_envoi == "boite" and self.cultiveau_boite_envoi_id and self.cultiveau_boite_envoi_id.mail_server_id and self.cultiveau_boite_envoi_id.etat == "connectee":
             b = self.cultiveau_boite_envoi_id
             return formataddr((nom, b.adresse)), False, b.mail_server_id
-        return formataddr((nom, self._cultiveau_adresse_reseau())), (formataddr((nom, self.email)) if self.email else False), False
+        reponse = self.cultiveau_adresse_reponse(auteur)
+        return formataddr((nom, self._cultiveau_adresse_reseau())), (formataddr(reponse) if reponse else False), False
 
 
 class Reglages(models.TransientModel):
@@ -77,7 +95,8 @@ class Mail(models.Model):
             if vals.get("cultiveau_expediteur_pose") or self.env.context.get("cultiveau_expediteur_brut"):
                 continue
             societe = self._cultiveau_societe(vals)
-            email_from, reply_to, serveur = societe.cultiveau_expediteur()
+            auteur = self.env["res.partner"].sudo().browse(int(vals["author_id"])).exists() if vals.get("author_id") else self.env.user.partner_id
+            email_from, reply_to, serveur = societe.cultiveau_expediteur(auteur)
             vals["email_from"] = email_from
             if reply_to and not vals.get("reply_to"):
                 vals["reply_to"] = reply_to
