@@ -1,1 +1,1 @@
-from . import ecran
+from . import ecran, entree
