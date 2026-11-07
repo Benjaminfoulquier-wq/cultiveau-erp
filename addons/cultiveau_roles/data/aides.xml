@@ -74,5 +74,11 @@
             <field name="resume">Un rôle règle les droits d'un coup : gérant, administratif, technicien, magasinier, commercial.</field>
             <field name="texte"><![CDATA[<ul><li>Choisissez le rôle Cultiveau : les applications et les droits suivent. « Réglage à la main » ne touche à rien.</li><li>Un technicien voit ses interventions, le stock et ses notes de frais ; un administratif facture et achète ; le gérant valide tout.</li><li>Depuis Employés, « Lui donner un accès » crée l'utilisateur et envoie l'invitation.</li></ul>]]></field>
         </record>
+        <record id="aide_gestes" model="cultiveau.aide">
+            <field name="name">Les gestes qui font gagner du temps</field><field name="sequence">99</field><field name="action_xmlid">cultiveau_roles.gestes</field>
+            <field name="resume">Pas d'aide propre à cet écran ; voici les gestes d'Odoo qui servent partout.</field>
+            <field name="texte"><![CDATA[<ul><li><b>Ctrl + K</b> (Cmd + K) : la palette de commandes ; tapez un écran, un client, une action.</li><li><b>Alt</b> maintenu montre les raccourcis de l'écran (Alt + C créer, Alt + S enregistrer).</li><li><b>Vue liste</b> : cochez plusieurs lignes et changez un champ, Odoo l'applique à toutes ; Action › exporter, archiver, fusionner.</li><li><b>Regrouper, filtrer, Favoris › Enregistrer</b> (par défaut, partagé) : vos recherches reviennent.</li><li><b>Dates</b> : <code>+7</code> pour dans sept jours, <code>+2m</code> pour deux mois.</li><li><b>Activités</b> : l'horloge en haut, « Planifier une activité » sur toute fiche ; marquer fait trace l'effort.</li><li><b>Mathis</b> répond en français et agit après votre accord ; sur la map, <b>/</b> cherche, <b>T</b> visite, <b>H</b> vue d'ensemble.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/GESTES.md</field>
+        </record>
     </data>
 </odoo>

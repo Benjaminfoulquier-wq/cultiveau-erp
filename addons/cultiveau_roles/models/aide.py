@@ -25,6 +25,8 @@ class Aide(models.Model):
         if not aide and res_model:
             aide = self.search([("res_model", "=", res_model), ("action_xmlid", "=", False)], limit=1) or self.search([("res_model", "=", res_model)], limit=1)
         if not aide:
+            aide = self.search([("action_xmlid", "=", "cultiveau_roles.gestes")], limit=1)
+        if not aide:
             return False
         return {"id": aide.id, "nom": aide.name, "resume": aide.resume, "texte": aide.texte or "", "doc": aide.doc or "",
                 "editable": self.env.user.has_group("cultiveau_base.group_equipe")}

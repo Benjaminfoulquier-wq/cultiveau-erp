@@ -48,4 +48,5 @@ class TestRoles(TransactionCase):
         b = A.pour("sale.action_quotations_with_onboarding", "sale.order")
         self.assertEqual(b["nom"], "Devis")
         self.assertIn("nomenclature", b["texte"].lower())
-        self.assertFalse(A.pour("x.y", "modele.inconnu"))
+        g = A.pour("x.y", "modele.inconnu")
+        self.assertEqual(g["nom"], "Les gestes qui font gagner du temps")  # le repli : les gestes d'Odoo

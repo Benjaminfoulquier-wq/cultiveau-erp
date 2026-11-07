@@ -43,7 +43,7 @@ export class AideSystray extends Component {
             const { xmlid, modele, nom } = this.courant;
             const aide = await this.orm.call("cultiveau.aide", "pour", [xmlid, modele]);
             if (!aide) {
-                this.notification.add(nom ? `Pas encore d'aide pour « ${nom} ». Le menu Cultiveau regroupe tout ; Mathis (icône à côté) répond à vos questions.` : "Pas d'aide pour cet écran.", { type: "info" });
+                this.notification.add("Pas d'aide pour cet écran.", { type: "info" });
                 return;
             }
             this.dialog.add(AideDialog, { aide });
