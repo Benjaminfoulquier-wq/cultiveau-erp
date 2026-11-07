@@ -1,9 +1,19 @@
-// Les couleurs du logo Cultiveau : bleu-vert sombre (barre de menu, titres) et cyan (actions, liens).
-$o-community-color: #183840;
-$o-brand-odoo: #183840;
-$o-brand-primary: #0b8aa3;
-$o-action: #0b8aa3;
+// L'identité de cultiveau.fr dans l'ERP : ses polices (Plus Jakarta Sans pour les titres, Inter pour le texte), ses couleurs
+// (bleu nuit, cyan, fond chaud), ses arrondis. Le logiciel en dessous ne doit plus se voir.
+$o-system-fonts: ("Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji");
+$o-font-family-sans-serif: o-add-unicode-support-font($o-system-fonts);
+$o-headings-font-family: o-add-unicode-support-font(("Plus Jakarta Sans", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif));
+$o-font-size-base: o-to-rem(14px);
+$o-border-radius: o-to-rem(10px);
+$o-border-radius-sm: o-to-rem(8px);
+$o-border-radius-lg: o-to-rem(14px);
+// bleu nuit du site (barre, titres), cyan des actions et liens, gris bleuté secondaire
+$o-community-color: #15283a;
+$o-brand-odoo: #15283a;
+$o-brand-primary: #1d9fbd;
+$o-action: #1d9fbd;
 $o-brand-secondary: #5d6b78;
-$o-main-link-color: #0b8aa3;
-// La palette des pages publiques (connexion, portail) part de cette couleur « éditeur » : on la remplace aussi.
-$o-enterprise-color: #0b8aa3;
+$o-main-link-color: #1d9fbd;
+$o-enterprise-color: #1d9fbd;
+$o-webclient-background-color: #f5f3ee;
+$o-navbar-height: 50px;

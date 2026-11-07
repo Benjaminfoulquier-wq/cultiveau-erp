@@ -7,13 +7,17 @@
         </xpath>
         <xpath expr="//link[@rel='shortcut icon']" position="replace">
             <link type="image/png" rel="shortcut icon" href="/cultiveau_marque/static/src/img/favicon.png"/>
+            <!-- les polices de cultiveau.fr : Plus Jakarta Sans pour les titres, Inter pour le texte -->
+            <link rel="preconnect" href="https://fonts.googleapis.com"/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap"/>
         </xpath>
     </template>
 
     <!-- La couleur de la barre du navigateur (mobile, application installée) : le bleu-vert Cultiveau, pas le violet. -->
     <template id="webclient_bootstrap_cultiveau" inherit_id="web.webclient_bootstrap" name="Cultiveau : couleur du navigateur">
         <xpath expr="//meta[@name='theme-color']" position="attributes">
-            <attribute name="content">#183840</attribute>
+            <attribute name="content">#15283a</attribute>
         </xpath>
     </template>
 

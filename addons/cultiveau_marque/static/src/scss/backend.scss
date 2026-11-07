@@ -1,17 +1,60 @@
-// La barre de menu et l'écran de chargement aux couleurs Cultiveau.
+// L'ERP habillé comme cultiveau.fr : bleu nuit, cyan, fond chaud, cartes arrondies, Plus Jakarta Sans pour ce qui se lit en grand.
+$cv-nuit: #15283a;
+$cv-nuit-2: #1b2f4a;
+$cv-cyan: #1d9fbd;
+$cv-cyan-clair: #35c9e8;
+$cv-turquoise: #22d3c5;
+$cv-fond: #f5f3ee;
+$cv-carte: #ffffff;
+$cv-bord: #e3e6ea;
+$cv-texte: #182838;
+
+body, .o_web_client { font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: $cv-texte; }
+h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5, .o_form_view .oe_title h1, .o_kanban_record .o_kanban_record_title, .o_control_panel .o_breadcrumb .active,
+.o_statusbar_status, .o_view_nocontent_smiling_face, .display-6, .lead, .o_cv_fiche_nom, .o_cv_kpi b { font-family: "Plus Jakarta Sans", "Inter", -apple-system, sans-serif; letter-spacing: -0.01em; }
+
+// la barre : dégradé bleu nuit, le nom de l'application en Jakarta, l'accent cyan au survol
 .o_main_navbar {
-    background-color: #183840;
-    border-bottom-color: #0b8aa3;
+    background: linear-gradient(90deg, $cv-nuit 0%, $cv-nuit-2 100%);
+    border-bottom: 2px solid $cv-cyan;
+    .o_menu_brand, .o_navbar_apps_menu .dropdown-toggle { color: #fff; font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+    .o_menu_sections .dropdown-toggle, .o_menu_sections > a, .o_menu_sections .o_nav_entry { color: rgba(255, 255, 255, 0.86); border-radius: 8px; }
+    .o_menu_sections .dropdown-toggle:hover, .o_menu_sections > a:hover, .o_menu_sections .o_nav_entry:hover, .o_menu_sections .dropdown-toggle.show { background: rgba(255, 255, 255, 0.10); color: #fff; }
+    .o_menu_systray .dropdown-toggle, .o_menu_systray a, .o_menu_systray .fa { color: rgba(255, 255, 255, 0.88); }
+    .o_menu_systray .o_mail_navbar_dropdown .o_notification_counter, .o_menu_systray .badge { background: $cv-cyan-clair; color: $cv-nuit; }
 }
-.o_main_navbar .o_menu_brand, .o_main_navbar .o_navbar_apps_menu .dropdown-toggle {
-    color: #ffffff;
-}
-// Les illustrations des listes vides, redessinées aux couleurs Cultiveau (l'éditeur les dessine en violet).
+// le fond chaud du site, les cartes blanches arrondies qui flottent légèrement
+.o_action_manager, .o_content { background-color: $cv-fond; }
+.o_form_view .o_form_sheet_bg { background: $cv-fond; }
+.o_form_view .o_form_sheet { border: 1px solid $cv-bord; border-radius: 16px; box-shadow: 0 10px 30px rgba(21, 40, 58, 0.06); }
+.o_control_panel { background: $cv-fond; border-bottom: 1px solid $cv-bord; }
+.o_kanban_view .o_kanban_record { border-radius: 14px; border: 1px solid $cv-bord; box-shadow: 0 4px 14px rgba(21, 40, 58, 0.05); }
+.o_kanban_view .o_kanban_record:hover { box-shadow: 0 10px 26px rgba(21, 40, 58, 0.10); }
+.o_list_view .o_list_renderer { border-radius: 14px; overflow: hidden; border: 1px solid $cv-bord; background: $cv-carte; }
+.o_list_view .table thead th { background: #eef2f5; color: $cv-texte; font-weight: 600; text-transform: none; letter-spacing: 0; }
+.o_notebook .nav-tabs .nav-link { border-radius: 10px 10px 0 0; font-weight: 600; }
+.o_notebook .nav-tabs .nav-link.active { color: $cv-cyan; border-bottom-color: $cv-cyan; }
+// boutons : arrondis, le principal en cyan foncé, le texte en blanc lisible
+.btn { border-radius: 10px; font-weight: 600; }
+.btn-primary { background: $cv-cyan; border-color: $cv-cyan; color: #fff; &:hover, &:focus { background: darken($cv-cyan, 7%); border-color: darken($cv-cyan, 7%); } }
+.btn-secondary { background: #fff; border-color: $cv-bord; color: $cv-texte; &:hover { background: #eef2f5; } }
+.o_statusbar_status .o_arrow_button.o_arrow_button_current { background: $cv-cyan; color: #fff; }
+.o_statusbar_status .o_arrow_button.o_arrow_button_current:before, .o_statusbar_status .o_arrow_button.o_arrow_button_current:after { border-left-color: $cv-cyan; }
+.o_stat_button .o_stat_value, .o_stat_button .o_button_icon { color: $cv-cyan; }
+.badge.text-bg-primary, .o_tag.o_tag_color_0 { background: $cv-cyan !important; }
+a, .o_form_view .o_field_widget a { color: $cv-cyan; }
+// le menu des applications : le bleu nuit du site, les icônes en cartes
+.o_navbar_apps_menu .dropdown-menu, .o_home_menu { background: $cv-nuit; }
+.o_navbar_apps_menu .dropdown-item { color: #fff; border-radius: 10px; }
+.o_navbar_apps_menu .dropdown-item:hover { background: rgba(255, 255, 255, 0.10); }
+// dialogues et notifications
+.modal-content { border-radius: 16px; border: 0; box-shadow: 0 24px 60px rgba(21, 40, 58, 0.25); }
+.modal-header { border-bottom-color: $cv-bord; .modal-title { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; } }
+.o_notification { border-radius: 12px; }
+// les illustrations des listes vides, redessinées aux couleurs Cultiveau
 .o_nocontent_help {
-    .o_view_nocontent_smiling_face:before {
-        background-image: url(/cultiveau_marque/static/src/img/smiling_face.svg);
-    }
-    .o_view_nocontent_neutral_face:before {
-        background-image: url(/cultiveau_marque/static/src/img/neutral_face.svg);
-    }
+    .o_view_nocontent_smiling_face:before { background-image: url(/cultiveau_marque/static/src/img/smiling_face.svg); }
+    .o_view_nocontent_neutral_face:before { background-image: url(/cultiveau_marque/static/src/img/neutral_face.svg); }
 }
+// barre de défilement discrète
+::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-thumb { background: #c7ced6; border-radius: 10px; border: 2px solid $cv-fond; }

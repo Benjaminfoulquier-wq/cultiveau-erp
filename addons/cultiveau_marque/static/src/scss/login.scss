@@ -1,0 +1,18 @@
+// La page de connexion comme cultiveau.fr : bleu nuit, le logo, une carte blanche arrondie.
+body.o_web_client_login, body:has(.oe_login_form) {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: radial-gradient(1200px 600px at 10% -10%, #1b2f4a 0%, #15283a 55%, #0f172a 100%) !important;
+    min-height: 100vh;
+}
+.oe_login_form, .o_database_list, .oe_reset_password_form, .oe_signup_form {
+    background: #fff; border-radius: 18px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35); padding: 28px 28px 22px !important;
+    .btn-primary { background: #1d9fbd; border-color: #1d9fbd; border-radius: 10px; font-weight: 700; padding: 10px; }
+    .btn-primary:hover { background: #17849e; border-color: #17849e; }
+    .form-control { border-radius: 10px; border-color: #e3e6ea; padding: 10px 12px; }
+    label, .form-label { font-weight: 600; color: #182838; }
+    a { color: #1d9fbd; }
+}
+.o_login_auth, .oe_login_buttons { font-size: 14px; }
+.card.border-0.mx-auto, .o_login_card { background: transparent; box-shadow: none; }
+img.img-fluid.d-block.mx-auto { max-height: 64px; margin-bottom: 18px; }
+.o_login_footer, .oe_login_form + div, .text-center.small.mt-4 { color: rgba(255, 255, 255, 0.75) !important; a { color: #35c9e8 !important; } }
