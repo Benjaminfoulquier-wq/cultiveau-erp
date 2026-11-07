@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_acompte_ligne" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.acompte.ligne</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_documents.res_config_settings_view_form_documents"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_documents']/setting[1]" position="after">
+                <setting string="Acompte payé en ligne" help="À la signature en ligne, le client règle l'acompte dans la foulée : virement avec RIB et QR code, ou carte (Stripe, Mollie) si vous l'activez avec vos clés. La commande se confirme à la réception.">
+                    <div class="mt8"><field name="cultiveau_acompte_en_ligne"/><label for="cultiveau_acompte_en_ligne"/></div>
+                    <div class="mt8 text-muted">Moyens actifs : <field name="cultiveau_fournisseurs_actifs" class="oe_inline"/><field name="cultiveau_virement_actif" invisible="1"/></div>
+                    <div class="mt8">
+                        <button name="action_activer_virement" type="object" string="Activer le virement bancaire" class="btn-link" icon="fa-university" invisible="cultiveau_virement_actif"/>
+                        <button name="action_fournisseurs_paiement" type="object" string="Fournisseurs de paiement (Stripe, Mollie…)" class="btn-link" icon="fa-credit-card"/>
+                    </div>
+                    <div class="mt4 text-muted small">Le virement demande un compte bancaire sur la société (Réglages › Sociétés › Comptes bancaires).</div>
+                </setting>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_form_acompte_ligne" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau.acompte.ligne</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="cultiveau_documents.view_order_form_documents"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cultiveau_acompte_pct']" position="after">
+                <field name="cultiveau_acompte_en_ligne_texte" invisible="not cultiveau_acompte_en_ligne_texte" nolabel="1" colspan="2" class="text-muted"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
