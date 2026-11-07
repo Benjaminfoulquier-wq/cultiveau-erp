@@ -175,7 +175,7 @@ class Users(models.Model):
             r = requests.get(url, timeout=20)
             if r.status_code != 200 or not r.content or len(r.content) > 5_000_000 or not (r.headers.get("Content-Type") or "").startswith("image/"):
                 return False
-            company.sudo().write({"logo": base64.b64encode(r.content), "cultiveau_site_logo_url": url})
+            company.sudo().write({"logo": base64.b64encode(r.content), "cultiveau_site_logo_url": url})  # un logo choisi : la règle du logo Cultiveau ne le touche plus
             _logger.info("cultiveau.fr : logo de %s repris dans l'ERP", company.name)
             return True
         except Exception as e:  # noqa: BLE001 — image illisible, site injoignable : le logo attend, l'entrée ne bloque pas

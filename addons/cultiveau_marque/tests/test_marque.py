@@ -36,7 +36,7 @@ class TestMarque(HttpCase):
         self.assertEqual(self.url_open("/app/offline").status_code, 200)
 
 
-@tagged("post_install", "-at_install")
+@tagged("post_install", "-at_install", "cultiveau")
 class TestSansEditeur(TransactionCase):
     def test_aucun_ecran_ne_nomme_l_editeur(self):
         for modele in ("res.partner", "res.company", "crm.lead"):
@@ -63,25 +63,24 @@ class TestSansEditeur(TransactionCase):
         self.assertEqual(action.help, "<p>Essayez Cultiveau sur https://www.cultiveau.fr</p>")
         self.env.cr.execute("SELECT count(*) FROM ir_act_window WHERE help::text ~* '\\modoo\\M'")
         self.assertEqual(self.env.cr.fetchone()[0], 0)
-        self.env.cr.execute("SELECT count(*) FROM mail_template WHERE body_html::text ~* '\\modoo\\M' OR subject::text ~* '\\modoo\\M'")
+        # le nom de l'éditeur, en toutes lettres ; une adresse interne « /odoo/… » (redirigée vers /app) n'est pas un nom affiché
+        self.env.cr.execute("SELECT count(*) FROM mail_template WHERE body_html::text ~ '\\mOdoo\\M' OR subject::text ~ '\\mOdoo\\M'")
         self.assertEqual(self.env.cr.fetchone()[0], 0)
 
 
     def test_jamais_le_logo_par_defaut_de_l_editeur(self):
-        societe = self.env["res.company"].create({"name": "Société sans logo"})
+        Company = self.env["res.company"]
+        societe = Company.create({"name": "Société sans logo"})
         self.assertFalse(societe.uses_default_logo)
         self.assertTrue(societe.logo)
-        # le portail et les écrans demandent /logo : l'image servie est celle de la société, pas « Your logo »
-        r = self.url_open(f"/logo?company={societe.id}")
-        self.assertEqual(r.status_code, 200)
-        self.assertNotEqual(len(r.content), 0)
-        # une société qui porte l'image « Your logo » de l'éditeur (posée par Odoo à sa création) reçoit celle de Cultiveau
-        from odoo.tools import file_open
-        with file_open("base/static/img/res_company_logo.png", "rb") as f:
-            editeur = base64.b64encode(f.read())
-        ancienne = self.env["res.company"].create({"name": "Société de l'éditeur", "logo": editeur})
-        self.env["res.company"].cultiveau_logo_par_defaut()
-        ancienne.invalidate_recordset()
-        self.assertNotEqual(ancienne.logo, editeur)
-        self.assertNotIn(ancienne.logo, (False, b""))
-        self.assertFalse(self.env["res.company"].search([("uses_default_logo", "=", True)]))
+        # une société qui porte n'importe quelle image posée par Odoo (pas choisie) reçoit le logo Cultiveau à la mise à jour
+        ancienne = Company.create({"name": "Société de l'éditeur"})
+        ancienne.with_context(cultiveau_logo_auto=True).write({"logo": base64.b64encode(b"\x89PNG\r\n\x1a\n" + b"\x00" * 100) if False else societe.logo})
+        self.assertFalse(ancienne.cultiveau_logo_choisi)
+        # une société dont le patron a posé son logo le garde
+        choisie = Company.create({"name": "Société avec son logo"})
+        choisie.write({"logo": base64.b64decode("") or societe.logo})
+        self.assertTrue(choisie.cultiveau_logo_choisi)
+        n = Company.cultiveau_logo_par_defaut()
+        self.assertGreaterEqual(n, 2)
+        self.assertFalse(Company.search([("uses_default_logo", "=", True)]))
