@@ -43,10 +43,9 @@ h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5, .o_form_view .oe_title h1, .o_kanba
 .o_stat_button .o_stat_value, .o_stat_button .o_button_icon { color: $cv-cyan; }
 .badge.text-bg-primary, .o_tag.o_tag_color_0 { background: $cv-cyan !important; }
 a, .o_form_view .o_field_widget a { color: $cv-cyan; }
-// le menu des applications : le bleu nuit du site, les icônes en cartes
-.o_navbar_apps_menu .dropdown-menu, .o_home_menu { background: $cv-nuit; }
-.o_navbar_apps_menu .dropdown-item { color: #fff; border-radius: 10px; }
-.o_navbar_apps_menu .dropdown-item:hover { background: rgba(255, 255, 255, 0.10); }
+// le menu des applications : lisible, arrondi, l'application active en cyan
+.o-dropdown--menu .dropdown-item { border-radius: 8px; }
+.o-dropdown--menu .dropdown-item.active, .o-dropdown--menu .dropdown-item:active { background: $cv-cyan; color: #fff; }
 // dialogues et notifications
 .modal-content { border-radius: 16px; border: 0; box-shadow: 0 24px 60px rgba(21, 40, 58, 0.25); }
 .modal-header { border-bottom-color: $cv-bord; .modal-title { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; } }
