@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document_fiches" inherit_id="sale.report_saleorder_document" name="Cultiveau : fiches techniques listées sur le devis">
+        <!-- Pas de sous-total sous les notes techniques du référentiel. -->
+        <xpath expr="//tr[hasclass('is-subtotal')]" position="attributes">
+            <attribute name="t-if">not (section_fermee and section_fermee.name == 'Notes techniques (référentiel Cultiveau V4)')</attribute>
+        </xpath>
+        <xpath expr="//span[@name='order_note']/.." position="after">
+            <t t-if="doc.cultiveau_fiche_ids and not env.context.get('proforma')">
+                <div style="margin-top: 10px; font-size: 10px;" name="fiches_cultiveau">
+                    <div style="font-weight: 700; margin-bottom: 3px;">Fiches techniques des matériels proposés</div>
+                    <t t-foreach="doc.cultiveau_fiche_ids" t-as="fiche">
+                        <div>
+                            <t t-out="fiche.name"/>
+                            <t t-if="fiche.fournisseur_nom"> · <t t-out="fiche.fournisseur_nom"/></t>
+                            <t t-if="fiche.fichier"> (jointe à ce devis)</t>
+                            <t t-elif="fiche.url"> · <a t-att-href="fiche.url" t-out="fiche.url"/></t>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>

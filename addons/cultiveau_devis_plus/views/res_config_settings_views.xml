@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_devis_plus" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.devis.plus</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="Le devis qui en dit plus" name="cultiveau_devis_plus">
+                    <setting string="Marge minimale visée" help="En dessous, le devis le signale au vendeur. Les marges se voient sur chaque ligne, par lot et au total ; jamais du client.">
+                        <div class="content-group"><div class="row mt8"><label for="cultiveau_marge_mini_pct" class="col-lg-6 o_light_label"/><field name="cultiveau_marge_mini_pct" class="col-lg-3"/> %</div></div>
+                    </setting>
+                    <setting string="Fiches techniques" help="Les fiches des matériels du devis partent en pièces jointes du courriel, rapatriées depuis la logistique ou le fournisseur si besoin.">
+                        <div class="mt8"><field name="cultiveau_devis_fiches"/><label for="cultiveau_devis_fiches"/></div>
+                    </setting>
+                    <setting string="Référentiel sur le devis" help="Les notes techniques du référentiel V4 : à la demande (bouton Relire avec le référentiel), ou avant chaque envoi.">
+                        <div class="mt8"><field name="cultiveau_devis_avis_auto"/><label for="cultiveau_devis_avis_auto"/></div>
+                        <div class="mt8"><button name="action_voir_avis" type="object" string="Les règles du référentiel" class="btn-link" icon="oi-arrow-right"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

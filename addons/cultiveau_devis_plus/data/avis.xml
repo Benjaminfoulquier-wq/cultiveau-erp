@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Règles du réseau, tirées du référentiel technique de l'irrigation agricole V4 (pagination recalée du 07/10/2026). -->
+        <record id="avis_filtration_goutte" model="cultiveau.referentiel.avis">
+            <field name="name">Finesse et type de filtration</field>
+            <field name="sequence">10</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">goutteur, goutte à goutte, goutte a goutte, gaine, micro-aspersion, micro aspersion, microasperseur, micro-asperseur, ligne de goutteurs</field>
+            <field name="texte">La finesse de filtration se choisit sur le plus petit passage des organes de distribution : de l'ordre du 1/7 au 1/10 du passage du goutteur. Le type de filtre suit la nature de la charge : tamis ou disques (80 à 200 µm) pour les particules dures, sable pour la matière organique et les algues (eau de retenue), hydrocyclone en tête sur forage sableux ; on combine souvent préfiltration et filtration fine.</field>
+            <field name="section">14.2</field>
+            <field name="page">99</field>
+            <field name="niveau">ordre_de_grandeur</field>
+        </record>
+        <record id="avis_filtre_manquant" model="cultiveau.referentiel.avis">
+            <field name="name">Pas de filtration dans un devis de micro-irrigation</field>
+            <field name="sequence">11</field>
+            <field name="genre">absence</field>
+            <field name="mots_cles">filtre, filtration, hydrocyclone, tamis, disques</field>
+            <field name="types">goutte_surface, goutte_enterre, micro_aspersion</field>
+            <field name="texte">Le devis ne prévoit aucune filtration alors que l'installation est en micro-irrigation. La station de filtration se dimensionne sur le débit maximal à filtrer et la perte de charge admissible, avec une réserve de capacité pour l'eau dégradée de fin de saison ; sans elle, les goutteurs se colmatent.</field>
+            <field name="section">14.3</field>
+            <field name="page">100</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_filtre_sable" model="cultiveau.referentiel.avis">
+            <field name="name">Filtre à sable : batterie et vitesse de filtration</field>
+            <field name="sequence">12</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">filtre à sable, filtre a sable, filtre sable, filtres à sable, filtration sable</field>
+            <field name="texte">Une batterie d'au moins deux cuves permet le contre-lavage alterné sans interrompre l'irrigation ; le débit de lavage se prévoit dans le dimensionnement du pompage. Vitesse de filtration recommandée sur sable : 40 à 60 m³/h par m² de surface filtrante (50 en eau chargée).</field>
+            <field name="section">14.3</field>
+            <field name="page">100</field>
+            <field name="niveau">ordre_de_grandeur</field>
+        </record>
+        <record id="avis_fertigation_antiretour" model="cultiveau.referentiel.avis">
+            <field name="name">Injection d'engrais : anti-retour obligatoire</field>
+            <field name="sequence">20</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">injecteur, injection, doseur, pompe doseuse, venturi, fertigation, fertirrigation, fertilisation</field>
+            <field name="texte">La fertigation introduit des produits dans l'eau : un dispositif anti-retour (une disconnexion en cas de risque sanitaire) est obligatoire en amont du point d'injection, pour empêcher tout reflux vers la ressource ou le réseau d'eau potable. Son absence est une non-conformité bloquante à la réception. Après chaque injection, le réseau se rince à l'eau claire jusqu'au point le plus éloigné (§ 15.3.2).</field>
+            <field name="section">15.3.1</field>
+            <field name="page">107</field>
+            <field name="niveau">exigence_reglementaire</field>
+        </record>
+        <record id="avis_antiretour_manquant" model="cultiveau.referentiel.avis">
+            <field name="name">Injection prévue sans anti-retour au devis</field>
+            <field name="sequence">21</field>
+            <field name="genre">absence</field>
+            <field name="mots_cles">anti-retour, antiretour, anti retour, clapet, disconnecteur, disconnexion</field>
+            <field name="si_present">injecteur, injection, doseur, pompe doseuse, venturi, fertigation, fertirrigation</field>
+            <field name="texte">Le devis prévoit une injection sans dispositif anti-retour ni disconnecteur. Le référentiel l'impose en amont du point d'injection : à ajouter au devis, faute de quoi la réception sera bloquée.</field>
+            <field name="section">15.3.1</field>
+            <field name="page">107</field>
+            <field name="niveau">exigence_reglementaire</field>
+        </record>
+        <record id="avis_ventouses" model="cultiveau.referentiel.avis">
+            <field name="name">Ventouses : implantation et diamètre</field>
+            <field name="sequence">30</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">ventouse, purgeur, purge d'air, purge air</field>
+            <field name="texte">Les ventouses s'implantent aux points hauts, en tête de réseau et de part et d'autre des vannes maîtresses. Repère : une ventouse triple fonction de diamètre 1/8 à 1/10 du diamètre de la conduite (mini DN50 sur les principales) aux points hauts majeurs ; de simples purgeurs automatiques aux points hauts secondaires. Une conduite qui se vide vite exige une admission d'air dimensionnée sur le débit de vidange.</field>
+            <field name="section">13.3.2</field>
+            <field name="page">95</field>
+            <field name="niveau">ordre_de_grandeur</field>
+        </record>
+        <record id="avis_ventouse_manquante" model="cultiveau.referentiel.avis">
+            <field name="name">Réseau enterré sans ventouse</field>
+            <field name="sequence">31</field>
+            <field name="genre">absence</field>
+            <field name="mots_cles">ventouse, purgeur</field>
+            <field name="si_present">tube, tuyau, pvc, pehd, conduite, canalisation, collecteur, tranchée, enterré</field>
+            <field name="texte">Le devis ne prévoit pas de ventouse. Un réseau sans ventouses aux points hauts accumule des poches d'air qui réduisent le débit et aggravent les coups de bélier ; la check-list de réception du réseau demande des ventouses aux points hauts et des purges aux points bas (§ 13.5.2).</field>
+            <field name="section">13.3.2</field>
+            <field name="page">95</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_compteur" model="cultiveau.referentiel.avis">
+            <field name="name">Compteur : implantation et usage</field>
+            <field name="sequence">40</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">compteur, débitmètre, debitmetre, comptage</field>
+            <field name="texte">Le compteur se dimensionne et s'implante avec les longueurs droites amont et aval prévues (§ 16.5.1). Il sert à suivre la consommation, à la comparer au volume autorisé et à détecter les dérives (fuites, colmatage) ; relevé avec l'énergie (kWh), il fonde le diagnostic énergétique.</field>
+            <field name="section">8.3</field>
+            <field name="page">62</field>
+            <field name="niveau">exigence_reglementaire</field>
+        </record>
+        <record id="avis_compteur_manquant" model="cultiveau.referentiel.avis">
+            <field name="name">Pas de compteur volumétrique</field>
+            <field name="sequence">41</field>
+            <field name="genre">absence</field>
+            <field name="mots_cles">compteur, débitmètre, debitmetre</field>
+            <field name="si_present">pompe, forage, station, tube, tuyau, conduite, pehd, pvc</field>
+            <field name="texte">Le devis ne prévoit pas de compteur volumétrique. Le comptage des volumes prélevés est une obligation courante et un outil de pilotage : à prévoir en tête d'installation.</field>
+            <field name="section">8.3</field>
+            <field name="page">62</field>
+            <field name="niveau">exigence_reglementaire</field>
+        </record>
+        <record id="avis_regulateur" model="cultiveau.referentiel.avis">
+            <field name="name">Régulateurs et limiteurs de pression</field>
+            <field name="sequence">50</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">régulateur de pression, regulateur de pression, régulateur, regulateur, limiteur de pression, réducteur de pression, reducteur de pression</field>
+            <field name="texte">Les régulateurs maintiennent une pression aval constante ; les limiteurs plafonnent la pression pour protéger les organes et l'uniformité (§ 6.4.3). Ils sont indispensables sur les réseaux à forts dénivelés (§ 6.5.3).</field>
+            <field name="section">13.3.4</field>
+            <field name="page">95</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_pompe_securite" model="cultiveau.referentiel.avis">
+            <field name="name">Pompe : protection contre la marche à sec</field>
+            <field name="sequence">60</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">pompe, groupe de pompage, station de pompage, surpresseur, motopompe, électropompe, electropompe</field>
+            <field name="texte">La marche à sec détruit rapidement garnitures et roue : une protection (sonde de niveau, capteur de pression basse ou contrôle de débit) coupe la pompe avant dommage. Indispensable sur forage (dénoyage) et sur retenue (garde d'eau). Côté démarrage, le démarreur progressif ou le variateur réduisent l'appel de courant et les coups de bélier (§ 11.3, p. 80).</field>
+            <field name="section">10.5.1</field>
+            <field name="page">76</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_securite_manquante" model="cultiveau.referentiel.avis">
+            <field name="name">Pompe sans sécurité au devis</field>
+            <field name="sequence">61</field>
+            <field name="genre">absence</field>
+            <field name="mots_cles">pressostat, sonde de niveau, manque d'eau, marche à sec, contrôleur de débit, controleur de debit, variateur, coffret, armoire, protection</field>
+            <field name="si_present">pompe, groupe de pompage, station de pompage, surpresseur, motopompe, électropompe, electropompe</field>
+            <field name="texte">Le devis prévoit une pompe sans protection apparente contre la marche à sec (pressostat, sonde de niveau, contrôle de débit ou variateur). Les asservissements intègrent les sécurités : marche à sec, pressions haute et basse, défaut moteur, niveau de réserve (§ 11.5, p. 88).</field>
+            <field name="section">10.5.1</field>
+            <field name="page">76</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_canalisations" model="cultiveau.referentiel.avis">
+            <field name="name">Canalisations : classe de pression et vitesses</field>
+            <field name="sequence">70</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">tube, tuyau, pvc, pehd, pe 100, pe100, pe 80, conduite, canalisation, collecteur, pn 10, pn10, pn 16, pn16, pn 6, pn6</field>
+            <field name="texte">La pression nominale (PN) se choisit supérieure à la pression maximale de service, surpressions transitoires comprises (coups de bélier), avec un coefficient de sécurité (§ 13.1.3). La vitesse d'écoulement se maintient entre 0,5 et 2,0 m/s ; les principales se dimensionnent plutôt vers 1,0 à 1,5 m/s pour ménager les extensions (§ 13.1.5, p. 92).</field>
+            <field name="section">13.1.3</field>
+            <field name="page">90</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_enterre" model="cultiveau.referentiel.avis">
+            <field name="name">Réseau enterré : profondeur hors gel</field>
+            <field name="sequence">71</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">tranchée, tranchee, terrassement, enterré, enterre, enfouissement, trancheuse, grillage avertisseur</field>
+            <field name="texte">Profondeur d'enfouissement hors gel indicative (génératrice supérieure du tube) : 0,60 à 0,80 m en climat océanique doux, 0,80 à 1,00 m en semi-continental et plateaux, 1,00 à 1,20 m et plus en montagne. Au-dessus, ou en cas de doute, la vidange d'hivernage est obligatoire (§ 18.5.1). Butées et ancrages aux coudes, tés et extrémités (§ 13.2.3).</field>
+            <field name="section">13.2.2</field>
+            <field name="page">93</field>
+            <field name="niveau">ordre_de_grandeur</field>
+        </record>
+        <record id="avis_enrouleur" model="cultiveau.referentiel.avis">
+            <field name="name">Enrouleur : couple machine, tuyau, canon</field>
+            <field name="sequence">80</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">enrouleur, canon, chariot porte-canon, rampe d'arrosage</field>
+            <field name="texte">On part du besoin (dose, surface, temps) pour choisir le canon, puis le tuyau, puis la machine. Le secteur du canon (180 à 240°) s'oriente dos au sens d'avancement pour garder la bande de roulement sèche ; un secteur plus fermé augmente la pluviométrie instantanée, à vérifier vis-à-vis de l'infiltration (§ 6.3.2). Uniformité de référence d'un enrouleur avec canon : CU 75 à 85 % (§ 4.3.1, p. 29).</field>
+            <field name="section">7.3.1</field>
+            <field name="page">52</field>
+            <field name="niveau">recommandation</field>
+        </record>
+        <record id="avis_pivot" model="cultiveau.referentiel.avis">
+            <field name="name">Pivot : la pluviométrie en bout commande</field>
+            <field name="sequence">81</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">pivot, rampe frontale, travée, porte-à-faux, porte a faux</field>
+            <field name="texte">Sur un pivot, le débit requis croît avec le rayon : la pluviométrie instantanée en bout est le critère de dimensionnement, à comparer à l'infiltration du sol (§ 6.6.3). Elle impose des organes adaptés (buses à débit croissant, parfois asperseurs déportés) et une vitesse d'avancement qui règle la dose. Uniformité de référence : CU ≥ 90 % (§ 4.3.1, p. 29).</field>
+            <field name="section">7.4</field>
+            <field name="page">53</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_automatisme" model="cultiveau.referentiel.avis">
+            <field name="name">Programmateur : piloté par le besoin, pas en aveugle</field>
+            <field name="sequence">90</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">programmateur, électrovanne, electrovanne, automate, télégestion, telegestion, pilotage, sonde</field>
+            <field name="texte">Les automatismes exécutent le programme (séquencement des secteurs, durées, fréquences), permettent les heures creuses et libèrent la main-d'œuvre. Le programme doit rester subordonné au besoin réel, piloté par bilan hydrique ou par sonde, et non fonctionner en aveugle sur un calendrier fixe.</field>
+            <field name="section">16.3</field>
+            <field name="page">110</field>
+            <field name="niveau">recommandation</field>
+        </record>
+        <record id="avis_vannes" model="cultiveau.referentiel.avis">
+            <field name="name">Vannes manuelles : manœuvre lente</field>
+            <field name="sequence">91</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">vanne manuelle, vanne papillon, vanne à boisseau, vanne a boisseau, vanne à opercule, vanne d'isolement, vanne de sectionnement, vannes manuelles</field>
+            <field name="texte">Les vannes manuelles équipent les points d'isolement du réseau et les secteurs peu automatisés. Une manœuvre trop rapide génère des coups de bélier (§ 13.3.1) : prévoir des organes à fermeture lente sur les gros diamètres et le dire à l'exploitant dans la fiche de réglage.</field>
+            <field name="section">17.3.1</field>
+            <field name="page">113</field>
+            <field name="niveau">recommandation</field>
+        </record>
+        <record id="avis_clapet" model="cultiveau.referentiel.avis">
+            <field name="name">Clapet anti-retour : dimensionné, sans claquement</field>
+            <field name="sequence">92</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">clapet anti-retour, clapet antiretour, clapet anti retour, clapet de retenue, clapet</field>
+            <field name="texte">Le clapet protège la ressource (§ 8.4.2), interdit le reflux en fertigation (§ 15.3.1) et évite la vidange du réseau à l'arrêt. Son dimensionnement évite les pertes de charge excessives et le claquement, source de coups de bélier.</field>
+            <field name="section">17.4</field>
+            <field name="page">115</field>
+            <field name="niveau">recommandation</field>
+        </record>
+        <record id="avis_mise_en_service" model="cultiveau.referentiel.avis">
+            <field name="name">Rinçage avant mise en service et hivernage</field>
+            <field name="sequence">100</field>
+            <field name="genre">toujours</field>
+            <field name="texte">Avant la mise en service, le réseau est rincé tronçon par tronçon, des principales vers les terminales, jusqu'à eau claire, pour évacuer les débris de chantier qui colmateraient filtres et goutteurs ; l'essai de pression se fait avant remblaiement et se consigne (§ 13.5.1). En fin de saison : vidange des canalisations et points bas, mise hors gel ou démontage des organes exposés, hivernage de la pompe, rinçage des réseaux de micro-irrigation (§ 18.5, p. 121).</field>
+            <field name="section">13.5.2</field>
+            <field name="page">98</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+    </data>
+</odoo>

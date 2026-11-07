@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_devis_plus" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau.devis.plus</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="priority" eval="40"/>
+        <field name="arch" type="xml">
+            <!-- Relire avec le référentiel -->
+            <xpath expr="//header" position="inside">
+                <button name="action_relire_referentiel" type="object" string="Relire avec le référentiel" class="btn-secondary"
+                        invisible="state not in ('draft', 'sent')" help="Ajoute en fin de devis les notes techniques du référentiel V4 que le matériel proposé appelle, et signale ce qui manque."/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_fiches" type="object" class="oe_stat_button" icon="fa-file-pdf-o" invisible="not cultiveau_nb_fiches">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="cultiveau_nb_fiches"/></span><span class="o_stat_text">Fiches jointes</span></div>
+                </button>
+            </xpath>
+            <!-- La marge sous le minimum : dit tout de suite -->
+            <xpath expr="//sheet/div[@name='button_box']" position="after">
+                <field name="cultiveau_marge_alerte" invisible="1"/>
+                <div class="alert alert-warning" role="alert" invisible="not cultiveau_marge_alerte" groups="sales_team.group_sale_salesman_all_leads">
+                    <i class="fa fa-percent me-1"/> <field name="cultiveau_marge_alerte" readonly="1" class="d-inline"/>
+                </div>
+            </xpath>
+            <!-- Les colonnes de marge, visibles -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='purchase_price']" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="groups">sales_team.group_sale_salesman_all_leads</attribute>
+                <attribute name="string">Achat</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='margin']" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="groups">sales_team.group_sale_salesman_all_leads</attribute>
+                <attribute name="string">Marge</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='margin_percent']" position="attributes">
+                <attribute name="optional">show</attribute>
+                <attribute name="groups">sales_team.group_sale_salesman_all_leads</attribute>
+                <attribute name="string">Taux</attribute>
+            </xpath>
+            <!-- Les marges par lot et l'avis du référentiel, dans l'onglet Autres informations -->
+            <xpath expr="//page[@name='other_information']" position="before">
+                <page string="Marges et référentiel" name="devis_plus" groups="sales_team.group_sale_salesman_all_leads">
+                    <group string="Marge par lot" invisible="not cultiveau_marges_html">
+                        <field name="cultiveau_marges_html" nolabel="1" readonly="1"/>
+                    </group>
+                    <group string="Ce que le référentiel dit de ce devis">
+                        <div colspan="2" class="mb-2">
+                            <field name="cultiveau_nb_avis" invisible="1"/>
+                            <button name="action_relire_referentiel" type="object" string="Écrire ces notes sur le devis" class="btn btn-primary btn-sm" invisible="not cultiveau_nb_avis or state not in ('draft', 'sent')"/>
+                            <button name="action_retirer_notes_referentiel" type="object" string="Retirer les notes du devis" class="btn btn-link btn-sm" invisible="state not in ('draft', 'sent')"/>
+                        </div>
+                        <field name="cultiveau_avis_html" nolabel="1" readonly="1" colspan="2"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_tree_devis_plus" model="ir.ui.view">
+        <field name="name">sale.order.list.cultiveau.devis.plus</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <field name="amount_total" position="after">
+                <field name="margin" optional="show" sum="Marge" groups="sales_team.group_sale_salesman_all_leads" string="Marge"/>
+                <field name="margin_percent" optional="show" widget="percentage" groups="sales_team.group_sale_salesman_all_leads" string="Taux"/>
+            </field>
+        </field>
+    </record>
+</odoo>

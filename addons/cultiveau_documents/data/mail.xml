@@ -22,6 +22,7 @@
         <a t-att-href="object.get_base_url() + object.get_portal_url()"
            style="background: #0b8aa3; color: #ffffff; padding: 10px 18px; border-radius: 4px; text-decoration: none; font-weight: 600;">Voir et signer le devis en ligne</a>
     </p>
+    <p t-if="object._fields.get('cultiveau_nb_fiches') and object.cultiveau_nb_fiches">Vous trouverez aussi en pièces jointes les fiches techniques des matériels proposés.</p>
     <p>Je reste à votre disposition pour en parler.</p>
     <p>Bien cordialement,<br/>
         <t t-out="object.user_id.name or object.company_id.name"/><t t-if="object.user_id.phone"> — <t t-out="object.user_id.phone"/></t><br/>
