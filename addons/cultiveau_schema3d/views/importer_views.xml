@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_schema3d_import_form" model="ir.ui.view">
+        <field name="name">cultiveau.schema3d.import.form</field>
+        <field name="model">cultiveau.schema3d.import</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="text-muted">Dans Réseau 3D (schema3d.cultiveau.fr), menu Projet › <b>Format d'échange</b> : le fichier <code>.echange.json</code> de l'étude.
+                    L'ERP remplit l'installation (A1.1, A1.2), attache le fichier au dossier et construit le devis par lots.</p>
+                <group>
+                    <group>
+                        <field name="partner_id" options="{'no_create': True}"/>
+                        <field name="installation_id" options="{'no_create': True}" context="{'default_partner_id': partner_id}"/>
+                        <field name="fichier" filename="fichier_nom" widget="binary"/>
+                        <field name="fichier_nom" invisible="1"/>
+                    </group>
+                    <group>
+                        <field name="remplir_installation"/>
+                        <field name="ecraser" invisible="not remplir_installation"/>
+                        <field name="creer_devis"/>
+                        <field name="avec_mise_en_service" invisible="not creer_devis"/>
+                    </group>
+                </group>
+                <field name="resume" nolabel="1" colspan="2"/>
+                <footer>
+                    <button name="action_importer" type="object" string="Importer" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_schema3d_import" model="ir.actions.act_window">
+        <field name="name">Importer une étude Schéma 3D</field>
+        <field name="res_model">cultiveau.schema3d.import</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_schema3d_import" name="Importer une étude Schéma 3D" parent="cultiveau_ventes.menu_ventes" action="action_schema3d_import" sequence="48"/>
+
+    <record id="view_installation_form_schema3d" model="ir.ui.view">
+        <field name="name">cultiveau.installation.form.schema3d</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="inherit_id" ref="cultiveau_installation.view_installation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_importer_schema3d" type="object" string="Importer l'étude Schéma 3D" icon="fa-cube"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_devis_schema3d" type="object" class="oe_stat_button" icon="fa-cube" invisible="not schema3d_nb_devis">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="schema3d_nb_devis"/></span><span class="o_stat_text">Devis Schéma 3D</span></div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_form_schema3d" model="ir.ui.view">
+        <field name="name">sale.order.form.schema3d</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="cultiveau_ventes.view_order_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cultiveau_analyse_validee']" position="after">
+                <field name="cultiveau_schema3d" invisible="1"/>
+                <field name="cultiveau_schema3d_etude" invisible="not cultiveau_schema3d" string="Étude Schéma 3D"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
