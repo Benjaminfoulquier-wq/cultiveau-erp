@@ -9,4 +9,13 @@
         <field name="interval_type">hours</field>
         <field name="active" eval="True"/>
     </record>
+    <record id="cron_chantiers_vers_site" model="ir.cron">
+        <field name="name">Cultiveau : chantiers de l'ERP vers l'appli Mon Chantier</field>
+        <field name="model_id" ref="model_cultiveau_chantier"/>
+        <field name="state">code</field>
+        <field name="code">model._cron_envoyer_vers_site()</field>
+        <field name="interval_number">15</field>
+        <field name="interval_type">minutes</field>
+        <field name="active" eval="True"/>
+    </record>
 </odoo>

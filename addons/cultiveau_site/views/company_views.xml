@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_erp" model="ir.ui.view">
+        <field name="name">res.company.form.cultiveau.erp</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Cultiveau" name="cultiveau_erp">
+                    <group>
+                        <field name="cultiveau_erp_ouvert"/>
+                        <field name="cultiveau_site_id"/>
+                    </group>
+                    <p class="text-muted">Tout le monde n'a pas l'ERP. Quand l'accès est ouvert, les tuiles « Gestion » apparaissent dans l'espace adhérent de cultiveau.fr de cette entreprise ; chaque personne de son équipe entre avec son compte cultiveau.fr, au rôle de son équipe (manager : gérant, gestionnaire : administratif, salarié : technicien).</p>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

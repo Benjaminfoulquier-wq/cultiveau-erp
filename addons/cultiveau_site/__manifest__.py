@@ -32,7 +32,7 @@ le site). Rien n'est recopié : une évolution du site ou de la logistique se vo
     "license": "LGPL-3",
     "depends": ["cultiveau_chantier", "cultiveau_interventions", "cultiveau_installation"],
     "external_dependencies": {"python": ["requests"]},
-    "data": ["security/ir.model.access.csv", "views/site_views.xml", "views/ecrans.xml", "views/res_config_settings_views.xml", "data/cron.xml"],
+    "data": ["security/ir.model.access.csv", "views/site_views.xml", "views/ecrans.xml", "views/res_config_settings_views.xml", "views/company_views.xml", "views/chantier_views.xml", "data/cron.xml", "data/erp_ouvert.xml"],
     "assets": {
         "web.assets_backend": [
             "cultiveau_site/static/src/js/ecran.js",

@@ -30,3 +30,19 @@ cultiveau.fr. Adresse du site : `cultiveau.url_site`. Côté site, `ERP_ORIGIN` 
 
 L'annuaire des collègues du réseau (module « Collègues » de cultiveau.fr) n'est pas recopié dans l'ERP : l'ERP connaît les
 entreprises et les personnes au fur et à mesure qu'elles entrent, et le réseau par l'import réseau (`cultiveau_base`).
+
+## Tout le monde n'a pas l'ERP (07/11/2026, soir)
+
+Les tuiles « Gestion » n'apparaissent sur cultiveau.fr que si l'ERP ouvre sa porte à la personne : cultiveau.fr le lui demande
+(`GET /cultiveau/entree/eligible`, signé). La porte est ouverte quand son compte ERP existe déjà, ou quand sa société a la case
+« Accès à l'ERP ouvert » (fiche Société, onglet Cultiveau ; les sociétés déjà équipées l'ont d'office à la mise à jour). Sinon,
+l'entrée répond « Votre entreprise n'a pas encore accès à l'ERP Cultiveau : demandez-le à Cultiveau », et rien n'est créé.
+
+## Les chantiers de l'ERP dans l'appli Mon Chantier
+
+Un chantier né dans l'ERP (commande confirmée, « Lancer le chantier ») est envoyé à cultiveau.fr une fois la transaction acquise
+(`POST /api/external/chantiers` avec la clé de l'entreprise) : client, objet, dates, état, phases et heures. Le site rend son
+identifiant, gardé dans `cultiveau_site_ref` : la synchronisation horaire reconnaît le même chantier. Une clé remise avant le
+07/11 (lecture seule) est remplacée d'elle-même au premier refus ou à la prochaine entrée depuis cultiveau.fr. Bouton « Envoyer
+dans Mon Chantier » sur le chantier, filet de sécurité toutes les 15 minutes. Le retour (modifications faites dans l'appli) passe
+toujours par la synchronisation horaire site → ERP.

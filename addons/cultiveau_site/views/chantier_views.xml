@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_chantier_form_site" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.form.site</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="inherit_id" ref="cultiveau_chantier.view_chantier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_envoyer_vers_site" type="object" string="Envoyer dans Mon Chantier" class="btn-secondary" invisible="cultiveau_site_ref"/>
+            </xpath>
+            <xpath expr="//sheet" position="inside">
+                <field name="cultiveau_site_ref" invisible="1"/>
+                <field name="cultiveau_site_envoye_le" invisible="1"/>
+                <div class="text-muted small mt-2" invisible="not cultiveau_site_ref">Présent dans l'appli Mon Chantier de cultiveau.fr<span invisible="not cultiveau_site_envoye_le"> (envoyé depuis l'ERP le <field name="cultiveau_site_envoye_le" readonly="1" class="d-inline"/>)</span>.</div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

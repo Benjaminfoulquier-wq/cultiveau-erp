@@ -22,6 +22,39 @@ class Company(models.Model):
     _inherit = "res.company"
 
     cultiveau_site_id = fields.Integer("Entreprise sur cultiveau.fr (id)", index=True, copy=False)
+    cultiveau_erp_ouvert = fields.Boolean("Accès à l'ERP ouvert", default=False,
+                                          help="Tout le monde n'a pas l'ERP : cochez pour que cette entreprise et son équipe puissent entrer depuis cultiveau.fr. Les comptes déjà créés entrent toujours.")
+
+    @api.model
+    def cultiveau_ouvrir_erp_existants(self):
+        """À la mise à jour : les entreprises qui ont déjà des utilisateurs gardent l'accès."""
+        self.env.cr.execute("SELECT DISTINCT company_id FROM res_users WHERE active AND share = false")
+        ids = [r[0] for r in self.env.cr.fetchall()]
+        if ids:
+            self.sudo().browse(ids).filtered(lambda c: not c.cultiveau_erp_ouvert).write({"cultiveau_erp_ouvert": True})
+        return True
+
+    @api.model
+    def cultiveau_erp_eligible(self, charge):
+        """cultiveau.fr demande si cette personne peut entrer : son compte existe, ou son entreprise a l'accès ouvert."""
+        email = (charge.get("email") or "").strip().lower()
+        if email and self.env["res.users"].sudo().with_context(active_test=False).search_count([("login", "=ilike", email), ("share", "=", False)]):
+            return True, "compte existant"
+        e = charge.get("entreprise") or {}
+        company = self._cultiveau_societe_site(e, creer=False)
+        if company and company.cultiveau_erp_ouvert:
+            return True, "entreprise ouverte"
+        return False, "Votre entreprise n'a pas encore accès à l'ERP Cultiveau : demandez-le à Cultiveau."
+
+    @api.model
+    def _cultiveau_societe_site(self, e, creer=False):
+        Company = self.sudo()
+        site_id = int(e.get("id") or 0)
+        nom = (e.get("nom") or "").strip()
+        company = Company.search([("cultiveau_site_id", "=", site_id)], limit=1) if site_id else Company.browse()
+        if not company and nom:
+            company = Company.search([("name", "=ilike", nom)], limit=1)
+        return company
 
 
 class LaissezPasser(models.Model):
@@ -60,9 +93,13 @@ class Users(models.Model):
         email = (charge.get("email") or "").strip().lower()
         if not email or "@" not in email:
             raise ValueError("laissez-passer sans e-mail")
-        company = self._cultiveau_societe_depuis_site(charge.get("entreprise") or {}, charge)
         Users = self.sudo().with_context(active_test=False)
         user = Users.search([("login", "=ilike", email)], limit=1)
+        if not user:
+            ok, raison = self.env["res.company"].sudo().cultiveau_erp_eligible(charge)
+            if not ok:
+                raise PermissionError(raison)
+        company = self._cultiveau_societe_depuis_site(charge.get("entreprise") or {}, charge)
         role = charge.get("role") if charge.get("role") in ROLES_SITE else "technicien"
         if user:
             vals = {}
@@ -106,6 +143,8 @@ class Users(models.Model):
         if site_id:
             vals["cultiveau_site_id"] = site_id
         if not company:
+            if "iap_enrich_auto_done" in Company._fields:
+                vals["iap_enrich_auto_done"] = True  # pas d'appel en ligne à l'éditeur pour une entreprise qui vient de cultiveau.fr
             company = Company.create(dict(vals, name=nom or f"Adhérent {site_id}"))
             _logger.info("cultiveau.fr : entreprise créée dans l'ERP : %s", company.name)
         elif vals:
@@ -129,10 +168,19 @@ class Connexion(models.Model):
     _inherit = "cultiveau.site.connexion"
 
     @api.model
-    def _cultiveau_relier_si_besoin(self, company, charge):
-        """Pas encore de clé d'accès aux données de cette entreprise ? L'ERP la demande à cultiveau.fr, signé avec le secret partagé."""
-        if self.sudo().with_context(active_test=False).search_count([("company_id", "=", company.id)]):
-            return False
+    def _cultiveau_relier_si_besoin(self, company, charge, forcer=False):
+        """Pas encore de clé d'accès aux données de cette entreprise, ou une clé qui ne sait pas écrire ? L'ERP en demande une à cultiveau.fr,
+        signé avec le secret partagé. La clé reçue depuis le 07/11/2026 sait aussi créer des chantiers (appli Mon Chantier)."""
+        existante = self.sudo().with_context(active_test=False).search([("company_id", "=", company.id)], limit=1)
+        if existante and not forcer:
+            vals = {}
+            if charge.get("cultiveau_id") and not existante.cultiveau_site_adherent_id:
+                vals["cultiveau_site_adherent_id"] = charge["cultiveau_id"]
+            if vals:
+                existante.write(vals)
+            if existante.cultiveau_site_ecriture:
+                return False
+            forcer = True  # clé ancienne, en lecture seule : on la remplace
         P = self.env["ir.config_parameter"].sudo()
         secret = P.get_param("cultiveau.erp_lien_secret")
         site = (P.get_param("cultiveau.url_site") or "https://cultiveau.fr").rstrip("/")
@@ -153,6 +201,10 @@ class Connexion(models.Model):
             return False
         if not cle:
             return False
-        self.sudo().create({"company_id": company.id, "url": site, "cle": cle})
-        _logger.info("cultiveau.fr : données de %s reliées à l'ERP (clé reçue, synchronisation horaire).", company.name)
+        vals = {"company_id": company.id, "url": site, "cle": cle, "cultiveau_site_adherent_id": cultiveau_id, "cultiveau_site_ecriture": True, "active": True}
+        if existante:
+            existante.write(vals)
+        else:
+            self.sudo().create(vals)
+        _logger.info("cultiveau.fr : données de %s reliées à l'ERP (clé reçue, synchronisation horaire, chantiers vers Mon Chantier).", company.name)
         return True

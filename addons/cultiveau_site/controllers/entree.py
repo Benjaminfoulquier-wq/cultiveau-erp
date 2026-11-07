@@ -55,6 +55,9 @@ class Entree(http.Controller):
         lp = LP.create({"nonce": charge["n"], "login": email, "expire_le": datetime.utcfromtimestamp(int(charge["exp"]))})
         try:
             user = env["res.users"].sudo().cultiveau_depuis_site(charge)
+        except PermissionError as e:
+            request.env.cr.rollback()
+            return self._message(str(e))
         except Exception as e:  # noqa: BLE001 — on explique plutôt qu'une page d'erreur
             _logger.exception("cultiveau.fr : entrée impossible pour %s", email)
             request.env.cr.rollback()
@@ -70,6 +73,22 @@ class Entree(http.Controller):
         reponse = request.redirect(vers)
         reponse.headers["Cache-Control"] = "no-store"
         return reponse
+
+    @http.route("/cultiveau/entree/eligible", type="http", auth="none", methods=["GET"], csrf=False)
+    def eligible(self, t="", **_kw):
+        """cultiveau.fr demande, signé, si cette personne peut entrer dans l'ERP : tout le monde n'a pas l'ERP."""
+        env = request.env(user=SUPERUSER_ID)
+        secret = env["ir.config_parameter"].sudo().get_param("cultiveau.erp_lien_secret")
+        reponse = {"eligible": False}
+        if secret:
+            try:
+                charge = lire_jeton(t, secret)
+                if charge.get("v") == 1 and charge.get("outil") == "erp" and charge.get("action") == "eligible":
+                    ok, raison = env["res.company"].sudo().cultiveau_erp_eligible(charge)
+                    reponse = {"eligible": ok, "raison": raison}
+            except (ValueError, TypeError) as e:
+                reponse = {"eligible": False, "raison": str(e)}
+        return request.make_response(json.dumps(reponse), headers=[("Content-Type", "application/json"), ("Cache-Control", "no-store")])
 
     def _message(self, texte):
         return request.make_response(

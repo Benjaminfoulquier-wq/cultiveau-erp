@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Les entreprises qui ont déjà des utilisateurs dans l'ERP gardent l'accès ; les autres l'obtiennent par la case « Accès à l'ERP ouvert ». -->
+        <function model="res.company" name="cultiveau_ouvrir_erp_existants"/>
+    </data>
+</odoo>
