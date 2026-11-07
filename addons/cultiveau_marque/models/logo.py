@@ -21,6 +21,11 @@ class Company(models.Model):
     def _get_logo(self):
         return logo_cultiveau()
 
+    def _compute_uses_default_logo(self):
+        """Odoo sert une image « Your logo » dès qu'il juge le logo « par défaut » : jamais ici, le vrai logo s'affiche toujours."""
+        for c in self:
+            c.uses_default_logo = False
+
     @api.model
     def cultiveau_logo_par_defaut(self):
         """À chaque mise à jour : les sociétés sans logo, ou avec le logo de l'éditeur, reçoivent celui de Cultiveau."""
@@ -35,5 +40,7 @@ class Company(models.Model):
             if not logo or logo == logo_editeur:
                 c.write({"logo": logo_cultiveau()})
                 n += 1
-        _logger.info("Cultiveau : logo posé sur %s société(s) qui n'en avaient pas.", n)
+        self.env.cr.execute("UPDATE res_company SET uses_default_logo = false WHERE uses_default_logo IS DISTINCT FROM false")
+        self.env.registry.clear_cache()
+        _logger.info("Cultiveau : logo posé sur %s société(s) qui n'en avaient pas ; plus aucune société en « logo par défaut ».", n)
         return n

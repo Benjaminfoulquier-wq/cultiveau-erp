@@ -64,3 +64,15 @@ class TestSansEditeur(TransactionCase):
         self.assertEqual(self.env.cr.fetchone()[0], 0)
         self.env.cr.execute("SELECT count(*) FROM mail_template WHERE body_html::text ~* '\\modoo\\M' OR subject::text ~* '\\modoo\\M'")
         self.assertEqual(self.env.cr.fetchone()[0], 0)
+
+
+    def test_jamais_le_logo_par_defaut_de_l_editeur(self):
+        societe = self.env["res.company"].create({"name": "Société sans logo"})
+        self.assertFalse(societe.uses_default_logo)
+        self.assertTrue(societe.logo)
+        # le portail et les écrans demandent /logo : l'image servie est celle de la société, pas « Your logo »
+        r = self.url_open(f"/logo?company={societe.id}")
+        self.assertEqual(r.status_code, 200)
+        self.assertNotEqual(len(r.content), 0)
+        self.env["res.company"].cultiveau_logo_par_defaut()
+        self.assertFalse(self.env["res.company"].search([("uses_default_logo", "=", True)]))
