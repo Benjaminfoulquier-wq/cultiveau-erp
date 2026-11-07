@@ -24,6 +24,21 @@ l'ERP, et un changement dans l'un se voit dans l'autre en moins d'une seconde.
 - **L'atelier** : une pompe sur un établi par intervention d'atelier ; des étincelles quand un technicien y est.
 - **Les livraisons** : un camion fournisseur dans la cour pour une réception du jour.
 
+## Le décor (07/11/2026)
+
+`static/src/js/decor.js`, posé une fois à la construction, sans données : le ciel et ses nuages qui dérivent, l'horizon
+(collines, bois, village et clocher, éoliennes qui tournent, château d'eau), la route avec son trottoir, ses lignes de rive, son
+passage piéton, son accotement et son fossé, les portails coulissants ouverts, l'auvent de l'entrée au nom de la société, le tapis
+« Bienvenue », les massifs fleuris, les mâts et leurs drapeaux qui flottent, le range-vélos, les poubelles de tri, les flèches et la
+place PMR du parking, le fardeau de tubes PVC, les piles de palettes, les cônes, les traces de pneus et les taches des camions, le
+transpalette et les caisses devant la porte de la cour. Dedans : les suspensions du hall et les dalles LED des bureaux (elles
+s'allument davantage le soir), les poteaux de charpente, les extincteurs, le tableau blanc du bureau d'étude, le planning à post-it
+de l'atelier, l'horloge de l'accueil à l'heure, le marquage piétons du stockage ; les murs ont un couronnement à la couleur, un
+soubassement et des fenêtres côté bureaux et accueil. Chez les agriculteurs : le chemin, une borne d'irrigation par parcelle, des
+haies, le bassin de stockage avec sa station de pompage, des balles de paille ; les parcelles sans dossier restent cultivées (blé,
+prairie, tournesol, labour). Des touffes d'herbe, des fleurs, des buissons et deux vols d'oiseaux. La lumière suit l'heure
+(`_ambiance`) : jour, crépuscule, soir, avec le dégradé du ciel de la page assorti.
+
 ## L'écran autour de la map
 
 - **Trois KPI** : interventions du jour, devis en attente, chantiers en cours. Ils clignotent quand ils changent.

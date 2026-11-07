@@ -38,7 +38,7 @@ export function creerKit(THREE) {
             const t = new THREE.CanvasTexture(canvas(w, h, dessiner));
             t.wrapS = t.wrapT = THREE.RepeatWrapping;
             t.repeat.set(repeat[0], repeat[1]);
-            t.anisotropy = 4;
+            t.anisotropy = 8;
             t.colorSpace = THREE.SRGBColorSpace;
             textures.set(id, t);
         }
@@ -69,15 +69,17 @@ export function creerKit(THREE) {
             bruit(ctx, w, h, 600, 0.08);
         }, rep),
         carrelage: (rep) => texture("carrelage", 256, 256, (ctx, w, h) => {
-            ctx.fillStyle = "#ece9e1";
+            // un carrelage de magasin : grands carreaux gris clair, légèrement différents, joints fins
+            ctx.fillStyle = "#d9d5cc";
             ctx.fillRect(0, 0, w, h);
-            ctx.strokeStyle = "rgba(120,115,105,0.35)";
-            ctx.lineWidth = 2;
-            for (let i = 0; i <= w; i += 64) {
-                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(w, i); ctx.stroke();
+            for (let y = 0; y < h; y += 64) {
+                for (let x = 0; x < w; x += 64) {
+                    ctx.fillStyle = `hsl(42, 14%, ${90 + Math.random() * 5}%)`;
+                    ctx.fillRect(x + 1.5, y + 1.5, 61, 61);
+                }
             }
-            bruit(ctx, w, h, 300, 0.05);
+            bruit(ctx, w, h, 300, 0.04);
+            bruit(ctx, w, h, 200, 0.25, "255,255,255");
         }, rep),
         carrelage_chaud: (rep) => texture("carrelage_chaud", 256, 256, (ctx, w, h) => {
             ctx.fillStyle = "#e6d6c3";
@@ -91,10 +93,18 @@ export function creerKit(THREE) {
             bruit(ctx, w, h, 300, 0.06);
         }, rep),
         beton: (rep) => texture("beton", 256, 256, (ctx, w, h) => {
-            ctx.fillStyle = "#cfcbc2";
+            // une dalle de hall : le béton lissé, ses joints de dilatation, quelques taches et traces de roues
+            ctx.fillStyle = "#cdc9c0";
             ctx.fillRect(0, 0, w, h);
-            bruit(ctx, w, h, 1500, 0.12);
-            bruit(ctx, w, h, 400, 0.08, "255,255,255");
+            bruit(ctx, w, h, 1800, 0.12);
+            bruit(ctx, w, h, 500, 0.08, "255,255,255");
+            ctx.strokeStyle = "rgba(80,75,70,0.28)";
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
+            for (let i = 0; i < 6; i++) {
+                ctx.fillStyle = `rgba(60,50,40,${0.04 + Math.random() * 0.05})`;
+                ctx.beginPath(); ctx.ellipse(Math.random() * w, Math.random() * h, 10 + Math.random() * 30, 6 + Math.random() * 14, Math.random() * 3, 0, Math.PI * 2); ctx.fill();
+            }
         }, rep),
         beton_marque: (rep) => texture("beton_marque", 256, 256, (ctx, w, h) => {
             ctx.fillStyle = "#c9c6bf";
@@ -112,10 +122,16 @@ export function creerKit(THREE) {
             bruit(ctx, w, h, 800, 0.12, "255,255,255");
         }, rep),
         enrobe: (rep) => texture("enrobe", 256, 256, (ctx, w, h) => {
-            ctx.fillStyle = "#6f7378";
+            // un enrobé : le liant sombre, les granulats clairs, quelques reprises de bitume plus noires
+            ctx.fillStyle = "#676b70";
             ctx.fillRect(0, 0, w, h);
-            bruit(ctx, w, h, 2500, 0.2);
-            bruit(ctx, w, h, 600, 0.12, "255,255,255");
+            bruit(ctx, w, h, 3200, 0.22);
+            bruit(ctx, w, h, 900, 0.16, "255,255,255");
+            bruit(ctx, w, h, 300, 0.1, "190,170,140");
+            for (let i = 0; i < 5; i++) {
+                ctx.fillStyle = `rgba(20,22,26,${0.05 + Math.random() * 0.06})`;
+                ctx.beginPath(); ctx.ellipse(Math.random() * w, Math.random() * h, 14 + Math.random() * 30, 8 + Math.random() * 16, Math.random() * 3, 0, Math.PI * 2); ctx.fill();
+            }
         }, rep),
         beton_ext: (rep) => texture("beton_ext", 256, 256, (ctx, w, h) => {
             ctx.fillStyle = "#bdb8ad";
@@ -126,19 +142,77 @@ export function creerKit(THREE) {
             ctx.beginPath(); ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h); ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2); ctx.stroke();
         }, rep),
         terre: (rep) => texture("terre", 256, 256, (ctx, w, h) => {
-            ctx.fillStyle = "#a9774a";
+            // la terre des champs : les sillons, les mottes, un peu d'herbe folle
+            ctx.fillStyle = "#a3744a";
             ctx.fillRect(0, 0, w, h);
-            bruit(ctx, w, h, 2000, 0.18);
+            bruit(ctx, w, h, 2600, 0.2);
+            bruit(ctx, w, h, 500, 0.1, "255,230,190");
             for (let y = 8; y < h; y += 16) {
-                ctx.fillStyle = "rgba(60,35,15,0.25)";
-                ctx.fillRect(0, y, w, 3);
+                ctx.fillStyle = "rgba(60,35,15,0.28)";
+                ctx.fillRect(0, y, w, 4);
+                ctx.fillStyle = "rgba(255,220,170,0.1)";
+                ctx.fillRect(0, y + 6, w, 2);
             }
+            for (let i = 0; i < 90; i++) {
+                ctx.fillStyle = `rgba(70,40,20,${0.2 + Math.random() * 0.3})`;
+                ctx.beginPath(); ctx.ellipse(Math.random() * w, Math.random() * h, 2 + Math.random() * 4, 1.5 + Math.random() * 2, Math.random() * 3, 0, Math.PI * 2); ctx.fill();
+            }
+            bruit(ctx, w, h, 120, 0.3, "110,150,60");
         }, rep),
         herbe: (rep) => texture("herbe", 256, 256, (ctx, w, h) => {
-            ctx.fillStyle = "#9ccd77";
+            // une pelouse : deux verts en bandes de tonte, des brins plus clairs et plus sombres, quelques pâquerettes
+            for (let y = 0; y < h; y += 32) {
+                ctx.fillStyle = (y / 32) % 2 ? "#97c874" : "#9fd07c";
+                ctx.fillRect(0, y, w, 32);
+            }
+            bruit(ctx, w, h, 2600, 0.14, "40,90,20");
+            bruit(ctx, w, h, 900, 0.12, "230,255,180");
+            ctx.strokeStyle = "rgba(60,120,40,0.35)";
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 700; i++) {
+                const x = Math.random() * w, y = Math.random() * h;
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + (Math.random() - 0.5) * 3, y - 3 - Math.random() * 4); ctx.stroke();
+            }
+            for (let i = 0; i < 14; i++) {
+                ctx.fillStyle = "rgba(255,255,255,0.8)";
+                ctx.beginPath(); ctx.arc(Math.random() * w, Math.random() * h, 1.5, 0, Math.PI * 2); ctx.fill();
+            }
+        }, rep),
+        gravier: (rep) => texture("gravier", 256, 256, (ctx, w, h) => {
+            ctx.fillStyle = "#c2b9a6";
             ctx.fillRect(0, 0, w, h);
-            bruit(ctx, w, h, 2500, 0.12, "40,90,20");
-            bruit(ctx, w, h, 700, 0.1, "255,255,200");
+            bruit(ctx, w, h, 3000, 0.2);
+            bruit(ctx, w, h, 1500, 0.2, "255,250,240");
+            for (let i = 0; i < 400; i++) {
+                ctx.fillStyle = `rgba(${90 + Math.random() * 80},${80 + Math.random() * 70},${60 + Math.random() * 60},0.6)`;
+                ctx.beginPath(); ctx.arc(Math.random() * w, Math.random() * h, 1 + Math.random() * 2.2, 0, Math.PI * 2); ctx.fill();
+            }
+        }, rep),
+        trottoir: (rep) => texture("trottoir", 256, 256, (ctx, w, h) => {
+            // des dalles de trottoir : joints gris, dalles claires légèrement différentes
+            ctx.fillStyle = "#b9b4aa";
+            ctx.fillRect(0, 0, w, h);
+            for (let y = 0; y < h; y += 64) {
+                for (let x = 0; x < w; x += 64) {
+                    ctx.fillStyle = `hsl(40, 12%, ${78 + Math.random() * 8}%)`;
+                    ctx.fillRect(x + 2, y + 2, 60, 60);
+                }
+            }
+            bruit(ctx, w, h, 1200, 0.1);
+        }, rep),
+        eau: (rep) => texture("eau", 256, 256, (ctx, w, h) => {
+            // l'eau d'un bassin : un bleu profond, des reflets en vaguelettes
+            const gr = ctx.createLinearGradient(0, 0, w, h);
+            gr.addColorStop(0, "#4fa3c9"); gr.addColorStop(1, "#2f7fa8");
+            ctx.fillStyle = gr;
+            ctx.fillRect(0, 0, w, h);
+            ctx.strokeStyle = "rgba(255,255,255,0.35)";
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 40; i++) {
+                const x = Math.random() * w, y = Math.random() * h, l = 10 + Math.random() * 30;
+                ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + l / 2, y - 3, x + l, y); ctx.stroke();
+            }
+            bruit(ctx, w, h, 600, 0.1, "255,255,255");
         }, rep),
         enduit: (rep) => texture("enduit", 256, 256, (ctx, w, h) => {
             ctx.fillStyle = "#f1ece2";

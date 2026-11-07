@@ -5,7 +5,7 @@
     --encre: #1d2f38;
     --gris: #5d6b78;
     --fond: #f4f1ea;
-    --carte: rgba(255, 255, 255, 0.96);
+    --carte: rgba(255, 255, 255, 0.9);
     --ombre: 0 1px 2px rgba(24, 40, 50, 0.06), 0 8px 24px rgba(24, 40, 50, 0.12);
     --vert: #2f9e5b; --ambre: #e3a21a; --rouge: #d94f45; --ardoise: #6c7883; --bleu: #2a63b0;
     background: var(--fond);
@@ -49,7 +49,10 @@
             &:hover { background: #eef6f8; } } }
 
     // ---------------------------------------------------------------- la scène
-    .o_cv_scene { overflow: hidden; user-select: none; touch-action: none; background: radial-gradient(ellipse at 50% 35%, #fbf8f1 0%, #ece6d8 70%, #e2dac8 100%); }
+    // le ciel derrière la scène : bleu en haut, brume claire à l'horizon ; il rougit au crépuscule et s'assombrit le soir
+    .o_cv_scene { overflow: hidden; user-select: none; touch-action: none; background: linear-gradient(180deg, #a9d3ee 0%, #cfe6f4 30%, #e4edf0 52%, #e9e4d6 70%, #e2dac8 100%);
+        &.o_cv_crepuscule { background: linear-gradient(180deg, #8fb4d9 0%, #e7c9b1 34%, #f4dcc4 50%, #e9dfcc 70%, #ddd3c0 100%); }
+        &.o_cv_soir { background: linear-gradient(180deg, #152238 0%, #2f3f5e 36%, #4a5570 52%, #3b4252 70%, #2d3340 100%); } }
     .o_cv_hote { position: absolute; inset: 0; canvas { display: block; cursor: grab; width: 100% !important; height: 100% !important; } }
     .o_cv_calque { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5;
         .o_cv_etiquette { position: absolute; left: 0; top: 0; will-change: transform; white-space: nowrap; }
@@ -66,7 +69,7 @@
 
     // ---------------------------------------------------------------- les KPI
     .o_cv_kpis { position: absolute; left: 16px; top: 16px; z-index: 10; display: flex; gap: 10px; }
-    .o_cv_kpi { background: var(--carte); border: 0; border-radius: 16px; padding: 10px 16px; min-width: 150px; text-align: left; box-shadow: var(--ombre); transition: transform 0.15s ease;
+    .o_cv_kpi { background: var(--carte); border: 0; border-left: 4px solid var(--accent); border-radius: 16px; padding: 10px 16px; min-width: 150px; text-align: left; box-shadow: var(--ombre); transition: transform 0.15s ease; backdrop-filter: blur(6px);
         .nom { font-size: 11px; color: var(--gris); font-weight: 600; } .valeur { font-size: 24px; font-weight: 800; line-height: 1.15; small { font-size: 13px; font-weight: 600; color: var(--gris); } }
         .sous { font-size: 11px; color: var(--gris); }
         &:hover { transform: translateY(-1px); } &.flash { animation: cv-flash 1.4s ease; } }

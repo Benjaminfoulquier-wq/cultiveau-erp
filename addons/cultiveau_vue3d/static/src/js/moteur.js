@@ -3,6 +3,8 @@
 // la sélection (crochets, halo, étiquettes projetées), les marcheurs (A* sur une grille de navigation), les véhicules
 // (courbes de Catmull-Rom), les animations d'objets et l'éditeur de plan. `frame(dt)` est séparée de requestAnimationFrame.
 
+import { decorer, fenetres, zoneEn, champLibre } from "./decor";
+
 const FOV = 26;
 const POLAIRE = [0.28, 1.18];
 const DISTANCE = [12, 190];
@@ -51,30 +53,33 @@ export class Moteur {
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.toneMapping = THREE.NeutralToneMapping ?? THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 1.0;
+        renderer.toneMappingExposure = 1.04;
         this.hote.appendChild(renderer.domElement);
         this.renderer = renderer;
         const scene = new THREE.Scene();
         scene.background = null;
-        scene.fog = new THREE.Fog(0xece6d8, 120, 260);
+        // la brume de l'horizon, de la couleur du ciel bas (le dégradé du ciel est celui de la page, derrière le canevas)
+        scene.fog = new THREE.Fog(0xe4edf0, 140, 420);
         this.scene = scene;
-        this.camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 600);
+        this.camera = new THREE.PerspectiveCamera(FOV, 1, 0.5, 900);
         this.cam = { cible: new THREE.Vector3(32, 0, 26), distance: 70, azimut: 0.66, polaire: 0.86, vel: { x: 0, z: 0, azimut: 0, polaire: 0, distance: 0 } };
-        // la lumière : un ciel, un soleil avec des ombres douces, un appoint froid
-        scene.add(new THREE.HemisphereLight(0xf4f8ff, 0xd9cdb2, 1.9));
-        const soleil = new THREE.DirectionalLight(0xfff1d6, 2.8);
-        soleil.position.set(-18, 60, 10);
+        // la lumière : un ciel bleuté sur un sol vert-brun, un soleil de fin de matinée aux ombres douces, un appoint froid
+        const ciel = new THREE.HemisphereLight(0xdcefff, 0xb9c6a2, 1.55);
+        scene.add(ciel);
+        const soleil = new THREE.DirectionalLight(0xffe9c8, 3.1);
+        soleil.position.set(-26, 58, 24);
         soleil.target.position.set(30, 0, 30);
         soleil.castShadow = true;
         soleil.shadow.mapSize.set(4096, 4096);
-        Object.assign(soleil.shadow.camera, { left: -60, right: 60, top: 60, bottom: -60, near: 1, far: 180 });
+        Object.assign(soleil.shadow.camera, { left: -64, right: 64, top: 64, bottom: -64, near: 1, far: 200 });
         soleil.shadow.bias = -0.0004;
-        soleil.shadow.normalBias = 0.03;
-        soleil.shadow.radius = 3;
+        soleil.shadow.normalBias = 0.035;
+        soleil.shadow.radius = 4;
         scene.add(soleil, soleil.target);
-        const appoint = new THREE.DirectionalLight(0xcfe3ff, 0.6);
+        const appoint = new THREE.DirectionalLight(0xcfe3ff, 0.55);
         appoint.position.set(40, 30, -30);
         scene.add(appoint);
+        this.lumieres = { ciel, soleil, appoint };
         if (THREE.PMREMGenerator && THREE.RoomEnvironment) {
             try {
                 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -138,7 +143,7 @@ export class Moteur {
         const ext = plan.exterieur || {};
         const [[x0, z0], [x1, z1]] = ext.sol || [[-8, -2], [72, 66]];
         // la plaine
-        const plaine = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ color: 0xcfe3ad, roughness: 1 }));
+        const plaine = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ map: kit.sol("herbe", 900, 900), color: 0xd8e6c0, roughness: 1 }));
         plaine.rotation.x = -Math.PI / 2;
         plaine.position.set((x0 + x1) / 2, -0.06, (z0 + z1) / 2);
         plaine.receiveShadow = true;
@@ -160,6 +165,13 @@ export class Moteur {
         for (const o of plan.objets || []) {
             this._objetDuPlan(o);
         }
+        // le décor : ciel, horizon, abords, dedans, campagne ; puis la lumière du moment de la journée
+        try {
+            decorer(this);
+        } catch (e) {
+            console.warn("[Map vivante] décor :", e);
+        }
+        this._ambiance();
         // les places : invisibles, sauf en édition (un disque)
         this.places = new Map((plan.places || []).map((p) => [p.cle, p]));
         this._placesVisuelles();
@@ -173,6 +185,26 @@ export class Moteur {
         this.vue = { cible: this.cam.cible.clone(), distance: this.cam.distance, azimut: this.cam.azimut, polaire: this.cam.polaire };
     }
 
+    /** La lumière du moment : le jour ; le soir et la nuit, le soleil se couche, les suspensions prennent le relais. */
+    _ambiance(heure = new Date().getHours() + new Date().getMinutes() / 60) {
+        const soir = heure >= 18.5 || heure < 7;
+        const crepuscule = !soir && (heure >= 17 || heure < 8.5);
+        const { ciel, soleil, appoint } = this.lumieres || {};
+        if (soleil) {
+            soleil.intensity = soir ? 0.55 : crepuscule ? 2.2 : 3.1;
+            soleil.color.setHex(soir ? 0x9fb4d8 : crepuscule ? 0xffd2a0 : 0xffe9c8);
+            soleil.position.set(soir ? 30 : crepuscule ? -48 : -26, soir ? 40 : crepuscule ? 26 : 58, 24);
+            ciel.intensity = soir ? 0.6 : crepuscule ? 1.2 : 1.55;
+            ciel.color.setHex(soir ? 0x6f86b0 : 0xdcefff);
+            appoint.intensity = soir ? 0.2 : 0.55;
+            this.scene.fog.color.setHex(soir ? 0x3f4a63 : crepuscule ? 0xf0dcc6 : 0xe4edf0);
+        }
+        for (const m of this.lampes || []) {
+            m.emissiveIntensity = soir ? 1.6 : crepuscule ? 1.1 : 0.7;
+        }
+        this.hote.parentElement?.classList.toggle("o_cv_soir", soir);
+        this.hote.parentElement?.classList.toggle("o_cv_crepuscule", crepuscule);
+    }
     _polygone(points) {
         const { THREE } = this;
         const forme = new THREE.Shape();
@@ -245,6 +277,13 @@ export class Moteur {
                 map.needsUpdate = true;
                 int.material = [matMur, matMur, matMur, matMur, new THREE.MeshStandardMaterial({ map: kit.SOLS.bardage([l / 2, 1]), roughness: 0.85 }), new THREE.MeshStandardMaterial({ map, roughness: 0.9 })];
                 g.add(int);
+                // le couronnement à la couleur, le soubassement, et les fenêtres des bureaux et de l'accueil
+                kit.bloc(g, l, 0.14, MUR_E + 0.06, new THREE.Color(this.accent).getHex(), 0, MUR_H - 0.14, 0, { rayon: 0.02, r: 0.5 });
+                kit.bloc(g, l, 0.38, MUR_E + 0.04, 0x9aa1a6, 0, 0, 0, { rayon: 0.01, r: 0.8 });
+                const dedans = zoneEn(plan, (a[0] + b[0]) / 2 - normale[0] * 0.7, (a[1] + b[1]) / 2 - normale[1] * 0.7);
+                if (dedans && ["bureau", "reunion", "pause", "accueil"].includes(dedans.type)) {
+                    fenetres(kit, g, l, MUR_E);
+                }
                 g.position.set((a[0] + b[0]) / 2, 0, (a[1] + b[1]) / 2);
                 g.rotation.y = -Math.atan2(b[1] - a[1], b[0] - a[0]);
                 g.userData.normale = normale;
@@ -893,6 +932,23 @@ export class Moteur {
                              installation: p.id, arrose: p.arrose, eau: p.eau, meta: p });
         }
         this.champs = new Map();
+        // les parcelles sans dossier restent cultivées : blé, prairie, tournesol ou labour, pour que la campagne vive
+        for (let i = 0; i < champs.length; i++) {
+            const place = champs[i], cle = `champ_libre:${place.cle}`;
+            const existant = this.objets.get(cle);
+            if (i < candidats.length) {
+                if (existant) {
+                    this.statique.remove(existant.groupe);
+                    this.objets.delete(cle);
+                }
+            } else if (!existant) {
+                const g = champLibre(kit, i);
+                g.position.set(place.x, 0, place.z);
+                this.statique.add(g);
+                this.objets.set(cle, { groupe: g, genre: "objet", id: place.cle, nom: "Parcelle voisine", sousTitre: "", priorite: 0, rayon: 5, statique: true,
+                                       centre: new THREE.Vector3(place.x, 0, place.z) });
+            }
+        }
         candidats.slice(0, champs.length).forEach((c, i) => {
             const place = champs[i];
             this.champs.set(c.installation, place);
