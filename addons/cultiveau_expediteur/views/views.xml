@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_expediteur" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.expediteur</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_base.res_config_settings_view_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='cultiveau_outils']" position="before">
+                <block title="L'expéditeur des courriels" name="cultiveau_expediteur">
+                    <setting string="Tout ce que l'ERP envoie part au nom de l'adhérent" class="col-12"
+                             help="Devis, commandes, factures, relances, réponses depuis le fil : le client voit le nom de son installateur. Par le réseau, rien à configurer ; par sa boîte, il faut l'avoir branchée dans Courriels › Boîtes mail. Chaque envoi est écrit dans le fil de la fiche.">
+                        <div class="mt8"><field name="cultiveau_envoi" widget="radio"/></div>
+                        <div class="mt8" invisible="cultiveau_envoi != 'boite'"><label for="cultiveau_boite_envoi_id" class="o_light_label me-2"/><field name="cultiveau_boite_envoi_id" options="{'no_create': True}"/></div>
+                        <div class="mt8">Vu par le client : <b><field name="cultiveau_expediteur_apercu" class="oe_inline"/></b></div>
+                        <div class="mt8 text-muted" groups="cultiveau_base.group_equipe"><label for="cultiveau_expediteur_reseau" class="o_light_label me-2"/><field name="cultiveau_expediteur_reseau" class="oe_inline"/></div>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>
