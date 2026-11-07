@@ -59,6 +59,10 @@ class Installation(models.Model):
             seq[0] += 10
             lignes.append(Command.create({"display_type": "line_section", "name": LOTS[cle], "sequence": seq[0]}))
 
+        def sous_section(nom):
+            seq[0] += 1
+            lignes.append(Command.create({"display_type": "line_section", "name": nom, "sequence": seq[0], "cultiveau_sous_lot": True}))
+
         def ligne(nom, qte, mots=(), dn=None, matiere=None, au_metre=False, note=None):
             seq[0] += 1
             # seul ce qui se reconnaît à coup sûr (un DN, une matière) est pris au catalogue ; une pompe ou un filtre se choisissent à la main
@@ -110,6 +114,7 @@ class Installation(models.Model):
         # Lot 4
         section("secteurs")
         for s in i.secteur_ids:
+            sous_section(f"{s.name} — {s.surface_ha:g} ha, {s.debit_m3h:g} m³/h")
             smat = dict(MATERIAUX).get(s.materiau or "pe", "PE").split(" ")[0]
             if s.longueur_m:
                 ligne(f"Conduite d'amenée {smat} Ø {s.diametre_calc}, {s.longueur_m:g} m — {s.name}", s.longueur_m, ("tube",), dn=s.diametre_calc, matiere=smat, au_metre=True)

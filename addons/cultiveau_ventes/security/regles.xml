@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="regle_nomenclature_lecture" model="ir.rule">
+        <field name="name">Nomenclatures : les miennes et celles du réseau</field>
+        <field name="model_id" ref="model_cultiveau_nomenclature"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+    <record id="regle_nomenclature_ecriture" model="ir.rule">
+        <field name="name">Nomenclatures : on ne modifie que les siennes</field>
+        <field name="model_id" ref="model_cultiveau_nomenclature"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        <field name="perm_read" eval="False"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+    <record id="regle_nomenclature_equipe" model="ir.rule">
+        <field name="name">Nomenclatures : l'équipe Cultiveau gère celles du réseau</field>
+        <field name="model_id" ref="model_cultiveau_nomenclature"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="groups" eval="[(4, ref('cultiveau_base.group_equipe'))]"/>
+    </record>
+    <record id="regle_nomenclature_ligne" model="ir.rule">
+        <field name="name">Articles de nomenclature : comme la nomenclature</field>
+        <field name="model_id" ref="model_cultiveau_nomenclature_ligne"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+    </record>
+</odoo>

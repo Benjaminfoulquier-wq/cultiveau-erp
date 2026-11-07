@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Des articles génériques du réseau (prix 0, à remplacer par l'article du catalogue au devis) pour porter les nomenclatures proposées. -->
+        <record id="art_clapet" model="product.template">
+            <field name="name">Clapet anti-retour / disconnecteur de station</field>
+            <field name="default_code">NOM-CLAPET</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+            <field name="description_sale">Protection sanitaire de la ressource (§ 15.3.1 : point d'arrêt à la réception). Référence à choisir au catalogue.</field>
+        </record>
+        <record id="art_antibelier" model="product.template">
+            <field name="name">Anti-bélier de station</field>
+            <field name="default_code">NOM-ANTIBELIER</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="art_manometre" model="product.template">
+            <field name="name">Manomètre à bain de glycérine</field>
+            <field name="default_code">NOM-MANO</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="art_compteur" model="product.template">
+            <field name="name">Compteur volumétrique de prélèvement</field>
+            <field name="default_code">NOM-COMPTEUR</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+            <field name="description_sale">Comptage des volumes prélevés (§ 8.3), longueurs droites amont et aval à respecter (§ 16.5.1).</field>
+        </record>
+        <record id="art_vanne_isolement" model="product.template">
+            <field name="name">Vanne d'isolement de station</field>
+            <field name="default_code">NOM-VANNE-STATION</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="art_vanne_secteur" model="product.template">
+            <field name="name">Vanne de secteur</field>
+            <field name="default_code">NOM-VANNE-SECTEUR</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="art_regulateur" model="product.template">
+            <field name="name">Régulateur de pression de secteur</field>
+            <field name="default_code">NOM-REGULATEUR</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+            <field name="description_sale">Quand l'écart de pression dans le secteur dépasse la tolérance (§ 6.4.2 : ± 10 % goutteurs non régulants, ± 15 % micro, ± 20 % aspersion).</field>
+        </record>
+        <record id="art_ventouse" model="product.template">
+            <field name="name">Ventouse (point haut)</field>
+            <field name="default_code">NOM-VENTOUSE</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="art_purge" model="product.template">
+            <field name="name">Purge (point bas)</field>
+            <field name="default_code">NOM-PURGE</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="art_regard" model="product.template">
+            <field name="name">Regard de vanne</field>
+            <field name="default_code">NOM-REGARD</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="art_filtre_secondaire" model="product.template">
+            <field name="name">Filtre secondaire à tamis (tête de secteur)</field>
+            <field name="default_code">NOM-FILTRE-SECTEUR</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="art_prise_mano" model="product.template">
+            <field name="name">Prise manométrique rapide</field>
+            <field name="default_code">NOM-PRISE-MANO</field>
+            <field name="type">consu</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="srv_rincage" model="product.template">
+            <field name="name">Rinçage des canalisations et essais de pression avant remblaiement</field>
+            <field name="default_code">NOM-RINCAGE</field>
+            <field name="type">service</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+            <field name="description_sale">§ 13.5.1 et 13.5.2.</field>
+        </record>
+        <record id="srv_pv" model="product.template">
+            <field name="name">Mise en service et procès-verbal A1.3 (pressions et débits de référence)</field>
+            <field name="default_code">NOM-PV-A13</field>
+            <field name="type">service</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="srv_reception" model="product.template">
+            <field name="name">Réception et certificat de conformité A1.4 (uniformité mesurée au champ)</field>
+            <field name="default_code">NOM-A14</field>
+            <field name="type">service</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+        <record id="srv_formation" model="product.template">
+            <field name="name">Fiche de réglage A1.5 et formation de l'exploitant</field>
+            <field name="default_code">NOM-A15</field>
+            <field name="type">service</field>
+            <field name="list_price">0</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Les nomenclatures proposées par le réseau (société vide). -->
+        <record id="nom_protection_station" model="cultiveau.nomenclature">
+            <field name="name">Protection de la station de pompage</field>
+            <field name="code">RES-STATION</field>
+            <field name="company_id" eval="False"/>
+            <field name="lot">filtration</field>
+            <field name="unite">par station</field>
+            <field name="reference_referentiel">§ 8.3, § 15.3.1, § 3.5</field>
+            <field name="description">Ce qui doit être présent à la réception, quel que soit le projet : l'anti-retour (point d'arrêt), le comptage du prélèvement, l'isolement, la mesure de pression, l'anti-bélier. Choisir les références au diamètre de la station.</field>
+            <field name="ligne_ids" eval="[
+                (0, 0, {'sequence': 10, 'product_id': ref('art_clapet'), 'quantite': 1, 'proportionnel': False, 'note': 'Disconnecteur si fertigation ou interconnexion avec l\'eau potable (§ 15.3.1) : absence = non-conformité bloquante.'}),
+                (0, 0, {'sequence': 20, 'product_id': ref('art_compteur'), 'quantite': 1, 'proportionnel': False}),
+                (0, 0, {'sequence': 30, 'product_id': ref('art_vanne_isolement'), 'quantite': 1, 'proportionnel': False}),
+                (0, 0, {'sequence': 40, 'product_id': ref('art_antibelier'), 'quantite': 1, 'proportionnel': False}),
+                (0, 0, {'sequence': 50, 'product_id': ref('art_manometre'), 'quantite': 2, 'proportionnel': False, 'note': 'Amont et aval de la filtration : la différence de pression dit quand nettoyer.'}),
+            ]"/>
+        </record>
+        <record id="nom_tete_secteur" model="cultiveau.nomenclature">
+            <field name="name">Tête de secteur</field>
+            <field name="code">RES-TETE-SECTEUR</field>
+            <field name="company_id" eval="False"/>
+            <field name="lot">secteurs</field>
+            <field name="unite">par secteur</field>
+            <field name="reference_referentiel">§ 6.4.2, § 6.4.3</field>
+            <field name="description">Une tête par secteur : la vanne, la régulation de pression, la purge d'air, la prise de mesure. Insérer autant de têtes que de secteurs ; le diamètre vient du dimensionnement.</field>
+            <field name="ligne_ids" eval="[
+                (0, 0, {'sequence': 10, 'product_id': ref('art_vanne_secteur'), 'quantite': 1}),
+                (0, 0, {'sequence': 20, 'product_id': ref('art_regulateur'), 'quantite': 1}),
+                (0, 0, {'sequence': 30, 'product_id': ref('art_ventouse'), 'quantite': 1}),
+                (0, 0, {'sequence': 40, 'product_id': ref('art_prise_mano'), 'quantite': 1, 'note': 'La pression en tête de secteur se relève au PV A1.3 puis à chaque diagnostic.'}),
+                (0, 0, {'sequence': 50, 'product_id': ref('art_filtre_secondaire'), 'quantite': 1, 'optionnel': True, 'note': 'En goutte à goutte, quand la conduite d\'amenée est longue ou l\'eau chargée (§ 5.4).'}),
+            ]"/>
+        </record>
+        <record id="nom_point_haut_bas" model="cultiveau.nomenclature">
+            <field name="name">Point haut et point bas du réseau</field>
+            <field name="code">RES-POINTS</field>
+            <field name="company_id" eval="False"/>
+            <field name="lot">reseau</field>
+            <field name="unite">par point singulier</field>
+            <field name="description">À chaque point haut une ventouse, à chaque point bas une purge, dans un regard. Compter les points sur le profil en long.</field>
+            <field name="ligne_ids" eval="[
+                (0, 0, {'sequence': 10, 'product_id': ref('art_ventouse'), 'quantite': 1}),
+                (0, 0, {'sequence': 20, 'product_id': ref('art_purge'), 'quantite': 1}),
+                (0, 0, {'sequence': 30, 'product_id': ref('art_regard'), 'quantite': 1}),
+            ]"/>
+        </record>
+        <record id="nom_mise_en_service" model="cultiveau.nomenclature">
+            <field name="name">Mise en service, réception et formation</field>
+            <field name="code">RES-MES</field>
+            <field name="company_id" eval="False"/>
+            <field name="lot">pose</field>
+            <field name="unite">par installation</field>
+            <field name="reference_referentiel">§ 3.4, § 3.5, § 3.6, A1.3, A1.4, A1.5</field>
+            <field name="description">Les prestations que le référentiel attend à la fin de tout projet, à chiffrer à part pour qu'elles ne soient ni oubliées ni offertes sans le dire.</field>
+            <field name="ligne_ids" eval="[
+                (0, 0, {'sequence': 10, 'product_id': ref('srv_rincage'), 'quantite': 1, 'proportionnel': False}),
+                (0, 0, {'sequence': 20, 'product_id': ref('srv_pv'), 'quantite': 1, 'proportionnel': False}),
+                (0, 0, {'sequence': 30, 'product_id': ref('srv_reception'), 'quantite': 1, 'proportionnel': False}),
+                (0, 0, {'sequence': 40, 'product_id': ref('srv_formation'), 'quantite': 1, 'proportionnel': False}),
+            ]"/>
+        </record>
+    </data>
+</odoo>

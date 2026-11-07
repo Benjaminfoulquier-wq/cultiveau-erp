@@ -31,6 +31,43 @@
                 </div>
             </div>
         </xpath>
+        <!-- Les sous-lots : leur sous-total, puis le total du lot qui les contient (le sous-total par section vient d'Odoo). -->
+        <xpath expr="//t[@t-set='current_subtotal'][@t-value='current_subtotal + line.price_subtotal']" position="after">
+            <t t-set="lot_total" t-value="(lot_total or 0) + line.price_subtotal"/>
+        </xpath>
+        <xpath expr="//t[@t-set='current_section'][@t-value='line']" position="after">
+            <t t-if="line.display_type == 'line_section' and not line.cultiveau_sous_lot">
+                <t t-set="lot_courant" t-value="line"/>
+                <t t-set="lot_total" t-value="0"/>
+                <t t-set="lot_a_sous_lots" t-value="False"/>
+            </t>
+            <t t-if="line.display_type == 'line_section' and line.cultiveau_sous_lot">
+                <t t-set="lot_a_sous_lots" t-value="True"/>
+            </t>
+        </xpath>
+        <xpath expr="//td[@name='td_section_line']" position="attributes">
+            <attribute name="t-attf-style">{{ 'padding-left: 18px; font-weight: 600; font-style: italic; font-size: 95%;' if line.cultiveau_sous_lot else '' }}</attribute>
+        </xpath>
+        <xpath expr="//t[@t-set='current_section'][@t-value='None']" position="before">
+            <t t-set="section_fermee" t-value="current_section"/>
+        </xpath>
+        <xpath expr="//td[@name='td_section_subtotal']" position="replace">
+            <td name="td_section_subtotal" colspan="99" t-attf-style="{{ 'font-size: 95%; font-style: italic;' if section_fermee and section_fermee.cultiveau_sous_lot else '' }}">
+                <strong class="mr16">Sous-total<t t-if="section_fermee and section_fermee.name"> · <t t-out="section_fermee.name"/></t></strong>
+                <span t-out="current_subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+            </td>
+        </xpath>
+        <xpath expr="//tr[hasclass('is-subtotal')]" position="after">
+            <t t-if="lot_a_sous_lots and lot_courant and (line_last or (lines_to_report[line_index+1].display_type == 'line_section' and not lines_to_report[line_index+1].cultiveau_sous_lot))">
+                <t t-set="lot_a_sous_lots" t-value="False"/>
+                <tr class="is-subtotal text-end">
+                    <td colspan="99" style="border-top: 1px solid #888;">
+                        <strong class="mr16">Total · <t t-out="lot_courant.name"/></strong>
+                        <span t-out="lot_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
         <!-- Les CGV en dernière page. -->
         <xpath expr="//span[@name='order_note']/.." position="after">
             <t t-if="doc.company_id.cultiveau_cgv and not is_html_empty(doc.company_id.cultiveau_cgv) and not env.context.get('proforma')">

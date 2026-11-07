@@ -19,6 +19,24 @@
             </xpath>
             <xpath expr="//header" position="inside">
                 <button name="action_creer_installation" type="object" string="Créer l'installation" invisible="cultiveau_installation_id or not partner_id"/>
+                <button name="action_inserer_nomenclature" type="object" string="Insérer une nomenclature" invisible="state not in ('draft', 'sent')"/>
+                <button name="action_enregistrer_nomenclature" type="object" string="Enregistrer en nomenclature" invisible="not order_line"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list" position="attributes">
+                <attribute name="decoration-it">cultiveau_sous_lot</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='display_type']" position="after">
+                <field name="cultiveau_sous_lot" column_invisible="True"/>
+                <field name="cultiveau_nomenclature_id" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/control/create[@name='add_section_control']" position="after">
+                <create name="add_sous_lot_control" string="Ajouter un sous-lot" context="{'default_display_type': 'line_section', 'default_cultiveau_sous_lot': True}"/>
+            </xpath>
+            <xpath expr="//page[@name='order_lines']" position="after">
+                <page string="Lots et sous-totaux" name="lots_cultiveau">
+                    <field name="cultiveau_nb_lots" invisible="1"/>
+                    <field name="cultiveau_recap_lots" nolabel="1"/>
+                </page>
             </xpath>
         </field>
     </record>

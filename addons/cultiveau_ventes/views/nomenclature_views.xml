@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_nomenclature_list" model="ir.ui.view">
+        <field name="name">cultiveau.nomenclature.list</field>
+        <field name="model">cultiveau.nomenclature</field>
+        <field name="arch" type="xml">
+            <list default_order="lot, sequence, name">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code" optional="hide"/>
+                <field name="lot"/>
+                <field name="type_systeme" optional="show"/>
+                <field name="unite"/>
+                <field name="nb_lignes"/>
+                <field name="prix_catalogue" widget="monetary"/>
+                <field name="nb_usages" string="Devis"/>
+                <field name="company_id" string="Proposée par" widget="many2one" options="{'no_open': True}"/>
+                <field name="reference_referentiel" optional="hide"/>
+                <button name="action_inserer" type="object" string="Insérer dans un devis" icon="fa-plus" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_nomenclature_form" model="ir.ui.view">
+        <field name="name">cultiveau.nomenclature.form</field>
+        <field name="model">cultiveau.nomenclature</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_inserer" type="object" string="Insérer dans un devis" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_devis" type="object" class="oe_stat_button" icon="fa-file-text-o">
+                            <field name="nb_usages" widget="statinfo" string="Devis"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Archivée" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Ex. Tête de secteur goutte à goutte"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="lot"/>
+                            <field name="type_systeme"/>
+                            <field name="unite" placeholder="par secteur, par station, par point haut"/>
+                            <field name="code"/>
+                        </group>
+                        <group>
+                            <field name="company_id" string="Proposée par" options="{'no_create': True}" groups="cultiveau_base.group_equipe"/>
+                            <field name="prix_catalogue" widget="monetary"/>
+                            <field name="reference_referentiel" placeholder="§ 15.3.1, § 8.3"/>
+                            <field name="origine_order_id" invisible="not origine_order_id"/>
+                            <field name="active" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Quand l'employer, ce qu'il reste à adapter (diamètre, finesse de filtration, pression)…"/>
+                    <notebook>
+                        <page string="Articles" name="articles">
+                            <field name="ligne_ids">
+                                <list editable="bottom" default_order="sequence, id">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="company_id" column_invisible="True"/>
+                                    <field name="product_id" options="{'no_create': True}"/>
+                                    <field name="name"/>
+                                    <field name="quantite"/>
+                                    <field name="uom_id" options="{'no_create': True}"/>
+                                    <field name="proportionnel" widget="boolean_toggle"/>
+                                    <field name="optionnel" widget="boolean_toggle"/>
+                                    <field name="prix" widget="monetary" sum="Catalogue"/>
+                                    <field name="note" optional="show"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_nomenclature_search" model="ir.ui.view">
+        <field name="name">cultiveau.nomenclature.search</field>
+        <field name="model">cultiveau.nomenclature</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="ligne_ids" string="Article" filter_domain="[('ligne_ids.product_id', 'ilike', self)]"/>
+                <filter name="miennes" string="Les miennes" domain="[('company_id', '!=', False)]"/>
+                <filter name="reseau" string="Proposées par le réseau" domain="[('company_id', '=', False)]"/>
+                <separator/>
+                <filter name="archivees" string="Archivées" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Regrouper">
+                    <filter name="par_lot" string="Lot" context="{'group_by': 'lot'}"/>
+                    <filter name="par_type" string="Type d'installation" context="{'group_by': 'type_systeme'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_nomenclatures" model="ir.actions.act_window">
+        <field name="name">Nomenclatures</field>
+        <field name="res_model">cultiveau.nomenclature</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_par_lot': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Des ensembles prêts à poser dans un devis</p>
+            <p>Une tête de secteur, la protection d'une station, un point haut, la mise en service : on insère l'ensemble, on ajuste, on chiffre.
+            Un lot bien fait d'un devis s'enregistre ici d'un clic (bouton « Enregistrer en nomenclature » du devis).</p>
+        </field>
+    </record>
+
+    <!-- Insérer dans un devis -->
+    <record id="view_nomenclature_inserer_form" model="ir.ui.view">
+        <field name="name">cultiveau.nomenclature.inserer.form</field>
+        <field name="model">cultiveau.nomenclature.inserer</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="order_id" options="{'no_create': True}" domain="[('state', 'in', ('draft', 'sent'))]"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="type_systeme" invisible="1"/>
+                        <field name="nomenclature_id" options="{'no_create': True}"/>
+                        <label for="quantite"/>
+                        <div class="d-flex align-items-baseline gap-2"><field name="quantite" class="oe_inline"/><field name="unite" class="oe_inline text-muted" readonly="1"/></div>
+                    </group>
+                    <group>
+                        <field name="placement" widget="radio"/>
+                        <field name="titre" invisible="placement == 'lignes'"/>
+                        <field name="avec_optionnelles"/>
+                    </group>
+                </group>
+                <field name="apercu" nolabel="1" colspan="2"/>
+                <footer>
+                    <button name="action_inserer" type="object" string="Insérer" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Enregistrer un lot du devis -->
+    <record id="view_nomenclature_enregistrer_form" model="ir.ui.view">
+        <field name="name">cultiveau.nomenclature.enregistrer.form</field>
+        <field name="model">cultiveau.nomenclature.enregistrer</field>
+        <field name="arch" type="xml">
+            <form>
+                <p class="text-muted">Les articles sous le lot choisi deviennent une nomenclature réutilisable. Un lot emporte ses sous-lots ; un sous-lot, seulement ses lignes.</p>
+                <group>
+                    <group>
+                        <field name="order_id" invisible="1"/>
+                        <field name="section_id" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="nb_lignes"/>
+                        <field name="name"/>
+                    </group>
+                    <group>
+                        <field name="lot"/>
+                        <field name="type_systeme"/>
+                        <field name="unite"/>
+                        <label for="quantite_reference"/>
+                        <div class="d-flex align-items-baseline gap-2"><field name="quantite_reference" class="oe_inline"/><span class="text-muted">ensemble(s)</span></div>
+                        <field name="reseau" groups="cultiveau_base.group_equipe"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="action_enregistrer" type="object" string="Enregistrer" class="btn-primary"/>
+                    <button string="Annuler" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

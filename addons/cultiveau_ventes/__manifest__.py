@@ -16,19 +16,25 @@ besoins et au dimensionnement de l'installation. Ce module :
 - fournit des **modèles de devis par type d'installation** (goutte à goutte, aspersion, enrouleur,
   pivot) avec les lots et les lignes de mise en service, réception et formation (PV A1.3, A1.5) ;
 - met devis, commandes, factures et opportunités dans le menu Cultiveau ;
+- des **nomenclatures** (ensembles d'articles : tête de secteur, protection de station, point haut, mise en service) à insérer au devis
+  en une fois, multipliées par le nombre de secteurs ; un lot d'un devis s'enregistre comme nomenclature ;
+- des **sous-lots** dans les lots, avec leurs sous-totaux à l'écran (onglet « Lots ») et sur le PDF ;
 - simule l'**irrigation à l'usage** (Journées Cultiveau 2025, atelier 5) : du CAPEX à l'OPEX, un prix au m³ tout
   inclus, une mensualité lissée, la bande de flexibilité 90–110 %, le comparatif avec l'achat à crédit.
 """,
-    "version": "18.0.2.0.0",
+    "version": "18.0.3.0.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
     "depends": ["cultiveau_installation", "sale_management", "crm", "account"],
     "data": [
         "security/ir.model.access.csv",
+        "security/regles.xml",
         "data/crm_stages.xml",
         "data/modeles_devis.xml",
+        "data/nomenclatures.xml",
         "views/sale_order_views.xml",
+        "views/nomenclature_views.xml",
         "views/crm_lead_views.xml",
         "views/installation_views.xml",
         "views/usage_views.xml",

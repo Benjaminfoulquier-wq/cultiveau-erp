@@ -1,2 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_usage_user,cultiveau.usage utilisateur,model_cultiveau_usage,base.group_user,1,1,1,1
+access_nomenclature_user,cultiveau.nomenclature utilisateur,model_cultiveau_nomenclature,base.group_user,1,1,1,1
+access_nomenclature_ligne_user,cultiveau.nomenclature.ligne utilisateur,model_cultiveau_nomenclature_ligne,base.group_user,1,1,1,1
+access_nomenclature_inserer_user,cultiveau.nomenclature.inserer utilisateur,model_cultiveau_nomenclature_inserer,base.group_user,1,1,1,1
+access_nomenclature_enregistrer_user,cultiveau.nomenclature.enregistrer utilisateur,model_cultiveau_nomenclature_enregistrer,base.group_user,1,1,1,1

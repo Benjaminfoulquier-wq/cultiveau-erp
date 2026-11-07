@@ -38,7 +38,7 @@ def regrouper(lignes, niveau, champs):
 
     def simple(l):
         return {"name": champs["nom"](l), "qte": champs["qte"](l), "unite": champs["unite"](l), "pu": champs["pu"](l), "remise": champs["remise"](l), "taxes": champs["taxes"](l),
-                "sous_total": champs["sous_total"](l), "section": champs["section"](l), "note": champs["note"](l)}
+                "sous_total": champs["sous_total"](l), "section": champs["section"](l), "note": champs["note"](l), "sous_lot": champs.get("sous_lot", lambda l: False)(l)}
 
     reelles = [l for l in lignes if not champs["section"](l) and not champs["note"](l)]
     if niveau == "forfait":
@@ -60,6 +60,8 @@ def regrouper(lignes, niveau, champs):
                 resultat.append(groupe(courant or LIBELLE_HORS_LOT, membres))
             resultat.extend(notes)  # les notes d'un lot viennent sous son montant
         for l in lignes:
+            if champs["section"](l) and champs.get("sous_lot", lambda l: False)(l):
+                continue  # un sous-lot fait partie de son lot : un seul montant
             if champs["section"](l):
                 fermer()
                 courant, membres, notes = champs["nom"](l), [], []
@@ -99,13 +101,14 @@ class SaleOrder(models.Model):
             return lignes
         champs = {"nom": lambda l: l.name, "qte": lambda l: l.product_uom_qty, "unite": lambda l: l.product_uom, "pu": lambda l: l.price_unit, "remise": lambda l: l.discount,
                   "taxes": lambda l: l.tax_id, "sous_total": lambda l: l.price_subtotal, "section": lambda l: l.display_type == "line_section",
-                  "note": lambda l: l.display_type == "line_note", "masquee": lambda l: l.cultiveau_masque, "produit": lambda l: l.product_id}
+                  "note": lambda l: l.display_type == "line_note", "masquee": lambda l: l.cultiveau_masque, "produit": lambda l: l.product_id,
+                  "sous_lot": lambda l: l.cultiveau_sous_lot}
         Ligne = self.env["sale.order.line"]
         virtuelles = Ligne
         for i, d in enumerate(regrouper(lignes, niveau, champs)):
             virtuelles |= Ligne.new({"order_id": self.id, "name": d["name"], "product_uom_qty": d["qte"], "product_uom": d["unite"].id if d["unite"] else False,
                                      "price_unit": d["pu"], "discount": d["remise"], "tax_id": [(6, 0, d["taxes"].ids)] if d["taxes"] else False,
-                                     "price_subtotal": d["sous_total"], "price_total": d["sous_total"], "sequence": i,
+                                     "price_subtotal": d["sous_total"], "price_total": d["sous_total"], "sequence": i, "cultiveau_sous_lot": d.get("sous_lot", False),
                                      "display_type": "line_section" if d["section"] else ("line_note" if d["note"] else False)})
         return virtuelles
 

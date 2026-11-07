@@ -1,1 +1,1 @@
-from . import test_ventes
+from . import test_ventes, test_nomenclatures
