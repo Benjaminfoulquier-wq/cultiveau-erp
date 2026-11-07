@@ -19,6 +19,9 @@
         <xpath expr="//meta[@name='theme-color']" position="attributes">
             <attribute name="content">#15283a</attribute>
         </xpath>
+        <xpath expr="//link[@rel='apple-touch-icon']" position="attributes">
+            <attribute name="href">/cultiveau_marque/static/src/img/icone-192.png</attribute>
+        </xpath>
     </template>
 
     <!-- Page de connexion : le logo Cultiveau, un pied de page Cultiveau. -->

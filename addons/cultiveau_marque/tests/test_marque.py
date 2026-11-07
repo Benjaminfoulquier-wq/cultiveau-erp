@@ -21,7 +21,7 @@ class TestMarque(HttpCase):
         self.authenticate("admin", "admin")
         r = self.url_open("/app/action-cultiveau_base.action_agriculteurs")
         self.assertEqual(r.status_code, 200)
-        self.assertIn('<meta name="theme-color" content="#183840"/>', r.text)
+        self.assertIn('<meta name="theme-color" content="#15283a"/>', r.text)
         self.assertNotIn("#71639e", r.text)
         self.assertIn("<title>Cultiveau</title>", r.text)
         # Le manifeste de l'application et la page hors ligne sont aux couleurs et au nom de Cultiveau.
@@ -45,3 +45,22 @@ class TestSansEditeur(TransactionCase):
                 vues = self.env[modele].with_context(lang=lang).get_views([(False, "form"), (False, "list"), (False, "kanban")])
                 for v in vues["views"].values():
                     self.assertNotIn("odoo.com", v["arch"].lower(), f"{modele} {lang}")
+
+    def test_les_phrases_traduites_ne_nomment_pas_l_editeur(self):
+        from odoo.tools import translate
+        web = translate.code_translations.get_web_translations("mail", "fr_FR")["messages"]
+        phrase = next((m["string"] for m in web if m["id"] == "Odoo will send notifications on this device!"), None)
+        self.assertEqual(phrase, "Cultiveau enverra des notifications à ce périphérique !")
+        self.assertFalse([m["string"] for m in web if "odoo" in m["string"].lower()][:3])
+        py = translate.code_translations.get_python_translations("mail", "fr_FR")
+        self.assertFalse([v for v in py.values() if "odoo" in v.lower()][:3])
+
+    def test_les_textes_en_base_ne_nomment_pas_l_editeur(self):
+        action = self.env["ir.actions.act_window"].create({"name": "Essai", "res_model": "res.partner", "help": "<p>Essayez Odoo sur www.odoo.com/fr</p>"})
+        self.env["ir.actions.act_window"].cultiveau_sans_editeur()
+        action.invalidate_recordset()
+        self.assertEqual(action.help, "<p>Essayez Cultiveau sur https://www.cultiveau.fr</p>")
+        self.env.cr.execute("SELECT count(*) FROM ir_act_window WHERE help::text ~* '\\modoo\\M'")
+        self.assertEqual(self.env.cr.fetchone()[0], 0)
+        self.env.cr.execute("SELECT count(*) FROM mail_template WHERE body_html::text ~* '\\modoo\\M' OR subject::text ~* '\\modoo\\M'")
+        self.assertEqual(self.env.cr.fetchone()[0], 0)

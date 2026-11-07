@@ -50,10 +50,11 @@ a, .o_form_view .o_field_widget a { color: $cv-cyan; }
 .modal-content { border-radius: 16px; border: 0; box-shadow: 0 24px 60px rgba(21, 40, 58, 0.25); }
 .modal-header { border-bottom-color: $cv-bord; .modal-title { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; } }
 .o_notification { border-radius: 12px; }
-// les illustrations des listes vides, redessinées aux couleurs Cultiveau
-.o_nocontent_help {
-    .o_view_nocontent_smiling_face:before { background-image: url(/cultiveau_marque/static/src/img/smiling_face.svg); }
-    .o_view_nocontent_neutral_face:before { background-image: url(/cultiveau_marque/static/src/img/neutral_face.svg); }
+// les illustrations des listes vides, redessinées aux couleurs Cultiveau ; la vidéo promotionnelle de l'éditeur sur les devis n'apparaît pas
+.o_sale_action_preview { display: none !important; }
+.o_view_nocontent .o_nocontent_help, .o_nocontent_help {
+    .o_view_nocontent_smiling_face:before { background-image: url(/cultiveau_marque/static/src/img/smiling_face.svg) !important; }
+    .o_view_nocontent_neutral_face:before { background-image: url(/cultiveau_marque/static/src/img/neutral_face.svg) !important; }
 }
 // barre de défilement discrète
 ::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-thumb { background: #c7ced6; border-radius: 10px; border: 2px solid $cv-fond; }
