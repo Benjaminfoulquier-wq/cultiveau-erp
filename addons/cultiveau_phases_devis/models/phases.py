@@ -51,9 +51,8 @@ class Order(models.Model):
             if courante is None or l.display_type or not l.product_id:
                 continue
             courante["lignes"] |= l
-            if l.product_id.type == "service" and l.product_uom and "hour" in (l.product_uom.name or "").lower() + (l.product_uom.category_id.name or "").lower():
-                courante["heures"] += l.product_uom_qty
-            elif l.product_id.type == "service" and "heure" in (l.name or "").lower():
+            uom_heure = self.env.ref("uom.product_uom_hour", raise_if_not_found=False)
+            if l.product_id.type == "service" and l.product_uom and (l.product_uom == uom_heure or any(m in (l.product_uom.name or "").lower() for m in ("heure", "hour"))):
                 courante["heures"] += l.product_uom_qty
         return phases
 

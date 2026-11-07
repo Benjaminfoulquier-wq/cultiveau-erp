@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_commande_projet" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau.commande.projet</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="cultiveau_ventes.view_order_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_envoyer_questionnaire" type="object" string="Questionnaire de financement" invisible="state not in ('sale', 'done') or cultiveau_financement"/>
+                <button name="action_sans_suite" type="object" string="Sans suite" invisible="state not in ('draft', 'sent')" confirm="Classer ce devis sans suite, avec la raison indiquée ?"/>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_voir_taches" type="object" class="oe_stat_button" icon="fa-tasks" invisible="not cultiveau_nb_taches">
+                    <field name="cultiveau_nb_taches" widget="statinfo" string="Tâches"/>
+                </button>
+                <button name="action_voir_chantiers" type="object" class="oe_stat_button" icon="fa-clock-o" invisible="not cultiveau_heures_pointees">
+                    <div class="o_stat_info"><span class="o_stat_value"><field name="cultiveau_heures_pointees" widget="float_time"/></span><span class="o_stat_text">Heures pointées</span></div>
+                </button>
+            </xpath>
+            <xpath expr="//field[@name='cultiveau_analyse_validee']" position="after">
+                <field name="cultiveau_financement" invisible="state not in ('sale', 'done') and not cultiveau_financement"/>
+                <field name="cultiveau_financement_detail" invisible="not cultiveau_financement_detail"/>
+                <field name="cultiveau_date_pose_souhaitee" invisible="not cultiveau_date_pose_souhaitee"/>
+                <field name="cultiveau_questionnaire_envoye_le" invisible="not cultiveau_questionnaire_envoye_le"/>
+                <field name="cultiveau_sans_suite_raison_id" invisible="state not in ('draft', 'sent', 'cancel')" options="{'no_create': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="res_config_settings_view_form_commande_projet" model="ir.ui.view">
+        <field name="name">res.config.settings.form.cultiveau.commande.projet</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="cultiveau_declenche.res_config_settings_view_form_declenche"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cultiveau_decl_mise_en_service']/.." position="after">
+                <div class="mt8"><field name="cultiveau_decl_taches"/><label for="cultiveau_decl_taches"/></div>
+                <div class="mt8"><field name="cultiveau_decl_financement"/><label for="cultiveau_decl_financement"/>
+                    <span class="ms-2 text-muted">à partir de <field name="cultiveau_financement_seuil" class="oe_inline" style="width: 5rem;"/> € HT</span></div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

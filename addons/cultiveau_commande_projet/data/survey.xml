@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="questionnaire_financement" model="survey.survey">
+            <field name="title">Votre financement et votre date de pose</field>
+            <field name="access_mode">token</field>
+            <field name="users_login_required" eval="False"/>
+            <field name="description">Votre devis est accepté, merci. Pour préparer la suite, dites-nous comment vous financez le projet et quand vous souhaitez la pose. Deux minutes.</field>
+        </record>
+        <record id="q_mode" model="survey.question">
+            <field name="survey_id" ref="questionnaire_financement"/>
+            <field name="sequence">10</field>
+            <field name="title">Comment financez-vous ce projet ?</field>
+            <field name="question_type">simple_choice</field>
+            <field name="constr_mandatory" eval="True"/>
+            <field name="suggested_answer_ids" eval="[(0, 0, {'value': 'Comptant (fonds propres)', 'sequence': 1}), (0, 0, {'value': 'Crédit bancaire', 'sequence': 2}),
+                (0, 0, {'value': 'Location ou crédit-bail', 'sequence': 3}), (0, 0, {'value': 'Irrigation à l\'usage Cultiveau (prix au m³)', 'sequence': 4}),
+                (0, 0, {'value': 'Je ne sais pas encore, j\'ai besoin de conseils', 'sequence': 5})]"/>
+        </record>
+        <record id="q_aide" model="survey.question">
+            <field name="survey_id" ref="questionnaire_financement"/>
+            <field name="sequence">20</field>
+            <field name="title">Une aide est-elle demandée ou prévue ?</field>
+            <field name="question_type">simple_choice</field>
+            <field name="suggested_answer_ids" eval="[(0, 0, {'value': 'Non', 'sequence': 1}), (0, 0, {'value': 'Oui, dossier déposé (PCAE, Agence de l\'eau, Région…)', 'sequence': 2}),
+                (0, 0, {'value': 'Oui, à monter : j\'aimerais être accompagné', 'sequence': 3})]"/>
+        </record>
+        <record id="q_banque" model="survey.question">
+            <field name="survey_id" ref="questionnaire_financement"/>
+            <field name="sequence">30</field>
+            <field name="title">Banque ou organisme (si crédit ou location)</field>
+            <field name="question_type">char_box</field>
+        </record>
+        <record id="q_date" model="survey.question">
+            <field name="survey_id" ref="questionnaire_financement"/>
+            <field name="sequence">40</field>
+            <field name="title">Date de pose souhaitée</field>
+            <field name="question_type">date</field>
+        </record>
+        <record id="q_commentaire" model="survey.question">
+            <field name="survey_id" ref="questionnaire_financement"/>
+            <field name="sequence">50</field>
+            <field name="title">Ce que nous devons savoir (accès, contraintes, questions)</field>
+            <field name="question_type">text_box</field>
+        </record>
+    </data>
+</odoo>
