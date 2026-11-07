@@ -237,7 +237,7 @@ class Importer(models.TransientModel):
         if "micro" in texte:
             return "micro_aspersion"
         if "asperseur" in texte or "aspersion" in texte:
-            return "aspersion"
+            return "couverture_integrale"
         return False
 
     def _remplir(self, inst, data):

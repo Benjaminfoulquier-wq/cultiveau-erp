@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_phases" model="ir.ui.view">
+        <field name="name">sale.order.form.cultiveau.phases</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="cultiveau_ventes.view_order_form_cultiveau"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_depuis_mon_stock" type="object" string="Depuis mon stock" icon="fa-archive" invisible="state not in ('draft', 'sent')"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='cultiveau_sous_lot']" position="after">
+                <field name="cultiveau_phase" column_invisible="True"/>
+                <field name="cultiveau_jours" column_invisible="True"/>
+                <field name="cultiveau_jalon_pct" column_invisible="True"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='product_uom_qty']" position="after">
+                <field name="cultiveau_dispo" optional="show" decoration-success="cultiveau_dispo >= product_uom_qty and product_uom_qty" decoration-danger="cultiveau_manque > 0"/>
+                <field name="cultiveau_manque" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/control/create[@name='add_sous_lot_control']" position="after">
+                <create name="add_phase_control" string="Ajouter une phase" context="{'default_display_type': 'line_section', 'default_cultiveau_phase': True}"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='name']" position="after">
+                <group invisible="not cultiveau_phase" string="Phase de chantier">
+                    <field name="cultiveau_phase" invisible="1"/>
+                    <field name="cultiveau_jours"/>
+                    <field name="cultiveau_jalon_pct"/>
+                </group>
+            </xpath>
+            <xpath expr="//page[@name='lots_cultiveau']" position="inside">
+                <field name="cultiveau_nb_phases" invisible="1"/>
+                <h5 class="mt-3">Phases du chantier</h5>
+                <field name="cultiveau_phases_apercu" nolabel="1"/>
+                <field name="order_line" readonly="state not in ('draft', 'sent')" context="{'cultiveau_phases_seules': 1}" domain="[('cultiveau_phase', '=', True)]" nolabel="1" colspan="2">
+                    <list editable="bottom" create="0" delete="0" default_order="sequence, id">
+                        <field name="sequence" widget="handle"/>
+                        <field name="name" string="Phase" readonly="1"/>
+                        <field name="cultiveau_jours"/>
+                        <field name="cultiveau_jalon_pct"/>
+                        <field name="cultiveau_phase" column_invisible="True"/>
+                        <field name="display_type" column_invisible="True"/>
+                    </list>
+                </field>
+            </xpath>
+        </field>
+    </record>
+</odoo>
