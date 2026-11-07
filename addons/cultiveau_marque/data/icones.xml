@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Les icônes des applications, redessinées aux couleurs Cultiveau (bleu nuit, pictogramme blanc, accent cyan). -->
+    <record id="cultiveau_base.menu_cultiveau_root" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/cultiveau.png</field></record>
+    <record id="mail.menu_root_discuss" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/discussion.png</field></record>
+    <record id="calendar.mail_menu_calendar" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/calendrier.png</field></record>
+    <record id="contacts.menu_contacts" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/contacts.png</field></record>
+    <record id="crm.crm_menu_root" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/crm.png</field></record>
+    <record id="sale.sale_menu_root" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/ventes.png</field></record>
+    <record id="account.menu_finance" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/facturation.png</field></record>
+    <record id="project.menu_main_pm" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/projet.png</field></record>
+    <record id="mass_mailing.mass_mailing_menu_root" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/marketing.png</field></record>
+    <record id="purchase.menu_purchase_root" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/achats.png</field></record>
+    <record id="stock.menu_stock_root" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/inventaire.png</field></record>
+    <record id="base.menu_management" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/apps.png</field></record>
+    <record id="base.menu_administration" model="ir.ui.menu"><field name="web_icon">cultiveau_marque,static/src/img/apps/parametres.png</field></record>
+    <!-- les applications optionnelles (RH, flotte, sondages, tableaux, to-do) : posées si elles sont là, à chaque mise à jour -->
+    <function model="ir.ui.menu" name="cultiveau_poser_icones"/>
+</odoo>

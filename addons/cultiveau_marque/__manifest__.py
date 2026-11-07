@@ -17,6 +17,7 @@ l'éditeur ni lien d'inscription publique, menu utilisateur sans les liens vers 
     "depends": ["web", "auth_signup", "mail", "cultiveau_base"],
     "data": [
         "data/marque.xml",
+        "data/icones.xml",
         "views/templates.xml",
     ],
     "assets": {
