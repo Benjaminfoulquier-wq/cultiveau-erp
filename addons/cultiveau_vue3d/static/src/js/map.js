@@ -14,7 +14,7 @@ import { Moteur } from "./moteur";
 const LIB = "/cultiveau_vue3d/static/lib/three/three.min.js";
 const ICONES = { personne: "fa-user", camion: "fa-truck", client: "fa-car", dossier: "fa-leaf", chantier: "fa-wrench", intervention: "fa-bolt", rayon: "fa-archive", rayon_fixe: "fa-archive",
                  zone: "fa-map-o", borne: "fa-id-card-o", livraison: "fa-truck", poste: "fa-desktop", machine: "fa-cog", objet: "fa-cube", comptoir: "fa-shopping-basket", etabli: "fa-wrench", article: "fa-cube",
-                 assistant: "fa-comments-o", appel: "fa-phone", salle: "fa-users" };
+                 assistant: "fa-comments-o", appel: "fa-phone", salle: "fa-users", type_clients: "fa-users" };
 const GENRES_FICHE = { personne: "personne", camion: "camion", client: "client", dossier: "dossier", chantier: "chantier", intervention: "intervention", rayon: "rayon", zone: "zone", borne: "borne",
                        livraison: "livraison", poste: "poste", machine: "intervention", article: "article", appel: "appel" };
 const ICONES_EVENEMENT = { arrivee: "fa-sign-in", depart: "fa-sign-out", pause_debut: "fa-coffee", pause_fin: "fa-coffee", depart_intervention: "fa-truck", retour_intervention: "fa-truck",
@@ -385,7 +385,45 @@ export class MapVivante extends Component {
             this.state.fiche = { genre: "objet", nom: o.nom, sousTitre: o.sousTitre, cle, actions: [] };
             return;
         }
+        // un véhicule du parking : pas le client, tous les clients de son type (le premier filtre ; la personne à l'accueil, elle, ouvre le client)
+        if (o.genre === "client" && cle.startsWith("client:") && o.meta?.type && !this._clientDirect) {
+            this.ouvrirTypeClients(o.meta.type, o.id, cle);
+            return;
+        }
+        this._clientDirect = false;
         this.ouvrirFiche(cle, true);
+    }
+    /** Tous les clients d'un type (agriculteurs, paysagistes…) : la fiche d'où l'on travaille les personas et les newsletters. */
+    async ouvrirTypeClients(type, clientId = 0, cle = null) {
+        this.state.selection = cle || this.state.selection;
+        this.state.fiche = null;
+        this.state.ficheChargement = true;
+        try {
+            const f = await this.orm.call("cultiveau.map", "fiche", ["type_clients", clientId || 0], { cle: type });
+            f.cle = cle || `type_clients:${type}`;
+            f.icone = ICONES.type_clients;
+            this.state.fiche = f;
+        } catch (e) {
+            this.notification.add(e.data?.message || e.message, { type: "warning" });
+        } finally {
+            this.state.ficheChargement = false;
+        }
+    }
+    /** Un client précis, depuis la fiche de son type : sa fiche s'ouvre sans bouger la caméra. */
+    async ouvrirClient(id) {
+        const cle = `client:${id}`;
+        this.state.fiche = null;
+        this.state.ficheChargement = true;
+        try {
+            const f = await this.orm.call("cultiveau.map", "fiche", ["client", id]);
+            f.cle = cle;
+            f.icone = ICONES.client;
+            this.state.fiche = f;
+        } catch (e) {
+            this.notification.add(e.data?.message || e.message, { type: "warning" });
+        } finally {
+            this.state.ficheChargement = false;
+        }
     }
     onSurvol(cle, o) {
         for (const e of [...this.moteur.etiquettes.keys()]) {
@@ -470,6 +508,8 @@ export class MapVivante extends Component {
             return;
         }
         if (ouvrir) {
+            // depuis une liste ou la recherche, un client reste un client (le clic sur son véhicule, lui, ouvre son type)
+            this._clientDirect = cle.startsWith("client:");
             this.moteur.selectionner(cle, true);
         } else {
             this.moteur.volerVers(cle, 0);
@@ -587,6 +627,10 @@ export class MapVivante extends Component {
             if (a.cle === "interventions_de") {
                 await this.action.doAction({ type: "ir.actions.act_window", name: `Interventions — ${f.nom || f.conducteur || ""}`, res_model: "project.task", view_mode: "list,form",
                                              domain: [["cultiveau_intervention", "=", true], ["user_ids", "in", [f.id || f.conducteur_id]]] });
+                return;
+            }
+            if (a.cle === "type_clients") {
+                await this.ouvrirTypeClients(a.parametre, f.id || 0, f.cle);
                 return;
             }
             if (a.cle === "devis_nouveau") {

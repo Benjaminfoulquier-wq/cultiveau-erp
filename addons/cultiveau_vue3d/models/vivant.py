@@ -461,6 +461,8 @@ class Map(models.AbstractModel):
             raise UserError(f"Pas de fiche pour « {genre} ».")
         if genre == "zone":
             return methode(company, 0, cle=cle)
+        if genre == "type_clients":
+            return methode(company, int(res_id or 0), cle=cle)
         return methode(company, int(res_id or 0))
 
     def _fiche_personne(self, company, uid):
@@ -571,7 +573,7 @@ class Map(models.AbstractModel):
         # le premier filtre : tous les clients du même type ; puis plus loin : son persona (évalué, ou à évaluer)
         actions = [{"cle": "fiche", "nom": "Fiche complète", "modele": "res.partner", "id": pid}]
         if t in TYPES_CLIENTS:
-            actions.append({"cle": "clients_type", "nom": f"Voir les {TYPES_CLIENTS[t][1].lower()}" if t != "tp" else "Voir les clients TP", "parametre": t})
+            actions.append({"cle": "type_clients", "nom": f"Tous les {TYPES_CLIENTS[t][1].lower()}" if t != "tp" else "Tous les clients TP", "parametre": t})
         if "cultiveau_persona_id" in p._fields:
             actions.append({"cle": "persona", "nom": f"Persona : {persona.animal or ''} {persona.name}".strip() if persona else "Évaluer son persona",
                             "doaction": {"type": "ir.actions.act_window", "res_model": "res.partner", "res_id": pid, "views": [[False, "form"]], "target": "current",
@@ -584,6 +586,60 @@ class Map(models.AbstractModel):
                 "devis": [{"id": o.id, "nom": o.name, "montant": round(o.amount_total), "etat": o.state} for o in devis],
                 "installations": [{"id": i.id, "nom": i.name, "etat": i.etat} for i in inst[:6]], "note": (p.comment and str(p.comment)[:300]) or "",
                 "actions": actions}
+
+    def _fiche_type_clients(self, company, pid, cle=None):
+        """Le clic sur un véhicule du parking : pas le client, mais tous les clients de son type (demande de Benjamin du
+        07/11/2026). Le premier filtre, d'où l'on travaille les personas et les newsletters. `pid` est le client dont c'est le
+        véhicule : il reste accessible en une ligne."""
+        from .scene import TYPES_CLIENTS
+        t = cle or ""
+        if t not in TYPES_CLIENTS:
+            raise UserError("Type de client inconnu.")
+        Partner = self.env["res.partner"].sudo()
+        domaine = [("company_id", "in", [company.id, False]), ("parent_id", "=", False), ("cultiveau_type", "=", t)]
+        clients = Partner.search(domaine, order="write_date desc")
+        avec_persona = "cultiveau_persona_id" in Partner._fields
+        factures = self.env["account.move"].sudo().read_group([("partner_id", "in", clients.ids), ("company_id", "=", company.id), ("move_type", "=", "out_invoice"), ("state", "=", "posted")],
+                                                             ["amount_untaxed:sum"], []) if clients else []
+        ca = round((factures[0].get("amount_untaxed") or 0) if factures else 0)
+        devis = self.env["sale.order"].sudo().search_count([("partner_id", "in", clients.ids), ("company_id", "=", company.id), ("state", "in", ("draft", "sent"))]) if clients else 0
+        # la répartition des personas : ce qu'il reste à évaluer, et comment leur parler
+        personas, sans_persona = {}, 0
+        for c in clients:
+            per = c.cultiveau_persona_id if avec_persona else None
+            if per:
+                d = personas.setdefault(per.id, {"id": per.id, "nom": per.name, "animal": per.animal or "", "surnom": per.surnom or "", "couleur": per.couleur or "", "resume": per.resume or "", "n": 0})
+                d["n"] += 1
+            else:
+                sans_persona += 1
+        personas = sorted(personas.values(), key=lambda d: -d["n"])
+        avec_courriel = len(clients.filtered("email"))
+        present = Partner.browse(pid) if pid else Partner
+        singulier, pluriel = TYPES_CLIENTS[t]
+        nom_pluriel = pluriel.lower() if t != "tp" else "clients TP"
+        liste = [{"id": c.id, "nom": c.name, "commune": c.city or "", "courriel": bool(c.email), "telephone": c.mobile or c.phone or "",
+                  "persona": c.cultiveau_persona_id.name if avec_persona and c.cultiveau_persona_id else "",
+                  "persona_animal": c.cultiveau_persona_id.animal if avec_persona and c.cultiveau_persona_id else "",
+                  "persona_couleur": c.cultiveau_persona_id.couleur if avec_persona and c.cultiveau_persona_id else ""} for c in clients[:12]]
+        actions = [{"cle": "clients_type", "nom": f"Voir les {len(clients)} {nom_pluriel}", "parametre": t}]
+        if avec_persona:
+            actions.append({"cle": "personas_type", "nom": f"Travailler les personas" + (f" ({sans_persona} à évaluer)" if sans_persona else ""),
+                            "doaction": {"type": "ir.actions.act_window", "name": f"Personas des {nom_pluriel}", "res_model": "res.partner", "view_mode": "list,kanban,form",
+                                         "views": [[False, "list"], [False, "kanban"], [False, "form"]], "domain": domaine, "target": "current",
+                                         "context": {"group_by": ["cultiveau_persona_id"], "default_cultiveau_type": t, "cultiveau_onglet": "persona"}}})
+        if "mailing.mailing" in self.env:
+            modele = self.env["ir.model"].sudo()._get_id("res.partner")
+            actions.append({"cle": "newsletter_type", "nom": f"Newsletter aux {nom_pluriel}",
+                            "doaction": {"type": "ir.actions.act_window", "name": f"Newsletter aux {nom_pluriel}", "res_model": "mailing.mailing", "views": [[False, "form"]], "target": "current",
+                                         "context": {"default_mailing_model_id": modele, "default_mailing_domain": repr([("cultiveau_type", "=", t), ("parent_id", "=", False), ("email", "!=", False)]),
+                                                     "default_subject": f"{company.name} : du nouveau pour les {nom_pluriel}", "default_mailing_type": "mail"}}})
+            actions.append({"cle": "newsletters", "nom": "Les newsletters envoyées",
+                            "doaction": {"type": "ir.actions.act_window", "name": "Newsletters", "res_model": "mailing.mailing", "view_mode": "list,kanban,form",
+                                         "views": [[False, "list"], [False, "kanban"], [False, "form"]], "domain": [("mailing_domain", "ilike", f"'cultiveau_type', '=', '{t}'")], "target": "current"}})
+        actions.append({"cle": "client_type_nouveau", "nom": f"Nouveau client {singulier.lower()}", "parametre": t})
+        return {"genre": "type_clients", "type": t, "nom": pluriel, "singulier": singulier, "nombre": len(clients), "avec_persona": len(clients) - sans_persona, "sans_persona": sans_persona,
+                "avec_courriel": avec_courriel, "ca": ca, "devis": devis, "personas": personas, "clients": liste,
+                "present": {"id": present.id, "nom": present.name} if present else None, "actions": actions}
 
     def _fiche_article(self, company, pid):
         a = self.env["product.template"].sudo().with_company(company).browse(pid)

@@ -361,7 +361,7 @@
         <div class="o_cv_fiche_entete">
             <span class="o_cv_fiche_icone"><i t-att-class="'fa ' + (f.icone || icone(f.genre))"/></span>
             <div class="flex-grow-1 min-w-0">
-                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet', article: 'Article', assistant: 'Assistant', appel: 'Appel', salle: 'Salle de réunion'}[f.genre] || f.genre"/>
+                <div class="o_cv_fiche_genre" t-esc="{personne: 'Équipe', camion: 'Camion', client: 'Client', dossier: 'Installation', chantier: 'Chantier', intervention: 'Intervention', rayon: 'Rayon', zone: 'Zone', borne: 'Badgeuse', livraison: 'Livraison', poste: 'Poste de travail', objet: 'Objet', article: 'Article', assistant: 'Assistant', appel: 'Appel', salle: 'Salle de réunion', type_clients: 'Clients · ' + (f.nombre || 0)}[f.genre] || f.genre"/>
                 <div class="o_cv_fiche_nom text-truncate" t-esc="f.nom"/>
             </div>
             <button class="o_cv_bouton rond petit" t-if="f.genre !== 'zone' and f.genre !== 'objet'" t-on-click="suivre" t-att-class="{ actif: state.suivi === state.selection }" title="Suivre"><i class="fa fa-crosshairs"/></button>
@@ -457,6 +457,37 @@
                 <div class="o_cv_bloc" t-if="f.devis.length"><small>Devis récents</small><button t-foreach="f.devis.slice(0, 3)" t-as="d" t-key="d.id" class="o_cv_lien d-flex" t-on-click="() => this.ouvrirBackOffice('sale.order', d.id)"><span t-esc="d.nom"/><b class="ms-auto" t-esc="euros(d.montant) + ' €'"/></button></div>
                 <div class="o_cv_bloc" t-if="f.installations.length"><small>Installations</small><button t-foreach="f.installations" t-as="i" t-key="i.id" class="o_cv_lien d-block" t-on-click="() => this.aller('dossier:' + i.id)"><i class="fa fa-leaf me-1"/><t t-esc="i.nom"/></button></div>
                 <div class="o_cv_bloc" t-if="f.note"><small>Note interne</small><div class="small" t-out="f.note"/></div>
+            </t>
+            <!-- tous les clients d'un type : le premier filtre, puis les personas et les newsletters -->
+            <t t-elif="f.genre === 'type_clients'">
+                <div class="o_cv_statut"><span class="badge accent" t-esc="f.nombre + ' ' + (f.nombre > 1 ? f.nom.toLowerCase() : f.singulier.toLowerCase())"/>
+                    <span class="ms-auto small" t-if="f.present"><i class="fa fa-car me-1"/>Au parking : <button class="o_cv_lien d-inline p-0" t-on-click="() => this.ouvrirClient(f.present.id)" t-esc="f.present.nom"/></span></div>
+                <div class="o_cv_grille">
+                    <div><small>Personas évalués</small><b t-esc="f.avec_persona + ' / ' + f.nombre"/></div>
+                    <div><small>Avec e-mail</small><b t-att-class="{ 'text-danger': f.avec_courriel &lt; f.nombre }" t-esc="f.avec_courriel + ' / ' + f.nombre"/></div>
+                    <div><small>CA cumulé</small><b t-esc="euros(f.ca) + ' €'"/></div>
+                    <div><small>Devis en attente</small><b t-esc="f.devis"/></div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.personas.length or f.sans_persona"><small>Les personas</small>
+                    <div t-foreach="f.personas" t-as="p" t-key="p.id" class="o_cv_persona_ligne" t-att-title="p.resume">
+                        <span class="o_cv_persona_badge" t-att-style="p.couleur ? 'background:' + p.couleur : ''" t-esc="(p.animal ? p.animal + ' ' : '') + p.nom"/>
+                        <span class="o_cv_persona_barre"><span t-att-style="'width:' + Math.round(p.n / f.nombre * 100) + '%;' + (p.couleur ? 'background:' + p.couleur : '')"/></span>
+                        <b t-esc="p.n"/>
+                    </div>
+                    <div t-if="f.sans_persona" class="o_cv_persona_ligne text-muted">
+                        <span class="o_cv_persona_badge gris">À évaluer</span>
+                        <span class="o_cv_persona_barre"><span t-att-style="'width:' + Math.round(f.sans_persona / f.nombre * 100) + '%'"/></span>
+                        <b t-esc="f.sans_persona"/>
+                    </div>
+                </div>
+                <div class="o_cv_bloc" t-if="f.clients.length"><small>Les derniers touchés</small>
+                    <button t-foreach="f.clients" t-as="c" t-key="c.id" class="o_cv_lien d-flex gap-2 align-items-center" t-on-click="() => this.ouvrirClient(c.id)">
+                        <span class="text-truncate" t-esc="c.nom"/>
+                        <span class="text-muted small text-truncate" t-if="c.commune" t-esc="c.commune"/>
+                        <span class="ms-auto small" t-if="c.persona" t-att-style="c.persona_couleur ? 'color:' + c.persona_couleur : ''" t-esc="c.persona_animal || c.persona"/>
+                        <i class="fa fa-envelope-o small" t-att-class="{ 'text-muted': c.courriel, 'text-danger': !c.courriel }" t-att-title="c.courriel ? 'A une adresse e-mail' : 'Pas d\'adresse e-mail : pas de newsletter'"/>
+                    </button>
+                </div>
             </t>
             <!-- la salle de réunion -->
             <t t-elif="f.genre === 'salle'">

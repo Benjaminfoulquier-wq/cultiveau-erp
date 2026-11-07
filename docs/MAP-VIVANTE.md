@@ -19,9 +19,13 @@ l'ERP, et un changement dans l'un se voit dans l'autre en moins d'une seconde.
   tricolore de la collectivité, plateau chargé de végétaux du paysagiste, fourgon à tuyaux du plombier, fourgon à échelle du
   pisciniste, benne orange des travaux publics, utilitaire gris de l'industrie, voiture du particulier. D'abord ceux « sur place »
   (devis, vente ou commande du jour, avec la personne à l'accueil), puis, sur les places qui restent, les derniers clients
-  touchés, un par type. Un clic ouvre le client : type, persona (animal, surnom, comment lui parler), CA, impayés, devis,
-  installations, et les boutons « Voir les paysagistes » (le premier filtre : tous les clients du même type), « Persona » (sa
-  fiche, pour l'évaluer ou lire l'Agent), « Fiche complète », « Nouveau devis », « Appeler ».
+  touchés, un par type. Un clic sur le véhicule n'ouvre pas le client mais **tous les clients de son type** (fiche
+  `type_clients`) : combien, personas évalués et répartition par persona (barres), avec e-mail, CA cumulé, devis en attente, les
+  derniers touchés (chacun ouvre sa fiche client), et les boutons « Voir les 12 agriculteurs » (la liste), « Travailler les
+  personas » (la liste groupée par persona, les « à évaluer » à part), « Newsletter aux agriculteurs » (un envoi de masse
+  pré-filtré sur le type et les adresses e-mail), « Les newsletters envoyées » à ce type, « Nouveau client ». La personne du
+  client à l'accueil, elle, ouvre le client : type, persona (animal, surnom, comment lui parler), CA, impayés, devis,
+  installations, « Tous les paysagistes » (retour au type), « Persona », « Fiche complète », « Nouveau devis », « Appeler ».
 - **Les champs** : les chantiers en cours (pelle, tubes, tranchée, équipe), les installations en réalisation, les parcelles en
   service avec leur matériel (pivot qui tourne, enrouleur et canon, goutte à goutte, aspersion) et leur arrosage en saison ; une
   épingle rouge quand l'état d'eau est en déficit (module Parcelles).
