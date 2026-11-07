@@ -1,0 +1,67 @@
+// L'entretien A1.1 : des cartes, une question par carte, aux couleurs de cultiveau.fr.
+$cv-ent-navy: #15283a;
+$cv-ent-cyan: #1d9fbd;
+$cv-ent-cyan-clair: #e4f5f9;
+$cv-ent-fond: #f5f3ee;
+
+.cv-entretien {
+    max-width: 1100px;
+    margin: 0 auto;
+
+    h2 { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; color: $cv-ent-navy; font-size: 1.35rem; margin: 0 0 .25rem; }
+    h3 { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; color: $cv-ent-navy; font-size: 1.1rem; margin: 0 0 .35rem; }
+    p { margin-bottom: .5rem; }
+}
+
+.cv-entretien-tete {
+    display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;
+    padding: 1rem 1.25rem; margin-bottom: 1rem;
+    background: $cv-ent-fond; border-radius: 14px;
+    .cv-entretien-titre { flex: 1 1 420px; p { color: #4a5a6a; margin: 0; } }
+    .cv-entretien-avancement-champ { flex: 0 1 320px; min-width: 260px; }
+}
+.cv-entretien-avancement { display: flex; align-items: center; gap: .75rem; margin-bottom: .35rem; }
+.cv-entretien-barre { flex: 1; height: 10px; border-radius: 6px; background: #dfe6ea; overflow: hidden; }
+.cv-entretien-rempli { height: 100%; background: linear-gradient(90deg, $cv-ent-cyan, #35c9e8); border-radius: 6px; transition: width .4s; }
+.cv-entretien-chiffre { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; color: $cv-ent-navy; white-space: nowrap; }
+.cv-entretien-etat { color: #5a6a7a; font-size: .9rem; &.cv-ok { color: #1a7f4b; font-weight: 600; } }
+
+.cv-entretien-mots {
+    margin-bottom: 1rem;
+    label { font-weight: 600; color: $cv-ent-navy; display: block; margin-bottom: .25rem; }
+    .o_field_text textarea { min-height: 64px; border-radius: 10px; background: #fffdf7; border: 1px dashed #cfc9bb; padding: .5rem .75rem; }
+}
+
+.cv-etape {
+    display: flex; gap: 1rem; align-items: flex-start;
+    padding: 1rem 1.25rem 0.75rem; margin-bottom: .75rem;
+    background: #fff; border: 1px solid #e3e8ec; border-radius: 14px;
+    &:hover { border-color: #c9dde5; }
+}
+.cv-etape-num {
+    flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: $cv-ent-cyan-clair; color: $cv-ent-cyan; font-weight: 700; font-size: 1.1rem;
+    font-family: "Plus Jakarta Sans", "Inter", sans-serif;
+    .cv-fait { color: #1a7f4b; }
+}
+.cv-etape-corps { flex: 1; min-width: 0; .o_inner_group { margin-top: .25rem; } }
+.cv-demander { color: $cv-ent-navy; font-style: italic; font-size: 1rem; line-height: 1.45; border-left: 3px solid $cv-ent-cyan; padding-left: .75rem; margin: .25rem 0 .6rem; }
+.cv-pourquoi { color: #6b7a88; font-size: .85rem; margin: .35rem 0 0; }
+
+.cv-parcelles-source {
+    display: flex; flex-direction: column; gap: .4rem; margin-bottom: .6rem;
+    > div { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+}
+.cv-pastille {
+    display: inline-flex; align-items: center; gap: .3rem;
+    background: $cv-ent-cyan-clair; color: $cv-ent-navy; border-radius: 999px; padding: .2rem .7rem; font-size: .9rem; font-weight: 600;
+    .cv-inline { display: inline; width: auto; .o_field_widget, input, span { display: inline; width: auto; padding: 0; } }
+    &.cv-pastille-vide { background: #f1e9d8; color: #7a5a1e; }
+}
+.cv-etape-actions { display: flex; gap: .5rem; margin-top: .25rem; }
+
+@media (max-width: 767px) {
+    .cv-etape { padding: .75rem .75rem .5rem; gap: .6rem; }
+    .cv-etape-num { flex-basis: 32px; width: 32px; height: 32px; font-size: 1rem; }
+}

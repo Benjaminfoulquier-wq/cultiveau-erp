@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_choisir_parcelles_form" model="ir.ui.view">
+        <field name="name">cultiveau.installation.parcelles.form</field>
+        <field name="model">cultiveau.installation.parcelles</field>
+        <field name="arch" type="xml">
+            <form>
+                <div class="alert alert-info" role="status">Les parcelles irriguées de sa dernière déclaration PAC sont déjà cochées. Gardez celles que ce projet doit arroser : la surface, les cultures, la culture de pointe, les lieux-dits et l'assolement se rempliront d'eux-mêmes.</div>
+                <group>
+                    <field name="installation_id" invisible="1"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="campagne" options="{'enable_formatting': false}"/>
+                    <field name="surface_ha"/>
+                </group>
+                <field name="parcelle_ids" nolabel="1">
+                    <list editable="bottom" create="0" delete="1">
+                        <field name="ilot"/>
+                        <field name="numero"/>
+                        <field name="culture_id"/>
+                        <field name="code_id" optional="hide"/>
+                        <field name="surface_ha" sum="Total"/>
+                        <field name="commune" optional="show"/>
+                        <field name="irriguee" optional="show"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_appliquer" type="object" string="Reprendre ces parcelles dans le projet" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_import_telepac_form_projet" model="ir.ui.view">
+        <field name="name">cultiveau.import.telepac.form.projet</field>
+        <field name="model">cultiveau.import.telepac</field>
+        <field name="inherit_id" ref="cultiveau_parcelles.view_import_telepac_form"/>
+        <field name="arch" type="xml">
+            <field name="partner_id" position="after">
+                <field name="installation_id" invisible="1"/>
+            </field>
+        </field>
+    </record>
+</odoo>

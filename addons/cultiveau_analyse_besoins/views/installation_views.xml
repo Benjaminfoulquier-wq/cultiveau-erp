@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_installation_form_entretien" model="ir.ui.view">
+        <field name="name">cultiveau.installation.form.entretien</field>
+        <field name="model">cultiveau.installation</field>
+        <field name="inherit_id" ref="cultiveau_installation.view_installation_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='analyse']" position="replace">
+                <page string="A1.1 Analyse des besoins" name="analyse">
+                    <field name="nb_parcelles_client" invisible="1"/>
+                    <field name="campagne_client" invisible="1"/>
+                    <field name="etape_parcellaire_ok" invisible="1"/><field name="etape_cultures_ok" invisible="1"/><field name="etape_sol_ok" invisible="1"/><field name="etape_eau_ok" invisible="1"/>
+                    <field name="etape_titre_ok" invisible="1"/><field name="etape_energie_ok" invisible="1"/><field name="etape_travail_ok" invisible="1"/><field name="etape_priorite_ok" invisible="1"/>
+                    <div class="cv-entretien">
+                        <div class="cv-entretien-tete">
+                            <div class="cv-entretien-titre">
+                                <h2>L'entretien avec l'exploitant</h2>
+                                <p>Huit questions, dans l'ordre où elles viennent à la ferme. Le conseil vient avant la vente : on ne dimensionne rien avant d'avoir relu ces réponses avec lui et validé (référentiel § 3.2, p. 22 ; trame A1.1, p. 129).</p>
+                            </div>
+                            <field name="entretien_html" nolabel="1" readonly="1" class="cv-entretien-avancement-champ"/>
+                        </div>
+                        <div class="cv-entretien-mots">
+                            <label for="entretien_notes" string="Ses mots, en vrac"/>
+                            <field name="entretien_notes" nolabel="1" placeholder="Notez ce qu'il dit pendant la visite, tel quel. Vous rangerez dans les cartes après : « le forage tient 40 m³/h en juin mais tombe à 25 en août », « le voisin se plaint du bruit la nuit »…"/>
+                        </div>
+
+                        <!-- 1 · parcelles -->
+                        <div class="cv-etape" name="etape_parcellaire">
+                            <div class="cv-etape-num"><span class="cv-fait" invisible="not etape_parcellaire_ok">✓</span><span invisible="etape_parcellaire_ok">1</span></div>
+                            <div class="cv-etape-corps">
+                                <h3>Ses parcelles</h3>
+                                <p class="cv-demander">« Quelles parcelles voulez-vous arroser ? Qu'est-ce qu'il y a entre l'eau et le champ : route, haie, ligne électrique, ruisseau ? Ça monte ? »</p>
+                                <div class="cv-parcelles-source" invisible="parcelle_ids">
+                                    <div invisible="not nb_parcelles_client">
+                                        <span class="cv-pastille"><field name="nb_parcelles_client" readonly="1" class="cv-inline"/> parcelles déclarées à la PAC <field name="campagne_client" readonly="1" class="cv-inline" options="{'enable_formatting': false}"/></span>
+                                        <button name="action_reprendre_parcelles" type="object" string="Reprendre ses parcelles" class="btn btn-primary btn-sm" invisible="not partner_id"/>
+                                    </div>
+                                    <div invisible="nb_parcelles_client">
+                                        <span class="cv-pastille cv-pastille-vide">Pas encore sa déclaration PAC</span>
+                                        <button name="action_importer_telepac" type="object" string="Importer son fichier Telepac" class="btn btn-primary btn-sm" invisible="not partner_id"/>
+                                        <button name="action_demander_telepac" type="object" string="Lui demander par e-mail" class="btn btn-secondary btn-sm" invisible="not partner_id"/>
+                                    </div>
+                                </div>
+                                <div invisible="not parcelle_ids">
+                                    <field name="parcelle_ids" nolabel="1" context="{'default_partner_id': partner_id}">
+                                        <list create="0" delete="1" decoration-danger="etat == 'alerte'">
+                                            <field name="ilot"/>
+                                            <field name="numero"/>
+                                            <field name="culture_id"/>
+                                            <field name="surface_ha" sum="Total"/>
+                                            <field name="commune" optional="show"/>
+                                            <field name="campagne" optional="hide" options="{'enable_formatting': false}"/>
+                                            <field name="etat" widget="badge" decoration-danger="etat == 'alerte'" decoration-success="etat == 'ok'" optional="show"/>
+                                        </list>
+                                    </field>
+                                    <div class="cv-etape-actions">
+                                        <button name="action_reprendre_parcelles" type="object" string="Changer les parcelles" class="btn btn-link btn-sm"/>
+                                        <button name="action_voir_parcelles" type="object" string="Voir sur la carte" class="btn btn-link btn-sm"/>
+                                    </div>
+                                </div>
+                                <group>
+                                    <group>
+                                        <field name="surface_ha"/>
+                                        <field name="parcelle" string="Lieux-dits"/>
+                                        <field name="commune"/>
+                                    </group>
+                                    <group>
+                                        <field name="pente_moyenne_pct"/>
+                                        <field name="pente_max_pct"/>
+                                        <field name="distance_ressource_m"/>
+                                        <field name="obstacles"/>
+                                    </group>
+                                </group>
+                                <p class="cv-pourquoi">Pourquoi : plan, surfaces, pentes, obstacles et distance à la ressource sont la première donnée d'entrée de la check-list (p. 23). La pente et la distance décident des diamètres, des pertes de charge et de la pompe.</p>
+                            </div>
+                        </div>
+
+                        <!-- 2 · cultures -->
+                        <div class="cv-etape" name="etape_cultures">
+                            <div class="cv-etape-num"><span class="cv-fait" invisible="not etape_cultures_ok">✓</span><span invisible="etape_cultures_ok">2</span></div>
+                            <div class="cv-etape-corps">
+                                <h3>Ce qu'il cultive, aujourd'hui et demain</h3>
+                                <p class="cv-demander">« Qu'est-ce que vous mettez dedans cette année ? Et dans trois ans, si la rotation change ? Laquelle de vos cultures ne supporte pas d'avoir soif au mauvais moment ? Une qui craint l'eau sur les feuilles, ou qui doit être récoltée au sec ? »</p>
+                                <group>
+                                    <group>
+                                        <field name="culture_ids" widget="many2many_tags" options="{'color_field': 'couleur', 'no_create': True}"/>
+                                        <field name="culture_pointe_id" options="{'no_create': True}"/>
+                                    </group>
+                                    <group>
+                                        <field name="assolement" placeholder="Aujourd'hui : maïs grain 12 ha, soja 6 ha. Prévisible : passage en maïs semence sur 8 ha d'ici 2028."/>
+                                    </group>
+                                </group>
+                                <p class="cv-pourquoi">Pourquoi : un système se dimensionne pour la culture la plus exigeante en pointe de la rotation, pas pour la culture moyenne, et sur l'assolement prévisible, sinon il bride l'exploitation au premier changement (§ 3.2.1, p. 22).</p>
+                            </div>
+                        </div>
+
+                        <!-- 3 · sol -->
+                        <div class="cv-etape" name="etape_sol">
+                            <div class="cv-etape-num"><span class="cv-fait" invisible="not etape_sol_ok">✓</span><span invisible="etape_sol_ok">3</span></div>
+                            <div class="cv-etape-corps">
+                                <h3>Son sol</h3>
+                                <p class="cv-demander">« Avez-vous une analyse de sol ? Ça sèche vite après la pluie ? Des cailloux, de l'argile, du sable ? À quelle profondeur on tape sur le dur ? Est-ce que c'est pareil sur toute la parcelle ? »</p>
+                                <group>
+                                    <group>
+                                        <field name="sol_texture"/>
+                                        <field name="ru_mm"/>
+                                    </group>
+                                    <group>
+                                        <field name="profondeur_sol_cm"/>
+                                    </group>
+                                </group>
+                                <p class="cv-pourquoi">Pourquoi : texture, profondeur exploitable et réserve utile fixent la dose maximale et la fréquence ; une analyse de sol ou une carte pédologique est indispensable, et une parcelle hétérogène se découpe en zones (§ 3.2.2, p. 22).</p>
+                            </div>
+                        </div>
+
+                        <!-- 4 · eau -->
+                        <div class="cv-etape" name="etape_eau">
+                            <div class="cv-etape-num"><span class="cv-fait" invisible="not etape_eau_ok">✓</span><span invisible="etape_eau_ok">4</span></div>
+                            <div class="cv-etape-corps">
+                                <h3>Son eau</h3>
+                                <p class="cv-demander">« D'où vient l'eau ? Combien ça débite en plein été, quand tout le monde pompe, pas au printemps ? Combien de m³ par an avez-vous le droit de prendre ? Y a-t-il des restrictions certaines années ? Avez-vous une analyse d'eau : fer, sable, calcaire, algues ? »</p>
+                                <group>
+                                    <group>
+                                        <field name="ressource"/>
+                                        <field name="debit_mobilisable_m3h"/>
+                                        <field name="volume_autorise_m3"/>
+                                    </group>
+                                    <group>
+                                        <field name="analyse_eau_date"/>
+                                        <field name="analyse_eau_resume"/>
+                                    </group>
+                                </group>
+                                <p class="cv-pourquoi">Pourquoi : la donnée qui dimensionne n'est pas le débit maximal du forage, mais le volume autorisé et le débit réellement mobilisable en pointe, usages concurrents et restrictions déduits (§ 3.2.3, p. 23). La qualité d'eau décide de la filtration.</p>
+                            </div>
+                        </div>
+
+                        <!-- 5 · titre -->
+                        <div class="cv-etape" name="etape_titre">
+                            <div class="cv-etape-num"><span class="cv-fait" invisible="not etape_titre_ok">✓</span><span invisible="etape_titre_ok">5</span></div>
+                            <div class="cv-etape-corps">
+                                <h3>Son droit de prélever</h3>
+                                <p class="cv-demander">« Vous avez un récépissé de déclaration, un arrêté d'autorisation ? Qui gère : OUGC, ASA, chambre, le réseau collectif ? Quel volume vous est attribué ? »</p>
+                                <group>
+                                    <group>
+                                        <field name="titre_prelevement"/>
+                                    </group>
+                                    <group>
+                                        <field name="titre_organisme"/>
+                                    </group>
+                                </group>
+                                <p class="cv-pourquoi">Pourquoi : le titre de prélèvement (déclaration ou autorisation, volume attribué, organisme gestionnaire) est une donnée d'entrée à part entière de la check-list (p. 23) : sans lui, le volume autorisé de la question précédente n'a pas de base.</p>
+                            </div>
+                        </div>
+
+                        <!-- 6 · énergie -->
+                        <div class="cv-etape" name="etape_energie">
+                            <div class="cv-etape-num"><span class="cv-fait" invisible="not etape_energie_ok">✓</span><span invisible="etape_energie_ok">6</span></div>
+                            <div class="cv-etape-corps">
+                                <h3>Son énergie</h3>
+                                <p class="cv-demander">« Quel compteur au bord du champ, et quelle puissance souscrite ? Ou un groupe ? Vous avez des heures creuses ? Du solaire envisagé ? »</p>
+                                <group>
+                                    <group>
+                                        <field name="energie"/>
+                                        <field name="puissance_souscrite_kva"/>
+                                    </group>
+                                    <group>
+                                        <field name="tarif_energie"/>
+                                    </group>
+                                </group>
+                                <p class="cv-pourquoi">Pourquoi : une puissance insuffisante au point de livraison peut à elle seule imposer de fractionner le fonctionnement, voire un stockage tampon (§ 3.2.4, p. 23).</p>
+                            </div>
+                        </div>
+
+                        <!-- 7 · travail -->
+                        <div class="cv-etape" name="etape_travail">
+                            <div class="cv-etape-num"><span class="cv-fait" invisible="not etape_travail_ok">✓</span><span invisible="etape_travail_ok">7</span></div>
+                            <div class="cv-etape-corps">
+                                <h3>Comment il travaille</h3>
+                                <p class="cv-demander">« Qui va s'occuper de l'arrosage, et combien de temps par jour il peut y passer ? On peut arroser la nuit, ou les voisins vont se plaindre ? On accède à la parcelle avec quoi ? Vous voulez tout à la main, un programmateur, ou piloter depuis le téléphone avec des sondes ? »</p>
+                                <group>
+                                    <group>
+                                        <field name="main_d_oeuvre"/>
+                                        <field name="horaires"/>
+                                    </group>
+                                    <group>
+                                        <field name="acces"/>
+                                        <field name="niveau_automatisme"/>
+                                    </group>
+                                </group>
+                                <p class="cv-pourquoi">Pourquoi : main-d'œuvre, horaires admissibles, accès et degré d'automatisation voulu pèsent autant que la technique sur le choix du système (§ 3.2.5, p. 23 ; chapitre 16 pour l'automatisme).</p>
+                            </div>
+                        </div>
+
+                        <!-- 8 · priorité -->
+                        <div class="cv-etape" name="etape_priorite">
+                            <div class="cv-etape-num"><span class="cv-fait" invisible="not etape_priorite_ok">✓</span><span invisible="etape_priorite_ok">8</span></div>
+                            <div class="cv-etape-corps">
+                                <h3>Ce qui compte le plus pour lui</h3>
+                                <p class="cv-demander">« S'il faut choisir : économiser l'eau parce qu'elle manque, économiser l'énergie parce que ça coûte, ou aller chercher le rendement maximum ? »</p>
+                                <group>
+                                    <group>
+                                        <field name="hierarchie"/>
+                                    </group>
+                                    <group>
+                                        <field name="analyse_validee_le"/>
+                                    </group>
+                                </group>
+                                <p class="cv-pourquoi">Pourquoi : la hiérarchie eau / énergie / rendement se valide avec l'exploitant ; c'est elle qui tranche quand la technique hésite (check-list p. 23). Une fois les huit réponses relues avec lui, validez l'analyse : le projet passe à l'étude (§ 3.2).</p>
+                            </div>
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
