@@ -46,3 +46,13 @@ identifiant, gardé dans `cultiveau_site_ref` : la synchronisation horaire recon
 07/11 (lecture seule) est remplacée d'elle-même au premier refus ou à la prochaine entrée depuis cultiveau.fr. Bouton « Envoyer
 dans Mon Chantier » sur le chantier, filet de sécurité toutes les 15 minutes. Le retour (modifications faites dans l'appli) passe
 toujours par la synchronisation horaire site → ERP.
+
+## Tout ce que l'adhérent a sur cultiveau.fr arrive dans l'ERP (07/11/2026, nuit)
+
+- Le premier passage de la synchronisation envoyait « updatedSince=False » au site, qui répondait 422 : rien n'arrivait. Corrigé.
+- La première synchronisation part dans la minute qui suit la liaison (entrée depuis cultiveau.fr), plus seulement à l'heure.
+- Les **articles** de « Clients & Articles » deviennent des articles de la société dans l'ERP (référence, désignation, prix HT,
+  code-barres, unité, famille sous « Articles cultiveau.fr », marque), source « Clients & Articles de cultiveau.fr », reconnus
+  par `cultiveau_site_ref`. Si la clé de l'entreprise n'a pas encore le droit « articles », la synchronisation le dit et continue.
+- Les chantiers du site sont dans l'application **Chantiers** de l'ERP (menu Cultiveau), pas dans « Projet » d'Odoo ; la tuile
+  Chantiers de cultiveau.fr y mène directement.

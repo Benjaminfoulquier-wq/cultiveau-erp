@@ -44,6 +44,7 @@
                             <field name="interventions"/>
                             <field name="chantiers"/>
                             <field name="bons"/>
+                            <field name="articles"/>
                         </group>
                     </group>
                     <group string="Suivi">

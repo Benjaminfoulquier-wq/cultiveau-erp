@@ -206,5 +206,8 @@ class Connexion(models.Model):
             existante.write(vals)
         else:
             self.sudo().create(vals)
-        _logger.info("cultiveau.fr : données de %s reliées à l'ERP (clé reçue, synchronisation horaire, chantiers vers Mon Chantier).", company.name)
+        cron = self.env.ref("cultiveau_site.cron_synchro_site", raise_if_not_found=False)
+        if cron:
+            cron.sudo()._trigger()  # tout ce que l'adhérent a sur cultiveau.fr arrive dans la minute, pas dans une heure
+        _logger.info("cultiveau.fr : données de %s reliées à l'ERP (clé reçue, première synchronisation lancée, chantiers vers Mon Chantier).", company.name)
         return True

@@ -27,11 +27,18 @@ BON = {"success": True, "bon": {
     "heuresMachines": []}}
 
 
+ARTICLES = {"success": True, "total": 2, "limit": 500, "offset": 0, "articles": [
+    {"id": 9001, "reference": "REF-SITE-001", "ean": "3000000000011", "designation": "Raccord exemple 32 mm", "categorie": "Raccords", "marque": "Plasson",
+     "prixUnitaireHT": "60.00", "unite": "u", "tvaRate": "20", "isActive": 1, "createdAt": "2026-10-01 10:00:00", "updatedAt": "2026-10-20 18:00:00"},
+    {"id": 9002, "reference": "PE32-PN10", "ean": None, "designation": "Tube PE 32 PN10", "categorie": "Tubes", "marque": None,
+     "prixUnitaireHT": "1.45", "unite": "m", "tvaRate": "20", "isActive": 1, "createdAt": "2026-10-01 10:00:00", "updatedAt": "2026-10-20 18:00:00"}]}
+
+
 def faux_site(appels):
     def _appeler(self, chemin, params=None):
         appels.append((chemin, dict(params or {})))
         return {"clients": CLIENTS, "interventions": INTERVENTIONS, "chantiers": CHANTIERS, "bons-intervention": BONS,
-                "bons-intervention/501": BON}[chemin]
+                "bons-intervention/501": BON, "articles": ARTICLES}[chemin]
     return _appeler
 
 
@@ -59,7 +66,15 @@ class TestSite(TransactionCase):
         bon = self.env["cultiveau.site.bon"].search([("connexion_id", "=", connexion.id)])
         self.assertEqual((bon.numero, bon.partner_id, bon.task_id, bon.chantier_id, bon.total_ttc), ("BI-2026-0501", jean, t, ch, 288.0))
         self.assertEqual(sorted(bon.ligne_ids.mapped("genre")), ["article", "mo"])
-        self.assertTrue(connexion.curseur_clients and connexion.curseur_bons)
+        self.assertTrue(connexion.curseur_clients and connexion.curseur_bons and connexion.curseur_articles)
+        # les articles de « Clients & Articles » : dans le catalogue de la société, avec leur référence, prix, unité et famille
+        Produit = self.env["product.template"]
+        raccord = Produit.search([("cultiveau_site_ref", "=", f"{connexion.id}:9001")])
+        self.assertEqual((raccord.default_code, raccord.list_price, raccord.company_id, raccord.categ_id.name, raccord.barcode), ("REF-SITE-001", 60.0, societe, "Raccords", "3000000000011"))
+        tube = Produit.search([("cultiveau_site_ref", "=", f"{connexion.id}:9002")])
+        self.assertEqual((tube.uom_id, tube.cultiveau_source), (self.env.ref("uom.product_uom_meter"), "site"))
+        # le premier passage ne doit pas envoyer « updatedSince=False » (le site répondait 422 et rien n'arrivait)
+        self.assertFalse([p for c, p in appels if p.get("updatedSince") is False])
         # une seconde passe ne crée rien en double, et ne relit que depuis le curseur
         avant = (Partner.search_count([("name", "like", "-Site")]), self.env["project.task"].search_count([("cultiveau_site_ref", "!=", False)]))
         with patch.object(type(connexion), "_appeler", faux_site(appels)):

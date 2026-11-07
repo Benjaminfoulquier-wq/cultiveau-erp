@@ -26,3 +26,10 @@ class Installation(models.Model):
     _inherit = "cultiveau.installation"
 
     cultiveau_site_ref = fields.Char("Référence cultiveau.fr", index=True, copy=False, readonly=True)
+
+
+class Produit(models.Model):
+    _inherit = "product.template"
+
+    cultiveau_site_ref = fields.Char("Référence cultiveau.fr", index=True, copy=False, readonly=True)
+    cultiveau_source = fields.Selection(selection_add=[("site", "Clients & Articles de cultiveau.fr")], ondelete={"site": "set null"})

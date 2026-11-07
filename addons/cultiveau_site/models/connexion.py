@@ -58,6 +58,8 @@ class SiteConnexion(models.Model):
     interventions = fields.Boolean("Interventions", default=True)
     chantiers = fields.Boolean("Chantiers", default=True)
     bons = fields.Boolean("Bons d'intervention", default=True)
+    articles = fields.Boolean("Articles (Clients & Articles)", default=True)
+    curseur_articles = fields.Datetime("Articles lus jusqu'au", readonly=True)
     curseur_clients = fields.Datetime("Clients lus jusqu'au", readonly=True)
     curseur_bons = fields.Datetime("Bons lus jusqu'au", readonly=True)
     derniere_synchro = fields.Datetime("Dernière synchronisation", readonly=True)
@@ -81,7 +83,7 @@ class SiteConnexion(models.Model):
             raise UserError(f"{self.company_id.name} : la clé d'API du site n'est pas renseignée.")
         url = f"{self.url.rstrip('/')}/api/external/{chemin.lstrip('/')}"
         try:
-            r = requests.get(url, params={k: v for k, v in (params or {}).items() if v not in (None, "")}, headers={"X-API-Key": cle, "Accept": "application/json"}, timeout=30)
+            r = requests.get(url, params={k: v for k, v in (params or {}).items() if v not in (None, "", False)}, headers={"X-API-Key": cle, "Accept": "application/json"}, timeout=30)
         except requests.RequestException as e:
             raise UserError(f"Site injoignable : {e}") from e
         if r.status_code == 401:
@@ -101,7 +103,7 @@ class SiteConnexion(models.Model):
         """Toutes les pages d'une liste (limit / offset)."""
         decalage, resultats = 0, []
         while True:
-            rep = self._appeler(chemin, {**(params or {}), "limit": taille, "offset": decalage})
+            rep = self._appeler(chemin, {**{k: v for k, v in (params or {}).items() if v not in (None, "", False)}, "limit": taille, "offset": decalage})
             lot = rep.get(cle_liste) or []
             resultats += lot
             total = rep.get("total")
@@ -157,6 +159,8 @@ class SiteConnexion(models.Model):
                     bilan.append(self._synchro_chantiers())
                 if self.bons:
                     bilan.append(self._synchro_bons())
+                if self.articles:
+                    bilan.append(self._synchro_articles())
             self.write({"derniere_synchro": debut, "resultat": " · ".join(bilan) or "Rien à synchroniser.", "en_erreur": False})
         except UserError as e:
             self.write({"derniere_synchro": debut, "resultat": str(e.args[0] if e.args else e), "en_erreur": True})
@@ -286,6 +290,68 @@ class SiteConnexion(models.Model):
                 Chantier.create({**valeurs, "installation_id": installation.id, "company_id": self.company_id.id, "cultiveau_site_ref": ref, "chef_id": False})
                 crees += 1
         return f"{len(lus)} chantier(s) : {crees} nouveau(x), {maj} à jour"
+
+    # ---- articles de « Clients & Articles »
+
+    def _synchro_articles(self):
+        """Les articles de l'adhérent sur cultiveau.fr deviennent des articles de sa société dans l'ERP (référence, désignation, prix, unité,
+        famille, marque), reconnus par leur référence du site. Un site qui ne les expose pas encore (clé ancienne, version du site) ne bloque rien."""
+        env = self._env()
+        Produit = env["product.template"].with_context(active_test=False)
+        debut = fields.Datetime.now()
+        depuis = self.curseur_articles and (self.curseur_articles - timedelta(minutes=5)).strftime("%Y-%m-%dT%H:%M:%S")
+        try:
+            lus = self._pages("articles", "articles", {"updatedSince": depuis}, taille=500)
+        except UserError as e:
+            texte = str(e.args[0] if e.args else e)
+            if "403" in texte or "404" in texte or "droit" in texte:
+                return "articles : pas encore exposés par le site pour cette clé"
+            raise
+        crees = maj = 0
+        for a in lus:
+            ref = self._ref(a.get("id"))
+            reference = (a.get("reference") or "").strip()
+            produit = Produit.search([("cultiveau_site_ref", "=", ref)], limit=1)
+            if not produit and reference:
+                produit = Produit.search([("default_code", "=", reference), ("company_id", "=", self.company_id.id)], limit=1)
+            valeurs = {"name": (a.get("designation") or reference or f"Article {a.get('id')}")[:255], "default_code": reference[:64] or False,
+                       "list_price": float(a.get("prixUnitaireHT") or 0.0), "barcode": (a.get("ean") or "").strip()[:64] or False,
+                       "sale_ok": True, "purchase_ok": True, "type": "consu", "is_storable": True, "company_id": self.company_id.id,
+                       "cultiveau_site_ref": ref, "active": bool(a.get("isActive", 1))}
+            if "cultiveau_source" in Produit._fields:
+                valeurs["cultiveau_source"] = "site"
+            if a.get("categorie"):
+                valeurs["categ_id"] = self._categorie_article(a["categorie"], env).id
+            if a.get("marque"):
+                valeurs["description_sale"] = f"Marque : {a['marque']}"
+            unite = self._unite_article(a.get("unite"), env)
+            if unite:
+                valeurs.update({"uom_id": unite.id, "uom_po_id": unite.id})
+            if produit:
+                produit.write({k: v for k, v in valeurs.items() if k not in ("uom_id", "uom_po_id") or not produit.uom_id})
+                maj += 1
+            elif valeurs["active"]:
+                Produit.create(valeurs)
+                crees += 1
+        self.curseur_articles = debut
+        return f"{len(lus)} article(s) lus, {crees} créé(s), {maj} à jour"
+
+    def _categorie_article(self, nom, env):
+        Categ = env["product.category"]
+        racine = Categ.search([("name", "=", "Articles cultiveau.fr"), ("parent_id", "=", False)], limit=1) or Categ.create({"name": "Articles cultiveau.fr"})
+        return Categ.search([("name", "=ilike", nom.strip()[:120]), ("parent_id", "=", racine.id)], limit=1) or Categ.create({"name": nom.strip()[:120], "parent_id": racine.id})
+
+    def _unite_article(self, libelle, env):
+        if not libelle:
+            return None
+        cle = libelle.strip().lower()
+        correspondances = {"m": "uom.product_uom_meter", "ml": "uom.product_uom_meter", "mètre": "uom.product_uom_meter", "metre": "uom.product_uom_meter",
+                           "kg": "uom.product_uom_kgm", "l": "uom.product_uom_litre", "litre": "uom.product_uom_litre", "h": "uom.product_uom_hour", "heure": "uom.product_uom_hour",
+                           "u": "uom.product_uom_unit", "unité": "uom.product_uom_unit", "unite": "uom.product_uom_unit", "pce": "uom.product_uom_unit", "pièce": "uom.product_uom_unit"}
+        xmlid = correspondances.get(cle)
+        if xmlid:
+            return env.ref(xmlid, raise_if_not_found=False)
+        return env["uom.uom"].search([("name", "=ilike", libelle.strip())], limit=1) or None
 
     # ---- bons d'intervention
 
