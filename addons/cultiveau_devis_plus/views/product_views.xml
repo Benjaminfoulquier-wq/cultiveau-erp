@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product_template_form_referentiel" model="ir.ui.view">
+        <field name="name">product.template.form.cultiveau.referentiel</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Référentiel" name="cultiveau_referentiel" invisible="not cultiveau_nb_avis">
+                    <field name="cultiveau_nb_avis" invisible="1"/>
+                    <div class="alert alert-info" role="status">Ce que le référentiel technique de l'irrigation agricole V4 dit de ce type de matériel. Sur un devis, « Relire avec le référentiel » reprend ces avis et y ajoute ce qui manque.</div>
+                    <field name="cultiveau_referentiel_html" nolabel="1" readonly="1"/>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

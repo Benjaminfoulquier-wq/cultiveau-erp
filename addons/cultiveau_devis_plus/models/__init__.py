@@ -1,1 +1,1 @@
-from . import avis, company, sale_order
+from . import avis, company, product, sale_order

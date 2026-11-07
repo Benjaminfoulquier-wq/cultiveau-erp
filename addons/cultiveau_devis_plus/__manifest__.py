@@ -24,6 +24,7 @@ Le devis qui en dit plus
         "data/avis.xml",
         "views/avis_views.xml",
         "views/sale_order_views.xml",
+        "views/product_views.xml",
         "views/res_config_settings_views.xml",
         "report/devis.xml",
     ],

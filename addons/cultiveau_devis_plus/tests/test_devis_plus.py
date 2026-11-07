@@ -84,3 +84,11 @@ class TestDevisPlus(TransactionCase):
         devis.action_relire_referentiel()
         noms = [a.name for a, _l in self.env["cultiveau.referentiel.avis"].pour_devis(devis)]
         self.assertNotIn("Compteur : implantation et usage", noms)
+
+    def test_la_fiche_article_dit_ce_que_dit_le_referentiel(self):
+        hydro = self.env["product.template"].create({"name": "Odis hydrocyclone DN150 (98-160M3/H)", "default_code": "101094878"})
+        noms = hydro.cultiveau_avis().mapped("name")
+        self.assertIn("Hydrocyclone : une préfiltration, pas une filtration", noms)
+        self.assertIn("§ 14.2", hydro.cultiveau_referentiel_html)
+        self.assertGreaterEqual(self.pompe.cultiveau_nb_avis, 2)  # marche à sec et kWh/m³
+        self.assertEqual(self.env["product.template"].create({"name": "Sac de 25 kg"}).cultiveau_nb_avis, 0)

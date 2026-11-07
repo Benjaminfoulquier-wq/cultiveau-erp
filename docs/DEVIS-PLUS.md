@@ -35,3 +35,11 @@ et sur le portail. Les règles se complètent par entreprise ou pour le réseau 
 
 Hors référentiel : le choix des mots déclencheurs est une pratique Cultiveau ; le référentiel fixe les prescriptions citées,
 pas la manière de les repérer dans un devis. Un avis mal placé se corrige dans la règle, jamais en modifiant la citation.
+
+## Sur la fiche de l'article (07/11/2026, soir)
+
+Onglet « Référentiel » sur chaque article dont le nom, la référence, la famille ou la description déclenchent un avis « présence » :
+ce que le référentiel dit de ce type de matériel, section, page et niveau. Qu'il vienne du stock de l'adhérent, du réseau ou de la
+logistique (arrivé à la volée en tapant sa référence dans un devis), l'article porte sa lecture du référentiel. Vingt-neuf règles
+livrées (hydrocyclone § 14.2, goutteurs § 17.2.1, longueur de rampe § 7.5.1, appareils de mesure § 17.5, électrovannes § 17.3.2,
+coups de bélier § 13.3.1, kWh/m³ § 10.6.1, sondes § 16.2.2, couverture partielle § 7.2, en plus des vingt premières).

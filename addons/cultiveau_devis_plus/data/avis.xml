@@ -206,5 +206,95 @@
             <field name="page">98</field>
             <field name="niveau">exigence_technique</field>
         </record>
+        <record id="avis_hydrocyclone" model="cultiveau.referentiel.avis">
+            <field name="name">Hydrocyclone : une préfiltration, pas une filtration</field>
+            <field name="sequence">13</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">hydrocyclone, cyclone, séparateur de sable, separateur de sable</field>
+            <field name="texte">L'hydrocyclone retient le sable et les particules denses : c'est une préfiltration, en tête, pour un forage sableux. Il ne remplace pas la filtration fine (tamis ou disques, 80 à 200 µm) qui protège les goutteurs : la chaîne type est préfiltration, puis filtration fine, puis fertigation, puis réseau.</field>
+            <field name="section">14.2</field>
+            <field name="page">99</field>
+            <field name="niveau">ordre_de_grandeur</field>
+        </record>
+        <record id="avis_goutteurs" model="cultiveau.referentiel.avis">
+            <field name="name">Goutteurs : autorégulants ou non, et leur plage de pression</field>
+            <field name="sequence">14</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">goutteur, autorégulant, autoregulant, auto-régulant, non régulant, gaine, ligne de goutteurs</field>
+            <field name="texte">Le goutteur non régulant a un débit qui varie avec la pression : simple et économique, il exige des rampes courtes et un terrain plat pour rester dans la tolérance d'écart de débit (§ 6.4.2). L'autorégulant maintient un débit quasi constant sur une plage de pression : indispensable en pente, sur longues rampes ou pour une uniformité élevée. Le respect de la plage de pression de service conditionne le débit annoncé et l'uniformité (§ 17.2.2).</field>
+            <field name="section">17.2.1</field>
+            <field name="page">113</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_longueur_rampe" model="cultiveau.referentiel.avis">
+            <field name="name">Goutte à goutte de surface : longueur de rampe admissible</field>
+            <field name="sequence">15</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">gaine, goutte à goutte, goutte a goutte, tube goutteur, ligne de goutteurs</field>
+            <field name="texte">Le point de dimensionnement est la longueur admissible de rampe pour rester dans la tolérance d'écart de débit (§ 6.4.2). Repères, goutteurs non régulants, écart ≤ 10 %, terrain plat : 1 l/h tous les 0,30 m, environ 110 m en Ø16 et 190 m en Ø20 ; 1 l/h tous les 0,50 m, environ 150 m en Ø16 et 260 m en Ø20 ; 2 l/h tous les 0,30 m, environ 75 m en Ø16 et 130 m en Ø20. Sensible aux UV, aux rongeurs et aux travaux culturaux.</field>
+            <field name="section">7.5.1</field>
+            <field name="page">54</field>
+            <field name="niveau">ordre_de_grandeur</field>
+        </record>
+        <record id="avis_mesure" model="cultiveau.referentiel.avis">
+            <field name="name">Manomètres, compteurs, débitmètres : les yeux de l'exploitant</field>
+            <field name="sequence">42</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">manomètre, manometre, débitmètre, debitmetre, compteur, capteur de pression, pressostat</field>
+            <field name="texte">Les appareils de mesure sont les yeux de l'exploitant : manomètres aux points clés (§ 16.5.2), compteurs volumétriques (§ 8.3), débitmètres pour le débit instantané. Leur présence aux bons endroits est la condition d'un pilotage et d'un diagnostic possibles ; un réseau sans instruments se conduit en aveugle.</field>
+            <field name="section">17.5</field>
+            <field name="page">115</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_electrovannes" model="cultiveau.referentiel.avis">
+            <field name="name">Vannes hydrauliques et électrovannes</field>
+            <field name="sequence">93</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">électrovanne, electrovanne, vanne hydraulique, vanne à membrane, vanne a membrane, solénoïde, solenoide</field>
+            <field name="texte">Les vannes hydrauliques (commandées par la pression) et les électrovannes (commandées électriquement) permettent l'automatisation du séquencement des secteurs (§ 16.3). Elles se choisissent pour le débit, la pression et le mode de commande de l'installation.</field>
+            <field name="section">17.3.2</field>
+            <field name="page">113</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_anti_belier" model="cultiveau.referentiel.avis">
+            <field name="name">Coups de bélier : analyse et protection</field>
+            <field name="sequence">72</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">anti-bélier, anti bélier, antibélier, anti-belier, réservoir à vessie, reservoir a vessie, ballon, soupape de décharge, soupape de securite, soupape de sécurité</field>
+            <field name="texte">Le coup de bélier est une surpression transitoire due à une variation brusque du débit (fermeture rapide d'une vanne, arrêt intempestif de pompe) ; il peut dépasser plusieurs fois la pression de service et rompre la conduite. On l'atténue par des manœuvres lentes, un démarrage et un arrêt progressifs (§ 11.3), des réservoirs anti-bélier, des soupapes ou des ventouses adaptées. Repère : en PEHD, célérité de l'onde d'environ 300 m/s (exemple 13-B).</field>
+            <field name="section">13.3.1</field>
+            <field name="page">94</field>
+            <field name="niveau">exigence_technique</field>
+        </record>
+        <record id="avis_pompe_energie" model="cultiveau.referentiel.avis">
+            <field name="name">Pompe : consommation spécifique en kWh par m³</field>
+            <field name="sequence">62</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">pompe, groupe de pompage, station de pompage, surpresseur, motopompe, électropompe, electropompe</field>
+            <field name="texte">La consommation spécifique (énergie par mètre cube pompé, à une HMT donnée) est l'indicateur de référence de l'efficacité du pompage : énergie spécifique (kWh/m³) = HMT (m) / (367 × rendement global pompe × moteur). Exemple du référentiel : 76 m de HMT et un rendement de 0,65 donnent 0,32 kWh/m³. À relever au PV de mise en service, puis à suivre au compteur.</field>
+            <field name="section">10.6.1</field>
+            <field name="page">76</field>
+            <field name="niveau">ordre_de_grandeur</field>
+        </record>
+        <record id="avis_sondes" model="cultiveau.referentiel.avis">
+            <field name="name">Sondes de sol : utiles si bien implantées</field>
+            <field name="sequence">94</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">sonde, tensiomètre, tensiometre, capacitive, sonde de sol, station météo, station meteo</field>
+            <field name="texte">Les sondes mesurent directement l'état hydrique du sol : capacitives (teneur en eau) ou tensiométriques (effort d'extraction pour la plante). Elles calent et vérifient le bilan hydrique et détectent la profondeur d'humectation. Leur bonne implantation (zone racinaire représentative, plusieurs profondeurs) conditionne leur utilité.</field>
+            <field name="section">16.2.2</field>
+            <field name="page">109</field>
+            <field name="niveau">recommandation</field>
+        </record>
+        <record id="avis_couverture_partielle" model="cultiveau.referentiel.avis">
+            <field name="name">Couverture partielle : main-d'œuvre et raccords de position</field>
+            <field name="sequence">82</field>
+            <field name="genre">presence</field>
+            <field name="mots_cles">couverture partielle, couverture semi-fixe, rampe déplaçable, rampe deplacable, asperseur, sprinkler</field>
+            <field name="texte">La couverture partielle n'équipe qu'une fraction de la parcelle à la fois, déplacée à la main ou mécaniquement. Elle réduit l'investissement au prix d'une main-d'œuvre de déplacement et d'un risque d'hétérogénéité aux raccords de position ; elle convient aux exploitations qui ont la main-d'œuvre et des surfaces modérées. Uniformité de référence en couverture intégrale : CU 84 à 88 % (§ 4.3.1, p. 29).</field>
+            <field name="section">7.2</field>
+            <field name="page">51</field>
+            <field name="niveau">recommandation</field>
+        </record>
     </data>
 </odoo>
