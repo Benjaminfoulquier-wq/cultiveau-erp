@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_bon_checklist" inherit_id="cultiveau_terrain.report_bon" name="Bon d'intervention : checklist">
+        <xpath expr="//div[@t-if='o.travaux']" position="before">
+            <div t-if="o.point_ids" class="mb-3">
+                <strong>Points de contrôle</strong>
+                <span class="text-muted" style="font-size: 10px;"> · <t t-out="o.modele_checklist_id.name"/><t t-if="o.modele_checklist_id.reference"> (référentiel <t t-out="o.modele_checklist_id.reference"/>)</t> · <t t-out="o.checklist_faits"/> / <t t-out="o.checklist_total"/> faits</span>
+                <table class="table table-sm" style="font-size: 11px;">
+                    <thead><tr><th style="width: 6%"></th><th>Point</th><th class="text-end" style="width: 16%">Mesure</th><th style="width: 30%">Remarque</th><th style="width: 8%">Réf.</th></tr></thead>
+                    <tbody>
+                        <tr t-foreach="o.point_ids" t-as="p">
+                            <td class="text-center"><t t-if="p.etat == 'ok'">☑</t><t t-elif="p.etat == 'sans_objet'">—</t><t t-else="">☐</t></td>
+                            <td><t t-out="p.name"/><t t-if="p.genre == 'texte' and p.texte"> : <i t-out="p.texte"/></t></td>
+                            <td class="text-end"><t t-if="p.genre == 'mesure' and p.valeur"><t t-out="'%g' % p.valeur"/> <t t-out="p.unite or ''"/></t></td>
+                            <td><t t-out="p.remarque or ''"/></td>
+                            <td class="text-muted"><t t-out="p.reference or ''"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </xpath>
+    </template>
+</odoo>

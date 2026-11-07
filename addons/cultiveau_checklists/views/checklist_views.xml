@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_checklist_modele_list" model="ir.ui.view">
+        <field name="name">cultiveau.checklist.modele.list</field>
+        <field name="model">cultiveau.checklist.modele</field>
+        <field name="arch" type="xml">
+            <list default_order="nature, sequence">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="nature"/>
+                <field name="type_systeme" optional="show"/>
+                <field name="nb_points"/>
+                <field name="nb_bons"/>
+                <field name="reference" optional="show"/>
+                <field name="company_id" string="Proposée par" options="{'no_open': True}"/>
+                <button name="action_copier_pour_moi" type="object" string="Adapter pour moi" icon="fa-copy" class="btn-link" invisible="company_id"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_checklist_modele_form" model="ir.ui.view">
+        <field name="name">cultiveau.checklist.modele.form</field>
+        <field name="model">cultiveau.checklist.modele</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_copier_pour_moi" type="object" string="Adapter pour ma société" class="btn-primary" invisible="company_id"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_voir_bons" type="object" class="oe_stat_button" icon="fa-file-text-o"><field name="nb_bons" widget="statinfo" string="Bons"/></button>
+                    </div>
+                    <widget name="web_ribbon" title="Archivée" bg_color="text-bg-danger" invisible="active"/>
+                    <div class="oe_title"><h1><field name="name" placeholder="Ex. Remise en service pivot"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="nature"/>
+                            <field name="type_systeme"/>
+                            <field name="reference" placeholder="§ 18.3, A1.6"/>
+                        </group>
+                        <group>
+                            <field name="company_id" string="Proposée par" options="{'no_create': True}" groups="cultiveau_base.group_equipe"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <field name="description" placeholder="Quand l'employer, ce qu'on regarde…"/>
+                    <field name="ligne_ids">
+                        <list editable="bottom" default_order="sequence, id">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                            <field name="genre"/>
+                            <field name="unite"/>
+                            <field name="cle" optional="show"/>
+                            <field name="reference"/>
+                            <field name="obligatoire" widget="boolean_toggle"/>
+                            <field name="aide" optional="show"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_checklist_modele_search" model="ir.ui.view">
+        <field name="name">cultiveau.checklist.modele.search</field>
+        <field name="model">cultiveau.checklist.modele</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="miennes" string="Les miennes" domain="[('company_id', '!=', False)]"/>
+                <filter name="reseau" string="Proposées par le réseau" domain="[('company_id', '=', False)]"/>
+                <group expand="0" string="Regrouper"><filter name="par_nature" string="Nature" context="{'group_by': 'nature'}"/></group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_checklists" model="ir.actions.act_window">
+        <field name="name">Checklists par nature</field>
+        <field name="res_model">cultiveau.checklist.modele</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_par_nature': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Une checklist par nature d'intervention</p>
+            <p>Remise en service, hivernage, entretien, mise en service, dépannage, diagnostic : les check-lists du référentiel, à adapter à votre façon de travailler. Le bon d'intervention la reçoit tout seul.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_checklists" name="Checklists par nature" parent="cultiveau_interventions.menu_interventions_racine" action="action_checklists" sequence="45"/>
+</odoo>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_bon_form_checklist" model="ir.ui.view">
+        <field name="name">cultiveau.bon.form.checklist</field>
+        <field name="model">cultiveau.bon</field>
+        <field name="inherit_id" ref="cultiveau_terrain.view_bon_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <div class="alert alert-warning mb-0" role="alert" invisible="not checklist_manques or etat != 'brouillon'">
+                    Points obligatoires non faits : <field name="checklist_manques" class="oe_inline"/>
+                </div>
+            </xpath>
+            <xpath expr="//page[@name='releves']" position="before">
+                <page string="Checklist" name="checklist">
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <field name="nature" readonly="etat != 'brouillon'" class="oe_inline"/>
+                        <field name="modele_checklist_id" class="oe_inline" options="{'no_open': True}"/>
+                        <field name="checklist_avancement" widget="progressbar" class="oe_inline" style="min-width: 140px"/>
+                        <field name="checklist_faits" invisible="1"/><field name="checklist_total" invisible="1"/>
+                        <button name="action_tout_cocher" type="object" string="Tout cocher" class="btn btn-link btn-sm" invisible="etat != 'brouillon'"/>
+                        <button name="action_recharger_checklist" type="object" string="Recharger la checklist" class="btn btn-link btn-sm" invisible="etat != 'brouillon'"
+                                confirm="Les points cochés et mesurés seront remplacés par ceux du modèle. Continuer ?"/>
+                    </div>
+                    <field name="point_ids" readonly="etat != 'brouillon'">
+                        <list editable="bottom" default_order="sequence, id" decoration-success="etat == 'ok'" decoration-muted="etat == 'sans_objet'" decoration-danger="obligatoire and etat == 'non'">
+                            <field name="sequence" widget="handle"/>
+                            <field name="genre" column_invisible="True"/>
+                            <field name="obligatoire" column_invisible="True"/>
+                            <field name="cle" column_invisible="True"/>
+                            <field name="fait" widget="boolean_toggle" invisible="genre != 'case'"/>
+                            <field name="name" readonly="1"/>
+                            <field name="valeur" invisible="genre != 'mesure'"/>
+                            <field name="unite" readonly="1" invisible="genre != 'mesure'"/>
+                            <field name="texte" invisible="genre != 'texte'"/>
+                            <field name="etat" widget="selection"/>
+                            <field name="remarque"/>
+                            <field name="reference" readonly="1" optional="show"/>
+                            <field name="aide" readonly="1" optional="hide"/>
+                        </list>
+                    </field>
+                    <p class="text-muted small mt-2 mb-0">Les mesures de pression remplissent les relevés du bon. Un point obligatoire non fait est signalé à la signature, sans bloquer.
+                        Les modèles : Interventions › Checklists par nature.</p>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
