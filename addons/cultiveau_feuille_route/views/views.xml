@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- l'intervention : les salariés sans accès et la consigne -->
+    <record id="view_task_form_feuille" model="ir.ui.view">
+        <field name="name">project.task.form.cultiveau.feuille</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="cultiveau_terrain.view_task_form_terrain"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='cultiveau_adresse']" position="after">
+                <field name="cultiveau_salarie_ids" widget="many2many_tags" invisible="not cultiveau_intervention" options="{'no_create': True}"/>
+                <field name="cultiveau_consignes" invisible="not cultiveau_intervention" placeholder="Où entrer, qui appeler, quoi prendre…"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- le chantier -->
+    <record id="view_chantier_form_feuille" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.form.feuille</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="inherit_id" ref="cultiveau_chantier.view_chantier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='equipe_ids']" position="after">
+                <field name="salarie_ids" widget="many2many_tags" options="{'no_create': True}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- la fiche employé : le lien, l'e-mail de la veille -->
+    <record id="view_employee_form_feuille" model="ir.ui.view">
+        <field name="name">hr.employee.form.cultiveau.feuille</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Feuille de route" name="feuille_route">
+                    <group>
+                        <group string="Sa journée sur le téléphone">
+                            <field name="cultiveau_feuille_url" widget="CopyClipboardChar" readonly="1"/>
+                            <field name="cultiveau_feuille_mail"/>
+                            <field name="cultiveau_feuille_derniere"/>
+                        </group>
+                        <group string="Envoyer">
+                            <div colspan="2" class="d-flex gap-2 flex-wrap">
+                                <button name="action_envoyer_feuille" type="object" string="Envoyer sa journée de demain" class="btn btn-primary"/>
+                                <button name="action_voir_feuille" type="object" string="Voir sa page" class="btn btn-secondary"/>
+                                <button name="action_nouveau_jeton" type="object" string="Nouveau lien" class="btn btn-link" confirm="L'ancien lien cessera de fonctionner. Continuer ?"/>
+                            </div>
+                            <p colspan="2" class="text-muted small">Le lien ne demande pas de mot de passe : il ne montre que la journée de cette personne (clients, adresses, itinéraires, produits à embarquer).
+                                Envoyez-le par SMS une fois ; la veille au soir, l'e-mail part tout seul quand quelque chose est planifié.</p>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_feuilles_route" model="ir.actions.act_window">
+        <field name="name">Feuilles de route</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('company_id', 'in', allowed_company_ids)]</field>
+        <field name="context">{'search_default_sans_acces': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Chaque salarié a sa feuille de route</p>
+            <p>Avec ou sans accès à l'ERP : sa journée sur le téléphone par un lien personnel, et par e-mail la veille au soir. Créez les salariés sans compte dans Employés, affectez-les aux interventions et aux chantiers.</p>
+        </field>
+    </record>
+
+    <record id="view_employee_search_feuille" model="ir.ui.view">
+        <field name="name">hr.employee.search.cultiveau.feuille</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[1]" position="before">
+                <filter name="sans_acces" string="Sans accès à l'ERP" domain="[('user_id', '=', False)]"/>
+                <filter name="avec_acces" string="Avec accès" domain="[('user_id', '!=', False)]"/>
+                <separator/>
+            </xpath>
+        </field>
+    </record>
+
+    <menuitem id="menu_feuilles_route" name="Feuilles de route" parent="cultiveau_interventions.menu_interventions_racine" action="action_feuilles_route" sequence="6"/>
+</odoo>
