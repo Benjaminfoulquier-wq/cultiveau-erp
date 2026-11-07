@@ -18,3 +18,10 @@ Ce que le module couvre, et comment :
 
 Quand un écran sent encore l'éditeur : chercher d'où vient le texte (vue, traduction, base, composant JS) et étendre la couche
 correspondante plutôt que corriger l'écran seul.
+
+## Logo et portail client (07/11/2026, nuit)
+
+- Une société sans logo porte celui de Cultiveau, jamais celui de l'éditeur (`models/logo.py` : logo par défaut, et pose à chaque
+  mise à jour sur les sociétés qui n'en ont pas). Le logo de l'adhérent le remplace dès qu'il entre depuis cultiveau.fr.
+- Portail client : « Généré par Cultiveau » sous le devis ou la facture, plus de logo de l'éditeur ; « The conversation is empty »
+  traduit (i18n/fr_FR.po du module).

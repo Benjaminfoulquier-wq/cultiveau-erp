@@ -17,6 +17,8 @@
         <function model="res.partner" name="cultiveau_habiller_assistant"/>
         <!-- Les textes de l'éditeur enregistrés en base (aides des écrans vides, modèles de courriels, menus) : réécrits à chaque mise à jour. -->
         <function model="ir.actions.act_window" name="cultiveau_sans_editeur"/>
+        <!-- Aucune société sans logo, et jamais celui de l'éditeur : celui de Cultiveau en attendant le sien. -->
+        <function model="res.company" name="cultiveau_logo_par_defaut"/>
     </data>
     <data noupdate="1">
         <!-- Le logo de la société principale : Cultiveau. -->

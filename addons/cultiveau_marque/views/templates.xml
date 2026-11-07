@@ -71,4 +71,11 @@
             </td>
         </xpath>
     </template>
+
+    <!-- Portail client : pas de « Powered by » de l'éditeur sous le devis ou la facture. -->
+    <template id="portal_record_sidebar_cultiveau" inherit_id="portal.portal_record_sidebar" name="Cultiveau : portail sans l'éditeur">
+        <xpath expr="//div[hasclass('o_portal_sidebar_content')]/div[last()]" position="replace">
+            <div class="d-none d-lg-block mt-5 small text-center text-muted">Généré par <a target="_blank" href="https://cultiveau.fr">Cultiveau</a></div>
+        </xpath>
+    </template>
 </odoo>

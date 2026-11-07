@@ -1,0 +1,21 @@
+# Traductions françaises manquantes dans les écrans vus par les clients (portail), posées par Cultiveau.
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: mail
+#. odoo-javascript
+#: code:addons/mail/static/src/core/common/thread.xml:0
+msgid "The conversation is empty."
+msgstr "Aucun message pour l'instant."
+
+#. module: mail
+#. odoo-javascript
+#: code:addons/mail/static/src/core/common/thread.xml:0
+msgid "The conversation is empty"
+msgstr "Aucun message pour l'instant"
