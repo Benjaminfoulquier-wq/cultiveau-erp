@@ -13,7 +13,7 @@ from odoo.exceptions import UserError
 TYPES_CLIENTS = {
     "agriculteur": ("Agriculteur", "Agriculteurs"), "collectivite": ("Collectivité", "Collectivités"), "particulier": ("Particulier", "Particuliers"),
     "industrie": ("Industrie", "Industries"), "plombier": ("Plombier", "Plombiers"), "paysagiste": ("Paysagiste", "Paysagistes"),
-    "pisciniste": ("Pisciniste", "Piscinistes"), "autre": ("Autre", "Autres clients"),
+    "pisciniste": ("Pisciniste", "Piscinistes"), "tp": ("Travaux publics", "Travaux publics"), "autre": ("Autre", "Autres clients"),
 }
 
 CLOTURES = ("1_done", "1_canceled")

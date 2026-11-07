@@ -444,13 +444,16 @@
             </t>
             <!-- un client -->
             <t t-elif="f.genre === 'client'">
-                <div class="o_cv_statut"><span class="badge accent" t-esc="f.type || 'client'"/><span class="ms-auto small" t-esc="f.commune"/></div>
+                <div class="o_cv_statut"><span class="badge accent" t-esc="f.type_nom || f.type || 'Client'"/>
+                    <span class="badge ms-2" t-if="f.persona" t-att-style="f.persona_couleur ? 'background:' + f.persona_couleur : ''" t-esc="(f.persona_animal ? f.persona_animal + ' ' : '') + f.persona"/>
+                    <span class="ms-auto small" t-esc="f.commune"/></div>
                 <div class="o_cv_grille">
                     <div><small>CA cumulé</small><b t-esc="euros(f.ca) + ' €'"/></div>
                     <div><small>Impayés</small><b t-att-class="{ 'text-danger': f.impayes }" t-esc="euros(f.impayes) + ' €'"/></div>
                     <div><small>Téléphone</small><b t-esc="f.telephone || '—'"/></div>
-                    <div><small>Persona</small><b t-esc="f.persona || '—'"/></div>
+                    <div><small>Persona</small><b t-esc="f.persona ? (f.persona_surnom || f.persona) : 'À évaluer'"/></div>
                 </div>
+                <div class="o_cv_bloc" t-if="f.persona_resume"><small>Comment lui parler</small><div class="small" t-esc="f.persona_resume"/></div>
                 <div class="o_cv_bloc" t-if="f.devis.length"><small>Devis récents</small><button t-foreach="f.devis.slice(0, 3)" t-as="d" t-key="d.id" class="o_cv_lien d-flex" t-on-click="() => this.ouvrirBackOffice('sale.order', d.id)"><span t-esc="d.nom"/><b class="ms-auto" t-esc="euros(d.montant) + ' €'"/></button></div>
                 <div class="o_cv_bloc" t-if="f.installations.length"><small>Installations</small><button t-foreach="f.installations" t-as="i" t-key="i.id" class="o_cv_lien d-block" t-on-click="() => this.aller('dossier:' + i.id)"><i class="fa fa-leaf me-1"/><t t-esc="i.nom"/></button></div>
                 <div class="o_cv_bloc" t-if="f.note"><small>Note interne</small><div class="small" t-out="f.note"/></div>

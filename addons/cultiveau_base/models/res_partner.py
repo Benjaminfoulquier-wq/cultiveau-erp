@@ -8,6 +8,7 @@ TYPES = [
     ("plombier", "Plombier"),
     ("paysagiste", "Paysagiste"),
     ("pisciniste", "Pisciniste"),
+    ("tp", "Travaux publics"),
     ("adherent", "Adhérent du réseau"),
     ("fournisseur", "Fournisseur"),
     ("partenaire", "Partenaire (coopérative, chambre, pépinière…)"),
@@ -16,7 +17,7 @@ TYPES = [
 
 
 # Les types de clients (ceux qui achètent de l'irrigation) : chacun a son véhicule en guise de portrait.
-CLIENTS = ["agriculteur", "collectivite", "particulier", "industrie", "plombier", "paysagiste", "pisciniste", "autre"]
+CLIENTS = ["agriculteur", "collectivite", "particulier", "industrie", "plombier", "paysagiste", "pisciniste", "tp", "autre"]
 
 
 def departement_depuis_code_postal(code_postal):

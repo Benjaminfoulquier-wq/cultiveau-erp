@@ -896,12 +896,28 @@ export class Moteur {
         // --- les voitures des clients au parking
         for (const c of v.clients) {
             const cle = `client:${c.id}`;
-            const o = this._objetVivant(cle, "client", c.id, c.nom, c.devis ? `${c.devis.nom} · ${c.devis.montant.toLocaleString("fr-FR")} €` : "Sur place", () => {
-                const teintes = [0xd94f45, 0x2a63b0, 0x6c7883, 0xf2c230, 0x4fa83a, 0xe9e3d6];
-                const g = kit.M.voiture({ couleur: teintes[c.id % teintes.length], pickup: c.type === "agriculteur" });
-                g.add(kit.ombreContact(1.8));
+            const sousTitre = `${c.type_nom || "Client"} · ${c.devis ? `${c.devis.nom} · ${c.devis.montant.toLocaleString("fr-FR")} €` : c.present === false ? "passé récemment" : "sur place"}`;
+            const o = this._objetVivant(cle, "client", c.id, c.nom, sousTitre, () => {
+                const g = this._vehiculeClient(c);
+                g.add(kit.ombreContact(2.2));
                 return g;
             }, c);
+            if (o.type !== c.type) {
+                // le type a changé : le véhicule aussi
+                if (o.type !== undefined) {
+                    const ancien = o.groupe;
+                    const g = this._vehiculeClient(c);
+                    g.add(kit.ombreContact(2.2));
+                    g.position.copy(ancien.position);
+                    g.rotation.copy(ancien.rotation);
+                    this.dynamique.remove(ancien);
+                    this.cibles = this.cibles.filter((m) => m.userData.cle !== cle);
+                    g.traverse((m) => { if (m.isMesh) { m.userData.cle = cle; m.userData.priorite = 2; this.cibles.push(m); } });
+                    this.dynamique.add(g);
+                    o.groupe = g;
+                }
+                o.type = c.type;
+            }
             const place = this.place(c.place) || this.placeLibre("parking", occupees);
             if (place && !o.pose3d) {
                 o.groupe.position.set(place.x, 0, place.z);
@@ -911,7 +927,10 @@ export class Moteur {
             // le client lui-même : à l'accueil
             const clePers = `visiteur:${c.id}`;
             const attente = this.placeLibre("attente", occupees);
-            const pers = this._objetVivant(clePers, "client", c.id, c.nom, "Client sur place", () => kit.personnage({ tenue: "client", casquette: c.type === "agriculteur" ? 0x4fa83a : false }), c);
+            const tenues = { plombier: "travail", paysagiste: "travail", tp: "travail", pisciniste: "travail", collectivite: "chemise", industrie: "chemise" };
+            const pers = this._objetVivant(clePers, "client", c.id, c.nom, `${c.type_nom || "Client"} · à l'accueil`, () => kit.personnage({
+                tenue: tenues[c.type] || "client", casquette: c.type === "agriculteur" ? 0x4fa83a : false, casque: c.type === "tp" ? 0xf2c230 : false,
+                accessoire: c.type === "collectivite" || c.type === "industrie" ? "tablette" : null }), c);
             pers.groupe.userData.phase = c.id % 6;
             if (attente) {
                 this._marcher(clePers, pers, [attente.x, attente.z], "assis_detendu", ((attente.rot || 0) * Math.PI) / 180, premiere || !pers.place);
@@ -1067,6 +1086,22 @@ export class Moteur {
     }
     _champPour(installation) {
         return this.champs?.get(installation);
+    }
+    /** Le véhicule d'un client selon son type : on voit d'un coup d'œil qui est au parking (07/11/2026). */
+    _vehiculeClient(c) {
+        const M = this.kit.M, T = this.kit.TEINTES;
+        const teintes = [0xd94f45, 0x2a63b0, 0x6c7883, 0xf2c230, 0x4fa83a, 0xe9e3d6];
+        switch (c.type) {
+            case "agriculteur": return M.voiture({ couleur: [0x4fa83a, 0x6c7883, 0x2c3a43, 0xc89a62][c.id % 4], pickup: true });
+            case "collectivite": return M.plateau({ couleur: T.blanc, charge: "benne", gyrophare: true, tricolore: true });
+            case "paysagiste": return M.plateau({ couleur: 0x4fa83a, charge: "vert" });
+            case "plombier": return M.fourgonnette({ couleur: T.blanc, bande: 0x2a63b0, tuyaux: true });
+            case "pisciniste": return M.fourgonnette({ couleur: T.blanc, bande: T.eau, echelle: true });
+            case "tp": return M.plateau({ couleur: T.orange, charge: "benne", benne: 0x5c6b7b, gyrophare: true });
+            case "industrie": return M.utilitaire({ couleur: T.grisFonce });
+            case "particulier": return M.voiture({ couleur: teintes[c.id % teintes.length] });
+            default: return M.voiture({ couleur: 0xe9e3d6 });
+        }
     }
     /** La parcelle d'un champ : la culture et son matériel d'irrigation (pivot, enrouleur, goutte à goutte, aspersion), ou le chantier. */
     _champ(c) {

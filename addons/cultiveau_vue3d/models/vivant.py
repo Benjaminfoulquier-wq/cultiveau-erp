@@ -187,19 +187,52 @@ class Map(models.AbstractModel):
         return resultat
 
     def _clients_presents(self, company, local):
-        """Les clients « sur place » : une voiture par devis ou vente du jour au comptoir (et par rendez-vous du jour)."""
+        """Les clients au parking, chacun avec le véhicule de son type (pick-up de l'agriculteur, fourgon du plombier, plateau du
+        paysagiste, benne de la collectivité ou des TP…) : d'abord ceux « sur place » (un devis, une vente ou une commande du
+        jour), puis, sur les places qui restent, les derniers clients touchés, un par type autant que possible. Le parking
+        montre d'un coup d'œil qui achète chez l'adhérent, et un clic ouvre le client (demande de Benjamin du 07/11/2026 :
+        un premier filtre par type, puis plus loin avec les personas)."""
         Order = self.env["sale.order"].sudo()
+        Partner = self.env["res.partner"].sudo()
+        types = dict(Partner._fields["cultiveau_type"].selection) if "cultiveau_type" in Partner._fields else {}
+        plan = self.env["cultiveau.plan"].courant(company)
+        places = [p["cle"] for p in (plan.layout or {}).get("places", []) if p.get("usage") == "parking"] or [f"parking-{i}" for i in range(1, 6)]
+
+        def fiche(p, **extra):
+            t = (getattr(p, "cultiveau_type", "") or "autre") if types else "autre"
+            persona = getattr(p, "cultiveau_persona_id", None)
+            return {"id": p.id, "nom": p.name, "type": t, "type_nom": types.get(t, "Client"), "commune": p.city or "",
+                    "persona": persona.name if persona else "", "persona_animal": persona.animal if persona else "", "present": True, "devis": None, **extra}
+
         debut = local.replace(hour=0, minute=0, second=0, microsecond=0)
         debut_utc = fields.Datetime.to_string(debut.astimezone(datetime.now().astimezone().tzinfo).replace(tzinfo=None))
-        commandes = Order.search([("company_id", "=", company.id), ("create_date", ">=", debut_utc), ("state", "in", ("draft", "sent", "sale"))], order="create_date desc", limit=5)
+        commandes = Order.search([("company_id", "=", company.id), ("create_date", ">=", debut_utc), ("state", "in", ("draft", "sent", "sale"))], order="create_date desc", limit=len(places))
         resultat, vus = [], set()
         for c in commandes:
-            if c.partner_id.id in vus:
+            if c.partner_id.id in vus or len(resultat) >= len(places):
                 continue
             vus.add(c.partner_id.id)
-            resultat.append({"id": c.partner_id.id, "nom": c.partner_id.name, "type": c.partner_id.cultiveau_type or "autre" if "cultiveau_type" in c.partner_id._fields else "autre",
-                             "place": f"parking-{len(resultat) + 1}", "devis": {"id": c.id, "nom": c.name, "montant": round(c.amount_untaxed), "etat": c.state},
-                             "depuis": fields.Datetime.to_string(c.create_date), "comptoir": c.origin == "Comptoir"})
+            resultat.append(fiche(c.partner_id, devis={"id": c.id, "nom": c.name, "montant": round(c.amount_untaxed), "etat": c.state},
+                                  depuis=fields.Datetime.to_string(c.create_date), comptoir=c.origin == "Comptoir"))
+        if len(resultat) < len(places):
+            domaine = [("company_id", "in", [company.id, False]), ("parent_id", "=", False), ("id", "not in", list(vus))]
+            if "cultiveau_est_client" in Partner._fields:
+                domaine.append(("cultiveau_est_client", "=", True))
+            recents = Partner.search(domaine, order="write_date desc", limit=60)
+            types_vus = {r["type"] for r in resultat}
+            # un client par type d'abord, pour que le parking montre la diversité ; puis les plus récents
+            for passe in ("types", "reste"):
+                for p in recents:
+                    if len(resultat) >= len(places) or p.id in vus:
+                        continue
+                    t = (getattr(p, "cultiveau_type", "") or "autre") if types else "autre"
+                    if passe == "types" and t in types_vus:
+                        continue
+                    types_vus.add(t)
+                    vus.add(p.id)
+                    resultat.append(fiche(p, present=False))
+        for i, r in enumerate(resultat):
+            r["place"] = places[i]
         return resultat
 
     # ---------------------------------------------------------------- les interventions, les dossiers, les chantiers
@@ -531,13 +564,26 @@ class Map(models.AbstractModel):
         devis = Order.search([("partner_id", "child_of", pid), ("company_id", "=", company.id)], order="date_order desc", limit=5)
         factures = self.env["account.move"].sudo().search([("partner_id", "child_of", pid), ("company_id", "=", company.id), ("move_type", "=", "out_invoice"), ("state", "=", "posted")])
         inst = self.env["cultiveau.installation"].sudo().search([("partner_id", "child_of", pid), ("company_id", "=", company.id)])
+        from .scene import TYPES_CLIENTS
+        types = dict(p._fields["cultiveau_type"].selection) if "cultiveau_type" in p._fields else {}
+        t = getattr(p, "cultiveau_type", "") or ""
+        persona = getattr(p, "cultiveau_persona_id", None)
+        # le premier filtre : tous les clients du même type ; puis plus loin : son persona (évalué, ou à évaluer)
+        actions = [{"cle": "fiche", "nom": "Fiche complète", "modele": "res.partner", "id": pid}]
+        if t in TYPES_CLIENTS:
+            actions.append({"cle": "clients_type", "nom": f"Voir les {TYPES_CLIENTS[t][1].lower()}" if t != "tp" else "Voir les clients TP", "parametre": t})
+        if "cultiveau_persona_id" in p._fields:
+            actions.append({"cle": "persona", "nom": f"Persona : {persona.animal or ''} {persona.name}".strip() if persona else "Évaluer son persona",
+                            "doaction": {"type": "ir.actions.act_window", "res_model": "res.partner", "res_id": pid, "views": [[False, "form"]], "target": "current",
+                                         "context": {"cultiveau_onglet": "persona"}}})
+        actions += [{"cle": "devis_nouveau", "nom": "Nouveau devis", "contexte": {"default_partner_id": pid}}, {"cle": "appeler", "nom": "Appeler", "tel": p.mobile or p.phone or ""}]
         return {"genre": "client", "id": pid, "nom": p.name, "telephone": p.mobile or p.phone or "", "courriel": p.email or "", "commune": p.city or "",
-                "type": getattr(p, "cultiveau_type", "") or "", "ca": round(sum(factures.mapped("amount_untaxed"))), "impayes": round(sum(factures.mapped("amount_residual"))),
-                "persona": getattr(p, "cultiveau_persona_id", None) and p.cultiveau_persona_id.name or "",
+                "type": t, "type_nom": types.get(t, "") or "Client", "ca": round(sum(factures.mapped("amount_untaxed"))), "impayes": round(sum(factures.mapped("amount_residual"))),
+                "persona": persona.name if persona else "", "persona_animal": persona.animal if persona else "", "persona_surnom": persona.surnom if persona else "",
+                "persona_resume": persona.resume if persona else "", "persona_couleur": persona.couleur if persona else "",
                 "devis": [{"id": o.id, "nom": o.name, "montant": round(o.amount_total), "etat": o.state} for o in devis],
                 "installations": [{"id": i.id, "nom": i.name, "etat": i.etat} for i in inst[:6]], "note": (p.comment and str(p.comment)[:300]) or "",
-                "actions": [{"cle": "fiche", "nom": "Fiche complète", "modele": "res.partner", "id": pid}, {"cle": "devis_nouveau", "nom": "Nouveau devis", "contexte": {"default_partner_id": pid}},
-                            {"cle": "appeler", "nom": "Appeler", "tel": p.mobile or p.phone or ""}]}
+                "actions": actions}
 
     def _fiche_article(self, company, pid):
         a = self.env["product.template"].sudo().with_company(company).browse(pid)

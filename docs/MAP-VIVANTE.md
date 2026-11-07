@@ -15,7 +15,13 @@ l'ERP, et un changement dans l'un se voit dans l'autre en moins d'une seconde.
   sinon des interventions et chantiers en cours, sinon de la connexion à l'ERP.
 - **Les camions** : un par technicien, avec son stock à bord (module Terrain) ; il sort de la cour quand le technicien part et
   rentre à son retour.
-- **Les clients sur place** : une voiture au parking et une personne à l'accueil par devis ou vente du jour.
+- **Les clients au parking** (07/11/2026) : chaque type a son véhicule, pick-up de l'agriculteur, benne à gyrophare et bande
+  tricolore de la collectivité, plateau chargé de végétaux du paysagiste, fourgon à tuyaux du plombier, fourgon à échelle du
+  pisciniste, benne orange des travaux publics, utilitaire gris de l'industrie, voiture du particulier. D'abord ceux « sur place »
+  (devis, vente ou commande du jour, avec la personne à l'accueil), puis, sur les places qui restent, les derniers clients
+  touchés, un par type. Un clic ouvre le client : type, persona (animal, surnom, comment lui parler), CA, impayés, devis,
+  installations, et les boutons « Voir les paysagistes » (le premier filtre : tous les clients du même type), « Persona » (sa
+  fiche, pour l'évaluer ou lire l'Agent), « Fiche complète », « Nouveau devis », « Appeler ».
 - **Les champs** : les chantiers en cours (pelle, tubes, tranchée, équipe), les installations en réalisation, les parcelles en
   service avec leur matériel (pivot qui tourne, enrouleur et canon, goutte à goutte, aspersion) et leur arrosage en saison ; une
   épingle rouge quand l'état d'eau est en déficit (module Parcelles).
