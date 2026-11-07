@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_favori_list" model="ir.ui.view">
+        <field name="name">cultiveau.tableau.favori.list</field>
+        <field name="model">cultiveau.tableau.favori</field>
+        <field name="arch" type="xml">
+            <list default_order="sequence, name">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="sujet"/>
+                <field name="mesure"/>
+                <field name="groupe"/>
+                <field name="groupe2" optional="hide"/>
+                <field name="periode"/>
+                <field name="graphique"/>
+                <field name="partage" widget="boolean_toggle"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="show"/>
+                <button name="action_ouvrir" type="object" string="Ouvrir" icon="fa-bar-chart" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_favori_form" model="ir.ui.view">
+        <field name="name">cultiveau.tableau.favori.form</field>
+        <field name="model">cultiveau.tableau.favori</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_ouvrir" type="object" string="Ouvrir le tableau" class="btn-primary"/>
+                </header>
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="Ex. Interventions par technicien, ce mois"/></h1></div>
+                    <group>
+                        <group>
+                            <field name="sujet"/>
+                            <field name="mesure"/>
+                            <field name="groupe"/>
+                            <field name="groupe2"/>
+                        </group>
+                        <group>
+                            <field name="periode"/>
+                            <field name="graphique"/>
+                            <field name="partage"/>
+                            <field name="user_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="text-muted small"><field name="aide" nolabel="1"/></div>
+                    <p class="text-muted small mt-2 mb-0">Vous pouvez aussi le demander à Mathis : « montre-moi les devis par commercial sur le trimestre, en camembert, et enregistre-le ».</p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_favoris" model="ir.actions.act_window">
+        <field name="name">Mes tableaux</field>
+        <field name="res_model">cultiveau.tableau.favori</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Vos tableaux de bord, en trois choix</p>
+            <p>Un sujet, une mesure, un regroupement : l'ERP ouvre le graphique et le tableau croisé. Ou demandez-le à Mathis en français ; « enregistre-le » le range ici.</p>
+        </field>
+    </record>
+    <menuitem id="menu_favoris" name="Mes tableaux" parent="cultiveau_base.menu_cultiveau_root" action="action_favoris" sequence="36"/>
+</odoo>

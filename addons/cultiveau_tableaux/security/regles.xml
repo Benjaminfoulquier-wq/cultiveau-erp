@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="regle_favori_perso" model="ir.rule">
+        <field name="name">Mes tableaux : les miens et ceux partagés de ma société</field>
+        <field name="model_id" ref="model_cultiveau_tableau_favori"/>
+        <field name="domain_force">['&amp;', ('company_id', 'in', company_ids), '|', ('user_id', '=', user.id), ('partage', '=', True)]</field>
+    </record>
+</odoo>
