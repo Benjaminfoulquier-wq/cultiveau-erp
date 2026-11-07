@@ -5,6 +5,7 @@ L'ERP retrouve ou crée l'entreprise (res.company, reliée par l'identifiant cul
 rôle Cultiveau), puis ouvre sa session par une vérification d'identité propre (type « cultiveau_site ») au lieu d'un mot de passe.
 À la première entrée d'une entreprise, l'ERP demande aussi à cultiveau.fr sa clé d'accès aux données (clients, interventions,
 chantiers, bons), de serveur à serveur : la synchronisation horaire démarre d'elle-même."""
+import base64
 import logging
 import secrets
 import time
@@ -22,6 +23,7 @@ class Company(models.Model):
     _inherit = "res.company"
 
     cultiveau_site_id = fields.Integer("Entreprise sur cultiveau.fr (id)", index=True, copy=False)
+    cultiveau_site_logo_url = fields.Char("Logo repris de cultiveau.fr (adresse)", copy=False, readonly=True)
     cultiveau_erp_ouvert = fields.Boolean("Accès à l'ERP ouvert", default=False,
                                           help="Tout le monde n'a pas l'ERP : cochez pour que cette entreprise et son équipe puissent entrer depuis cultiveau.fr. Les comptes déjà créés entrent toujours.")
 
@@ -161,7 +163,24 @@ class Users(models.Model):
             coord["street"] = e["adresse"][:128]
         if coord:
             partenaire.write(coord)
+        self._cultiveau_logo_depuis_site(company, e.get("logo_url"))
         return company
+
+    @api.model
+    def _cultiveau_logo_depuis_site(self, company, url):
+        """Le logo de l'entreprise est celui de son espace cultiveau.fr : repris à l'entrée, et à chaque fois qu'il change là-bas."""
+        if not url or not str(url).startswith("http") or company.cultiveau_site_logo_url == url and company.logo:
+            return False
+        try:
+            r = requests.get(url, timeout=20)
+            if r.status_code != 200 or not r.content or len(r.content) > 5_000_000 or not (r.headers.get("Content-Type") or "").startswith("image/"):
+                return False
+            company.sudo().write({"logo": base64.b64encode(r.content), "cultiveau_site_logo_url": url})
+            _logger.info("cultiveau.fr : logo de %s repris dans l'ERP", company.name)
+            return True
+        except Exception as e:  # noqa: BLE001 — image illisible, site injoignable : le logo attend, l'entrée ne bloque pas
+            _logger.info("cultiveau.fr : logo de %s non repris (%s)", company.name, e)
+            return False
 
 
 class Connexion(models.Model):

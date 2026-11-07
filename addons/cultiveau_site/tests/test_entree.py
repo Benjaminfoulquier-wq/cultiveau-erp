@@ -1,3 +1,4 @@
+import base64
 import time
 from unittest.mock import patch
 
@@ -135,3 +136,24 @@ class TestEntree(HttpCase):
             self.assertEqual(ch.cultiveau_envoyer_vers_site(), 1)
         self.assertEqual(redemandes, [("Irrigation Sud", 77, True)])
         self.assertEqual(ch.cultiveau_site_ref, f"{cx.id}:7")
+
+    def test_le_logo_vient_de_cultiveau_fr(self):
+        import requests as req
+
+        class Reponse:
+            status_code = 200
+            headers = {"Content-Type": "image/png"}
+            content = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==")
+        appels = []
+
+        def get(url, timeout=20, **kw):
+            appels.append(url)
+            return Reponse()
+        with patch.object(req, "get", get), patch.object(ConnexionModele, "_cultiveau_relier_si_besoin", lambda self_, c, ch, forcer=False: False):
+            ch = charge(email="logo@irrigation-sud.fr", n="n7")
+            ch["entreprise"]["logo_url"] = "https://site.test/api/adherent-image/77/logo"
+            self.url_open("/cultiveau/entree?t=" + fabriquer_jeton(ch, SECRET), allow_redirects=False)
+        self.ouverte.invalidate_recordset()
+        self.assertEqual(appels, ["https://site.test/api/adherent-image/77/logo"])
+        self.assertTrue(self.ouverte.logo)
+        self.assertEqual(self.ouverte.cultiveau_site_logo_url, "https://site.test/api/adherent-image/77/logo")

@@ -56,3 +56,6 @@ toujours par la synchronisation horaire site → ERP.
   par `cultiveau_site_ref`. Si la clé de l'entreprise n'a pas encore le droit « articles », la synchronisation le dit et continue.
 - Les chantiers du site sont dans l'application **Chantiers** de l'ERP (menu Cultiveau), pas dans « Projet » d'Odoo ; la tuile
   Chantiers de cultiveau.fr y mène directement.
+- **Le logo de l'entreprise** est celui de son espace cultiveau.fr : le laissez-passer porte son adresse, l'ERP le reprend à
+  l'entrée et le remplace quand il change là-bas (`res.company.cultiveau_site_logo_url`). Il sert alors sur les devis, factures et
+  courriels de l'ERP.
