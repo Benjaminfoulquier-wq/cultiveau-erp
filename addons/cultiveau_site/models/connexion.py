@@ -11,6 +11,7 @@ import requests
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools import config
 
 from odoo.addons.cultiveau_base.models.res_partner import normaliser_telephone
 
@@ -145,22 +146,30 @@ class SiteConnexion(models.Model):
 
     # ---------------------------------------------------------------- la synchronisation
 
+    def _acquis(self):
+        """Une étape terminée est acquise tout de suite : une coupure (déploiement, redémarrage) ne perd pas tout, et personne n'attend
+        derrière une transaction de vingt minutes. Rien dans les tests, qui tournent dans une seule transaction."""
+        if not config["test_enable"]:
+            self.env.cr.commit()
+
     def _synchroniser(self):
         self.ensure_one()
+        # un seul passage à la fois par entreprise : le robot de l'heure et un lancement à la main ne se marchent pas dessus
+        self.env.cr.execute("SELECT id FROM cultiveau_site_connexion WHERE id = %s FOR UPDATE SKIP LOCKED", (self.id,))
+        if not self.env.cr.fetchone():
+            _logger.info("Synchronisation cultiveau.fr de %s : déjà en cours, passage ignoré.", self.company_id.name)
+            return
         debut = fields.Datetime.now()
         bilan = []
         try:
-            with self.env.cr.savepoint():
-                if self.clients:
-                    bilan.append(self._synchro_clients())
-                if self.interventions:
-                    bilan.append(self._synchro_interventions())
-                if self.chantiers:
-                    bilan.append(self._synchro_chantiers())
-                if self.bons:
-                    bilan.append(self._synchro_bons())
-                if self.articles:
-                    bilan.append(self._synchro_articles())
+            for actif, etape in ((self.clients, self._synchro_clients), (self.interventions, self._synchro_interventions), (self.chantiers, self._synchro_chantiers),
+                                 (self.bons, self._synchro_bons), (self.articles, self._synchro_articles)):
+                if not actif:
+                    continue
+                with self.env.cr.savepoint():
+                    bilan.append(etape())
+                self.write({"resultat": " · ".join(bilan) + " …", "en_erreur": False})
+                self._acquis()
             self.write({"derniere_synchro": debut, "resultat": " · ".join(bilan) or "Rien à synchroniser.", "en_erreur": False})
         except UserError as e:
             self.write({"derniere_synchro": debut, "resultat": str(e.args[0] if e.args else e), "en_erreur": True})

@@ -1,3 +1,4 @@
+import base64
 import json
 
 from odoo.tests import HttpCase, TransactionCase, tagged
@@ -74,5 +75,13 @@ class TestSansEditeur(TransactionCase):
         r = self.url_open(f"/logo?company={societe.id}")
         self.assertEqual(r.status_code, 200)
         self.assertNotEqual(len(r.content), 0)
+        # une société qui porte l'image « Your logo » de l'éditeur (posée par Odoo à sa création) reçoit celle de Cultiveau
+        from odoo.tools import file_open
+        with file_open("base/static/img/res_company_logo.png", "rb") as f:
+            editeur = base64.b64encode(f.read())
+        ancienne = self.env["res.company"].create({"name": "Société de l'éditeur", "logo": editeur})
         self.env["res.company"].cultiveau_logo_par_defaut()
+        ancienne.invalidate_recordset()
+        self.assertNotEqual(ancienne.logo, editeur)
+        self.assertNotIn(ancienne.logo, (False, b""))
         self.assertFalse(self.env["res.company"].search([("uses_default_logo", "=", True)]))
