@@ -304,32 +304,59 @@ class SiteConnexion(models.Model):
 
     def _synchro_articles(self):
         """Les articles de l'adhérent sur cultiveau.fr deviennent des articles de sa société dans l'ERP (référence, désignation, prix, unité,
-        famille, marque), reconnus par leur référence du site. Un site qui ne les expose pas encore (clé ancienne, version du site) ne bloque rien."""
+        famille, marque), reconnus par leur référence du site. Par pages de 500, chaque page acquise : une base de 40 000 articles passe sans
+        transaction géante. Un site qui ne les expose pas encore (clé ancienne, version du site) ne bloque rien."""
         env = self._env()
         Produit = env["product.template"].with_context(active_test=False)
         debut = fields.Datetime.now()
         depuis = self.curseur_articles and (self.curseur_articles - timedelta(minutes=5)).strftime("%Y-%m-%dT%H:%M:%S")
-        try:
-            lus = self._pages("articles", "articles", {"updatedSince": depuis}, taille=500)
-        except UserError as e:
-            texte = str(e.args[0] if e.args else e)
-            if "404" in texte:
-                return "articles : pas encore exposés par le site"
-            if "403" in texte or "droit" in texte:
-                # clé remise avant le droit « articles » : on en redemande une, et on réessaie une fois
-                if hasattr(self, "_cultiveau_redemander_cle") and self._cultiveau_redemander_cle():
-                    lus = self._pages("articles", "articles", {"updatedSince": depuis}, taille=500)
-                else:
+        params = {"updatedSince": depuis} if depuis else {}
+        taille, decalage, lus, crees, maj = 500, 0, 0, 0, 0
+        caches = {"categ": {}, "uom": {}}
+        while True:
+            try:
+                rep = self._appeler("articles", {**params, "limit": taille, "offset": decalage})
+            except UserError as e:
+                texte = str(e.args[0] if e.args else e)
+                if "404" in texte:
+                    return "articles : pas encore exposés par le site"
+                if ("403" in texte or "droit" in texte) and decalage == 0:
+                    # clé remise avant le droit « articles » : on en redemande une, et on réessaie une fois
+                    if hasattr(self, "_cultiveau_redemander_cle") and self._cultiveau_redemander_cle():
+                        continue
                     return "articles : la clé du site n'a pas encore le droit « articles » (repassez par cultiveau.fr)"
-            else:
                 raise
+            page = rep.get("articles") or []
+            if not page:
+                break
+            c, m = self._articles_appliquer(page, Produit, env, caches)
+            crees, maj, lus = crees + c, maj + m, lus + len(page)
+            self.write({"resultat": f"articles : {lus} lus, {crees} créé(s), {maj} à jour …"})
+            self._acquis()
+            if not config["test_enable"]:
+                env.invalidate_all()
+            total = rep.get("total")
+            decalage += len(page)
+            if len(page) < taille or (total is not None and decalage >= total):
+                break
+        self.curseur_articles = debut
+        return f"{lus} article(s) lus, {crees} créé(s), {maj} à jour"
+
+    def _articles_appliquer(self, page, Produit, env, caches):
+        """Une page d'articles : les existants retrouvés en deux requêtes, puis créés ou mis à jour."""
+        refs = [self._ref(a.get("id")) for a in page]
+        codes = [(a.get("reference") or "").strip() for a in page if (a.get("reference") or "").strip()]
+        par_ref = {p.cultiveau_site_ref: p for p in Produit.search([("cultiveau_site_ref", "in", refs)])}
+        par_code = {}
+        if codes:
+            for p in Produit.search([("default_code", "in", codes), ("company_id", "=", self.company_id.id), ("cultiveau_site_ref", "=", False)]):
+                par_code.setdefault(p.default_code, p)
         crees = maj = 0
-        for a in lus:
+        a_creer = []
+        for a in page:
             ref = self._ref(a.get("id"))
             reference = (a.get("reference") or "").strip()
-            produit = Produit.search([("cultiveau_site_ref", "=", ref)], limit=1)
-            if not produit and reference:
-                produit = Produit.search([("default_code", "=", reference), ("company_id", "=", self.company_id.id)], limit=1)
+            produit = par_ref.get(ref) or (par_code.get(reference) if reference else None)
             valeurs = {"name": (a.get("designation") or reference or f"Article {a.get('id')}")[:255], "default_code": reference[:64] or False,
                        "list_price": float(a.get("prixUnitaireHT") or 0.0), "barcode": (a.get("ean") or "").strip()[:64] or False,
                        "sale_ok": True, "purchase_ok": True, "type": "consu", "is_storable": True, "company_id": self.company_id.id,
@@ -337,30 +364,56 @@ class SiteConnexion(models.Model):
             if "cultiveau_source" in Produit._fields:
                 valeurs["cultiveau_source"] = "site"
             if a.get("categorie"):
-                valeurs["categ_id"] = self._categorie_article(a["categorie"], env).id
+                valeurs["categ_id"] = self._categorie_article(a["categorie"], env, caches["categ"]).id
             if a.get("marque"):
                 valeurs["description_sale"] = f"Marque : {a['marque']}"
-            unite = self._unite_article(a.get("unite"), env)
+            unite = self._unite_article(a.get("unite"), env, caches["uom"])
             if unite:
                 valeurs.update({"uom_id": unite.id, "uom_po_id": unite.id})
             if produit:
-                produit.write({k: v for k, v in valeurs.items() if k not in ("uom_id", "uom_po_id") or not produit.uom_id})
+                if produit.uom_id and "uom_id" in valeurs:
+                    valeurs.pop("uom_id"), valeurs.pop("uom_po_id")
+                if not valeurs["barcode"]:
+                    valeurs.pop("barcode")
+                produit.write(valeurs)
                 maj += 1
             elif valeurs["active"]:
-                Produit.create(valeurs)
-                crees += 1
-        self.curseur_articles = debut
-        return f"{len(lus)} article(s) lus, {crees} créé(s), {maj} à jour"
+                a_creer.append(valeurs)
+        if a_creer:
+            # un code-barres en double dans la base du site ferait tout rater : on le garde seulement s'il est unique
+            vus = set()
+            for v in a_creer:
+                if v.get("barcode") in vus or (v.get("barcode") and Produit.search_count([("barcode", "=", v["barcode"])])):
+                    v["barcode"] = False
+                elif v.get("barcode"):
+                    vus.add(v["barcode"])
+            Produit.create(a_creer)
+            crees += len(a_creer)
+        return crees, maj
 
-    def _categorie_article(self, nom, env):
+    def _categorie_article(self, nom, env, cache=None):
+        cache = cache if cache is not None else {}
+        cle = nom.strip()[:120].lower()
+        if cle in cache:
+            return cache[cle]
         Categ = env["product.category"]
-        racine = Categ.search([("name", "=", "Articles cultiveau.fr"), ("parent_id", "=", False)], limit=1) or Categ.create({"name": "Articles cultiveau.fr"})
-        return Categ.search([("name", "=ilike", nom.strip()[:120]), ("parent_id", "=", racine.id)], limit=1) or Categ.create({"name": nom.strip()[:120], "parent_id": racine.id})
+        racine = cache.get("__racine__") or Categ.search([("name", "=", "Articles cultiveau.fr"), ("parent_id", "=", False)], limit=1) or Categ.create({"name": "Articles cultiveau.fr"})
+        cache["__racine__"] = racine
+        categ = Categ.search([("name", "=ilike", nom.strip()[:120]), ("parent_id", "=", racine.id)], limit=1) or Categ.create({"name": nom.strip()[:120], "parent_id": racine.id})
+        cache[cle] = categ
+        return categ
 
-    def _unite_article(self, libelle, env):
+    def _unite_article(self, libelle, env, cache=None):
         if not libelle:
             return None
+        cache = cache if cache is not None else {}
         cle = libelle.strip().lower()
+        if cle in cache:
+            return cache[cle]
+        cache[cle] = self._unite_article_chercher(cle, libelle, env)
+        return cache[cle]
+
+    def _unite_article_chercher(self, cle, libelle, env):
         correspondances = {"m": "uom.product_uom_meter", "ml": "uom.product_uom_meter", "mètre": "uom.product_uom_meter", "metre": "uom.product_uom_meter",
                            "kg": "uom.product_uom_kgm", "l": "uom.product_uom_litre", "litre": "uom.product_uom_litre", "h": "uom.product_uom_hour", "heure": "uom.product_uom_hour",
                            "u": "uom.product_uom_unit", "unité": "uom.product_uom_unit", "unite": "uom.product_uom_unit", "pce": "uom.product_uom_unit", "pièce": "uom.product_uom_unit"}
