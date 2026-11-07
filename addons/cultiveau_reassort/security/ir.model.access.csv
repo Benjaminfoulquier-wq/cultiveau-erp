@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_reassort,cultiveau.reassort,model_cultiveau_reassort,base.group_user,1,1,1,1
+access_reassort_ligne,cultiveau.reassort.ligne,model_cultiveau_reassort_ligne,base.group_user,1,1,1,1

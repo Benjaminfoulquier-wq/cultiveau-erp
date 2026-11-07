@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_reassort_form" model="ir.ui.view">
+        <field name="name">cultiveau.reassort.form</field>
+        <field name="model">cultiveau.reassort</field>
+        <field name="arch" type="xml">
+            <form create="0">
+                <header>
+                    <button name="action_poser_regles" type="object" string="Poser les règles de réassort" class="btn-primary"/>
+                    <button name="action_commander" type="object" string="Commander les manquants" class="btn-primary" invisible="not nb_sous_minimum"/>
+                    <button name="action_recalculer" type="object" string="Recalculer"/>
+                </header>
+                <sheet>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h1>Réassort du stock</h1>
+                        <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="nb_sous_minimum"/>
+                            <field name="montant_a_commander" widget="monetary"/>
+                        </group>
+                        <group>
+                            <field name="seulement_actifs"/>
+                        </group>
+                    </group>
+                    <field name="ligne_ids">
+                        <list editable="bottom" create="0" delete="0" decoration-danger="a_commander > 0" decoration-muted="conso_12m == 0">
+                            <field name="retenir" widget="boolean_toggle"/>
+                            <field name="product_id" readonly="1"/>
+                            <field name="conso_12m" readonly="1"/>
+                            <field name="conso_mois" readonly="1"/>
+                            <field name="stock" readonly="1"/>
+                            <field name="arrive" readonly="1" optional="show"/>
+                            <field name="reserve" readonly="1" optional="show"/>
+                            <field name="couverture" readonly="1"/>
+                            <field name="mini_actuel" readonly="1" optional="hide"/>
+                            <field name="maxi_actuel" readonly="1" optional="hide"/>
+                            <field name="mini_propose"/>
+                            <field name="maxi_propose"/>
+                            <field name="a_commander"/>
+                            <field name="fournisseur_id" options="{'no_create': True}"/>
+                            <field name="prix" optional="show"/>
+                            <field name="delai" optional="hide"/>
+                            <field name="regle_id" column_invisible="True"/>
+                        </list>
+                    </field>
+                    <p class="text-muted small mt-2 mb-0">Mini proposé : un mois et demi de consommation ; maxi : trois mois. Ajustez, puis « Poser les règles » : Odoo prépare ensuite seul les
+                        demandes de prix dès qu'un article passe sous son minimum (planificateur de chaque nuit). « Commander les manquants » le fait tout de suite.</p>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_reassort" model="ir.actions.server">
+        <field name="name">Réassort du stock</field>
+        <field name="model_id" ref="model_cultiveau_reassort"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_ouvrir()</field>
+    </record>
+    <menuitem id="menu_reassort" name="Réassort du stock" parent="cultiveau_base.menu_cultiveau_root" action="action_reassort" sequence="38"/>
+</odoo>
