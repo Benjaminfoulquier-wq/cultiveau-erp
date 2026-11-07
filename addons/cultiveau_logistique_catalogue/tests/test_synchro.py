@@ -60,3 +60,38 @@ class TestSynchroLogistique(TransactionCase):
         self.env["ir.config_parameter"].sudo().set_param("cultiveau.logistique_secret", "")
         with self.assertRaises(Exception):
             self.env["product.template"]._logistique_page(1)
+
+    def test_recherche_a_la_volee_depuis_un_devis(self):
+        P = self.env["product.template"]
+        self.assertFalse(P.search([("default_code", "=", "ODIS-FD3")]))
+        appels = []
+
+        def recherche(self_, q, taille=20):
+            appels.append(q)
+            return [p for p in PAGE["produits"] if q.lower() in (p["reference"] + " " + p["nom"]).lower() and p["actif"]]
+        with patch.object(type(P), "_logistique_recherche", recherche), patch.object(type(P), "_logistique_telecharger", lambda self, url: None):
+            # taper la référence dans une ligne de devis : la variante est trouvée après un aller-retour logistique
+            variantes = self.env["product.product"].name_search("ODIS-FD3")
+            self.assertEqual(appels, ["ODIS-FD3"])
+            self.assertEqual(len(variantes), 1)
+            produit = P.search([("default_code", "=", "ODIS-FD3")])
+            self.assertEqual((produit.cultiveau_source, produit.standard_price, produit.cultiveau_logistique_id), ("logistique", 310.0, 102))
+            self.assertTrue(produit.seller_ids.filtered(lambda s: s.partner_id.name == "Cultiveau Logistique" and s.price == 310.0))
+            # une deuxième frappe ne rappelle pas la logistique : l'article est déjà là
+            self.env["product.product"].name_search("ODIS-FD3")
+            self.assertEqual(appels, ["ODIS-FD3"])
+            # trop court, ou inconnu partout : rien ne casse
+            self.assertFalse(self.env["product.product"].name_search("xyz-inconnu-123"))
+
+    def test_le_robot_ne_copie_pas_tout_sans_le_demander(self):
+        P = self.env["product.template"]
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.logistique_copie", "False")
+        with patch.object(type(P), "_logistique_page", lambda self, page, depuis=None, taille=500: PAGE if page == 1 else {"total": 3, "page": page, "taille": 500, "produits": []}), \
+             patch.object(type(P), "_logistique_telecharger", lambda self, url: None):
+            bilan = P.cultiveau_synchro_logistique(tout=False)
+            self.assertIn("à la volée", bilan)
+            self.assertFalse(P.search([("cultiveau_source", "=", "logistique")]))
+            # un article déjà utilisé, lui, est rafraîchi
+            connu = P.create({"name": "Gaine D5000", "default_code": "RIV-D5000-16", "cultiveau_logistique_id": 101, "cultiveau_source": "logistique", "standard_price": 0.05})
+            P.cultiveau_synchro_logistique(tout=False)
+            self.assertEqual(connu.standard_price, 0.12)

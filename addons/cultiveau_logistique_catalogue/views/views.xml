@@ -10,7 +10,9 @@
                     <setting string="Les produits de logistique.cultiveau.fr dans l'ERP" class="col-12"
                              help="Toutes les heures, les produits mis en ligne ou modifiés sur la logistique arrivent dans le catalogue du réseau : famille, fournisseur, prix, photo, fiches techniques. Un produit retiré là-bas est archivé ici. Le secret partagé est posé sur le serveur par l'équipe Cultiveau.">
                         <div class="mt8"><label for="cultiveau_logistique_url" class="o_light_label me-2"/><field name="cultiveau_logistique_url" class="oe_inline"/></div>
+                        <div class="mt8 text-muted">La logistique est la base : tapez une référence ou un nom dans un devis, l'ERP l'interroge à la volée et l'article arrive avec son prix d'achat et sa fiche.</div>
                         <div class="mt8"><field name="cultiveau_logistique_photos"/><label for="cultiveau_logistique_photos"/></div>
+                        <div class="mt8"><field name="cultiveau_logistique_copie"/><label for="cultiveau_logistique_copie"/></div>
                         <div class="mt8 text-muted">Secret : <field name="cultiveau_logistique_secret_pose" class="oe_inline" readonly="1"/> · dernière synchronisation : <field name="cultiveau_logistique_bilan" class="oe_inline"/></div>
                         <div class="mt8"><button name="action_synchroniser_logistique" type="object" string="Tout synchroniser maintenant" class="btn-link" icon="fa-refresh"/></div>
                     </setting>

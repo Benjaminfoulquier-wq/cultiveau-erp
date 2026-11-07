@@ -21,6 +21,8 @@ class Reglages(models.TransientModel):
     cultiveau_logistique_secret_pose = fields.Boolean("Secret posé", compute="_compute_logistique_etat")
     cultiveau_logistique_bilan = fields.Char("Dernière synchronisation", compute="_compute_logistique_etat")
     cultiveau_logistique_photos = fields.Boolean("Rapatrier les photos", config_parameter="cultiveau.logistique_photos", default=True)
+    cultiveau_logistique_copie = fields.Boolean("Copier tout le catalogue dans l'ERP (sinon : consulté à la volée, seuls les articles utilisés sont tenus à jour)",
+                                                config_parameter="cultiveau.logistique_copie", default=False)
 
     def _compute_logistique_etat(self):
         P = self.env["ir.config_parameter"].sudo()
@@ -66,6 +68,35 @@ class Produit(models.Model):
         return r.json()
 
     @api.model
+    def _logistique_recherche(self, q, taille=20):
+        """Interroge la logistique sur une référence ou un nom. Sans secret, ou si la logistique ne répond pas : liste vide, sans erreur."""
+        P = self.env["ir.config_parameter"].sudo()
+        url = (P.get_param("cultiveau.logistique_url") or "https://logistique.cultiveau.fr").rstrip("/")
+        secret = (P.get_param("cultiveau.logistique_secret") or "").strip()
+        if not secret or len((q or "").strip()) < 3:
+            return []
+        try:
+            r = requests.get(f"{url}/api/erp/recherche", params={"q": q.strip(), "taille": taille}, headers={"X-Erp-Secret": secret}, timeout=8)
+            if r.status_code != 200:
+                _logger.info("Logistique : recherche « %s » refusée (%s)", q, r.status_code)
+                return []
+            return r.json().get("produits") or []
+        except (requests.RequestException, ValueError) as e:
+            _logger.info("Logistique : recherche « %s » impossible (%s)", q, e)
+            return []
+
+    @api.model
+    def cultiveau_logistique_chercher(self, q, taille=20):
+        """La logistique est la base : ce qu'elle connaît sous ce nom ou cette référence entre dans le catalogue de l'ERP, à jour, et revient ici."""
+        produits = self._logistique_recherche(q, taille)
+        if not produits:
+            return self.browse()
+        bilan = {"crees": 0, "maj": 0, "archives": 0, "fiches": 0, "photos": 0}
+        self._logistique_appliquer(produits, bilan, creer=True)
+        ids = [p["id"] for p in produits]
+        return self.sudo().with_context(active_test=False).search([("cultiveau_logistique_id", "in", ids), ("active", "=", True)])
+
+    @api.model
     def _logistique_telecharger(self, url):
         try:
             r = requests.get(url, timeout=60)
@@ -86,6 +117,7 @@ class Produit(models.Model):
             _logger.info("Logistique → ERP : %s", texte)
             return texte
         depuis = None if tout else P.get_param("cultiveau.logistique_depuis")
+        copie = (P.get_param("cultiveau.logistique_copie") or "False") not in ("False", "0", "")
         debut = fields.Datetime.now()
         page, bilan = 1, {"crees": 0, "maj": 0, "archives": 0, "fiches": 0, "photos": 0}
         while True:
@@ -93,7 +125,7 @@ class Produit(models.Model):
             produits = data.get("produits") or []
             if not produits:
                 break
-            self._logistique_appliquer(produits, bilan)
+            self._logistique_appliquer(produits, bilan, creer=copie or tout)
             if not config["test_enable"]:
                 self.env.cr.commit()  # chaque page est acquise : une coupure ne perd pas tout
             if page * data.get("taille", 500) >= data.get("total", 0):
@@ -101,12 +133,14 @@ class Produit(models.Model):
             page += 1
         P.set_param("cultiveau.logistique_depuis", fields.Datetime.to_string(debut))
         texte = f"{fields.Datetime.context_timestamp(self, fields.Datetime.now()):%d/%m %H:%M} : {bilan['crees']} créé(s), {bilan['maj']} mis à jour, {bilan['archives']} archivé(s), {bilan['fiches']} fiche(s), {bilan['photos']} photo(s)."
+        if not (copie or tout):
+            texte += " Catalogue consulté à la volée : seuls les articles déjà utilisés sont rafraîchis."
         P.set_param("cultiveau.logistique_bilan", texte)
         _logger.info("Logistique → ERP : %s", texte)
         return texte
 
     @api.model
-    def _logistique_appliquer(self, produits, bilan):
+    def _logistique_appliquer(self, produits, bilan, creer=True):
         Fiche = self.env["cultiveau.fiche"].sudo()
         cache_f, cache_c = {}, {}
         avec_photos = (self.env["ir.config_parameter"].sudo().get_param("cultiveau.logistique_photos") or "True") not in ("False", "0", "")
@@ -149,8 +183,8 @@ class Produit(models.Model):
                 elif etait_actif:
                     bilan["archives"] += 1
             else:
-                if not valeurs["active"]:
-                    continue  # un produit retiré qu'on ne connaissait pas : rien à créer
+                if not valeurs["active"] or not creer:
+                    continue  # un produit retiré, ou un produit qu'on n'a pas demandé : rien à créer
                 produit = Produit.create(valeurs)
                 bilan["crees"] += 1
                 existants[p["id"]] = produit
@@ -185,3 +219,28 @@ class Produit(models.Model):
                     except Exception as e:  # noqa: BLE001 : une image illisible n'arrête pas la synchronisation
                         _logger.info("Logistique : photo refusée pour %s (%s)", produit.default_code, e)
         return bilan
+
+
+class ProduitVariante(models.Model):
+    _inherit = "product.product"
+
+    @api.model
+    def name_search(self, name="", args=None, operator="ilike", limit=100):
+        """Rien trouvé dans l'ERP ? La logistique est la base : on l'interroge sur ce qu'on a tapé, les articles entrent dans le catalogue et la recherche reprend."""
+        res = super().name_search(name, args, operator, limit)
+        if not res and name and len(name.strip()) >= 4 and operator in ("ilike", "=", "like", "=ilike") and self.env.context.get("cultiveau_logistique_live", True):
+            if self.env["product.template"].with_context(cultiveau_logistique_live=False).cultiveau_logistique_chercher(name.strip()):
+                res = super().name_search(name, args, operator, limit)
+        return res
+
+
+class ProduitModele(models.Model):
+    _inherit = "product.template"
+
+    @api.model
+    def name_search(self, name="", args=None, operator="ilike", limit=100):
+        res = super().name_search(name, args, operator, limit)
+        if not res and name and len(name.strip()) >= 4 and operator in ("ilike", "=", "like", "=ilike") and self.env.context.get("cultiveau_logistique_live", True):
+            if self.with_context(cultiveau_logistique_live=False).cultiveau_logistique_chercher(name.strip()):
+                res = super().name_search(name, args, operator, limit)
+        return res

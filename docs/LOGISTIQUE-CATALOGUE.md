@@ -18,3 +18,12 @@ logistique.cultiveau.fr, il doit l'être aussi sur erp.cultiveau.fr avec les fic
 
 Non fait : les fichiers des fiches ne sont pas copiés dans l'ERP (lien vers la logistique) ; les caractéristiques techniques
 (DN, PN…) de la logistique ne sont pas encore reprises dans les cotes de l'article.
+
+## La logistique est la base (07/11/2026, soir)
+
+« On ne doit pas avoir besoin de copier » : le catalogue n'est plus copié en masse dans l'ERP. Quand on tape une référence ou un nom
+(quatre caractères au moins) dans une ligne de devis, de commande d'achat ou d'inventaire et que l'ERP ne trouve rien, il interroge
+`GET /api/erp/recherche?q=…` sur la logistique, les articles trouvés entrent dans le catalogue (prix d'achat en fournisseur
+« Cultiveau Logistique », prix de vente, fiches, photo) et la recherche reprend : l'article apparaît comme s'il avait toujours
+été là. Le robot horaire ne crée plus rien : il rafraîchit les articles déjà utilisés (prix, fiches, retraits). La copie complète
+reste possible par le réglage « Copier tout le catalogue dans l'ERP » ou le bouton « Tout synchroniser maintenant ».
