@@ -156,14 +156,21 @@ class SaleOrder(models.Model):
             if not seller:
                 sans.append(p)
                 continue
-            par_fournisseur.setdefault(seller.partner_id, []).append((p, qte, seller))
+            par_fournisseur.setdefault(seller.partner_id, []).append((p, qte, seller, b.get("besoin_le")))
         crees = Achat
         for fournisseur, lignes in par_fournisseur.items():
             maintenant = fields.Datetime.now()
+
+            def date_prevue(s, besoin):
+                # la date de besoin du chantier quand elle existe (module jalons), sinon aujourd'hui plus le délai du fournisseur
+                if besoin:
+                    return fields.Datetime.to_datetime(besoin)
+                return maintenant + timedelta(days=s.delay or 0)
+
             po = Achat.create({
                 "partner_id": fournisseur.id, "company_id": self.company_id.id, "origin": self.name, "cultiveau_sale_order_id": self.id,
                 "order_line": [(0, 0, {"product_id": p.id, "name": p.display_name, "product_qty": qte, "product_uom": p.uom_po_id.id or p.uom_id.id,
-                                       "price_unit": s.price if s.price else p.standard_price, "date_planned": maintenant + timedelta(days=s.delay or 0)}) for p, qte, s in lignes]})
+                                       "price_unit": s.price if s.price else p.standard_price, "date_planned": date_prevue(s, besoin)}) for p, qte, s, besoin in lignes]})
             crees |= po
         return crees, sans
 

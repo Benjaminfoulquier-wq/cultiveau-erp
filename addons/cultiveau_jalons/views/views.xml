@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_chantier_form_jalons" model="ir.ui.view">
+        <field name="name">cultiveau.chantier.form.jalons</field>
+        <field name="model">cultiveau.chantier</field>
+        <field name="inherit_id" ref="cultiveau_chantier.view_chantier_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='phase_ids']/list/field[@name='etat']" position="after">
+                <field name="jalon_pct" sum="Jalons"/>
+                <field name="jalon_etat" widget="badge" decoration-warning="jalon_etat == 'a_facturer'" decoration-info="jalon_etat == 'facture'" decoration-success="jalon_etat == 'payee'"/>
+                <button name="action_facturer_jalon" type="object" string="Facturer" icon="fa-euro" invisible="jalon_etat != 'a_facturer'" title="Facturer ce jalon"/>
+            </xpath>
+            <xpath expr="//field[@name='ligne_ids']/list/field[@name='note']" position="after">
+                <field name="phase_id" options="{'no_create': True}"/>
+                <field name="besoin_le" optional="show"/>
+            </xpath>
+            <xpath expr="//page[@name='rentabilite']" position="before">
+                <page string="Facturation à l'avancement" name="jalons">
+                    <field name="jalons_pct_total" invisible="1"/>
+                    <field name="solde_invoice_id" invisible="1"/>
+                    <field name="plan_facturation" nolabel="1"/>
+                    <button name="action_facturer_solde" type="object" string="Facturer le solde" class="btn btn-primary" invisible="not sale_order_id or solde_invoice_id"/>
+                    <p class="text-muted small mt-2 mb-0">Les jalons se règlent dans l'onglet Phases et heures (colonne « Jalon »). Le matériel rattaché à une phase a sa date de besoin : l'approvisionnement du devis la demande aux fournisseurs.</p>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_approvisionnement_form_jalons" model="ir.ui.view">
+        <field name="name">cultiveau.approvisionnement.form.jalons</field>
+        <field name="model">cultiveau.approvisionnement</field>
+        <field name="inherit_id" ref="cultiveau_declenche.view_approvisionnement_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='ligne_ids']/list/field[@name='delai']" position="after">
+                <field name="besoin_le" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

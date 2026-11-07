@@ -57,7 +57,8 @@ class Approvisionnement(models.TransientModel):
             seller = l.product_id.with_company(self.order_id.company_id)._select_seller(partner_id=l.fournisseur_id, quantity=l.a_commander, uom_id=l.product_id.uom_id)
             if not seller:
                 seller = Seller.new({"partner_id": l.fournisseur_id.id, "price": l.prix, "delay": l.delai, "product_tmpl_id": l.product_id.product_tmpl_id.id})
-            besoins.append({"product": l.product_id, "qte": l.qte_devis, "manque": l.manque, "a_commander": l.a_commander, "seller": seller})
+            besoins.append({"product": l.product_id, "qte": l.qte_devis, "manque": l.manque, "a_commander": l.a_commander, "seller": seller,
+                            "besoin_le": l.besoin_le if "besoin_le" in l._fields else False})
         crees, _sans = self.order_id._cultiveau_commander_manquants(besoins=besoins)
         self.order_id.message_post(body=f"Approvisionnement : {len(crees)} demande(s) de prix créée(s) ({len(lignes)} ligne(s), {self.total_a_commander:,.0f} € HT au prix fournisseur).".replace(",", " "))
         if len(crees) == 1:
