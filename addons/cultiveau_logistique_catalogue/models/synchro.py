@@ -80,6 +80,11 @@ class Produit(models.Model):
     def cultiveau_synchro_logistique(self, tout=False):
         """Lit les produits modifiés depuis la dernière fois (ou tous) et les pose dans le catalogue du réseau. Renvoie le bilan en une phrase."""
         P = self.env["ir.config_parameter"].sudo()
+        if not (P.get_param("cultiveau.logistique_secret") or "").strip():
+            texte = "Secret partagé avec la logistique non réglé : rien n'est synchronisé (équipe Cultiveau : script deploiement/publier-erp-export)."
+            P.set_param("cultiveau.logistique_bilan", texte)
+            _logger.info("Logistique → ERP : %s", texte)
+            return texte
         depuis = None if tout else P.get_param("cultiveau.logistique_depuis")
         debut = fields.Datetime.now()
         page, bilan = 1, {"crees": 0, "maj": 0, "archives": 0, "fiches": 0, "photos": 0}
