@@ -1,9 +1,11 @@
 """Les appels reçus ou passés par l'assistant téléphonique, rangés dans l'ERP : le sujet d'abord, puis tout ce qui a été dit et l'audio."""
 import re
 
-from markupsafe import Markup
+from markupsafe import Markup, escape
 
 from odoo import api, fields, models
+
+from .synchro import FAMILLES, INSTALLATION_ASSISTANT
 
 SENS = [("entrant", "Reçu"), ("sortant", "Passé par l'assistant")]
 
@@ -37,6 +39,8 @@ class Appel(models.Model):
     sujet = fields.Char("Sujet", required=True, readonly=True)
     resume = fields.Text("Résumé", readonly=True)
     transcription = fields.Text("Tout ce qui a été dit", readonly=True)
+    recueilli = fields.Html("Ce que l'assistant a retenu", readonly=True, sanitize=True)
+    reperes = fields.Text("Repères pour le technicien", readonly=True, help="Repère du référentiel (§ 18.9) et pré-analyse des besoins quand il y en a.")
     lien_assistant = fields.Char("Fiche dans l'assistant", readonly=True)
     audio_url = fields.Char("Enregistrement", readonly=True, groups="base.group_user")
     audio_jusqu_au = fields.Date("Écoutable jusqu'au", readonly=True)
@@ -70,13 +74,62 @@ class Appel(models.Model):
         self.ensure_one()
         return f"/app/action-cultiveau_connecteurs.action_appels/{self.id}"
 
-    def _ligne_du_fil(self):
-        """Ce qu'on voit dans le fil : une ligne, le sujet, et de quoi ouvrir le reste."""
+    def _ligne_du_fil(self, avec_recueilli=False):
+        """Ce qu'on voit dans le fil : une ligne, le sujet, et de quoi ouvrir le reste. Sur la fiche du client, aussi tout ce que
+        l'assistant a retenu de lui pendant l'appel : c'est son CRM, rien ne doit rester seulement dans l'assistant."""
         self.ensure_one()
         quand = fields.Datetime.context_timestamp(self, self.date).strftime("%d/%m à %H:%M") if self.date else ""
         entete = " · ".join(x for x in ("Appel " + ("passé par l'assistant" if self.sens == "sortant" else "reçu par l'assistant"), quand, self.duree) if x)
-        return Markup('<p>📞 <b>%s</b> — %s<br/><a href="%s">Voir la conversation%s</a></p>') % (
+        corps = Markup('<p>📞 <b>%s</b> — %s<br/><a href="%s">Voir la conversation%s</a></p>') % (
             entete, self.sujet, self._lien(), " et écouter" if self.audio_url else "")
+        if avec_recueilli and self.recueilli:
+            corps += Markup(self.recueilli)
+        return corps
+
+    @staticmethod
+    def _recueilli_html(lignes):
+        """Les informations recueillies, telles que l'assistant les envoie : une liste de [libellé, valeur]."""
+        paires = [(str(l[0]).strip(), str(l[1]).strip()) for l in (lignes or []) if isinstance(l, (list, tuple)) and len(l) == 2 and str(l[1]).strip()]
+        if not paires:
+            return False
+        return Markup('<table class="table table-sm o_cultiveau_recueilli"><tbody>%s</tbody></table>') % Markup("").join(
+            Markup("<tr><td><b>%s</b></td><td>%s</td></tr>") % (k, v) for k, v in paires[:60])
+
+    @api.model
+    def _completer_client(self, partner, donnees):
+        """Ce que l'assistant a appris du client complète sa fiche : seulement les champs vides, jamais d'écrasement (ce que l'adhérent a saisi fait foi)."""
+        client = donnees.get("client") or {}
+        valeurs = {"email": client.get("email"), "street": client.get("adresse"), "zip": client.get("code_postal"), "city": client.get("commune"),
+                   "exploitation": client.get("exploitation")}
+        maj = {k: str(v).strip()[:255] for k, v in valeurs.items() if v and str(v).strip() and not partner[k]}
+        if partner.mobile and client.get("telephone2") and not partner.phone and client["telephone2"] != partner.mobile:
+            maj["phone"] = client["telephone2"]
+        if maj:
+            partner.with_context(mail_notrack=True).write(maj)
+        return maj
+
+    @api.model
+    def _materiel_depuis_appel(self, societe, partner, donnees):
+        """Le matériel dont le client a parlé devient un équipement de sa fiche, s'il n'y en a pas déjà un de cette famille ; marque et modèle
+        complètent un équipement connu qui ne les avait pas."""
+        famille = donnees.get("materiel_famille") or ""
+        if not partner or famille not in FAMILLES or famille == "autre":
+            return self.env["cultiveau.equipement"]
+        categorie, libelle = FAMILLES[famille]
+        marque, modele = (donnees.get("marque") or "").strip()[:64], (donnees.get("modele") or "").strip()[:64]
+        Equipement = self.env["cultiveau.equipement"].sudo()
+        existants = Equipement.search([("partner_id", "=", partner.id), ("categorie", "=", categorie)], order="id")
+        if existants:
+            cible = next((e for e in existants if (not marque or (e.marque or "").lower() == marque.lower())), existants[:1])
+            maj = {k: v for k, v in (("marque", marque), ("modele", modele)) if v and not cible[k]}
+            if maj:
+                cible.write(maj)
+            return cible
+        Installation = self.env["cultiveau.installation"].sudo().with_company(societe)
+        installation = Installation.search([("partner_id", "=", partner.id), ("name", "=", INSTALLATION_ASSISTANT)], limit=1) or Installation.create({
+            "name": INSTALLATION_ASSISTANT, "partner_id": partner.id, "company_id": societe.id, "type_systeme": "mixte"})
+        return Equipement.create({"installation_id": installation.id, "categorie": categorie, "marque": marque or False, "modele": modele or False,
+                                  "name": " ".join(x for x in (libelle, marque, modele) if x), "notes": "Cité au téléphone à l'assistant ; à vérifier sur place."})
 
     @api.model
     def cultiveau_enregistrer(self, societe, partner, donnees):
@@ -92,6 +145,7 @@ class Appel(models.Model):
             "categorie": donnees.get("categorie") or "", "lien_assistant": donnees.get("lien_appel") or False,
             "urgence": donnees.get("urgence") if donnees.get("urgence") in ("immediate", "journee", "semaine", "non_urgent") else False,
             "audio_url": donnees.get("audio_url") or False, "audio_jusqu_au": donnees.get("audio_jusqu_au") or False,
+            "recueilli": self._recueilli_html(donnees.get("recueilli")), "reperes": (donnees.get("reperes") or "").strip() or False,
         }
         if donnees.get("date"):
             try:
@@ -103,7 +157,9 @@ class Appel(models.Model):
             return appel, False
         appel = self.sudo().create(valeurs)
         if partner:
-            partner.message_post(body=appel._ligne_du_fil(), subtype_xmlid="mail.mt_note", message_type="comment")
+            self._completer_client(partner, donnees)
+            self._materiel_depuis_appel(societe, partner, donnees)
+            partner.message_post(body=appel._ligne_du_fil(avec_recueilli=True), subtype_xmlid="mail.mt_note", message_type="comment")
         return appel, True
 
     def cultiveau_rattacher(self, rec):

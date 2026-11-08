@@ -25,7 +25,11 @@
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
                     </group>
+                    <field name="recueilli" nolabel="1" invisible="not recueilli"/>
                     <notebook>
+                        <page string="Repères pour le technicien" name="reperes" invisible="not reperes">
+                            <field name="reperes" nolabel="1"/>
+                        </page>
                         <page string="Tout ce qui a été dit" name="transcription">
                             <field name="transcription" nolabel="1"/>
                         </page>

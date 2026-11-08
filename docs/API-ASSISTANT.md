@@ -64,6 +64,18 @@ le sujet en une ou deux phrases et le lien « Voir la conversation et écouter �
   l'assistant, qui respecte la durée de conservation de l'adhérent), `audio_jusqu_au` : la date où il sera effacé ; après, le lecteur
   disparaît et la transcription reste.
 
+**Tout ce que l'assistant a capté du client s'écrit dans sa fiche** (08/11/2026 : « tout ce que l'assistant a capté de chaque client
+doit l'écrire dans le CRM du client »). Champs facultatifs de la même requête :
+
+- `client` : en plus de `nom`, `telephone`, `commune`, les clés `email`, `adresse`, `code_postal`, `exploitation`, `telephone2`
+  complètent les champs **vides** de la fiche (jamais d'écrasement : ce que l'adhérent a saisi fait foi) ;
+- `materiel_famille` (`pivot`, `enrouleur`, `station_pompage`, `goutte_a_goutte`… : les familles de l'assistant), `marque`, `modele` :
+  le matériel cité devient un équipement de la fiche (installation « Matériel connu de l'assistant ») s'il n'y en a pas déjà un de
+  cette famille ; sinon marque et modèle complètent l'équipement connu ;
+- `recueilli` : la liste des informations retenues, `[["Symptôme", "…"], ["Relevés de l'appelant", "…"], …]` : affichée dans le fil du
+  client sous la ligne de l'appel et sur la fiche de l'appel ;
+- `reperes` : le repère du référentiel (§ 18.9) et la pré-analyse des besoins (A1.1), onglet « Repères pour le technicien » de l'appel.
+
 ## Le CRM de l'assistant dans l'ERP
 
 ```

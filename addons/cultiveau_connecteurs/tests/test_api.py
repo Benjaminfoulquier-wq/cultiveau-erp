@@ -97,6 +97,37 @@ class TestApi(HttpCase):
         appel.invalidate_recordset(["lecteur", "audio_disponible"])
         self.assertNotIn("<audio", appel.lecteur or "")
 
+    def test_tout_ce_que_l_assistant_a_capte_est_dans_la_fiche_du_client(self):
+        """Ce que le client a dit de lui complète sa fiche (sans rien écraser), le matériel cité devient un équipement, et tout ce qui a été
+        retenu est lisible dans son fil : son CRM, c'est l'ERP."""
+        corps = {"numero_dedie": "+33970000001", "reference": "APL-2026-0123", "categorie": "panne", "duree_s": 180,
+                 "client": {"telephone": "06 11 22 33 44", "nom": "Durand J.", "email": "jean.durand@exemple.fr", "adresse": "Mas de la Source",
+                            "commune": "Anduze", "exploitation": "EARL de la Source"},
+                 "resume": "Le pivot Valley s'arrête tout seul au bout de dix minutes.",
+                 "materiel_famille": "pivot", "marque": "Valley", "modele": "8000",
+                 "recueilli": [["Matériel", "Pivot"], ["Marque / modèle", "Valley 8000"], ["Symptôme", "s'arrête au bout de dix minutes"],
+                               ["Relevés de l'appelant", "pression 2,8 bar au centre"], ["Depuis", "hier soir"], ["Vide", ""]],
+                 "reperes": "Repère § 18.9 : causes probables — sécurité de pression, alimentation électrique."}
+        r = self.url_open("/cultiveau/api/appel", data=json.dumps(corps), headers=self.entetes)
+        self.assertEqual(r.status_code, 200, r.text)
+        self.agri.invalidate_recordset()
+        # champs vides complétés, champs renseignés intacts (le nom et la commune venaient de l'ERP)
+        self.assertEqual((self.agri.name, self.agri.city, self.agri.email, self.agri.street, self.agri.exploitation),
+                         ("Durand Jean", "Alès", "jean.durand@exemple.fr", "Mas de la Source", "EARL de la Source"))
+        equipement = self.env["cultiveau.equipement"].search([("partner_id", "=", self.agri.id)])
+        self.assertEqual((equipement.categorie, equipement.marque, equipement.modele, equipement.installation_id.name), ("pivot", "Valley", "8000", "Matériel connu de l'assistant"))
+        appel = self.env["cultiveau.appel"].search([("reference", "=", "APL-2026-0123")])
+        self.assertIn("pression 2,8 bar", appel.recueilli)
+        self.assertNotIn("Vide", appel.recueilli)
+        self.assertIn("§ 18.9", appel.reperes)
+        ligne = self.agri.message_ids.filtered(lambda m: "APL" not in (m.body or "") and "Appel reçu par l'assistant" in (m.body or ""))
+        self.assertEqual(len(ligne), 1)
+        self.assertIn("Valley 8000", ligne.body)
+        # un deuxième appel sur le même pivot n'en crée pas un autre
+        corps.update({"reference": "APL-2026-0124", "modele": "", "recueilli": []})
+        self.url_open("/cultiveau/api/appel", data=json.dumps(corps), headers=self.entetes)
+        self.assertEqual(len(self.env["cultiveau.equipement"].search([("partner_id", "=", self.agri.id)])), 1)
+
     def test_synchro_du_crm(self):
         E = lambda **k: k  # noqa: E731
         elements = [
