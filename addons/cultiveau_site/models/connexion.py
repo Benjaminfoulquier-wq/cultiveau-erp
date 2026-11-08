@@ -215,7 +215,7 @@ class SiteConnexion(models.Model):
 
     def _env(self):
         return self.sudo().with_company(self.company_id).with_context(mail_create_nolog=True, mail_notrack=True, tracking_disable=True,
-                                                                        mail_auto_subscribe_no_notify=True).env
+                                                                        mail_auto_subscribe_no_notify=True, cultiveau_depuis_site=True).env
 
     # ---- clients
 

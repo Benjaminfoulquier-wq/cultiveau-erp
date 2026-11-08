@@ -83,3 +83,18 @@ colonne stock ; le stock réel de l'adhérent est dans sa gestion commerciale, S
   le résultat, jamais inventée. Article reconnu par son identifiant du site, sinon sa référence, sinon son code-barres.
 - Tant qu'aucun inventaire n'est validé, le stock reste à zéro. L'autre chemin reste l'import Excel du stock Sage dans l'ERP (Inventaire ›
   Ajustements, import standard).
+
+## La base articles dans les deux sens, et un écran pour les prix (08/11/2026)
+
+« Le stock ne se fera que par l'ERP ; en revanche il faut que les articles créés soient disponibles dans la base, et qu'on puisse facilement
+accéder à la base articles pour mettre à jour les prix de vente et les prix d'achat. »
+
+- **ERP → cultiveau.fr** (`models/article_site.py`) : pour une société reliée, un article créé dans l'ERP est créé dans la base Clients & Articles
+  du site (`POST /api/external/articles`, droit `articles:write`) ; un changement de désignation, référence, prix de vente, unité, TVA, famille,
+  code-barres ou archivage y est répercuté (`PATCH /api/external/articles/<id>`). Le prix d'achat et le stock ne partent pas. L'article créé par
+  un utilisateur d'une société reliée appartient à sa société. Envoi après l'enregistrement, filet toutes les 15 minutes, action « Envoyer sur
+  cultiveau.fr » dans la liste. Ce que la synchronisation site → ERP écrit ne repart jamais (contexte `cultiveau_depuis_site`).
+- **Écran Base articles** (menu Cultiveau › Base articles, tuile Gestion › Base articles sur cultiveau.fr) : liste modifiable ligne par ligne,
+  référence, désignation, famille, prix d'achat, prix de vente HT, TVA, stock ; filtres « sans prix d'achat », « sans prix de vente »,
+  « venus de cultiveau.fr », « à envoyer » ; modification en masse.
+- Le stock se gère dans l'ERP seul ; l'étape « Inventaires » (Mon Inventaire validé → stock) reste disponible et peut se décocher par société.

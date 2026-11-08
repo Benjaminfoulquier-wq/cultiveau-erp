@@ -30,9 +30,9 @@ le site). Rien n'est recopié : une évolution du site ou de la logistique se vo
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
-    "depends": ["stock", "cultiveau_chantier", "cultiveau_interventions", "cultiveau_installation"],
+    "depends": ["stock", "sale_management", "uom", "cultiveau_chantier", "cultiveau_interventions", "cultiveau_installation"],
     "external_dependencies": {"python": ["requests"]},
-    "data": ["security/ir.model.access.csv", "views/site_views.xml", "views/ecrans.xml", "views/res_config_settings_views.xml", "views/company_views.xml", "views/chantier_views.xml", "data/cron.xml", "data/erp_ouvert.xml", "data/entrepots.xml"],
+    "data": ["security/ir.model.access.csv", "views/site_views.xml", "views/ecrans.xml", "views/res_config_settings_views.xml", "views/company_views.xml", "views/chantier_views.xml", "views/articles_views.xml", "data/cron.xml", "data/erp_ouvert.xml", "data/entrepots.xml"],
     "assets": {
         "web.assets_backend": [
             "cultiveau_site/static/src/js/ecran.js",

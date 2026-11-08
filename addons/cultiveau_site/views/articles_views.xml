@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- La base articles : un seul écran pour voir et corriger les prix de vente et les prix d'achat, ligne par ligne, sans ouvrir de fiche.
+         Ce qui change de prix de vente, de désignation ou de famille repart dans la base Clients & Articles de cultiveau.fr. -->
+    <record id="view_base_articles_list" model="ir.ui.view">
+        <field name="name">product.template.list.cultiveau.base</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" multi_edit="1" string="Base articles" default_order="default_code, name">
+                <field name="default_code" string="Référence"/>
+                <field name="name" string="Désignation"/>
+                <field name="categ_id" string="Famille" optional="show"/>
+                <field name="uom_id" string="Unité" optional="show" groups="uom.group_uom"/>
+                <field name="standard_price" string="Prix d'achat" widget="monetary" options="{'currency_field': 'cost_currency_id'}"/>
+                <field name="list_price" string="Prix de vente HT" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="taxes_id" string="TVA" widget="many2many_tags" optional="hide"/>
+                <field name="qty_available" string="Stock" optional="show" readonly="1"/>
+                <field name="cultiveau_source" string="Origine" optional="hide"/>
+                <field name="cultiveau_site_a_envoyer" string="À envoyer sur cultiveau.fr" optional="hide"/>
+                <field name="active" column_invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="cost_currency_id" column_invisible="1"/>
+                <field name="company_id" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_base_articles_search" model="ir.ui.view">
+        <field name="name">product.template.search.cultiveau.base</field>
+        <field name="model">product.template</field>
+        <field name="arch" type="xml">
+            <search string="Base articles">
+                <field name="name" string="Article" filter_domain="['|', '|', ('default_code', 'ilike', self), ('name', 'ilike', self), ('barcode', 'ilike', self)]"/>
+                <field name="categ_id" string="Famille"/>
+                <filter name="sans_achat" string="Sans prix d'achat" domain="[('standard_price', '=', 0)]"/>
+                <filter name="sans_vente" string="Sans prix de vente" domain="[('list_price', '=', 0)]"/>
+                <filter name="du_site" string="Venus de cultiveau.fr" domain="[('cultiveau_site_ref', '!=', False)]"/>
+                <filter name="a_envoyer" string="À envoyer sur cultiveau.fr" domain="[('cultiveau_site_a_envoyer', '=', True)]"/>
+                <filter name="archives" string="Archivés" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="groupe_famille" string="Famille" context="{'group_by': 'categ_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="action_base_articles" model="ir.actions.act_window">
+        <field name="name">Base articles</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_base_articles_list"/>
+        <field name="search_view_id" ref="view_base_articles_search"/>
+        <field name="domain">[('sale_ok', '=', True)]</field>
+        <field name="context">{'default_sale_ok': True, 'default_purchase_ok': True, 'default_type': 'consu', 'default_is_storable': True}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Pas encore d'article</p>
+            <p>Les articles de l'espace cultiveau.fr arrivent ici tout seuls. Un article saisi ici part dans la base Clients &amp; Articles de cultiveau.fr. Le prix d'achat et le stock restent dans l'ERP.</p>
+        </field>
+    </record>
+    <record id="action_base_articles_envoyer" model="ir.actions.server">
+        <field name="name">Envoyer sur cultiveau.fr</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_view_types">list</field>
+        <field name="state">code</field>
+        <field name="code">action = records.action_envoyer_vers_site()</field>
+    </record>
+    <menuitem id="menu_base_articles" name="Base articles" parent="cultiveau_base.menu_cultiveau_root" action="action_base_articles" sequence="23"/>
+</odoo>

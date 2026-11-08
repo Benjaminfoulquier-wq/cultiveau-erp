@@ -142,6 +142,47 @@ class TestSite(TransactionCase):
         self.env["res.company"].cultiveau_entrepots_manquants()
         self.assertEqual(len(self.env["stock.warehouse"].search([("company_id", "=", societe.id)])), 1)
 
+    def test_un_article_cree_dans_l_erp_arrive_dans_la_base(self):
+        """Un article créé ou dont le prix de vente change dans l'ERP part dans la base Clients & Articles de cultiveau.fr ; le prix d'achat
+        et ce que la synchronisation du site écrit ne repartent pas."""
+        from ..models.chantier_site import Connexion as CxEnvoi
+        societe = self.env.company
+        cx = self.env["cultiveau.site.connexion"].create({"company_id": societe.id, "url": "https://site.test", "cle": "cle-de-test", "cultiveau_site_ecriture": True})
+        envois = []
+
+        def poster(self_, chemin, d):
+            envois.append(("POST", chemin, d))
+            return 201, {"success": True, "created": True, "article": {"id": 777, "reference": d["reference"]}}
+
+        def modifier(self_, chemin, d):
+            envois.append(("PATCH", chemin, d))
+            return 200, {"success": True, "article": {"id": 777}}
+        with patch.object(CxEnvoi, "_poster", poster), patch.object(type(cx), "_modifier", modifier):
+            vanne = self.env["product.template"].create({"name": "Vanne 2 pouces", "default_code": "VAN-2", "list_price": 45.0, "standard_price": 30.0})
+            self.assertEqual(vanne.company_id, societe, "l'article d'un adhérent relié est à lui")
+            self.assertTrue(vanne.cultiveau_site_a_envoyer)
+            self.assertEqual(vanne.cultiveau_envoyer_vers_site(), 1)
+            self.assertEqual(vanne.cultiveau_site_ref, f"{cx.id}:777")
+            self.assertFalse(vanne.cultiveau_site_a_envoyer)
+            genre, chemin, d = envois[0]
+            self.assertEqual((genre, chemin, d["reference"], d["designation"], d["prixUnitaireHT"]), ("POST", "articles", "VAN-2", "Vanne 2 pouces", 45.0))
+            self.assertNotIn("standard_price", str(d))
+            vanne.list_price = 49.0
+            self.assertTrue(vanne.cultiveau_site_a_envoyer)
+            self.assertEqual(vanne.cultiveau_envoyer_vers_site(), 1)
+            self.assertEqual((envois[-1][0], envois[-1][1], envois[-1][2]["prixUnitaireHT"]), ("PATCH", "articles/777", 49.0))
+            vanne.standard_price = 32.0  # le prix d'achat : affaire de l'ERP seulement
+            self.assertFalse(vanne.cultiveau_site_a_envoyer)
+            sans_ref = self.env["product.template"].create({"name": "Collier sans référence", "list_price": 3.0})
+            sans_ref.cultiveau_envoyer_vers_site()
+            self.assertEqual((sans_ref.default_code, envois[-1][2]["reference"]), (f"ERP-{sans_ref.id}", f"ERP-{sans_ref.id}"))
+        # ce que la synchronisation du site écrit ne repart pas vers le site
+        with patch.object(type(cx), "_appeler", faux_site([])):
+            cx._synchroniser()
+        raccord = self.env["product.template"].search([("cultiveau_site_ref", "=", f"{cx.id}:9001")])
+        self.assertTrue(raccord)
+        self.assertFalse(raccord.cultiveau_site_a_envoyer)
+
     def test_sans_cle_rien_ne_casse(self):
         connexion = self.env["cultiveau.site.connexion"].create({"company_id": self.env.company.id})
         connexion._synchroniser()
