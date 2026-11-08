@@ -71,6 +71,16 @@ class TestApi(HttpCase):
         self.assertEqual(r.json()["type"], "activite")
         self.assertTrue(self.agri.activity_ids.filtered(lambda a: a.summary == "Demande les horaires"))
 
+    def test_un_appel_renvoye_complete_est_rafraichi_sans_doublon(self):
+        corps = {"numero_dedie": "+33970000001", "reference": "APL-2026-0300", "categorie": "panne", "client": {"telephone": "06 11 22 33 44"}, "resume": "Pompe arrêtée"}
+        r1 = self.url_open("/cultiveau/api/appel", data=json.dumps(corps), headers=self.entetes).json()
+        corps.update({"duree_s": 212, "date": "2026-10-16T09:37:00", "audio_url": "https://assistant.exemple.fr/audio/erp/9/abc/", "audio_jusqu_au": "2099-01-01"})
+        r2 = self.url_open("/cultiveau/api/appel", data=json.dumps(corps), headers=self.entetes).json()
+        self.assertEqual((r2["deja"], r2["id"]), (True, r1["id"]))
+        appel = self.env["cultiveau.appel"].search([("reference", "=", "APL-2026-0300")])
+        self.assertEqual((len(appel), appel.duree, str(appel.date)[:16], bool(appel.audio_url), appel.task_id.id), (1, "3 min 32 s", "2026-10-16 09:37", True, r1["id"]))
+        self.assertEqual(self.env["project.task"].search_count([("cultiveau_reference_appel", "=", "APL-2026-0300")]), 1)
+
     def test_un_inconnu_qui_appelle_pour_un_renseignement_ne_cree_pas_de_client(self):
         avant = self.env["res.partner"].search_count([])
         corps = {"numero_dedie": "+33970000001", "reference": "APL-2026-0200", "categorie": "info", "client": {"telephone": "07 99 88 77 66"}, "resume": "Un fournisseur demande la compta"}

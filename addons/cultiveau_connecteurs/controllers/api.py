@@ -123,6 +123,10 @@ class CultiveauApi(http.Controller):
             Task, Lead = request.env["project.task"], request.env["crm.lead"]
             deja = Task.search([("cultiveau_reference_appel", "=", reference)], limit=1) or Lead.search([("cultiveau_reference_appel", "=", reference)], limit=1)
             if deja:
+                # l'appel lui-même est tout de même rafraîchi (date, durée, enregistrement, ce qui a été retenu) : l'assistant peut le renvoyer complété
+                appel, _nouveau = request.env["cultiveau.appel"].cultiveau_enregistrer(societe, partner, donnees)
+                if not (appel.task_id or appel.lead_id):
+                    appel.write({"task_id": deja.id} if deja._name == "project.task" else {"lead_id": deja.id})
                 return _json({"ok": True, "deja": True, "type": "intervention" if deja._name == "project.task" else "opportunite", "id": deja.id,
                               "client_id": partner.id or None, "url": f"/app/action-{'project.action_view_all_task' if deja._name == 'project.task' else 'crm.crm_lead_action_pipeline'}/{deja.id}"})
         resume = donnees.get("resume") or donnees.get("symptome") or "Appel reçu par l'assistant"
