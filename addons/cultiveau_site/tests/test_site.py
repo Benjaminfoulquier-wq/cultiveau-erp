@@ -183,6 +183,14 @@ class TestSite(TransactionCase):
         self.assertTrue(raccord)
         self.assertFalse(raccord.cultiveau_site_a_envoyer)
 
+    def test_la_base_articles_montre_les_articles_de_la_societe(self):
+        """L'écran Base articles s'ouvre sur les articles de la société (pas le catalogue commun à 1 €) ; les filtres existent."""
+        action = self.env.ref("cultiveau_site.action_base_articles")
+        self.assertEqual(action.context.get("search_default_mes_articles") if isinstance(action.context, dict) else eval(action.context).get("search_default_mes_articles"), 1)
+        arch = self.env.ref("cultiveau_site.view_base_articles_search").arch
+        self.assertIn("allowed_company_ids", arch)
+        self.assertIn("catalogue_commun", arch)
+
     def test_sans_cle_rien_ne_casse(self):
         connexion = self.env["cultiveau.site.connexion"].create({"company_id": self.env.company.id})
         connexion._synchroniser()

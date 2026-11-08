@@ -31,6 +31,9 @@
             <search string="Base articles">
                 <field name="name" string="Article" filter_domain="['|', '|', ('default_code', 'ilike', self), ('name', 'ilike', self), ('barcode', 'ilike', self)]"/>
                 <field name="categ_id" string="Famille"/>
+                <filter name="mes_articles" string="Mes articles" domain="[('company_id', 'in', allowed_company_ids)]" help="Les articles de votre société : ceux de votre base cultiveau.fr et ceux saisis ici."/>
+                <filter name="catalogue_commun" string="Catalogue commun du réseau" domain="[('company_id', '=', False)]" help="Le catalogue 3D et la logistique : prix indicatifs, pas les vôtres."/>
+                <separator/>
                 <filter name="sans_achat" string="Sans prix d'achat" domain="[('standard_price', '=', 0)]"/>
                 <filter name="sans_vente" string="Sans prix de vente" domain="[('list_price', '=', 0)]"/>
                 <filter name="du_site" string="Venus de cultiveau.fr" domain="[('cultiveau_site_ref', '!=', False)]"/>
@@ -49,7 +52,7 @@
         <field name="view_id" ref="view_base_articles_list"/>
         <field name="search_view_id" ref="view_base_articles_search"/>
         <field name="domain">[('sale_ok', '=', True)]</field>
-        <field name="context">{'default_sale_ok': True, 'default_purchase_ok': True, 'default_type': 'consu', 'default_is_storable': True}</field>
+        <field name="context">{'search_default_mes_articles': 1, 'default_sale_ok': True, 'default_purchase_ok': True, 'default_type': 'consu', 'default_is_storable': True}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">Pas encore d'article</p>
             <p>Les articles de l'espace cultiveau.fr arrivent ici tout seuls. Un article saisi ici part dans la base Clients &amp; Articles de cultiveau.fr. Le prix d'achat et le stock restent dans l'ERP.</p>
