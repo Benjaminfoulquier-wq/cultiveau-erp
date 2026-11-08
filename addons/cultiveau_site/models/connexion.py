@@ -5,6 +5,7 @@ l'administration du site, page « Clés API », avec les droits clients:read, in
 bons:read). 600 requêtes par heure et par clé. Les routes de lecture renvoient les lignes de la base du site.
 """
 import logging
+import re
 from datetime import timedelta
 
 import requests
@@ -265,7 +266,7 @@ class SiteConnexion(models.Model):
         projet = env["project.project"].cultiveau_projet_interventions(self.company_id)
         etapes = {e.name: e for e in projet.type_ids}
         lus = self._pages("interventions", "interventions", taille=200)
-        crees = maj = 0
+        crees = maj = rapprochees = 0
         for i in lus:
             i = {k: v for k, v in i.items() if k not in JETONS}
             partner, _ = self._client(i.get("clientName"), i.get("clientPhone"), i.get("clientEmail"), i.get("clientAddress"))
@@ -287,13 +288,22 @@ class SiteConnexion(models.Model):
                 valeurs["stage_id"] = etapes[ETAPES[statut]].id
             ref = self._ref(i.get("id"))
             t = Task.search([("cultiveau_site_ref", "=", ref)], limit=1)
+            if not t and "cultiveau_reference_appel" in Task._fields:
+                # la fiche créée sur le site par l'assistant téléphonique porte « réf. APL-… » : c'est la même intervention que celle née de
+                # l'appel dans l'ERP, on les rapproche au lieu d'en faire deux
+                refs_appel = set(re.findall(r"APL-[0-9A-Za-z]{6,}", " ".join(str(v) for v in i.values() if isinstance(v, str))))
+                if refs_appel:
+                    t = Task.search([("cultiveau_reference_appel", "in", list(refs_appel)), ("company_id", "=", self.company_id.id), ("cultiveau_site_ref", "=", False)], limit=1)
+                    if t:
+                        valeurs["cultiveau_site_ref"] = ref
+                        rapprochees += 1
             if t:
                 t.write(valeurs)
                 maj += 1
             else:
                 Task.create({**valeurs, "project_id": projet.id, "company_id": self.company_id.id, "cultiveau_site_ref": ref, "cultiveau_origine": "autre"})
                 crees += 1
-        return f"{len(lus)} intervention(s) : {crees} nouvelle(s), {maj} à jour"
+        return f"{len(lus)} intervention(s) : {crees} nouvelle(s), {maj} à jour" + (f" dont {rapprochees} rapprochée(s) d'un appel de l'assistant" if rapprochees else "")
 
     # ---- chantiers
 

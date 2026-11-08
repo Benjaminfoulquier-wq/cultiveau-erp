@@ -71,6 +71,19 @@ class TestApi(HttpCase):
         self.assertEqual(r.json()["type"], "activite")
         self.assertTrue(self.agri.activity_ids.filtered(lambda a: a.summary == "Demande les horaires"))
 
+    def test_un_inconnu_qui_appelle_pour_un_renseignement_ne_cree_pas_de_client(self):
+        avant = self.env["res.partner"].search_count([])
+        corps = {"numero_dedie": "+33970000001", "reference": "APL-2026-0200", "categorie": "info", "client": {"telephone": "07 99 88 77 66"}, "resume": "Un fournisseur demande la compta"}
+        r = self.url_open("/cultiveau/api/appel", data=json.dumps(corps), headers=self.entetes)
+        self.assertEqual((r.status_code, r.json()["type"], r.json()["client_id"]), (200, "appel", None), r.text)
+        self.assertEqual(self.env["res.partner"].search_count([]), avant)
+        appel = self.env["cultiveau.appel"].search([("reference", "=", "APL-2026-0200")])
+        self.assertEqual((bool(appel), appel.partner_id.id), (True, False))
+        # une panne d'un inconnu, elle, crée le client : il faudra bien intervenir chez lui
+        corps.update({"reference": "APL-2026-0201", "categorie": "panne", "resume": "Pivot arrêté"})
+        r = self.url_open("/cultiveau/api/appel", data=json.dumps(corps), headers=self.entetes)
+        self.assertEqual((r.json()["type"], r.json()["client_cree"]), ("intervention", True))
+
     def test_tout_ce_qui_est_dit_est_note_sur_la_fiche(self):
         transcription = "Agriculteur : la pompe ne démarre plus depuis ce matin.\n" + "Assistant : je note. " * 800
         corps = {"numero_dedie": "+33970000001", "reference": "APL-2026-0099", "categorie": "panne", "client": {"telephone": "06 11 22 33 44"},

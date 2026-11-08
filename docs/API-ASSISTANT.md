@@ -112,3 +112,12 @@ Pour chaque numéro dédié qui correspond à un adhérent de l'ERP, une clé pr
 "adherent": "…", "cle": "cv_…"}, {"numero_dedie": "…", "trouve": false}]}`. Redemander retire l'ancienne clé « Assistant
 téléphonique » de cet adhérent. L'assistant le fait chaque jour (secret `ERP_CLE_RESEAU`) : un adhérent qui passe à l'ERP y est
 relié de lui-même, et tout son CRM y part.
+
+## Chaque appel arrive dans l'ERP, sans doublon ni fiche client parasite (08/11/2026)
+
+- Côté assistant, le parcours de réglages pose une flèche « tout appel → fiche → ERP Cultiveau » dès qu'un connecteur ERP existe : l'ERP
+  reçoit chaque appel (jusque-là seules les pannes partaient, et vers Mes interventions de cultiveau.fr).
+- Un appelant **inconnu** pour un renseignement, un message ou la compta ne crée pas de fiche client : l'appel est rangé (menu Appels)
+  sans client, réponse `{"type": "appel"}`. Une panne ou une demande de prix d'un inconnu crée toujours le client.
+- La fiche d'intervention que l'assistant crée sur cultiveau.fr porte « réf. APL-… » : la synchronisation site → ERP la rapproche de
+  l'intervention née de l'appel dans l'ERP (`cultiveau_reference_appel`) au lieu d'en créer une deuxième.

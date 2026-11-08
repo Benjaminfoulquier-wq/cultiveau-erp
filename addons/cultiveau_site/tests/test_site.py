@@ -191,6 +191,28 @@ class TestSite(TransactionCase):
         self.assertIn("allowed_company_ids", arch)
         self.assertIn("catalogue_commun", arch)
 
+    def test_la_fiche_du_site_nee_d_un_appel_rejoint_l_intervention_de_l_erp(self):
+        """L'assistant a créé l'intervention dans l'ERP (réf. APL) et une fiche sur cultiveau.fr qui porte la même réf. : la synchro les rapproche."""
+        societe = self.env.company
+        if "cultiveau_reference_appel" not in self.env["project.task"]._fields:
+            self.skipTest("module connecteurs absent")
+        connexion = self.env["cultiveau.site.connexion"].create({"company_id": societe.id, "cle": "cle-de-test", "clients": False, "chantiers": False, "bons": False, "articles": False, "inventaires": False})
+        projet = self.env["project.project"].cultiveau_projet_interventions(societe)
+        tache = self.env["project.task"].create({"name": "Baisse de pression — appel", "project_id": projet.id, "company_id": societe.id, "cultiveau_reference_appel": "APL-abc123def4"})
+        inter = dict(INTERVENTIONS["interventions"][0], problemDescription="[À VALIDER — assistant téléphonique · réf. APL-abc123def4] Baisse de pression")
+        appels = []
+
+        def _appeler(self_, chemin, params=None):
+            appels.append(chemin)
+            return {"interventions": {**INTERVENTIONS, "interventions": [inter]}, "entreprise": ENTREPRISE}[chemin]
+        with patch.object(type(connexion), "_appeler", _appeler):
+            connexion._synchroniser()
+        self.assertFalse(connexion.en_erreur, connexion.resultat)
+        self.assertIn("1 rapprochée(s)", connexion.resultat)
+        tache.invalidate_recordset()
+        self.assertEqual(tache.cultiveau_site_ref, f"{connexion.id}:{inter['id']}")
+        self.assertEqual(self.env["project.task"].search_count([("cultiveau_site_ref", "=", f"{connexion.id}:{inter['id']}")]), 1)
+
     def test_sans_cle_rien_ne_casse(self):
         connexion = self.env["cultiveau.site.connexion"].create({"company_id": self.env.company.id})
         connexion._synchroniser()

@@ -103,7 +103,12 @@ class CultiveauApi(http.Controller):
         telephone = client.get("telephone") or donnees.get("telephone")
         partner = Partner.cultiveau_par_telephone(telephone, societe)
         cree = False
-        if not partner:
+        categorie = (donnees.get("categorie") or "autre").lower()
+        if not partner and categorie not in ("panne", "depannage", "urgence", "intervention", "devis", "projet", "prix", "demande_de_prix", "opportunite") and not client.get("nom"):
+            # un appelant inconnu pour un renseignement, un message, la compta : l'appel est rangé (menu Appels), sans créer une fiche client
+            # de plus dans la base de l'adhérent ; une panne ou une demande de prix, elle, crée toujours le client
+            partner = Partner.browse()
+        elif not partner:
             if not (client.get("nom") or telephone):
                 return _json({"erreur": "client : nom ou téléphone requis"}, 400)
             partner = Partner.create({
@@ -119,11 +124,12 @@ class CultiveauApi(http.Controller):
             deja = Task.search([("cultiveau_reference_appel", "=", reference)], limit=1) or Lead.search([("cultiveau_reference_appel", "=", reference)], limit=1)
             if deja:
                 return _json({"ok": True, "deja": True, "type": "intervention" if deja._name == "project.task" else "opportunite", "id": deja.id,
-                              "client_id": partner.id, "url": f"/app/action-{'project.action_view_all_task' if deja._name == 'project.task' else 'crm.crm_lead_action_pipeline'}/{deja.id}"})
-        categorie = (donnees.get("categorie") or "autre").lower()
+                              "client_id": partner.id or None, "url": f"/app/action-{'project.action_view_all_task' if deja._name == 'project.task' else 'crm.crm_lead_action_pipeline'}/{deja.id}"})
         resume = donnees.get("resume") or donnees.get("symptome") or "Appel reçu par l'assistant"
         # l'appel lui-même : le sujet dans le fil du client, tout ce qui a été dit et l'audio sur sa fiche
         appel, _nouveau = request.env["cultiveau.appel"].cultiveau_enregistrer(societe, partner, donnees)
+        if not partner:
+            return _json({"ok": True, "type": "appel", "id": appel.id, "client_id": None, "client_cree": False, "url": appel._lien()})
         if categorie in ("panne", "depannage", "urgence", "intervention"):
             t = request.env["project.task"].cultiveau_creer_depuis_appel(societe, partner, donnees)
             appel.cultiveau_rattacher(t)
