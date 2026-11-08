@@ -98,3 +98,71 @@ a, .o_form_view .o_field_widget a { color: $cv-cyan; }
 .form-check-input:checked { background-color: $cv-cyan; border-color: $cv-cyan; }
 .o_main_navbar .o_menu_sections .o_nav_entry, .o_main_navbar .o_menu_sections .dropdown-toggle { border-radius: $cv-rayon-pilule; }
 .o_main_navbar .o_menu_systray .o_notification_counter { background: $cv-or !important; color: $cv-nuit !important; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Second passage (08/11/2026, « j'ai pas l'impression ») : la différence doit se voir. Champs remplis et arrondis au lieu de soulignés,
+// listes qui respirent, titres plus grands en Jakarta, compteurs en pastilles, messages du fil en bulles. Même structure, autre peau.
+// ---------------------------------------------------------------------------------------------------------------------
+// les titres d'écran et de fiche
+.o_control_panel .o_breadcrumb .active, .o_control_panel .o_last_breadcrumb_item, .o_control_panel .o_last_breadcrumb_item > span { font-size: 20px; line-height: 1.2; }
+.o_control_panel { padding-top: 10px; padding-bottom: 10px; }
+.o_form_view .oe_title h1, .o_form_view .oe_title .o_field_widget input.o_input { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 30px; }
+// les champs : une pastille douce, arrondie, au lieu d'un trait sous le texte
+.o_form_view .o_form_sheet .o_field_widget:not(.o_field_boolean):not(.o_field_many2many_tags):not(.o_field_html):not(.o_field_image) > .o_input,
+.o_form_view .o_form_sheet .o_field_widget:not(.o_field_boolean):not(.o_field_html):not(.o_field_image) input.o_input,
+.o_form_view .o_form_sheet .o_field_widget textarea.o_input,
+.o_form_view .o_form_sheet .o_field_many2one .o_input_dropdown, .o_form_view .o_form_sheet .o_field_many2one_selection .o_input_dropdown,
+.o_form_view .o_form_sheet .o_field_selection select.o_input {
+    background: #f8f6f1; border: 1px solid #ebe7de !important; border-radius: 12px !important; padding: 6px 10px !important; min-height: 34px; transition: border-color .15s, background .15s;
+}
+.o_form_view .o_form_sheet .o_field_widget .o_input_dropdown input.o_input { background: transparent; border: 0 !important; padding: 0 !important; min-height: 0; }
+.o_form_view .o_form_sheet .o_field_widget input.o_input:focus, .o_form_view .o_form_sheet .o_field_widget textarea.o_input:focus,
+.o_form_view .o_form_sheet .o_input_dropdown:focus-within { background: #fff; border-color: $cv-cyan !important; box-shadow: 0 0 0 3px rgba(42, 127, 143, 0.12); }
+.o_form_view .o_form_sheet .o_form_label { color: $cv-texte-2; font-weight: 600; font-size: 13px; padding-top: 7px; }
+.o_form_view .o_form_sheet .o_inner_group { gap: 2px 18px; }
+.o_form_view .o_form_sheet .o_inner_group > .o_wrap_field { margin-bottom: 4px; }
+.o_form_view .o_form_sheet .o_td_label { padding-right: 8px; }
+.o_form_view .o_form_sheet { padding: 28px 32px; }
+.o_form_view .o_form_sheet_bg > .o_form_sheet { max-width: 1180px; }
+// les compteurs en haut d'une fiche : des pastilles séparées, pas une barre collée
+.o_form_view .oe_button_box { gap: 8px; padding: 4px 0 10px; border: 0 !important; }
+.o_form_view .oe_button_box .oe_stat_button { background: #fff; border: 1px solid $cv-bord !important; border-radius: 14px !important; padding: 6px 12px; margin: 0 !important; min-height: 44px; }
+.o_form_view .oe_button_box .oe_stat_button .o_stat_info { font-family: "Inter", sans-serif; }
+.o_form_view .oe_button_box .oe_stat_button .o_stat_value { color: $cv-cyan; font-weight: 700; font-size: 15px; }
+.o_form_view .oe_button_box .oe_stat_button .o_stat_text { color: $cv-texte-2; }
+// les listes : des lignes qui respirent, un en-tête discret, un survol arrondi
+.o_list_view .o_list_renderer { border-radius: 20px; }
+.o_list_view .table thead th { background: #f8f6f1 !important; color: $cv-texte-2; font-size: 12px; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; padding-top: 12px; padding-bottom: 12px; border-bottom: 1px solid $cv-bord !important; }
+.o_list_view .table tbody tr.o_data_row > td { padding-top: 11px; padding-bottom: 11px; border-color: #f1eee7; }
+.o_list_view .table tbody tr.o_data_row:nth-child(even) > td { background: #fcfbf8; }
+.o_list_view .table tbody tr.o_data_row:hover > td { background: rgba(42, 127, 143, 0.06) !important; }
+.o_list_view .table tbody tr.o_data_row.o_selected_row > td { background: rgba(42, 127, 143, 0.08) !important; }
+.o_list_view .o_list_table .o_list_record_selector .o-checkbox .form-check-input, .form-check-input { border-radius: 6px; border-color: #cfc9bd; }
+.o_list_view .table tfoot td { background: #f8f6f1; }
+// la barre de recherche : une pilule pleine largeur raisonnable
+.o_control_panel .o_searchview { border-radius: 999px !important; padding: 4px 12px; box-shadow: 0 2px 8px rgba(27, 39, 53, 0.04); }
+.o_control_panel .o_searchview .o_facet_values, .o_control_panel .o_searchview .o_searchview_facet { border-radius: 999px; }
+.o_control_panel .o_cp_switch_buttons .btn { border-radius: 999px; }
+.o_control_panel .o_pager .btn { border-radius: 999px; }
+// le kanban : cartes blanches bien rondes, colonnes sans cadre
+.o_kanban_view .o_kanban_record { border-radius: 20px; padding: 16px 18px; }
+.o_kanban_view .o_kanban_group { background: transparent; }
+.o_kanban_view .o_kanban_header .o_kanban_header_title { font-size: 15px; }
+.o_kanban_view .o_kanban_record:hover { box-shadow: 0 10px 28px rgba(27, 39, 53, 0.10); transform: translateY(-1px); transition: box-shadow .15s, transform .15s; }
+// le fil de discussion : des bulles, pas des blocs
+.o-mail-Message { padding: 6px 12px; }
+.o-mail-Message-core, .o-mail-Message-content { background: #fff; border: 1px solid $cv-bord; border-radius: 16px; padding: 10px 14px; }
+.o-mail-Message-header { margin-bottom: 4px; }
+.o-mail-Chatter-topbar { padding: 10px 12px; border-bottom: 1px solid $cv-bord; }
+.o-mail-Chatter-topbar .btn { border-radius: 999px; }
+.o-mail-Composer-input, .o-mail-Composer-coreMain { border-radius: 16px !important; }
+// les onglets du bas de fiche : une rangée de pilules sur fond papier
+.o_form_view .o_notebook .nav-tabs { background: #f3f0e9; border-radius: 999px; display: inline-flex; margin-bottom: 14px; }
+.o_form_view .o_notebook .nav-tabs .nav-link.active { background: #fff; box-shadow: 0 2px 8px rgba(27, 39, 53, 0.08); border-color: transparent; }
+// la barre d'état d'un document (devis, chantier) : des étapes en pilules
+.o_form_view .o_form_statusbar { padding: 8px 32px; }
+.o_statusbar_status .o_arrow_button { border-radius: 999px !important; margin-left: 6px; border: 1px solid $cv-bord !important; background: #fff; }
+.o_statusbar_status .o_arrow_button.btn-primary, .o_statusbar_status .o_arrow_button.o_arrow_button_current { background: $cv-cyan !important; border-color: $cv-cyan !important; color: #fff !important; }
+.o_statusbar_status .o_arrow_button::before, .o_statusbar_status .o_arrow_button::after { display: none !important; }
+// les boîtes de dialogue et menus : coins ronds et ombre douce (déjà), avec un titre en Jakarta
+.modal-header .modal-title { font-size: 20px; }
