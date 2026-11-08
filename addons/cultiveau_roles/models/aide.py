@@ -67,6 +67,13 @@ class Aide(models.Model):
     }
 
     @api.model
+    def _retirer_liens_github(self):
+        """Les tutos ne renvoient jamais vers GitHub (08/11/2026) : le lien « documentation » qui pointait sur le dépôt est effacé ;
+        la personne a le texte et la vidéo, rien d'autre."""
+        self.sudo().search(["|", ("doc", "ilike", "github"), ("video", "ilike", "github")]).write({"doc": False})
+        return True
+
+    @api.model
     def _relecture_20261108(self):
         """Les corrections de la relecture, appliquées aux tutos déjà en base (ils sont en noupdate pour garder les modifications de l'adhérent)."""
         from markupsafe import escape as _esc  # noqa: PLC0415

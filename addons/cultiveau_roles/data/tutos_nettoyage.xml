@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <function model="cultiveau.aide" name="_nettoyer_anciens"/>
+    <function model="cultiveau.aide" name="_retirer_liens_github"/>
     <function model="cultiveau.aide" name="_relecture_20261108"/>
 </odoo>

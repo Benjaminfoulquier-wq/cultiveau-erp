@@ -36,3 +36,12 @@ par le modèle affiché, sinon il montre les gestes qui servent partout (et le d
 modifications dans Réglages › Aides des écrans sont gardées), un par page du menu Cultiveau et pour les écrans standards utiles (devis,
 commandes, factures, produits, achats, inventaire, contacts, calendrier). L'ancien texte de la Map, qui pointait sur un identifiant
 inexistant, est retiré à la mise à jour.
+
+## La vidéo d'abord, jamais GitHub (08/11/2026)
+
+« Les tutos ne doivent pas ouvrir sur GitHub ; il faut que la personne ait le texte et surtout la vidéo, à chaque fois. » Le « ? » ouvre
+désormais la vidéo en premier : s'il y a un film produit pour la page (champ « Tuto vidéo » : lien cultiveau.fr ou YouTube), il joue ; sinon,
+le tuto est lu à voix haute, étape par étape, dans une scène animée aux couleurs de Cultiveau (synthèse vocale du navigateur, voix française).
+Le texte (pas à pas, par où commencer, pièges) reste en dessous. Plus aucun lien « Lire la documentation » vers le dépôt GitHub : les liens
+`doc` qui pointaient dessus sont effacés (source `tutos.xml` et enregistrements en base, `_retirer_liens_github`). Pour un vrai film sur une
+page, renseignez son lien dans Réglages › Aides des écrans : il remplace la lecture à voix haute.

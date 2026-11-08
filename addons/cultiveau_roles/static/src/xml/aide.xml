@@ -9,26 +9,46 @@
     </t>
     <t t-name="cultiveau_roles.AideDialog">
         <Dialog title="props.aide.nom" size="'lg'" contentClass="'o_cultiveau_aide_dialog'">
-            <p class="o_cultiveau_aide_resume" t-esc="props.aide.resume"/>
-            <p t-if="!props.aide.precis" class="text-muted small"><i class="fa fa-info-circle me-1"/>Cette page n'a pas encore son tuto : voici les gestes qui servent partout.</p>
+            <div class="o_cultiveau_aide_video">
+                <div t-if="video and estYoutube" class="o_cultiveau_aide_iframe">
+                    <iframe t-att-src="videoEmbed" allow="autoplay; encrypted-media; fullscreen" allowfullscreen="allowfullscreen" frameborder="0"/>
+                </div>
+                <video t-elif="video" class="o_cultiveau_aide_mp4" t-att-src="video" controls="controls" autoplay="autoplay" playsinline="playsinline"/>
+                <div t-else="" class="o_cultiveau_aide_player">
+                    <div class="o_cultiveau_aide_scene">
+                        <div class="o_cultiveau_aide_marque">CULTIVEAU</div>
+                        <div class="o_cultiveau_aide_titre" t-esc="props.aide.nom"/>
+                        <div class="o_cultiveau_aide_caption" t-esc="segmentCourant || props.aide.resume"/>
+                    </div>
+                    <div class="o_cultiveau_aide_barre"><span t-attf-style="width: {{ progression }}%;"/></div>
+                    <div class="o_cultiveau_aide_controls">
+                        <button class="btn btn-sm o_cultiveau_aide_play" t-if="!state.lecture and parleSupporte" t-on-click="jouer">
+                            <i class="fa fa-play me-1"/><t t-esc="state.termine ? 'Revoir le tuto' : 'Lire le tuto'"/>
+                        </button>
+                        <button class="btn btn-sm o_cultiveau_aide_play" t-if="state.lecture" t-on-click="pause"><i class="fa fa-pause me-1"/>Pause</button>
+                        <span class="o_cultiveau_aide_compteur" t-if="segments.length">Étape <t t-esc="etapeAffichee"/> / <t t-esc="segments.length"/></span>
+                        <span class="o_cultiveau_aide_muet small" t-if="!parleSupporte">Le son n'est pas disponible ici : le tuto est écrit ci-dessous.</span>
+                    </div>
+                </div>
+            </div>
+
+            <p t-if="!props.aide.precis" class="text-muted small mb-2 mt-3"><i class="fa fa-info-circle me-1"/>Cette page n'a pas encore son tuto : voici les gestes qui servent partout.</p>
+
             <div t-if="props.aide.etapes" class="o_cultiveau_aide_bloc">
                 <h5>Pas à pas</h5>
-                <div class="o_cultiveau_aide_etapes" t-out="etapes"/>
+                <div class="o_cultiveau_aide_etapes" t-out="etapesHtml"/>
             </div>
             <div t-if="props.aide.texte" class="o_cultiveau_aide_bloc">
                 <h5>Par où commencer</h5>
-                <div t-out="texte"/>
+                <div t-out="texteHtml"/>
             </div>
             <div t-if="props.aide.pieges" class="o_cultiveau_aide_bloc o_cultiveau_aide_pieges">
                 <h5>À ne pas faire</h5>
-                <div t-out="pieges"/>
+                <div t-out="piegesHtml"/>
             </div>
-            <p class="mt-3 mb-0 o_cultiveau_aide_liens">
-                <a t-if="props.aide.video" t-att-href="props.aide.video" target="_blank" rel="noopener" class="me-3"><i class="fa fa-play-circle me-1"/>Voir la vidéo</a>
-                <a t-if="props.aide.doc" t-att-href="props.aide.doc" target="_blank" rel="noopener"><i class="fa fa-book me-1"/>Lire la documentation</a>
-            </p>
+
             <t t-set-slot="footer">
-                <button class="btn btn-primary" t-on-click="() => props.close()">Compris</button>
+                <button class="btn btn-primary" t-on-click="fermer">Compris</button>
                 <button t-if="props.aide.editable" class="btn btn-secondary" t-on-click="modifier">Modifier ce tuto</button>
             </t>
         </Dialog>
