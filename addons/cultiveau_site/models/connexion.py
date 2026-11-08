@@ -164,6 +164,7 @@ class SiteConnexion(models.Model):
             return
         debut = fields.Datetime.now()
         bilan = []
+        self._synchro_fiche_entreprise()
         try:
             # pas de savepoint autour des étapes : elles acquièrent elles-mêmes leur travail page par page (un commit détruirait le savepoint)
             for actif, etape in ((self.clients, self._synchro_clients), (self.interventions, self._synchro_interventions), (self.chantiers, self._synchro_chantiers),
@@ -184,6 +185,22 @@ class SiteConnexion(models.Model):
             self._reprendre_apres_erreur()
             self.write({"derniere_synchro": debut, "resultat": " · ".join(bilan + [f"Erreur : {e}"]), "en_erreur": True})
             self._acquis()
+
+    def _synchro_fiche_entreprise(self):
+        """Le logo de l'entreprise suit celui de son espace cultiveau.fr, même posé après la première entrée dans l'ERP : la fiche est relue à
+        chaque passage (GET /entreprise). Un site plus ancien sans cette route, ou injoignable, ne bloque pas la synchronisation."""
+        try:
+            fiche = (self._appeler("entreprise") or {}).get("entreprise") or {}
+        except UserError as e:
+            _logger.info("Fiche entreprise de %s non relue : %s", self.company_id.name, e)
+            return False
+        except Exception as e:  # noqa: BLE001
+            _logger.info("Fiche entreprise de %s non relue : %s", self.company_id.name, e)
+            return False
+        if fiche.get("logo_url"):
+            self.env["res.users"]._cultiveau_logo_depuis_site(self.company_id, fiche["logo_url"])
+            self._acquis()
+        return True
 
     def _reprendre_apres_erreur(self):
         """Après une erreur de base de données, la transaction est inutilisable : on revient au dernier acquis pour pouvoir noter l'erreur."""

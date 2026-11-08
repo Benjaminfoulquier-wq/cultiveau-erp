@@ -55,6 +55,9 @@ class TestSansEditeur(TransactionCase):
         self.assertFalse([m["string"] for m in web if "odoo" in m["string"].lower()][:3])
         py = translate.code_translations.get_python_translations("mail", "fr_FR")
         self.assertFalse([v for v in py.values() if "odoo" in v.lower()][:3])
+        # les phrases que les traductions livrées laissent en anglais
+        vide = next((m["string"] for m in web if m["id"] == "The conversation is empty."), None)
+        self.assertEqual(vide, "Aucun message pour l'instant.")
 
     def test_les_textes_en_base_ne_nomment_pas_l_editeur(self):
         action = self.env["ir.actions.act_window"].create({"name": "Essai", "res_model": "res.partner", "help": "<p>Essayez Odoo sur www.odoo.com/fr</p>"})

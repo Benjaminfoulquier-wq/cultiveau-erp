@@ -38,8 +38,12 @@ def faux_site(appels):
     def _appeler(self, chemin, params=None):
         appels.append((chemin, dict(params or {})))
         return {"clients": CLIENTS, "interventions": INTERVENTIONS, "chantiers": CHANTIERS, "bons-intervention": BONS,
-                "bons-intervention/501": BON, "articles": ARTICLES}[chemin]
+                "bons-intervention/501": BON, "articles": ARTICLES, "entreprise": ENTREPRISE}[chemin]
     return _appeler
+
+
+ENTREPRISE = {"success": True, "entreprise": {"id": 120004, "nom": "Irrigation Sud", "logo_url": "https://site.test/api/adherent-image/77/logo"}}
+PNG_1x1 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
 
 
 @tagged("post_install", "-at_install", "cultiveau")
@@ -83,6 +87,34 @@ class TestSite(TransactionCase):
         self.assertEqual(avant, apres)
         self.assertEqual(self.env["cultiveau.site.bon"].search_count([("connexion_id", "=", connexion.id)]), 1)
         self.assertTrue(any(c == "clients" and p.get("updatedSince") for c, p in appels))
+
+    def test_le_logo_suit_l_espace_cultiveau_fr(self):
+        """Un logo posé sur cultiveau.fr après la première entrée arrive quand même : la fiche est relue à chaque passage."""
+        import base64
+        import requests as req
+
+        class Reponse:
+            status_code = 200
+            headers = {"Content-Type": "image/png"}
+            content = base64.b64decode(PNG_1x1)
+        images = []
+
+        def get(url, timeout=20, **kw):
+            images.append(url)
+            return Reponse()
+        societe = self.env["res.company"].create({"name": "Irrigation Sud (test logo)", "iap_enrich_auto_done": True})
+        connexion = self.env["cultiveau.site.connexion"].create({"company_id": societe.id, "cle": "cle-de-test", "clients": False, "interventions": False,
+                                                                  "chantiers": False, "bons": False, "articles": False})
+        with patch.object(type(connexion), "_appeler", faux_site([])), patch.object(req, "get", get):
+            connexion._synchroniser()
+        self.assertFalse(connexion.en_erreur, connexion.resultat)
+        self.assertEqual(images, ["https://site.test/api/adherent-image/77/logo"])
+        self.assertEqual(societe.cultiveau_site_logo_url, "https://site.test/api/adherent-image/77/logo")
+        self.assertTrue(societe.cultiveau_logo_choisi)
+        # même adresse au passage suivant : l'image n'est pas redemandée
+        with patch.object(type(connexion), "_appeler", faux_site([])), patch.object(req, "get", get):
+            connexion._synchroniser()
+        self.assertEqual(len(images), 1)
 
     def test_sans_cle_rien_ne_casse(self):
         connexion = self.env["cultiveau.site.connexion"].create({"company_id": self.env.company.id})
