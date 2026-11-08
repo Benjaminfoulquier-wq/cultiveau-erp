@@ -142,7 +142,44 @@ class Chantier(models.Model):
             envoyes += 1
         return envoyes
 
+    def _cultiveau_site_id(self):
+        """L'identifiant du chantier dans Mon Chantier (la référence est « connexion:id »)."""
+        self.ensure_one()
+        ref = self.cultiveau_site_ref or ""
+        return int(ref.split(":")[-1]) if ref.split(":")[-1].isdigit() else 0
+
+    def action_ouvrir_dans_site(self):
+        """La fiche du chantier telle qu'elle est dans l'appli Mon Chantier de cultiveau.fr, dans le cadre de l'ERP."""
+        self.ensure_one()
+        ident = self._cultiveau_site_id()
+        return {"type": "ir.actions.client", "tag": "cultiveau_site.ecran", "name": self.titre or self.name,
+                "params": {"vers": f"/adherent/chantier?id={ident}" if ident else "/adherent/chantier"}}
+
     @api.model
     def _cron_envoyer_vers_site(self):
         """Filet de sécurité : ce qui n'est pas parti tout de suite (site injoignable) part au passage suivant."""
         self.search([("cultiveau_site_a_envoyer", "=", True), ("cultiveau_site_ref", "=", False)], limit=50).cultiveau_envoyer_vers_site()
+
+
+class SaleOrder(models.Model):
+    _inherit = "sale.order"
+
+    def action_lancer_chantier(self):
+        """Le chantier lancé depuis la commande naît tout de suite dans Mon Chantier de cultiveau.fr, et c'est là qu'il s'ouvre : une seule
+        appli chantier pour tout le monde. Sans liaison au site (entreprise pas reliée, site injoignable), la fiche de l'ERP s'ouvre comme avant."""
+        action = super().action_lancer_chantier()
+        chantier = self.env["cultiveau.chantier"].browse(action.get("res_id")) if isinstance(action, dict) else self.env["cultiveau.chantier"]
+        if chantier and not chantier.cultiveau_site_ref:
+            chantier.cultiveau_envoyer_vers_site()
+        if chantier and chantier.cultiveau_site_ref:
+            return chantier.action_ouvrir_dans_site()
+        return action
+
+    def action_voir_chantiers(self):
+        """Le bouton « Chantiers » de la commande : la fiche du site quand il n'y a qu'un chantier et qu'il y est (le cas de la commande qui
+        a créé son chantier à la confirmation), la liste de l'ERP sinon."""
+        self.ensure_one()
+        chantiers = self.env["cultiveau.chantier"].search([("sale_order_id", "=", self.id)])
+        if len(chantiers) == 1 and chantiers.cultiveau_site_ref:
+            return chantiers.action_ouvrir_dans_site()
+        return super().action_voir_chantiers()

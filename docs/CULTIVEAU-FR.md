@@ -59,3 +59,12 @@ toujours par la synchronisation horaire site → ERP.
 - **Le logo de l'entreprise** est celui de son espace cultiveau.fr : le laissez-passer porte son adresse, l'ERP le reprend à
   l'entrée et le remplace quand il change là-bas (`res.company.cultiveau_site_logo_url`). Il sert alors sur les devis, factures et
   courriels de l'ERP.
+
+## Une seule appli chantier : celle de cultiveau.fr (08/11/2026)
+
+« J'aimerais que ça crée directement dans la partie chantier de cultiveau.fr et que la vue des chantiers soit celle de cultiveau.fr sur l'ERP. »
+
+- Le menu **Chantiers › Mes chantiers** de l'ERP ouvre l'appli Mon Chantier de cultiveau.fr dans le cadre de l'ERP (écran `cultiveau_site.ecran`, destination `/adherent/chantier`). La tuile Gestion › Chantiers de cultiveau.fr y mène aussi. La liste propre à l'ERP reste sous **Suivi ERP (matériel, heures, PV)** : c'est elle qui tient le matériel sorti du magasin, les heures, le PV et la facturation.
+- **Lancer le chantier** depuis une commande : le chantier est envoyé tout de suite dans Mon Chantier et c'est la fiche du site qui s'ouvre (`/adherent/chantier?id=<id du site>`). Sans liaison au site (entreprise pas reliée, site injoignable), la fiche de l'ERP s'ouvre comme avant et l'envoi se fera au passage suivant.
+- Le chantier créé à la confirmation de la commande (module déclenchements) part dans Mon Chantier après l'enregistrement ; le bouton **Chantiers** de la commande ouvre alors la fiche du site. Sur la fiche ERP d'un chantier présent sur le site : bouton **Ouvrir dans Mon Chantier**.
+- Le logo de l'entreprise suit son espace cultiveau.fr à chaque synchronisation (`GET /api/external/entreprise`), plus seulement à l'entrée.

@@ -6,6 +6,7 @@
         <field name="inherit_id" ref="cultiveau_chantier.view_chantier_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
+                <button name="action_ouvrir_dans_site" type="object" string="Ouvrir dans Mon Chantier" class="btn-primary" invisible="not cultiveau_site_ref"/>
                 <button name="action_envoyer_vers_site" type="object" string="Envoyer dans Mon Chantier" class="btn-secondary" invisible="cultiveau_site_ref"/>
             </xpath>
             <xpath expr="//sheet" position="inside">
@@ -15,4 +16,13 @@
             </xpath>
         </field>
     </record>
+
+    <!-- Le menu Chantiers de l'ERP ouvre l'appli Mon Chantier de cultiveau.fr : une seule vue des chantiers pour tout le réseau.
+         Le suivi propre à l'ERP (matériel sorti du magasin, heures, PV, facturation) reste accessible en second. -->
+    <record id="cultiveau_chantier.menu_chantiers" model="ir.ui.menu">
+        <field name="name">Mes chantiers</field>
+        <field name="action" ref="action_ecran_chantier"/>
+        <field name="sequence">5</field>
+    </record>
+    <menuitem id="menu_chantiers_suivi_erp" name="Suivi ERP (matériel, heures, PV)" parent="cultiveau_chantier.menu_chantiers_racine" action="cultiveau_chantier.action_chantiers" sequence="30"/>
 </odoo>

@@ -119,6 +119,30 @@ class TestEntree(HttpCase):
             self.assertEqual(ch.cultiveau_envoyer_vers_site(), 0)
         self.assertEqual(len(envois), 1)
 
+    def test_lancer_le_chantier_ouvre_mon_chantier(self):
+        """« Lancer le chantier » depuis la commande : le chantier naît dans Mon Chantier et c'est la fiche du site qui s'ouvre, dans l'ERP."""
+        from ..models.chantier_site import Connexion as CxEnvoi
+        self.env["cultiveau.site.connexion"].create({"company_id": self.ouverte.id, "url": "https://site.test", "cle": "cle-test", "cultiveau_site_ecriture": True})
+        if "cultiveau_decl_chantier" in self.ouverte._fields:  # ici on teste le bouton, pas le déclenchement automatique à la confirmation
+            (self.ouverte | self.env.company).write({"cultiveau_decl_chantier": False})
+        agri = self.env["res.partner"].create({"name": "EARL des Vergers", "cultiveau_type": "agriculteur", "company_id": self.ouverte.id})
+        tube = self.env["product.product"].create({"name": "Tube PE 63", "type": "consu", "list_price": 3})
+        commande = self.env["sale.order"].with_company(self.ouverte).create({"partner_id": agri.id, "company_id": self.ouverte.id, "cultiveau_type_systeme": "pivot",
+                                                                             "order_line": [(0, 0, {"product_id": tube.id, "product_uom_qty": 50})]})
+        commande.action_confirm()
+        with patch.object(CxEnvoi, "_poster", lambda self_, chemin, d: (201, {"success": True, "chantierId": 777, "reference": "CH-26-0077"})):
+            action = commande.with_company(self.ouverte).action_lancer_chantier()
+        self.assertEqual((action["type"], action["tag"], action["params"]["vers"]), ("ir.actions.client", "cultiveau_site.ecran", "/adherent/chantier?id=777"))
+        chantier = self.env["cultiveau.chantier"].search([("sale_order_id", "=", commande.id)])
+        self.assertEqual(chantier.cultiveau_site_ref.split(":")[-1], "777")
+        self.assertEqual(chantier.action_ouvrir_dans_site()["params"]["vers"], "/adherent/chantier?id=777")
+        self.assertEqual(commande.action_voir_chantiers()["tag"], "cultiveau_site.ecran")
+        # sans liaison au site : la fiche de l'ERP, comme avant
+        agri2 = self.env["res.partner"].create({"name": "EARL sans site", "cultiveau_type": "agriculteur"})
+        autre = self.env["sale.order"].create({"partner_id": agri2.id, "cultiveau_type_systeme": "pivot", "order_line": [(0, 0, {"product_id": tube.id, "product_uom_qty": 1})]})
+        autre.action_confirm()
+        self.assertEqual(autre.action_lancer_chantier()["res_model"], "cultiveau.chantier")
+
     def test_cle_en_lecture_seule_remplacee(self):
         from ..models.chantier_site import Connexion as CxEnvoi
         cx = self.env["cultiveau.site.connexion"].create({"company_id": self.ouverte.id, "url": "https://site.test", "cle": "vieille", "cultiveau_site_adherent_id": 77})

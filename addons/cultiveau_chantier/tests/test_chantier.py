@@ -8,6 +8,8 @@ class TestChantier(TransactionCase):
     def setUpClass(cls):
         super().setUpClass()
         cls.societe = cls.env.company
+        if "cultiveau_decl_chantier" in cls.societe._fields:  # ici on teste le bouton « Lancer le chantier », pas les déclenchements automatiques à la confirmation
+            cls.societe.write({k: False for k in ("cultiveau_decl_chantier", "cultiveau_decl_mise_en_service", "cultiveau_decl_livraison", "cultiveau_decl_acompte") if k in cls.societe._fields})
         cls.agri = cls.env["res.partner"].create({"name": "Agriculteur Chantier", "cultiveau_type": "agriculteur", "company_id": cls.societe.id})
         cls.tube = cls.env["product.product"].create({"name": "Tube PE 75 chantier", "type": "consu", "is_storable": True, "list_price": 4})
         cls.etude = cls.env["product.product"].create({"name": "Étude chantier", "type": "service", "list_price": 300})
