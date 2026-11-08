@@ -122,6 +122,27 @@ class TestEntree(HttpCase):
         charge = lire_jeton(unquote(parse_qs(urlparse(r.headers["Location"]).query)["t"][0]), SECRET)
         self.assertEqual(charge["vers"], "/adherent/espace")
 
+    def test_si_pas_erp_dans_l_admin_pas_d_acces(self):
+        """Mot de passe ou session ouverte : un compte d'une société fermée n'entre pas ; l'admin et Cultiveau passent toujours."""
+        from odoo.exceptions import AccessDenied
+        fermee = self.env["res.company"].create({"name": "Irrigation Fermée", "cultiveau_site_id": 77, "cultiveau_erp_ouvert": False, "iap_enrich_auto_done": True})
+        luc = self.env["res.users"].create({"name": "Luc Fermé", "login": "luc@irrigation-fermee.fr", "password": "motdepasse-luc", "company_id": fermee.id, "company_ids": [(6, 0, [fermee.id])],
+                                            "groups_id": [(4, self.env.ref("base.group_user").id)]})
+        with self.assertRaises(AccessDenied):
+            self.authenticate("luc@irrigation-fermee.fr", "motdepasse-luc")
+        # l'admin de cultiveau.fr ouvre la société : Luc entre
+        fermee.cultiveau_erp_ouvert = True
+        self.authenticate("luc@irrigation-fermee.fr", "motdepasse-luc")
+        self.assertEqual(self.url_open("/web/session/get_session_info", data=json.dumps({"jsonrpc": "2.0", "method": "call", "params": {}}), headers={"Content-Type": "application/json"}).json()["result"]["uid"], luc.id)
+        # la société est refermée pendant que Luc travaille : sa session tombe au prochain écran
+        fermee.cultiveau_erp_ouvert = False
+        r = self.url_open("/web/session/get_session_info", data=json.dumps({"jsonrpc": "2.0", "method": "call", "params": {}}), headers={"Content-Type": "application/json"}).json()
+        self.assertTrue(r.get("error"), r)
+        self.assertIn("Cultiveau", json.dumps(r["error"], ensure_ascii=False))
+        # l'administrateur passe toujours
+        self.authenticate("admin", "admin")
+        self.assertTrue(self.env.ref("base.user_admin")._cultiveau_acces_permis())
+
     def test_premiere_entree_cree_entreprise_et_acces(self):
         demandes = []
 

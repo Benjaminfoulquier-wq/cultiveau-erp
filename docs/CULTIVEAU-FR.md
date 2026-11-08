@@ -131,3 +131,11 @@ n'y figure plus (« Cultiveau n'est pas gérant »).
   `personne: {cultiveau_id, email}`, `acces: true/false`. Décochée dans Admin › Adhérents → compte de l'ERP désactivé (ses devis, chantiers et
   appels restent lisibles) ; cochée → réactivé s'il existe, sinon il naîtra à la première entrée. L'admin et un compte qui a d'autres sociétés
   ne sont jamais touchés. Réponse `{ok, utilisateur_id, actif}`.
+
+## « Si pas ERP dans l'admin, pas d'accès » (08/11/2026)
+
+`models/acces.py` : un compte interne n'entre dans l'ERP que si sa société a été ouverte depuis l'admin de cultiveau.fr (`cultiveau_erp_ouvert`),
+par toutes les portes : laissez-passer (déjà filtré par le site), mot de passe sur erp.cultiveau.fr (`_check_credentials` refuse), session déjà
+ouverte (`ir.http._auth_method_user` la termine au premier écran suivant). Passent toujours : l'administrateur et les comptes de la société
+Cultiveau (`base.main_company`). Une personne décochée est désactivée par `/cultiveau/entree/personne`. État au 08/11 : seules Cultiveau et
+Modern Irrigation 81 sont ouvertes ; les quatre autres sociétés n'ont aucun compte actif.
