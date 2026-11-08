@@ -68,3 +68,18 @@ toujours par la synchronisation horaire site → ERP.
 - **Lancer le chantier** depuis une commande : le chantier est envoyé tout de suite dans Mon Chantier et c'est la fiche du site qui s'ouvre (`/adherent/chantier?id=<id du site>`). Sans liaison au site (entreprise pas reliée, site injoignable), la fiche de l'ERP s'ouvre comme avant et l'envoi se fera au passage suivant.
 - Le chantier créé à la confirmation de la commande (module déclenchements) part dans Mon Chantier après l'enregistrement ; le bouton **Chantiers** de la commande ouvre alors la fiche du site. Sur la fiche ERP d'un chantier présent sur le site : bouton **Ouvrir dans Mon Chantier**.
 - Le logo de l'entreprise suit son espace cultiveau.fr à chaque synchronisation (`GET /api/external/entreprise`), plus seulement à l'entrée.
+
+## Le stock : un entrepôt par société, et l'inventaire validé devient le stock (08/11/2026)
+
+« Le stock n'est toujours pas disponible. » Deux causes : les sociétés venues de cultiveau.fr n'avaient **pas d'entrepôt** dans l'ERP (seule
+la première en avait un), donc aucune quantité n'était possible ; et **aucune quantité n'existe sur cultiveau.fr** (la base Articles n'a pas de
+colonne stock ; le stock réel de l'adhérent est dans sa gestion commerciale, Sage chez Modern Irrigation 81).
+
+- `res.company.cultiveau_entrepot()` crée l'entrepôt manquant au nom de la société (rejoué à chaque mise à jour par `data/entrepots.xml`, et à la
+  création d'une société depuis cultiveau.fr).
+- Nouvelle étape de la synchronisation, **Inventaires** : les inventaires **validés** dans Mon Inventaire (`GET /api/external/inventaires`,
+  avec leurs lignes) fixent la quantité en stock des articles comptés dans l'entrepôt de la société (mode inventaire d'Odoo). Les lignes d'un
+  même article s'additionnent (plusieurs zones) ; ce qui n'a pas été compté ne bouge pas ; une référence inconnue de l'ERP est signalée dans
+  le résultat, jamais inventée. Article reconnu par son identifiant du site, sinon sa référence, sinon son code-barres.
+- Tant qu'aucun inventaire n'est validé, le stock reste à zéro. L'autre chemin reste l'import Excel du stock Sage dans l'ERP (Inventaire ›
+  Ajustements, import standard).

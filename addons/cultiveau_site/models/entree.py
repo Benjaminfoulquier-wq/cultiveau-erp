@@ -59,6 +59,34 @@ class Company(models.Model):
         return company
 
 
+class CompanyEntrepot(models.Model):
+    _inherit = "res.company"
+
+    def cultiveau_entrepot(self):
+        """L'entrepôt de la société, créé s'il manque : sans entrepôt, aucun stock n'est possible (« le stock n'est toujours pas
+        disponible », 08/11/2026 : les sociétés venues de cultiveau.fr n'en avaient pas)."""
+        self.ensure_one()
+        Entrepot = self.env["stock.warehouse"].sudo().with_context(active_test=False)
+        entrepot = Entrepot.search([("company_id", "=", self.id)], limit=1)
+        if entrepot:
+            if not entrepot.active:
+                entrepot.active = True
+            if entrepot.name in ("My Company", "YourCompany") and self.name:
+                entrepot.name = self.name[:255]
+            return entrepot
+        code = "".join(c for c in (self.name or "").upper() if c.isalnum())[:5] or f"ENT{self.id}"
+        entrepot = Entrepot.with_company(self).create({"name": (self.name or f"Entrepôt {self.id}")[:255], "code": code[:5], "company_id": self.id})
+        _logger.info("Entrepôt créé pour %s (%s)", self.name, entrepot.code)
+        return entrepot
+
+    @api.model
+    def cultiveau_entrepots_manquants(self):
+        """À chaque mise à jour : chaque société a son entrepôt, au nom de la société."""
+        for company in self.sudo().search([]):
+            company.cultiveau_entrepot()
+        return True
+
+
 class LaissezPasser(models.Model):
     _name = "cultiveau.site.laissez_passer"
     _description = "Laissez-passer reçu de cultiveau.fr (usage unique)"
@@ -148,6 +176,7 @@ class Users(models.Model):
             if "iap_enrich_auto_done" in Company._fields:
                 vals["iap_enrich_auto_done"] = True  # pas d'appel en ligne à l'éditeur pour une entreprise qui vient de cultiveau.fr
             company = Company.create(dict(vals, name=nom or f"Adhérent {site_id}"))
+            company.cultiveau_entrepot()
             _logger.info("cultiveau.fr : entreprise créée dans l'ERP : %s", company.name)
         elif vals:
             company.write({k: v for k, v in vals.items() if company[k] != v})

@@ -34,11 +34,19 @@ ARTICLES = {"success": True, "total": 2, "limit": 500, "offset": 0, "articles": 
      "prixUnitaireHT": "1.45", "unite": "m", "tvaRate": "20", "isActive": 1, "createdAt": "2026-10-01 10:00:00", "updatedAt": "2026-10-20 18:00:00"}]}
 
 
+INVENTAIRES = {"success": True, "total": 1, "inventaires": [
+    {"id": 5, "nom": "Inventaire de novembre", "validatedAt": "2026-11-07T10:00:00", "lignes": [
+        {"articleId": 9001, "reference": "REF-SITE-001", "quantite": "12"},
+        {"articleId": 9001, "reference": "REF-SITE-001", "quantite": "3", "zoneId": 2},  # le même article compté dans une autre zone : ça s'additionne
+        {"reference": "PE32-PN10", "quantite": "250,5"},
+        {"reference": "INCONNUE-XYZ", "quantite": "1"}]}]}
+
+
 def faux_site(appels):
     def _appeler(self, chemin, params=None):
         appels.append((chemin, dict(params or {})))
         return {"clients": CLIENTS, "interventions": INTERVENTIONS, "chantiers": CHANTIERS, "bons-intervention": BONS,
-                "bons-intervention/501": BON, "articles": ARTICLES, "entreprise": ENTREPRISE}[chemin]
+                "bons-intervention/501": BON, "articles": ARTICLES, "entreprise": ENTREPRISE, "inventaires": INVENTAIRES}[chemin]
     return _appeler
 
 
@@ -55,6 +63,13 @@ class TestSite(TransactionCase):
         with patch.object(type(connexion), "_appeler", faux_site(appels)):
             connexion._synchroniser()
         self.assertFalse(connexion.en_erreur, connexion.resultat)
+        # l'inventaire validé sur cultiveau.fr est devenu le stock : 12 + 3 raccords, 250,5 m de tube ; la référence inconnue est signalée
+        raccord = self.env["product.product"].search([("product_tmpl_id.cultiveau_site_ref", "=", f"{connexion.id}:9001")])
+        tube = self.env["product.product"].search([("product_tmpl_id.cultiveau_site_ref", "=", f"{connexion.id}:9002")])
+        self.assertEqual((raccord.qty_available, tube.qty_available), (15.0, 250.5))
+        self.assertIn("1 inventaire(s) validé(s)", connexion.resultat)
+        self.assertIn("INCONNUE-XYZ", connexion.resultat)
+        self.assertTrue(connexion.curseur_inventaires)
         Partner = self.env["res.partner"]
         jean = Partner.search([("cultiveau_site_ref", "=", f"{connexion.id}:101")])
         self.assertEqual((jean.name, jean.exploitation, jean.city, jean.company_id), ("Jean Dupont-Site", "EARL Exemple Site", "Alès", societe))
@@ -115,6 +130,17 @@ class TestSite(TransactionCase):
         with patch.object(type(connexion), "_appeler", faux_site([])), patch.object(req, "get", get):
             connexion._synchroniser()
         self.assertEqual(len(images), 1)
+
+    def test_chaque_societe_a_son_entrepot(self):
+        """Une société venue de cultiveau.fr n'avait pas d'entrepôt : aucun stock possible. Maintenant il est créé, au nom de la société."""
+        societe = self.env["res.company"].create({"name": "Irrigation du Tarn (test entrepôt)", "iap_enrich_auto_done": True})
+        self.env["stock.warehouse"].sudo().with_context(active_test=False).search([("company_id", "=", societe.id)]).write({"active": False})
+        entrepot = societe.cultiveau_entrepot()
+        self.assertTrue(entrepot.active and entrepot.lot_stock_id)
+        self.assertEqual((entrepot.company_id, entrepot.name), (societe, "Irrigation du Tarn (test entrepôt)"))
+        self.assertEqual(societe.cultiveau_entrepot(), entrepot)  # pas de doublon au passage suivant
+        self.env["res.company"].cultiveau_entrepots_manquants()
+        self.assertEqual(len(self.env["stock.warehouse"].search([("company_id", "=", societe.id)])), 1)
 
     def test_sans_cle_rien_ne_casse(self):
         connexion = self.env["cultiveau.site.connexion"].create({"company_id": self.env.company.id})

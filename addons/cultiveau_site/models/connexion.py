@@ -61,6 +61,9 @@ class SiteConnexion(models.Model):
     bons = fields.Boolean("Bons d'intervention", default=True)
     articles = fields.Boolean("Articles (Clients & Articles)", default=True)
     curseur_articles = fields.Datetime("Articles lus jusqu'au", readonly=True)
+    inventaires = fields.Boolean("Inventaires validés (Mon Inventaire) → stock", default=True,
+                                 help="Un inventaire validé dans Mon Inventaire sur cultiveau.fr fixe les quantités en stock des articles comptés.")
+    curseur_inventaires = fields.Datetime("Inventaires lus jusqu'au", readonly=True)
     curseur_clients = fields.Datetime("Clients lus jusqu'au", readonly=True)
     curseur_bons = fields.Datetime("Bons lus jusqu'au", readonly=True)
     derniere_synchro = fields.Datetime("Dernière synchronisation", readonly=True)
@@ -130,7 +133,7 @@ class SiteConnexion(models.Model):
 
     def action_reinitialiser(self):
         """Tout relire au prochain passage (les curseurs « lu jusqu'au » sont effacés)."""
-        self.write({"curseur_clients": False, "curseur_bons": False, "curseur_articles": False})
+        self.write({"curseur_clients": False, "curseur_bons": False, "curseur_articles": False, "curseur_inventaires": False})
 
     def action_voir_bons(self):
         self.ensure_one()
@@ -168,7 +171,7 @@ class SiteConnexion(models.Model):
         try:
             # pas de savepoint autour des étapes : elles acquièrent elles-mêmes leur travail page par page (un commit détruirait le savepoint)
             for actif, etape in ((self.clients, self._synchro_clients), (self.interventions, self._synchro_interventions), (self.chantiers, self._synchro_chantiers),
-                                 (self.bons, self._synchro_bons), (self.articles, self._synchro_articles)):
+                                 (self.bons, self._synchro_bons), (self.articles, self._synchro_articles), (self.inventaires, self._synchro_inventaires)):
                 if not actif:
                     continue
                 bilan.append(etape())
@@ -453,6 +456,72 @@ class SiteConnexion(models.Model):
         return env["uom.uom"].search([("name", "=ilike", libelle.strip())], limit=1) or None
 
     # ---- bons d'intervention
+
+    def _synchro_inventaires(self):
+        """Un inventaire validé dans Mon Inventaire (cultiveau.fr) devient le stock de l'ERP : pour chaque article compté, la quantité en stock
+        de l'entrepôt de la société est fixée à la quantité comptée (les lignes d'un même article s'additionnent : plusieurs zones). Ce qui
+        n'a pas été compté ne bouge pas. Une référence inconnue de l'ERP est signalée, jamais inventée."""
+        env = self._env()
+        debut = fields.Datetime.now()
+        depuis = self.curseur_inventaires and (self.curseur_inventaires - timedelta(minutes=5)).strftime("%Y-%m-%dT%H:%M:%S")
+        try:
+            lots = self._pages("inventaires", "inventaires", {"updatedSince": depuis} if depuis else {}, taille=20)
+        except UserError as e:
+            texte = str(e.args[0] if e.args else e)
+            if "404" in texte:
+                return "inventaires : pas encore exposés par le site"
+            if "403" in texte or "droit" in texte:
+                return "inventaires : la clé du site n'a pas le droit « articles » (repassez par cultiveau.fr)"
+            raise
+        if not lots:
+            self.curseur_inventaires = debut
+            return "0 inventaire validé"
+        emplacement = self.company_id.sudo().cultiveau_entrepot().lot_stock_id
+        Produit = env["product.product"].with_context(active_test=False)
+        Quant = env["stock.quant"].with_context(inventory_mode=True)
+        appliques, lignes_ok, inconnues = 0, 0, []
+        for inv in lots:
+            quantites = {}
+            for l in inv.get("lignes") or []:
+                produit = self._produit_du_site(Produit, l)
+                if not produit:
+                    if l.get("reference") and l["reference"] not in inconnues:
+                        inconnues.append(l["reference"])
+                    continue
+                try:
+                    q = float(str(l.get("quantite") or "0").replace(",", "."))
+                except ValueError:
+                    continue
+                quantites[produit] = quantites.get(produit, 0.0) + q
+            for produit, q in quantites.items():
+                if not produit.is_storable:
+                    produit.product_tmpl_id.sudo().write({"is_storable": True})
+                quant = Quant.create({"product_id": produit.id, "location_id": emplacement.id, "inventory_quantity": q})
+                quant.action_apply_inventory()
+                lignes_ok += 1
+            appliques += 1
+            self._acquis()
+        self.curseur_inventaires = debut
+        texte = f"{appliques} inventaire(s) validé(s) appliqué(s) au stock ({lignes_ok} article(s))"
+        if inconnues:
+            texte += f" ; {len(inconnues)} référence(s) inconnue(s) de l'ERP : {', '.join(inconnues[:5])}" + (" …" if len(inconnues) > 5 else "")
+        return texte
+
+    def _produit_du_site(self, Produit, ligne):
+        """L'article de l'ERP qui répond à une ligne comptée : par son identifiant du site, sinon sa référence, sinon son code-barres."""
+        if ligne.get("articleId"):
+            p = Produit.search([("product_tmpl_id.cultiveau_site_ref", "=", self._ref(ligne["articleId"]))], limit=1)
+            if p:
+                return p
+        ref = (ligne.get("reference") or "").strip()
+        if ref:
+            p = Produit.search([("default_code", "=", ref), ("company_id", "in", (self.company_id.id, False))], limit=1)
+            if p:
+                return p
+        ean = (ligne.get("ean") or "").strip()
+        if ean:
+            return Produit.search([("barcode", "=", ean)], limit=1)
+        return Produit.browse()
 
     def _synchro_bons(self):
         env = self._env()

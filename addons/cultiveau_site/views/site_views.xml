@@ -45,6 +45,7 @@
                             <field name="chantiers"/>
                             <field name="bons"/>
                             <field name="articles"/>
+                            <field name="inventaires"/>
                         </group>
                     </group>
                     <group string="Suivi">
@@ -56,6 +57,7 @@
                         <group>
                             <field name="curseur_clients"/>
                             <field name="curseur_bons"/>
+                            <field name="curseur_inventaires"/>
                         </group>
                     </group>
                     <div class="text-muted">
