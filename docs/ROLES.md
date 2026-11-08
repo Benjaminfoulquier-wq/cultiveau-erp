@@ -26,3 +26,13 @@ Le « ? » en haut à droite ouvre l'aide de l'écran courant : en une phrase, p
 textes sont dans Réglages › Cultiveau › Aides des écrans (équipe Cultiveau), par identifiant d'action ou par modèle : map vivante,
 devis, interventions, bons, chantiers, installations, clients, nomenclatures, Mes tableaux, feuilles de route, checklists,
 opportunités, utilisateurs. Sans aide pour l'écran, une notification renvoie au menu Cultiveau et à Mathis.
+
+## Un tuto par page (08/11/2026)
+
+« Je veux un petit ? sur chaque page, on clique et on a le tuto. » Le « ? » devient un bouton visible en haut à droite (rond turquoise, « Tuto »
+sur grand écran). Il reconnaît la page par l'identifiant de son action, ou par son numéro résolu côté serveur (`_xmlid_de_l_action`), sinon
+par le modèle affiché, sinon il montre les gestes qui servent partout (et le dit). Le tuto a cinq parties : en une phrase, pas à pas
+(numéroté), par où commencer, à ne pas faire, liens (vidéo, documentation). Cent tutos sont livrés dans `data/tutos.xml` (noupdate : vos
+modifications dans Réglages › Aides des écrans sont gardées), un par page du menu Cultiveau et pour les écrans standards utiles (devis,
+commandes, factures, produits, achats, inventaire, contacts, calendrier). L'ancien texte de la Map, qui pointait sur un identifiant
+inexistant, est retiré à la mise à jour.

@@ -1,5 +1,5 @@
 /** @odoo-module **/
-// Le « ? » de chaque écran : à quoi il sert, par où commencer, où lire la suite.
+// Le « ? » de chaque écran : le tuto de la page (pas à pas, par où commencer, pièges, doc, vidéo).
 import { Component, useState, markup } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
@@ -11,7 +11,9 @@ class AideDialog extends Component {
     static props = { aide: Object, close: Function };
     setup() {
         this.action = useService("action");
+        this.etapes = markup(this.props.aide.etapes || "");
         this.texte = markup(this.props.aide.texte || "");
+        this.pieges = markup(this.props.aide.pieges || "");
     }
     modifier() {
         this.props.close();
@@ -32,7 +34,10 @@ export class AideSystray extends Component {
     get courant() {
         const c = this.action.currentController;
         const a = c && c.action;
-        return a ? { xmlid: a.xml_id || a.xmlId || null, modele: a.res_model || null, nom: a.display_name || a.name || "" } : { xmlid: null, modele: null, nom: "" };
+        if (!a) {
+            return { xmlid: null, modele: null, id: null, type: null };
+        }
+        return { xmlid: a.xml_id || a.xmlId || null, modele: a.res_model || null, id: typeof a.id === "number" ? a.id : null, type: a.type || null };
     }
     async ouvrir() {
         if (this.state.occupe) {
@@ -40,10 +45,10 @@ export class AideSystray extends Component {
         }
         this.state.occupe = true;
         try {
-            const { xmlid, modele, nom } = this.courant;
-            const aide = await this.orm.call("cultiveau.aide", "pour", [xmlid, modele]);
+            const { xmlid, modele, id, type } = this.courant;
+            const aide = await this.orm.call("cultiveau.aide", "pour", [xmlid, modele, id, type]);
             if (!aide) {
-                this.notification.add("Pas d'aide pour cet écran.", { type: "info" });
+                this.notification.add("Pas encore de tuto pour cet écran.", { type: "info" });
                 return;
             }
             this.dialog.add(AideDialog, { aide });

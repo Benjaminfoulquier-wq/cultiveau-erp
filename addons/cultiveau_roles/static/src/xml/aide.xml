@@ -2,19 +2,34 @@
 <templates xml:space="preserve">
     <t t-name="cultiveau_roles.AideSystray">
         <div class="o_cultiveau_aide_systray">
-            <a href="#" class="dropdown-toggle o-no-caret" role="button" title="À quoi sert cet écran ?" t-on-click.prevent="ouvrir" aria-label="Aide">
-                <i class="fa fa-question-circle-o fa-lg" role="img"/>
+            <a href="#" class="o_cultiveau_aide_bouton" role="button" title="Le tuto de cette page" t-on-click.prevent="ouvrir" aria-label="Tuto de cette page">
+                <span class="o_cultiveau_aide_rond">?</span><span class="o_cultiveau_aide_libelle d-none d-lg-inline">Tuto</span>
             </a>
         </div>
     </t>
     <t t-name="cultiveau_roles.AideDialog">
-        <Dialog title="props.aide.nom" size="'md'">
-            <p class="lead" t-esc="props.aide.resume"/>
-            <div t-out="texte"/>
-            <p t-if="props.aide.doc" class="mt-2 mb-0"><a t-att-href="props.aide.doc" target="_blank" rel="noopener"><i class="fa fa-book me-1"/>Lire la documentation</a></p>
+        <Dialog title="props.aide.nom" size="'lg'" contentClass="'o_cultiveau_aide_dialog'">
+            <p class="o_cultiveau_aide_resume" t-esc="props.aide.resume"/>
+            <p t-if="!props.aide.precis" class="text-muted small"><i class="fa fa-info-circle me-1"/>Cette page n'a pas encore son tuto : voici les gestes qui servent partout.</p>
+            <div t-if="props.aide.etapes" class="o_cultiveau_aide_bloc">
+                <h5>Pas à pas</h5>
+                <div class="o_cultiveau_aide_etapes" t-out="etapes"/>
+            </div>
+            <div t-if="props.aide.texte" class="o_cultiveau_aide_bloc">
+                <h5>Par où commencer</h5>
+                <div t-out="texte"/>
+            </div>
+            <div t-if="props.aide.pieges" class="o_cultiveau_aide_bloc o_cultiveau_aide_pieges">
+                <h5>À ne pas faire</h5>
+                <div t-out="pieges"/>
+            </div>
+            <p class="mt-3 mb-0 o_cultiveau_aide_liens">
+                <a t-if="props.aide.video" t-att-href="props.aide.video" target="_blank" rel="noopener" class="me-3"><i class="fa fa-play-circle me-1"/>Voir la vidéo</a>
+                <a t-if="props.aide.doc" t-att-href="props.aide.doc" target="_blank" rel="noopener"><i class="fa fa-book me-1"/>Lire la documentation</a>
+            </p>
             <t t-set-slot="footer">
                 <button class="btn btn-primary" t-on-click="() => props.close()">Compris</button>
-                <button t-if="props.aide.editable" class="btn btn-secondary" t-on-click="modifier">Modifier ce texte</button>
+                <button t-if="props.aide.editable" class="btn btn-secondary" t-on-click="modifier">Modifier ce tuto</button>
             </t>
         </Dialog>
     </t>

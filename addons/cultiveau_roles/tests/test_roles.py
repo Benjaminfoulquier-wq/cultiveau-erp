@@ -43,10 +43,15 @@ class TestRoles(TransactionCase):
 
     def test_aide_par_ecran(self):
         A = self.env["cultiveau.aide"]
-        a = A.pour("cultiveau_vue3d.action_map", "cultiveau.map")
-        self.assertEqual(a["nom"], "Map vivante")
+        a = A.pour("cultiveau_vue3d.action_vue3d", None)
+        self.assertEqual((a["nom"], a["precis"]), ("Map vivante", True))
+        self.assertIn("<ol>", a["etapes"])
+        # le navigateur ne connaît parfois que le numéro de l'action : il est résolu ici
+        numero = self.env.ref("cultiveau_site.action_base_articles").id if self.env.ref("cultiveau_site.action_base_articles", raise_if_not_found=False) else None
+        if numero:
+            self.assertEqual(A.pour(None, "product.template", numero, "ir.actions.act_window")["nom"], "Base articles")
         b = A.pour("sale.action_quotations_with_onboarding", "sale.order")
         self.assertEqual(b["nom"], "Devis")
-        self.assertIn("nomenclature", b["texte"].lower())
+        self.assertIn("nomenclature", (b["etapes"] + b["texte"]).lower())
         g = A.pour("x.y", "modele.inconnu")
-        self.assertEqual(g["nom"], "Les gestes qui font gagner du temps")  # le repli : les gestes d'Odoo
+        self.assertEqual((g["nom"], g["precis"]), ("Les gestes qui font gagner du temps", False))  # le repli : les gestes de l'ERP

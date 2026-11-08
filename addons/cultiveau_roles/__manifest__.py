@@ -21,8 +21,8 @@ formé. Ici :
     "website": "https://cultiveau.fr",
     "license": "LGPL-3",
     "depends": ["cultiveau_base", "cultiveau_rh", "cultiveau_terrain", "cultiveau_chantier", "sales_team", "crm", "account", "purchase", "stock", "project"],
-    "data": ["security/ir.model.access.csv", "data/aides.xml", "views/views.xml"],
-    "assets": {"web.assets_backend": ["cultiveau_roles/static/src/js/aide.js", "cultiveau_roles/static/src/xml/aide.xml"]},
+    "data": ["security/ir.model.access.csv", "data/aides.xml", "data/tutos.xml", "data/tutos_nettoyage.xml", "views/views.xml"],
+    "assets": {"web.assets_backend": ["cultiveau_roles/static/src/js/aide.js", "cultiveau_roles/static/src/xml/aide.xml", "cultiveau_roles/static/src/scss/aide.scss"]},
     "installable": True,
     "auto_install": False,
 }

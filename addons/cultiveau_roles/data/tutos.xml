@@ -1,0 +1,816 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="tuto_map" model="cultiveau.aide">
+            <field name="name">Map vivante</field>
+            <field name="sequence">21</field>
+            <field name="action_xmlid">cultiveau_vue3d.action_vue3d</field>
+            <field name="resume">Votre dépôt en 3D, vivant : l'équipe, les camions, les clients, les chantiers, le stock ; tout est cliquable et à jour en direct.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cliquez sur une personne : son statut (au poste, en intervention, sur chantier), ce qu'elle fait, son téléphone.</li><li>Cliquez sur un camion : son conducteur, ses échéances (contrôle technique, entretien), le réassort à bord.</li><li>Le panneau du bas (Équipe, Camions, Dossiers, Clients, Stock) liste et ouvre chaque chose ; un clic ouvre la fiche du back-office.</li><li>Le bouton Mathis pose une question sur vos données : « qui est en intervention ? », « il reste combien de PE 63 ? ».</li><li>La salle de réunion montre qui est en réunion ou en visio, d'après les agendas.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Laissez-la sur l'écran de l'accueil ou de l'atelier : elle se met à jour toute seule, sans recharger.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Un statut qui semble faux vient toujours d'une donnée (intervention non clôturée, pointage oublié) : corrigez la donnée, pas la map.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MAP-VIVANTE.md</field>
+        </record>
+        <record id="tuto_aujourdhui" model="cultiveau.aide">
+            <field name="name">Aujourd'hui</field>
+            <field name="sequence">22</field>
+            <field name="action_xmlid">cultiveau_quotidien.action_aujourdhui</field>
+            <field name="resume">Tout ce qui attend aujourd'hui, de la plus pressante à la moins pressante, en tuiles : un clic ouvre le document.</field>
+            <field name="etapes"><![CDATA[<ol><li>Parcourez les tuiles de haut en bas : courriels sans réponse, interventions du jour, devis à relancer, bons à facturer, échéances des camions.</li><li>Cliquez une ligne pour ouvrir le document ; « Tout voir » ouvre la liste complète filtrée.</li><li>Le gérant voit les tuiles de toute l'équipe, chacun voit les siennes.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Commencez votre journée ici : si une tuile est vide, c'est qu'il n'y a rien à faire sur ce sujet.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne traitez pas une tuile en la fermant : elle disparaît quand le document est traité (répondu, planifié, facturé).</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/QUOTIDIEN.md</field>
+        </record>
+        <record id="tuto_tableau_bord" model="cultiveau.aide">
+            <field name="name">Tableau de bord</field>
+            <field name="sequence">23</field>
+            <field name="action_xmlid">cultiveau_pilotage.action_tableau</field>
+            <field name="resume">Les chiffres de l'entreprise : chiffre d'affaires, marge, devis en cours, interventions, trésorerie, bilan et compte de résultat.</field>
+            <field name="etapes"><![CDATA[<ol><li>Choisissez la période en haut (mois, trimestre, année).</li><li>Chaque chiffre s'ouvre : cliquez pour voir la liste qui le compose.</li><li>Les écarts (devis expirés, factures impayées) sont en couleur : ce sont vos priorités.</li><li>Le gérant du réseau voit aussi la vue réseau, anonymisée.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Regardez-le le lundi matin, avec le rapport du lundi reçu par courriel.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Un chiffre à zéro est le plus souvent une saisie manquante (facture non validée, bon non facturé).</li></ul>]]></field>
+        </record>
+        <record id="tuto_mon_espace" model="cultiveau.aide">
+            <field name="name">Mon Espace (cultiveau.fr)</field>
+            <field name="sequence">24</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_espace</field>
+            <field name="resume">Votre espace adhérent de cultiveau.fr, affiché tel quel dans l'ERP : mêmes données, même compte, sans deuxième mot de passe.</field>
+            <field name="etapes"><![CDATA[<ol><li>Les tuiles sont celles de cultiveau.fr : Mes Interventions, Mon Chantier, Bons, Mon Équipe, Mon Inventaire, Mes DICT, Appels d'offres.</li><li>Ce que vous saisissez ici arrive dans l'ERP dans l'heure (clients, interventions, chantiers, articles).</li><li>Pour revenir à l'ERP : les menus du haut restent ceux de l'ERP.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Les écrans de l'espace adhérent ont leur propre « ? » à l'intérieur, avec leurs tutos vidéo.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_espace_interventions" model="cultiveau.aide">
+            <field name="name">Mes Interventions (cultiveau.fr)</field>
+            <field name="sequence">25</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_interventions</field>
+            <field name="resume">Les fiches d'intervention de l'équipe, telles que sur cultiveau.fr : création, planning, SMS au client, bon signé.</field>
+            <field name="etapes"><![CDATA[<ol><li>Travaillez dedans comme sur cultiveau.fr : c'est le même écran, sur le même compte.</li><li>Le « ? » à l'intérieur de l'écran donne son tuto détaillé et ses vidéos.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne ressaisissez rien dans l'ERP : ce que vous faites ici y arrive tout seul.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_espace_bons" model="cultiveau.aide">
+            <field name="name">Bons d'intervention (cultiveau.fr)</field>
+            <field name="sequence">26</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_bons</field>
+            <field name="resume">L'historique des bons d'intervention saisis sur cultiveau.fr ; ils arrivent aussi dans l'ERP (Interventions › Bons du site).</field>
+            <field name="etapes"><![CDATA[<ol><li>Travaillez dedans comme sur cultiveau.fr : c'est le même écran, sur le même compte.</li><li>Le « ? » à l'intérieur de l'écran donne son tuto détaillé et ses vidéos.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne ressaisissez rien dans l'ERP : ce que vous faites ici y arrive tout seul.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_espace_equipe" model="cultiveau.aide">
+            <field name="name">Mon Équipe (cultiveau.fr)</field>
+            <field name="sequence">27</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_equipe</field>
+            <field name="resume">Les personnes de l'entreprise sur cultiveau.fr et leurs rôles : c'est ici que se règle qui est gérant, administratif ou technicien.</field>
+            <field name="etapes"><![CDATA[<ol><li>Travaillez dedans comme sur cultiveau.fr : c'est le même écran, sur le même compte.</li><li>Le « ? » à l'intérieur de l'écran donne son tuto détaillé et ses vidéos.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne ressaisissez rien dans l'ERP : ce que vous faites ici y arrive tout seul.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_espace_inventaire" model="cultiveau.aide">
+            <field name="name">Mon Inventaire (cultiveau.fr)</field>
+            <field name="sequence">28</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_inventaire</field>
+            <field name="resume">L'inventaire au téléphone : on scanne, on compte par zone, on valide ; un inventaire validé devient le stock de l'ERP.</field>
+            <field name="etapes"><![CDATA[<ol><li>Travaillez dedans comme sur cultiveau.fr : c'est le même écran, sur le même compte.</li><li>Le « ? » à l'intérieur de l'écran donne son tuto détaillé et ses vidéos.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne ressaisissez rien dans l'ERP : ce que vous faites ici y arrive tout seul.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_espace_dict" model="cultiveau.aide">
+            <field name="name">Mes DICT (cultiveau.fr)</field>
+            <field name="sequence">29</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_dict</field>
+            <field name="resume">Les déclarations de travaux à proximité des réseaux, dossier par dossier, avec les exploitants et les récépissés.</field>
+            <field name="etapes"><![CDATA[<ol><li>Travaillez dedans comme sur cultiveau.fr : c'est le même écran, sur le même compte.</li><li>Le « ? » à l'intérieur de l'écran donne son tuto détaillé et ses vidéos.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne ressaisissez rien dans l'ERP : ce que vous faites ici y arrive tout seul.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_espace_ao" model="cultiveau.aide">
+            <field name="name">Appels d'offres (cultiveau.fr)</field>
+            <field name="sequence">30</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_ao</field>
+            <field name="resume">La veille des marchés publics d'irrigation et le dossier administratif prêt à joindre.</field>
+            <field name="etapes"><![CDATA[<ol><li>Travaillez dedans comme sur cultiveau.fr : c'est le même écran, sur le même compte.</li><li>Le « ? » à l'intérieur de l'écran donne son tuto détaillé et ses vidéos.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne ressaisissez rien dans l'ERP : ce que vous faites ici y arrive tout seul.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_logistique" model="cultiveau.aide">
+            <field name="name">Logistique</field>
+            <field name="sequence">31</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_logistique</field>
+            <field name="resume">logistique.cultiveau.fr dans l'ERP : le catalogue du réseau, les prix négociés, les fiches techniques, vos commandes.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cherchez un article par référence fournisseur ou par mot : la fiche montre le prix net réseau, le prix public et la fiche technique.</li><li>Dans un devis de l'ERP, inutile de venir ici : tapez la référence dans la ligne, l'article est trouvé à la volée.</li><li>Vos commandes passées sur la logistique s'y suivent (préparation, expédition).</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Le prix public du catalogue vaut au moins trois fois le prix d'achat : c'est voulu, c'est le prix affiché au client.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/LOGISTIQUE-CATALOGUE.md</field>
+        </record>
+        <record id="tuto_comptoir" model="cultiveau.aide">
+            <field name="name">Comptoir</field>
+            <field name="sequence">32</field>
+            <field name="action_xmlid">cultiveau_comptoir.action_comptoir</field>
+            <field name="resume">La vente au comptoir : on scanne ou on cherche l'article, on encaisse, le ticket sort, le stock et la compta suivent.</field>
+            <field name="etapes"><![CDATA[<ol><li>Scannez le code-barres ou tapez la référence : la ligne se pose avec le prix de vente.</li><li>Choisissez le client (ou « client de passage »), le mode de règlement, encaissez.</li><li>Le ticket s'imprime ; la facture est faite et payée, le stock est sorti.</li><li>Un retour se fait avec une quantité négative sur la même ligne.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Préparez vos articles courants avec un code-barres : la douchette fait tout le reste.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Pas de vente au comptoir pour une installation : passez par un devis, qui déclenche le chantier.</li></ul>]]></field>
+        </record>
+        <record id="tuto_courriels" model="cultiveau.aide">
+            <field name="name">Courriels</field>
+            <field name="sequence">33</field>
+            <field name="action_xmlid">cultiveau_messagerie.action_courriels</field>
+            <field name="resume">La boîte mail de l'entreprise rangée par client et par dossier : triée, résumée, suivie jusqu'à la réponse.</field>
+            <field name="etapes"><![CDATA[<ol><li>Chaque courriel arrive rattaché à son client (reconnu par l'adresse) et à son dossier (devis, intervention).</li><li>Le tri est fait : demande de prix, panne, facture, fournisseur, publicité.</li><li>Répondez depuis la fiche : la réponse part de notification@cultiveau.fr au nom de l'entreprise (ou de votre boîte) et reste dans le fil.</li><li>Mathis prépare une réponse si vous le lui demandez.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Branchez d'abord la boîte dans Courriels › Boîtes mail (Gmail, Outlook ou IMAP), une fois.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>N'archivez pas un courriel pour le faire disparaître d'« Aujourd'hui » : répondez-y ou marquez-le traité.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MESSAGERIE.md</field>
+        </record>
+        <record id="tuto_boites_mail" model="cultiveau.aide">
+            <field name="name">Boîtes mail</field>
+            <field name="sequence">34</field>
+            <field name="action_xmlid">cultiveau_messagerie.action_boites</field>
+            <field name="resume">Les boîtes branchées sur l'ERP : la boîte partagée de l'entreprise et, au choix, celle de chacun.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Nouveau », puis « Connecter » : Google ou Microsoft ouvrent leur page d'autorisation, une fois.</li><li>Pour une autre messagerie : IMAP, avec l'adresse du serveur et le mot de passe d'application.</li><li>Choisissez ce qui est relevé (dossiers, depuis quelle date) et qui voit la boîte.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Une boîte partagée se branche par l'administrateur de l'ERP, pas par chaque personne.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MESSAGERIE.md</field>
+        </record>
+        <record id="tuto_clients" model="cultiveau.aide">
+            <field name="name">Clients</field>
+            <field name="sequence">35</field>
+            <field name="action_xmlid">cultiveau_base.action_agriculteurs</field>
+            <field name="resume">Vos clients agriculteurs : la fiche, ses cultures et sa frise, ses installations, ses devis, ses appels, son persona.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cherchez par nom, commune ou téléphone dans la barre de recherche.</li><li>La fiche : coordonnées, exploitation, type de contact ; onglets Frise culturale, Persona, Parcelles PAC.</li><li>Les compteurs en haut ouvrent ses devis, ses commandes, ses factures, ses interventions.</li><li>Le fil à droite garde tout : courriels, appels de l'assistant avec leur enregistrement, notes.</li><li>Pour importer une liste : Cultiveau › Importer mes clients.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Les clients saisis sur cultiveau.fr arrivent ici tout seuls, dans l'heure.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne créez pas un deuxième client pour une deuxième exploitation : ajoutez un contact ou une adresse sur la fiche.</li></ul>]]></field>
+        </record>
+        <record id="tuto_import_clients" model="cultiveau.aide">
+            <field name="name">Importer mes clients</field>
+            <field name="sequence">36</field>
+            <field name="action_xmlid">cultiveau_base.action_import_clients</field>
+            <field name="resume">Un fichier Excel ou CSV de votre ancien logiciel devient vos clients, sans doublon.</field>
+            <field name="etapes"><![CDATA[<ol><li>Déposez le fichier : les colonnes sont reconnues (nom, téléphone, e-mail, adresse, commune, type).</li><li>Vérifiez l'aperçu : les doublons probables (même téléphone, même e-mail) sont signalés et fusionnés.</li><li>Lancez l'import ; le compte rendu dit ce qui a été créé, mis à jour, ignoré.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Exportez d'abord depuis votre logiciel avec une ligne d'en-tête : l'import se règle tout seul.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Un fichier sans téléphone ni e-mail crée des fiches impossibles à reconnaître par l'assistant téléphonique.</li></ul>]]></field>
+        </record>
+        <record id="tuto_appels" model="cultiveau.aide">
+            <field name="name">Appels</field>
+            <field name="sequence">37</field>
+            <field name="action_xmlid">cultiveau_connecteurs.action_appels</field>
+            <field name="resume">Tous les appels reçus ou passés par l'assistant téléphonique : le sujet, le client, l'enregistrement, et ce que l'appel a créé.</field>
+            <field name="etapes"><![CDATA[<ol><li>Ouvrez un appel : le résumé, tout ce qui a été dit, l'enregistrement à écouter, le tableau de ce que l'assistant a retenu.</li><li>« Ouvrir l'intervention » ou « Ouvrir l'opportunité » mène à ce que l'appel a déclenché ; « Retour à la fiche du client » revient au client.</li><li>Un appel sans client reconnu reste ici seulement : rattachez-le au client en modifiant le champ Client.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Les appels sont aussi sur la fiche de chaque client, dans son fil.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>L'enregistrement s'efface à la fin de la durée de conservation réglée dans l'assistant ; la transcription reste.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/API-ASSISTANT.md</field>
+        </record>
+        <record id="tuto_a_contacter" model="cultiveau.aide">
+            <field name="name">À contacter ce mois-ci</field>
+            <field name="sequence">38</field>
+            <field name="action_xmlid">cultiveau_frise.action_a_contacter</field>
+            <field name="resume">Les clients à appeler ce mois-ci d'après leurs cultures : le moment du projet et le moment de l'achat, par culture.</field>
+            <field name="etapes"><![CDATA[<ol><li>La liste est calculée depuis la frise culturale : chaque client y est avec la culture et la raison (projet, achat, période critique).</li><li>Appelez, puis notez l'échange dans le fil du client ou planifiez une activité.</li><li>Le persona du client dit sur quel ton lui parler.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Renseignez les cultures des clients (onglet Frise culturale) : plus elles sont justes, plus cette liste l'est.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/HISTOIRE-FRISES-PERSONAS.md</field>
+        </record>
+        <record id="tuto_assistant_standard" model="cultiveau.aide">
+            <field name="name">Assistant téléphonique : mon standard</field>
+            <field name="sequence">39</field>
+            <field name="action_xmlid">cultiveau_site.action_assistant_standard</field>
+            <field name="resume">L'accueil de l'assistant téléphonique de l'entreprise : appels de la semaine, demandes à traiter, nouveaux clients à vérifier.</field>
+            <field name="etapes"><![CDATA[<ol><li>Les chiffres de la semaine : appels reçus, dictées, choses faites.</li><li>« Demandes à traiter » : chaque appel non clos, à confier à quelqu'un ou à clore.</li><li>« Nouveaux clients à vérifier » : les fiches que l'assistant a créées d'après un appel ; validez ou corrigez le nom et la commune.</li><li>Le menu de gauche : Clients, Mails, Demandes, Tâches, Agenda, Ma marque, Connexions, Qui reçoit quoi, Crédit.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Tout ce que l'assistant capte d'un appel est aussi écrit sur la fiche du client dans l'ERP.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MATHIS.md</field>
+        </record>
+        <record id="tuto_assistant_reglages" model="cultiveau.aide">
+            <field name="name">Assistant : qui fait quoi, textes, horaires</field>
+            <field name="sequence">40</field>
+            <field name="action_xmlid">cultiveau_site.action_assistant_reglages</field>
+            <field name="resume">Le réglage de l'assistant en sept écrans : l'entreprise et sa phrase d'accueil, les horaires, les services et qui les reçoit, les numéros, les fiches, les clients.</field>
+            <field name="etapes"><![CDATA[<ol><li>Étape 1 : le nom annoncé et la phrase d'accueil (modifiable ; elle doit dire que c'est un assistant et que l'appel est enregistré).</li><li>Étape 2 : les horaires d'ouverture ; hors horaires, l'assistant prend le message.</li><li>Étape 3 : les quatre services (Technique, Commerce, Magasin, Comptabilité) : un nom, un numéro, un e-mail ; le numéro Technique reçoit les urgences.</li><li>Étapes 4 à 6 : le numéro dédié, où partent les fiches (ERP, Mes interventions, e-mail), le fichier clients.</li><li>Étape 7 : le récapitulatif ; « Appliquer » met l'agent à jour et branche le numéro.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Rejouez le parcours à chaque changement de personne ou de numéro : c'est lui qui règle les flèches d'appel.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne retirez pas le service Technique : c'est lui qui reçoit « irrigation arrêtée en saison ».</li></ul>]]></field>
+        </record>
+        <record id="tuto_assistant_appels" model="cultiveau.aide">
+            <field name="name">Assistant : appels, lire et écouter</field>
+            <field name="sequence">41</field>
+            <field name="action_xmlid">cultiveau_site.action_assistant_appels</field>
+            <field name="resume">Le CRM de l'assistant : chaque appel avec son résumé, sa transcription, son enregistrement, son suivi (nouvelle, en cours, traitée).</field>
+            <field name="etapes"><![CDATA[<ol><li>Ouvrez un appel ; écoutez-le ; lisez ce qui a été retenu.</li><li>Confiez-le à quelqu'un de l'équipe et changez son suivi : une demande de prix sans suite est rappelée par e-mail.</li><li>Les mêmes appels sont dans l'ERP (menu Appels) et sur la fiche du client.</li></ol>]]></field>
+        </record>
+        <record id="tuto_assistant_demandes" model="cultiveau.aide">
+            <field name="name">Assistant : demandes à suivre</field>
+            <field name="sequence">42</field>
+            <field name="action_xmlid">cultiveau_site.action_assistant_demandes</field>
+            <field name="resume">Le tableau des demandes ouvertes : qui s'en occupe, depuis quand, ce qui traîne.</field>
+            <field name="etapes"><![CDATA[<ol><li>Une colonne par état ; glissez une demande quand elle avance.</li><li>Une demande de prix oubliée remonte en rouge et un rappel part à celui qui la suit.</li></ol>]]></field>
+        </record>
+        <record id="tuto_assistant_agenda" model="cultiveau.aide">
+            <field name="name">Assistant : agenda</field>
+            <field name="sequence">43</field>
+            <field name="action_xmlid">cultiveau_site.action_assistant_agenda</field>
+            <field name="resume">Les rendez-vous pris au téléphone par l'assistant, dans les plages autorisées, et les rappels à passer.</field>
+            <field name="etapes"><![CDATA[<ol><li>Les créneaux proposés au téléphone sont ceux que vous avez autorisés dans les réglages.</li><li>Déplacez un rendez-vous en le glissant ; le client est prévenu si vous le demandez.</li></ol>]]></field>
+        </record>
+        <record id="tuto_chantiers_site" model="cultiveau.aide">
+            <field name="name">Mes chantiers (Mon Chantier)</field>
+            <field name="sequence">44</field>
+            <field name="action_xmlid">cultiveau_site.action_ecran_chantier</field>
+            <field name="resume">L'appli Mon Chantier de cultiveau.fr, la seule vue des chantiers : du devis à la réception, avec les phases, l'équipe, le matériel, le Gantt.</field>
+            <field name="etapes"><![CDATA[<ol><li>Un chantier naît d'un devis confirmé dans l'ERP (il arrive ici tout seul) ou de « Nouveau ».</li><li>La fiche : Général, Phases, Commande, Équipe et heures, Matériel, Bons SAV, Pièces, Synthèse.</li><li>Le Gantt et le plan de charge mural montrent tous les chantiers ; le cockpit et les alertes disent ce qui prend du retard.</li><li>Les DICT se lancent depuis le chantier (badge « DICT à faire »).</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Le suivi propre à l'ERP (matériel sorti du magasin, heures pointées, PV, facturation à l'avancement) est dans Chantiers › Suivi ERP.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne créez pas le chantier deux fois : s'il vient d'un devis, il est déjà là.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_chantiers_erp" model="cultiveau.aide">
+            <field name="name">Suivi ERP des chantiers</field>
+            <field name="sequence">45</field>
+            <field name="action_xmlid">cultiveau_chantier.action_chantiers</field>
+            <field name="resume">Le pendant ERP de chaque chantier : matériel sorti du stock, heures, jalons de facturation, PV de mise en service signé.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Démarrer la phase » sort le matériel de la phase du stock, sur la livraison de la commande (jamais deux fois).</li><li>« Terminer la phase » remplit le posé et prépare la facture du jalon (% du devis réglé sur la phase).</li><li>« Mettre en service » : le PV A1.3 avec les valeurs de référence, signé sur place ; le solde se facture ; l'entretien est proposé.</li><li>« Ouvrir dans Mon Chantier » ouvre la même affaire côté cultiveau.fr.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Le budget d'heures du chantier alerte à 50, 80 et 100 % du prévu.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne sortez pas le matériel à la main par un bon de stock : passez par la phase, sinon le stock sort deux fois.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CHANTIER-FLUX.md</field>
+        </record>
+        <record id="tuto_planning_chantiers" model="cultiveau.aide">
+            <field name="name">Planning des chantiers</field>
+            <field name="sequence">46</field>
+            <field name="action_xmlid">cultiveau_chantier.action_planning</field>
+            <field name="resume">Les chantiers dans le temps, par équipe : qui est où, quelle semaine.</field>
+            <field name="etapes"><![CDATA[<ol><li>Glissez un chantier pour le déplacer ; étirez-le pour changer sa durée.</li><li>Les conflits d'équipe (deux chantiers, même personne, même jour) sont signalés.</li></ol>]]></field>
+        </record>
+        <record id="tuto_planning_phases" model="cultiveau.aide">
+            <field name="name">Planning des équipes de pose</field>
+            <field name="sequence">47</field>
+            <field name="action_xmlid">cultiveau_chantier.action_planning_phases</field>
+            <field name="resume">Phase par phase : les jours prévus, les personnes, les salariés sans accès qui recevront leur feuille de route.</field>
+            <field name="etapes"><![CDATA[<ol><li>Ajoutez les personnes sur la phase ; celles sans compte ERP reçoivent leur journée la veille par e-mail ou SMS.</li><li>Les dates de besoin matière suivent la phase : les achats arrivent pour la phase.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/FEUILLE-DE-ROUTE.md</field>
+        </record>
+        <record id="tuto_interventions" model="cultiveau.aide">
+            <field name="name">Toutes les interventions</field>
+            <field name="sequence">48</field>
+            <field name="action_xmlid">cultiveau_interventions.action_interventions</field>
+            <field name="resume">Les interventions sur le parc installé : dépannage, mise en service, entretien ; urgence, installation, pièces, et le registre tenu tout seul.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Nouvelle intervention » : le client, l'installation, la nature, l'urgence (immédiate, journée, semaine, non urgent), le symptôme.</li><li>Planifiez : technicien et créneau ; le technicien la voit dans Ma journée et sur la map.</li><li>Sur place, le bon d'intervention : travaux, pièces sorties du camion, relevés, signature du client.</li><li>Clôturer met à jour le registre de maintenance de l'installation.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Les interventions saisies sur cultiveau.fr et celles créées par l'assistant téléphonique arrivent ici toutes seules.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Une intervention jamais clôturée reste « en cours » sur la map : clôturez-la le jour même.</li></ul>]]></field>
+        </record>
+        <record id="tuto_nouvelle_intervention" model="cultiveau.aide">
+            <field name="name">Nouvelle intervention</field>
+            <field name="sequence">49</field>
+            <field name="action_xmlid">cultiveau_interventions.action_nouvelle_intervention</field>
+            <field name="resume">La fiche de dépannage en six questions : qui, quelle installation, quoi, quelle urgence, quand, qui y va.</field>
+            <field name="etapes"><![CDATA[<ol><li>Choisissez le client : ses installations apparaissent.</li><li>Dites le symptôme en clair ; le référentiel propose les causes probables (§ 18.9).</li><li>L'urgence « irrigation arrêtée en saison » passe devant tout.</li></ol>]]></field>
+        </record>
+        <record id="tuto_ma_journee" model="cultiveau.aide">
+            <field name="name">Ma journée</field>
+            <field name="sequence">50</field>
+            <field name="action_xmlid">cultiveau_terrain.action_ma_journee</field>
+            <field name="resume">Les interventions du technicien pour la journée, dans l'ordre, avec l'itinéraire et le client à appeler.</field>
+            <field name="etapes"><![CDATA[<ol><li>Ouvrez l'intervention, « Sur place » lance le bon ; « Prévenir le client » envoie le SMS d'approche.</li><li>À la fin : signature du client sur le téléphone, le bon part par courriel.</li></ol>]]></field>
+        </record>
+        <record id="tuto_planning_techniciens" model="cultiveau.aide">
+            <field name="name">Planning des techniciens</field>
+            <field name="sequence">51</field>
+            <field name="action_xmlid">cultiveau_terrain.action_planning_techniciens</field>
+            <field name="resume">La semaine des techniciens : glisser-déposer des interventions, congés visibles, camions.</field>
+            <field name="etapes"><![CDATA[<ol><li>Glissez une intervention non planifiée depuis la liste de gauche sur un technicien et une heure.</li><li>Un congé ou un chantier bloque le créneau.</li></ol>]]></field>
+        </record>
+        <record id="tuto_bons" model="cultiveau.aide">
+            <field name="name">Bons d'intervention</field>
+            <field name="sequence">52</field>
+            <field name="action_xmlid">cultiveau_terrain.action_bons</field>
+            <field name="resume">Le bon rempli chez le client : travaux, pièces, relevés, checklist du référentiel, signature ; il se facture en un clic.</field>
+            <field name="etapes"><![CDATA[<ol><li>Travaux et pièces : les pièces sortent du stock du camion.</li><li>Relevés : pressions, débits, compteur ; la checklist de la nature (hivernage, remise en service…) se coche.</li><li>Signatures : le client signe sur l'écran ; « Facturer » crée la facture.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>« Bons à facturer » liste tous les bons signés pas encore facturés : facturez-les en masse le vendredi.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne facturez pas un bon non signé : la signature est la preuve.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CHECKLISTS.md</field>
+        </record>
+        <record id="tuto_bons_a_facturer" model="cultiveau.aide">
+            <field name="name">Bons à facturer</field>
+            <field name="sequence">53</field>
+            <field name="action_xmlid">cultiveau_terrain.action_bons_a_facturer</field>
+            <field name="resume">Les bons signés qui attendent leur facture.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cochez les bons, puis « Facturer les bons signés » : une facture par client, prête à envoyer.</li></ol>]]></field>
+        </record>
+        <record id="tuto_bons_site" model="cultiveau.aide">
+            <field name="name">Bons du site (cultiveau.fr)</field>
+            <field name="sequence">54</field>
+            <field name="action_xmlid">cultiveau_site.action_site_bons</field>
+            <field name="resume">Les bons d'intervention saisis dans Mes Interventions de cultiveau.fr, lus par l'ERP pour la facture et le registre.</field>
+            <field name="etapes"><![CDATA[<ol><li>Ils arrivent à chaque synchronisation (toutes les heures) ; rien à ressaisir.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_checklists" model="cultiveau.aide">
+            <field name="name">Checklists par nature</field>
+            <field name="sequence">55</field>
+            <field name="action_xmlid">cultiveau_checklists.action_checklists</field>
+            <field name="resume">Un modèle de points à vérifier par nature d'intervention, tiré du référentiel (ch. 18), coché sur le bon et imprimé pour le client.</field>
+            <field name="etapes"><![CDATA[<ol><li>Ouvrez le modèle de la nature (remise en service, hivernage, saison, mise en service, dépannage, diagnostic).</li><li>Ajoutez un point : à cocher, mesure avec unité, ou texte ; dites s'il est obligatoire et quelle section du référentiel il suit.</li><li>Un modèle par type d'installation passe avant le modèle général.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Un point obligatoire non coché empêche la signature du bon : c'est voulu.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CHECKLISTS.md</field>
+        </record>
+        <record id="tuto_contrats" model="cultiveau.aide">
+            <field name="name">Contrats d'entretien</field>
+            <field name="sequence">56</field>
+            <field name="action_xmlid">cultiveau_terrain.action_contrats</field>
+            <field name="resume">Les contrats d'entretien des installations : visites prévues, prix annuel, échéances ; les visites se planifient seules.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Renouveler » prolonge d'un an ; « Facturer l'année » crée la facture annuelle.</li><li>Les visites du contrat se créent en interventions aux bonnes saisons.</li></ol>]]></field>
+        </record>
+        <record id="tuto_feuilles_route" model="cultiveau.aide">
+            <field name="name">Feuilles de route</field>
+            <field name="sequence">57</field>
+            <field name="action_xmlid">cultiveau_feuille_route.action_feuilles_route</field>
+            <field name="resume">La journée des salariés sans accès à l'ERP, envoyée la veille, ouverte sur le téléphone par un simple lien.</field>
+            <field name="etapes"><![CDATA[<ol><li>Sur la fiche du salarié, onglet Feuille de route : son lien personnel, à envoyer une fois par SMS.</li><li>Planifiez-le sur une intervention ou une phase de chantier : il reçoit sa journée la veille à 17 h.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Le lien est personnel : ne le transférez pas d'une personne à l'autre.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/FEUILLE-DE-ROUTE.md</field>
+        </record>
+        <record id="tuto_techniciens" model="cultiveau.aide">
+            <field name="name">Techniciens et camions</field>
+            <field name="sequence">58</field>
+            <field name="action_xmlid">cultiveau_terrain.action_techniciens</field>
+            <field name="resume">Les techniciens, leur camion et le stock du camion.</field>
+            <field name="etapes"><![CDATA[<ol><li>Reliez chaque technicien à son camion : les pièces du bon sortent du stock du camion.</li><li>« Réassort du camion » remet le camion au niveau depuis le magasin.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/FLOTTE.md</field>
+        </record>
+        <record id="tuto_devis" model="cultiveau.aide">
+            <field name="name">Devis</field>
+            <field name="sequence">59</field>
+            <field name="action_xmlid">sale.action_quotations_with_onboarding</field>
+            <field name="resume">Le devis d'irrigation : par lots (station, filtration, réseau, secteurs, automatisme, pose), avec les marges pour vous, les fiches techniques et l'avis du référentiel pour le client.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Nouveau » : le client, l'installation (ou le type d'installation), et un modèle par lots si vous en avez un.</li><li>Les lignes : tapez une référence du catalogue Cultiveau ou de votre base ; une nomenclature pose un ensemble d'un coup ; « Depuis mon stock » filtre sur ce que vous avez.</li><li>Onglet « Marges et référentiel » : achat, marge et taux par ligne et par lot (jamais sur le PDF) ; « Relire le référentiel » ajoute les notes techniques.</li><li>« Envoyer » : le PDF à la marque de l'entreprise, les fiches techniques jointes, la signature et l'acompte en ligne.</li><li>À la confirmation : le chantier, l'acompte, les demandes de prix des manquants et la mise en service se créent seuls.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Faites d'abord l'analyse des besoins (A1.1) sur l'installation : le devis en découle.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Une marge sous le minimum de l'entreprise s'affiche en rouge : corrigez le prix ou l'achat avant d'envoyer.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/DEVIS-PLUS.md</field>
+        </record>
+        <record id="tuto_commandes" model="cultiveau.aide">
+            <field name="name">Commandes</field>
+            <field name="sequence">60</field>
+            <field name="action_xmlid">sale.action_orders</field>
+            <field name="resume">Les devis signés : ce qui est à livrer, à poser, à facturer.</field>
+            <field name="etapes"><![CDATA[<ol><li>Les boutons du haut : la livraison, le chantier, les achats, les factures et les heures pointées.</li><li>« Lancer le chantier » si le chantier n'a pas été créé à la confirmation.</li><li>« Créer la facture » pour l'acompte ou le solde ; les jalons se facturent depuis les phases du chantier.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/DECLENCHE.md</field>
+        </record>
+        <record id="tuto_factures" model="cultiveau.aide">
+            <field name="name">Factures clients</field>
+            <field name="sequence">61</field>
+            <field name="action_xmlid">account.action_move_out_invoice_type</field>
+            <field name="resume">Les factures et avoirs : validation, envoi, encaissement, relances automatiques.</field>
+            <field name="etapes"><![CDATA[<ol><li>Validez la facture (« Confirmer »), puis « Envoyer » : elle part au nom de l'entreprise avec le paiement en ligne.</li><li>« Enregistrer un paiement » quand le règlement arrive ; le rapprochement bancaire fait le reste.</li><li>Les relances partent toutes seules selon le retard, au ton réglé dans Réglages.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>La facture électronique obligatoire est prête dans Réglages › Facture électronique.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne modifiez jamais une facture validée : faites un avoir.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/FACTURE-ELECTRONIQUE.md</field>
+        </record>
+        <record id="tuto_opportunites" model="cultiveau.aide">
+            <field name="name">Opportunités (6 phases)</field>
+            <field name="sequence">62</field>
+            <field name="action_xmlid">crm.crm_lead_action_pipeline</field>
+            <field name="resume">Le pipeline commercial en six phases du référentiel : contact, analyse des besoins, étude, devis, négociation, mise en service.</field>
+            <field name="etapes"><![CDATA[<ol><li>Une opportunité par projet ; glissez-la d'étape en étape.</li><li>Chaque étape planifie l'action suivante (R1 à J+3, R2 à J+7, relance à J+7) : elles tombent dans vos activités.</li><li>Les appels de l'assistant téléphonique pour un devis arrivent ici tout seuls.</li><li>Perdue : la raison est obligatoire, c'est ce qui apprend.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>L'écran Effort commercial compte ce que vous faites pour faire avancer les affaires.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CRM-EFFORT.md</field>
+        </record>
+        <record id="tuto_effort" model="cultiveau.aide">
+            <field name="name">Effort commercial</field>
+            <field name="sequence">63</field>
+            <field name="action_xmlid">cultiveau_crm_effort.action_effort</field>
+            <field name="resume">Ce que l'équipe fait pour faire avancer les affaires : appels, visites R1 et R2, relances, par personne et par semaine.</field>
+            <field name="etapes"><![CDATA[<ol><li>Lisez la ligne de chacun ; une affaire sans activité depuis trop longtemps est reprise automatiquement.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CRM-EFFORT.md</field>
+        </record>
+        <record id="tuto_nomenclatures" model="cultiveau.aide">
+            <field name="name">Nomenclatures (ensembles)</field>
+            <field name="sequence">64</field>
+            <field name="action_xmlid">cultiveau_ventes.action_nomenclatures</field>
+            <field name="resume">Des ensembles d'articles prêts à poser dans un devis : une tête de secteur, la protection d'une station, un point haut.</field>
+            <field name="etapes"><![CDATA[<ol><li>Créez l'ensemble : lot du devis, type d'installation, ce que vaut une quantité de 1 (par secteur, par station), les articles et leurs quantités.</li><li>Dans le devis, une ligne « nomenclature » pose tout l'ensemble, modifiable ligne par ligne.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/NOMENCLATURES.md</field>
+        </record>
+        <record id="tuto_modeles_devis" model="cultiveau.aide">
+            <field name="name">Modèles de devis par lots</field>
+            <field name="sequence">65</field>
+            <field name="action_xmlid">sale_management.sale_order_template_action</field>
+            <field name="resume">Les squelettes de devis par type d'installation : les lots, leurs sections, les lignes habituelles.</field>
+            <field name="etapes"><![CDATA[<ol><li>Partez du modèle Cultiveau du type d'installation ; ajustez vos lignes habituelles ; il est proposé à la création du devis.</li></ol>]]></field>
+        </record>
+        <record id="tuto_usages" model="cultiveau.aide">
+            <field name="name">Irrigation à l'usage (€/m³)</field>
+            <field name="sequence">66</field>
+            <field name="action_xmlid">cultiveau_ventes.action_usages</field>
+            <field name="resume">Facturer l'irrigation à l'usage : un prix au m³, des relevés, la facture périodique.</field>
+            <field name="etapes"><![CDATA[<ol><li>Créez le contrat d'usage : client, installation, prix du m³, périodicité.</li><li>Saisissez les relevés de compteur ; la facture se calcule.</li></ol>]]></field>
+        </record>
+        <record id="tuto_schema3d" model="cultiveau.aide">
+            <field name="name">Importer une étude Schéma 3D</field>
+            <field name="sequence">67</field>
+            <field name="action_xmlid">cultiveau_schema3d.action_schema3d_import</field>
+            <field name="resume">Le réseau dessiné dans Réseau 3D devient l'analyse des besoins, la note de dimensionnement et le devis par lots.</field>
+            <field name="etapes"><![CDATA[<ol><li>Dans Réseau 3D : Projet › Format d'échange, enregistrez le fichier .echange.json.</li><li>Ici : choisissez le client, déposez le fichier, « Importer ».</li><li>Vérifiez le devis par lots créé : longueurs et pièces viennent du plan, plus de ressaisie.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/SCHEMA3D.md</field>
+        </record>
+        <record id="tuto_installations" model="cultiveau.aide">
+            <field name="name">Installations (parc installé)</field>
+            <field name="sequence">68</field>
+            <field name="action_xmlid">cultiveau_installation.action_installations</field>
+            <field name="resume">Chaque installation d'irrigation du besoin au suivi : analyse des besoins (A1.1), dimensionnement, mise en service (A1.3), équipements, registre.</field>
+            <field name="etapes"><![CDATA[<ol><li>Créez l'installation sur le client : type, ressource, énergie, parcelles (reprises de la PAC en un clic).</li><li>Onglet Analyse des besoins : les huit questions dans l'ordre de la visite ; « Valider l'A1.1 » quand c'est complet.</li><li>Dimensionnement : secteurs, débits, diamètres, pertes de charge, pompe ; la nomenclature du devis en sort.</li><li>Mise en service : le PV A1.3 avec les valeurs de référence ; ensuite le registre se tient tout seul avec les interventions.</li><li>Câblage : l'armoire et les électrovannes compilés depuis l'étude.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Une installation sans PV de mise en service remonte dans Qualité des données.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/ANALYSE-BESOINS.md</field>
+        </record>
+        <record id="tuto_registre" model="cultiveau.aide">
+            <field name="name">Registre de maintenance</field>
+            <field name="sequence">69</field>
+            <field name="action_xmlid">cultiveau_installation.action_registre</field>
+            <field name="resume">Tout ce qui a été fait sur chaque installation, dans l'ordre : interventions, pièces, relevés, PV.</field>
+            <field name="etapes"><![CDATA[<ol><li>Filtrez par installation ou par client ; exportez pour le client ou l'assureur.</li></ol>]]></field>
+        </record>
+        <record id="tuto_equipements_renouveler" model="cultiveau.aide">
+            <field name="name">Équipements à renouveler</field>
+            <field name="sequence">70</field>
+            <field name="action_xmlid">cultiveau_installation.action_equipements_a_renouveler</field>
+            <field name="resume">Les équipements du parc qui arrivent en fin de vie : l'occasion d'un devis avant la panne.</field>
+            <field name="etapes"><![CDATA[<ol><li>Triez par échéance ; « À renouveler sous 2 ans » ; proposez le remplacement au bon moment de la frise.</li></ol>]]></field>
+        </record>
+        <record id="tuto_cablage" model="cultiveau.aide">
+            <field name="name">Câblage des armoires</field>
+            <field name="sequence">71</field>
+            <field name="action_xmlid">cultiveau_cablage.action_armoires</field>
+            <field name="resume">L'armoire de pompage et le câblage des électrovannes, compilés depuis l'étude : puissance, protections, borniers, nomenclature.</field>
+            <field name="etapes"><![CDATA[<ol><li>Partez de l'installation : bouton « Câblage ».</li><li>Vérifiez la pompe retenue (moteur normalisé au-dessus) et les longueurs de câble estimées ; corrigez, le dossier se recompile.</li><li>Imprimez le dossier d'exécution avec son indice.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CABLAGE.md</field>
+        </record>
+        <record id="tuto_parcelles" model="cultiveau.aide">
+            <field name="name">Parcelles</field>
+            <field name="sequence">72</field>
+            <field name="action_xmlid">cultiveau_parcelles.action_parcelles</field>
+            <field name="resume">Les parcelles des clients depuis leur déclaration PAC (Telepac) : cultures automatiques, images satellite, alertes d'arrosage.</field>
+            <field name="etapes"><![CDATA[<ol><li>Sur le client : « Importer sa déclaration PAC » avec le fichier XML Telepac ; les parcelles et les cultures se posent.</li><li>« Nouvelles images satellite » lit NDVI et NDWI (Sentinel-2, gratuit) ; « À arroser » liste ce qui souffre.</li><li>« Noter un arrosage » garde la dose apportée.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Les codes cultures PAC sont ceux du ministère : ne les renommez pas.</li></ul>]]></field>
+        </record>
+        <record id="tuto_alertes_parcelles" model="cultiveau.aide">
+            <field name="name">Alertes satellite</field>
+            <field name="sequence">73</field>
+            <field name="action_xmlid">cultiveau_parcelles.action_alertes</field>
+            <field name="resume">Les parcelles où l'image satellite montre un stress ou une anomalie, pour appeler le client avant lui.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Prévenir le client » envoie le message ; « Rien d'anormal » classe l'alerte.</li></ol>]]></field>
+        </record>
+        <record id="tuto_frise_cultures" model="cultiveau.aide">
+            <field name="name">Cultures et frise de référence</field>
+            <field name="sequence">74</field>
+            <field name="action_xmlid">cultiveau_frise.action_cultures</field>
+            <field name="resume">La frise de chaque culture : stades, besoins en eau (Kc), fenêtres commerciales (projet, achat), par zone climatique.</field>
+            <field name="etapes"><![CDATA[<ol><li>Lisez la frise ; les Kc sont ceux du référentiel (ordres de grandeur) ; ajustez la zone climatique du département si besoin.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne changez pas les Kc de référence pour un client : adaptez-les sur sa culture (Kc adaptés).</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/HISTOIRE-FRISES-PERSONAS.md</field>
+        </record>
+        <record id="tuto_frise_clients" model="cultiveau.aide">
+            <field name="name">Cultures des agriculteurs</field>
+            <field name="sequence">75</field>
+            <field name="action_xmlid">cultiveau_frise.action_cultures_clients</field>
+            <field name="resume">Culture par culture, chez chaque client : surface, stade du moment, besoin de pointe, volume de la saison.</field>
+            <field name="etapes"><![CDATA[<ol><li>Ajoutez les cultures sur la fiche du client (onglet Frise culturale) ; cette liste en est la vue d'ensemble.</li></ol>]]></field>
+        </record>
+        <record id="tuto_climats" model="cultiveau.aide">
+            <field name="name">Climat des départements</field>
+            <field name="sequence">76</field>
+            <field name="action_xmlid">cultiveau_frise.action_climats</field>
+            <field name="resume">ETo de référence et pluie mois par mois, par département : la base du besoin en eau.</field>
+            <field name="etapes"><![CDATA[<ol><li>Vérifiez le département de vos clients ; les valeurs sont des ordres de grandeur, remplaçables par vos relevés.</li></ol>]]></field>
+        </record>
+        <record id="tuto_personas" model="cultiveau.aide">
+            <field name="name">Le guide des personas</field>
+            <field name="sequence">77</field>
+            <field name="action_xmlid">cultiveau_persona.action_personas</field>
+            <field name="resume">Qui est l'agriculteur en face et comment lui parler : cinq personas (Lion, Jaguar, Chat, Tortue, Abeille).</field>
+            <field name="etapes"><![CDATA[<ol><li>Lisez les cinq portraits ; sur une fiche client, l'onglet Persona pose huit questions et donne le ton.</li><li>L'assistant téléphonique lit le persona avant de décrocher.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/HISTOIRE-FRISES-PERSONAS.md</field>
+        </record>
+        <record id="tuto_persona_evaluations" model="cultiveau.aide">
+            <field name="name">Évaluations de personas</field>
+            <field name="sequence">78</field>
+            <field name="action_xmlid">cultiveau_persona.action_persona_evaluations</field>
+            <field name="resume">Les questionnaires remplis, client par client.</field>
+            <field name="etapes"><![CDATA[<ol><li>Refaites l'évaluation après un an : les gens changent.</li></ol>]]></field>
+        </record>
+        <record id="tuto_base_articles" model="cultiveau.aide">
+            <field name="name">Base articles</field>
+            <field name="sequence">79</field>
+            <field name="action_xmlid">cultiveau_site.action_base_articles</field>
+            <field name="resume">Vos articles, ligne par ligne : référence, désignation, famille, prix d'achat, prix de vente, TVA, stock ; à corriger sans ouvrir de fiche.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cliquez une cellule (prix d'achat, prix de vente) : tapez, Entrée ; la ligne est enregistrée.</li><li>Plusieurs lignes : cochez-les, modifiez une valeur, l'ERP propose de l'appliquer à toutes.</li><li>Filtres : sans prix d'achat, sans prix de vente, venus de cultiveau.fr, à envoyer ; « Catalogue commun du réseau » pour le catalogue partagé (prix indicatifs).</li><li>Un article créé ou modifié ici part dans votre base Clients &amp; Articles de cultiveau.fr ; le prix d'achat et le stock restent dans l'ERP.</li></ol>]]></field>
+            <field name="texte"><![CDATA[<ul><li>Vos articles de cultiveau.fr sont là tout seuls, avec leur prix de vente et leur gencod.</li></ul>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Le stock ne se saisit pas ici : passez par l'inventaire (Mon Inventaire ou Inventaire › Ajustements).</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_catalogue" model="cultiveau.aide">
+            <field name="name">Catalogue Cultiveau</field>
+            <field name="sequence">80</field>
+            <field name="action_xmlid">cultiveau_catalogue.action_catalogue</field>
+            <field name="resume">Le catalogue technique du réseau : DN, PN, matière, raccordement, fiches techniques, prix négociés.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cherchez par caractéristique (DN, PN, matière) ou par référence.</li><li>« Ajouter à mon catalogue » met l'article dans votre propre liste avec votre prix de vente proposé.</li><li>Comparer des articles : côte à côte, d'après les fiches techniques lues par l'IA.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Le prix public du catalogue vaut au moins trois fois le prix d'achat réseau.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/FICHES-TECHNIQUES-IA.md</field>
+        </record>
+        <record id="tuto_mon_catalogue" model="cultiveau.aide">
+            <field name="name">Mon catalogue</field>
+            <field name="sequence">81</field>
+            <field name="action_xmlid">cultiveau_catalogue.action_mon_catalogue</field>
+            <field name="resume">Les articles du réseau que vous vendez, avec votre marge et votre prix.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Retirer de mon catalogue » pour ne plus les proposer au devis.</li></ol>]]></field>
+        </record>
+        <record id="tuto_fiches" model="cultiveau.aide">
+            <field name="name">Bibliothèque technique</field>
+            <field name="sequence">82</field>
+            <field name="action_xmlid">cultiveau_catalogue.action_fiches</field>
+            <field name="resume">Les fiches techniques des articles : PDF lus par l'IA, caractéristiques structurées, jointes aux devis.</field>
+            <field name="etapes"><![CDATA[<ol><li>Ouvrez une fiche : le texte lu, les caractéristiques extraites, les articles reliés.</li><li>Au devis, les fiches des articles sont jointes à l'envoi si l'option est cochée.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/FICHES-TECHNIQUES-IA.md</field>
+        </record>
+        <record id="tuto_comparateur" model="cultiveau.aide">
+            <field name="name">Comparer des articles</field>
+            <field name="sequence">83</field>
+            <field name="action_xmlid">cultiveau_fiches.action_comparateur</field>
+            <field name="resume">Deux à quatre articles côte à côte, caractéristique par caractéristique, d'après leurs fiches.</field>
+            <field name="etapes"><![CDATA[<ol><li>Choisissez les articles ; les différences sont surlignées.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/FICHES-TECHNIQUES-IA.md</field>
+        </record>
+        <record id="tuto_familles_carac" model="cultiveau.aide">
+            <field name="name">Familles de caractéristiques</field>
+            <field name="sequence">84</field>
+            <field name="action_xmlid">cultiveau_fiches.action_familles_carac</field>
+            <field name="resume">Ce qu'on attend de chaque famille d'articles (pompes : débit, HMT, puissance…), pour que l'IA lise les fiches au bon endroit.</field>
+            <field name="etapes"><![CDATA[<ol><li>Réservé à l'équipe Cultiveau ; ajoutez une caractéristique et son unité, l'extraction la cherche dès la prochaine lecture.</li></ol>]]></field>
+        </record>
+        <record id="tuto_fournisseurs" model="cultiveau.aide">
+            <field name="name">Fournisseurs</field>
+            <field name="sequence">85</field>
+            <field name="action_xmlid">cultiveau_catalogue.action_fournisseurs</field>
+            <field name="resume">Les fournisseurs du réseau et les vôtres : coordonnées, conditions, articles.</field>
+            <field name="etapes"><![CDATA[<ol><li>Un fournisseur Cultiveau porte les tarifs négociés ; les vôtres portent vos prix d'achat.</li></ol>]]></field>
+        </record>
+        <record id="tuto_tarifs" model="cultiveau.aide">
+            <field name="name">Tarifs fournisseurs</field>
+            <field name="sequence">86</field>
+            <field name="action_xmlid">cultiveau_tarifs.action_tarifs</field>
+            <field name="resume">Les tarifs négociés par le réseau chez chaque fournisseur et votre marge : le prix de vente se propose seul.</field>
+            <field name="etapes"><![CDATA[<ol><li>Réglez votre marge par famille ; chaque devis la reprend.</li><li>Les commandes groupées rassemblent les besoins de plusieurs adhérents.</li></ol>]]></field>
+        </record>
+        <record id="tuto_groupees" model="cultiveau.aide">
+            <field name="name">Commandes groupées</field>
+            <field name="sequence">87</field>
+            <field name="action_xmlid">cultiveau_tarifs.action_groupees</field>
+            <field name="resume">Une commande du réseau ouverte à tous : chacun met ses quantités, le fournisseur livre, chacun paie sa part.</field>
+            <field name="etapes"><![CDATA[<ol><li>Rejoignez la commande ouverte ; saisissez vos quantités avant la date de clôture.</li></ol>]]></field>
+        </record>
+        <record id="tuto_grille" model="cultiveau.aide">
+            <field name="name">Grille de remises</field>
+            <field name="sequence">88</field>
+            <field name="action_xmlid">cultiveau_grille.action_grille</field>
+            <field name="resume">Vos remises par typologie de client (agriculteur, paysagiste, collectivité…) et par famille d'articles, appliquées seules au devis.</field>
+            <field name="etapes"><![CDATA[<ol><li>Une ligne par couple typologie × famille ; la remise s'applique à la création de la ligne de devis, la marge reste visible.</li></ol>]]></field>
+        </record>
+        <record id="tuto_grille_reseau" model="cultiveau.aide">
+            <field name="name">Grille de remises du réseau</field>
+            <field name="sequence">89</field>
+            <field name="action_xmlid">cultiveau_grille.action_grille_reseau</field>
+            <field name="resume">La grille proposée par le réseau, que vous pouvez copier dans la vôtre.</field>
+            <field name="etapes"><![CDATA[<ol><li>Copiez puis ajustez : la vôtre passe avant celle du réseau.</li></ol>]]></field>
+        </record>
+        <record id="tuto_gestes_pose" model="cultiveau.aide">
+            <field name="name">Matrice de pose</field>
+            <field name="sequence">90</field>
+            <field name="action_xmlid">cultiveau_pose.action_gestes</field>
+            <field name="resume">Le temps de pose par geste (tranchée au mètre, collage d'un raccord, pose d'un asperseur…), construit avec vos techniciens ; la main-d'œuvre du devis en sort.</field>
+            <field name="etapes"><![CDATA[<ol><li>Corrigez un temps d'après vos chantiers réels : le prochain devis le reprend.</li><li>La matrice du réseau sert de point de départ.</li></ol>]]></field>
+        </record>
+        <record id="tuto_gestes_pose_reseau" model="cultiveau.aide">
+            <field name="name">Matrice de pose du réseau</field>
+            <field name="sequence">91</field>
+            <field name="action_xmlid">cultiveau_pose.action_gestes_reseau</field>
+            <field name="resume">Les temps de pose de référence du réseau, à copier puis adapter.</field>
+            <field name="etapes"><![CDATA[<ol><li>Copiez les gestes qui vous manquent dans votre matrice.</li></ol>]]></field>
+        </record>
+        <record id="tuto_import_matrice" model="cultiveau.aide">
+            <field name="name">Importer la matrice</field>
+            <field name="sequence">92</field>
+            <field name="action_xmlid">cultiveau_catalogue.action_import_matrice</field>
+            <field name="resume">L'import du fichier matrice Cultiveau (référencement) dans le catalogue du réseau.</field>
+            <field name="etapes"><![CDATA[<ol><li>Réservé à l'équipe Cultiveau : déposez le fichier, vérifiez l'aperçu, importez.</li></ol>]]></field>
+        </record>
+        <record id="tuto_import_3d" model="cultiveau.aide">
+            <field name="name">Importer le catalogue 3D</field>
+            <field name="sequence">93</field>
+            <field name="action_xmlid">cultiveau_catalogue.action_import_3d</field>
+            <field name="resume">Les articles du catalogue 3D (Réseau 3D) dans l'ERP, pour que l'étude dessinée trouve ses pièces.</field>
+            <field name="etapes"><![CDATA[<ol><li>Réservé à l'équipe Cultiveau.</li></ol>]]></field>
+        </record>
+        <record id="tuto_import_articles" model="cultiveau.aide">
+            <field name="name">Importer mes articles</field>
+            <field name="sequence">94</field>
+            <field name="action_xmlid">cultiveau_catalogue.action_import_articles</field>
+            <field name="resume">Un fichier Excel ou CSV de vos articles (référence, désignation, prix d'achat, prix de vente, famille, code-barres) devient votre base.</field>
+            <field name="etapes"><![CDATA[<ol><li>Déposez le fichier ; les colonnes sont reconnues ; vérifiez l'aperçu ; importez.</li><li>Les articles importés ici sont les vôtres : ils partent aussi dans votre base cultiveau.fr.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Préférez l'import sur cultiveau.fr si votre équipe y travaille déjà : l'ERP le reçoit.</li></ul>]]></field>
+        </record>
+        <record id="tuto_reassort" model="cultiveau.aide">
+            <field name="name">Réassort du stock</field>
+            <field name="sequence">95</field>
+            <field name="action_xmlid">cultiveau_reassort.action_reassort</field>
+            <field name="resume">Ce que chaque article consomme, ce qu'il reste, ce qu'il faut : un clic pose les règles de réassort, un clic commande les manquants.</field>
+            <field name="etapes"><![CDATA[<ol><li>Lisez la couverture en mois et le mini / maxi proposés.</li><li>« Poser les règles » : l'ERP recommandera seul ensuite.</li><li>« Commander les manquants » : une demande de prix par fournisseur, prête à envoyer.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/REASSORT.md</field>
+        </record>
+        <record id="tuto_qualite" model="cultiveau.aide">
+            <field name="name">Qualité des données</field>
+            <field name="sequence">96</field>
+            <field name="action_xmlid">cultiveau_qualite.action_qualite</field>
+            <field name="resume">Un score sur 100 et, par groupe, ce qui manque ou doublonne, pourquoi ça compte, et le bouton pour corriger en masse.</field>
+            <field name="etapes"><![CDATA[<ol><li>Lisez le score et les groupes rouges.</li><li>« Voir et corriger » ouvre la liste filtrée : cochez, modifiez une valeur pour toutes ; Action › Fusionner pour les doublons.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/QUALITE.md</field>
+        </record>
+        <record id="tuto_mes_tableaux" model="cultiveau.aide">
+            <field name="name">Mes tableaux</field>
+            <field name="sequence">97</field>
+            <field name="action_xmlid">cultiveau_tableaux.action_favoris</field>
+            <field name="resume">Vos tableaux de bord demandés en français : « les interventions par technicien ce mois », enregistrés et rouverts en un clic.</field>
+            <field name="etapes"><![CDATA[<ol><li>Demandez à Mathis, ou remplissez les trois choix (sujet, mesure, regroupement) ; « Enregistrer » le garde ici.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/TABLEAUX.md</field>
+        </record>
+        <record id="tuto_aides" model="cultiveau.aide">
+            <field name="name">Aides des écrans (tutos)</field>
+            <field name="sequence">98</field>
+            <field name="action_xmlid">cultiveau_roles.action_aides</field>
+            <field name="resume">Les tutos du « ? » de chaque écran : une phrase, le pas à pas, par où commencer, les pièges, un lien vidéo.</field>
+            <field name="etapes"><![CDATA[<ol><li>Ouvrez le tuto d'un écran, corrigez le texte avec vos mots, enregistrez : il s'affiche aussitôt.</li><li>L'identifiant de l'action dit sur quel écran il s'affiche ; le modèle, sur tous les écrans d'un type de document.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne supprimez pas « Les gestes qui font gagner du temps » : c'est le texte qui s'affiche quand un écran n'a pas le sien.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/ROLES.md</field>
+        </record>
+        <record id="tuto_automatisations" model="cultiveau.aide">
+            <field name="name">Automatisations</field>
+            <field name="sequence">99</field>
+            <field name="action_xmlid">cultiveau_quotidien.action_regles</field>
+            <field name="resume">Les règles du métier qui tournent seules : devis à relancer, chantier à lancer, entretien à proposer, et celles que vous ajoutez.</field>
+            <field name="etapes"><![CDATA[<ol><li>Activez ou désactivez une règle ; réglez ses délais.</li><li>« Et si… ? » teste une règle sur une copie avant de la lancer.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/QUOTIDIEN.md</field>
+        </record>
+        <record id="tuto_cles_api" model="cultiveau.aide">
+            <field name="name">Clés d'API</field>
+            <field name="sequence">100</field>
+            <field name="action_xmlid">cultiveau_api.action_cles_api</field>
+            <field name="resume">Les clés qui ouvrent vos données à un outil (site, assistant, logiciel de l'adhérent), avec leurs droits et leur société.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Nouveau » : l'outil, les droits (lecture, écriture), la société ; copiez la clé une seule fois.</li><li>Révoquez une clé perdue : l'outil en redemande une.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Ne mettez jamais une clé dans un courriel.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/API.md</field>
+        </record>
+        <record id="tuto_liaison_site" model="cultiveau.aide">
+            <field name="name">Liaison avec cultiveau.fr</field>
+            <field name="sequence">101</field>
+            <field name="action_xmlid">cultiveau_site.action_site_connexions</field>
+            <field name="resume">Pour chaque société : la clé reçue de cultiveau.fr, ce qui est synchronisé (clients, interventions, chantiers, bons, articles, inventaires), le dernier passage et son résultat.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Synchroniser maintenant » force un passage ; sinon toutes les heures.</li><li>Décochez ce que vous ne voulez pas recevoir (par exemple les inventaires si le stock se tient ailleurs).</li><li>« Tout relire » efface les curseurs pour un passage complet.</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>La clé arrive toute seule quand quelqu'un de l'entreprise entre depuis cultiveau.fr : ne la saisissez pas à la main.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_audit" model="cultiveau.aide">
+            <field name="name">Journal d'audit</field>
+            <field name="sequence">102</field>
+            <field name="action_xmlid">cultiveau_conformite.action_audit</field>
+            <field name="resume">Qui a modifié quoi, avant et après, sur chaque document : la trace demandée par la conformité.</field>
+            <field name="etapes"><![CDATA[<ol><li>Filtrez par personne, type de document, jour ; sur un document, Action › Historique des modifications.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CONFORMITE.md</field>
+        </record>
+        <record id="tuto_adhesion" model="cultiveau.aide">
+            <field name="name">Nouvel adhérent</field>
+            <field name="sequence">103</field>
+            <field name="action_xmlid">cultiveau_adhesion.action_adhesion</field>
+            <field name="resume">Un adhérent prêt à travailler en dix minutes : société, utilisateurs, assistant téléphonique, clients, articles, comptabilité, facture électronique.</field>
+            <field name="etapes"><![CDATA[<ol><li>Remplissez l'écran dans l'ordre ; chaque étape crée ce qu'il faut ; à la fin le gérant reçoit son accès.</li><li>Depuis le 08/11, l'ouverture se fait aussi depuis Admin › Adhérents de cultiveau.fr.</li></ol>]]></field>
+        </record>
+        <record id="tuto_rdv" model="cultiveau.aide">
+            <field name="name">Rendez-vous en ligne</field>
+            <field name="sequence">104</field>
+            <field name="action_xmlid">cultiveau_rdv.action_rdv_types</field>
+            <field name="resume">Les motifs de rendez-vous que le client peut prendre lui-même par un lien : durée, lieu, qui peut le prendre, délai minimum.</field>
+            <field name="etapes"><![CDATA[<ol><li>Copiez le lien de la société ou d'un motif dans la signature des courriels ; le rendez-vous tombe dans l'agenda.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/RDV-EN-LIGNE.md</field>
+        </record>
+        <record id="tuto_reglages" model="cultiveau.aide">
+            <field name="name">Réglages Cultiveau</field>
+            <field name="sequence">105</field>
+            <field name="action_xmlid">cultiveau_base.action_cultiveau_config_settings</field>
+            <field name="resume">Tous les réglages de l'entreprise au même endroit : devis et factures, déclenchements, marges minimales, expéditeur des courriels, logistique, catalogue, facture électronique.</field>
+            <field name="etapes"><![CDATA[<ol><li>Un bloc par sujet ; « Enregistrer » en haut après chaque changement.</li><li>Les cases « Le devis déclenche tout » disent ce qui se crée à la signature.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/DECLENCHE.md</field>
+        </record>
+        <record id="tuto_import_reseau" model="cultiveau.aide">
+            <field name="name">Importer le réseau</field>
+            <field name="sequence">106</field>
+            <field name="action_xmlid">cultiveau_base.action_import_reseau</field>
+            <field name="resume">L'import des adhérents du réseau dans l'ERP (équipe Cultiveau).</field>
+            <field name="etapes"><![CDATA[<ol><li>Réservé à l'équipe Cultiveau.</li></ol>]]></field>
+        </record>
+        <record id="tuto_conversations_mathis" model="cultiveau.aide">
+            <field name="name">Conversations avec Mathis</field>
+            <field name="sequence">107</field>
+            <field name="action_xmlid">cultiveau_mathis.action_conversations</field>
+            <field name="resume">Ce qui a été demandé à Mathis et ce qu'il a répondu, pour relire ou corriger.</field>
+            <field name="etapes"><![CDATA[<ol><li>Un écran de lecture : filtrez, triez, exportez ; rien à saisir ici.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MAP-VIVANTE.md</field>
+        </record>
+        <record id="tuto_fil_activite" model="cultiveau.aide">
+            <field name="name">Fil d'activité de la map</field>
+            <field name="sequence">108</field>
+            <field name="action_xmlid">cultiveau_vue3d.action_evenements</field>
+            <field name="resume">Tout ce qui a bougé sur la map : arrivées, départs, interventions, pointages.</field>
+            <field name="etapes"><![CDATA[<ol><li>Un écran de lecture : filtrez, triez, exportez ; rien à saisir ici.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MAP-VIVANTE.md</field>
+        </record>
+        <record id="tuto_plans" model="cultiveau.aide">
+            <field name="name">Plans du site</field>
+            <field name="sequence">109</field>
+            <field name="action_xmlid">cultiveau_vue3d.action_plans</field>
+            <field name="resume">La disposition de votre dépôt sur la map : zones, postes, parking.</field>
+            <field name="etapes"><![CDATA[<ol><li>Un écran de lecture : filtrez, triez, exportez ; rien à saisir ici.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MAP-VIVANTE.md</field>
+        </record>
+        <record id="tuto_pointages" model="cultiveau.aide">
+            <field name="name">Pointages</field>
+            <field name="sequence">110</field>
+            <field name="action_xmlid">cultiveau_vue3d.action_pointages</field>
+            <field name="resume">Les pointages d'arrivée et de départ lus par la map et les chantiers.</field>
+            <field name="etapes"><![CDATA[<ol><li>Un écran de lecture : filtrez, triez, exportez ; rien à saisir ici.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/MAP-VIVANTE.md</field>
+        </record>
+        <record id="tuto_outils_reseau" model="cultiveau.aide">
+            <field name="name">Outils du réseau</field>
+            <field name="sequence">111</field>
+            <field name="action_xmlid">cultiveau_base.action_outil_academie</field>
+            <field name="resume">Les autres outils Cultiveau, ouverts sur votre compte : l'Académie (e-learning), l'assistant téléphonique, le DTe (diagnostic d'entreprise), le management DISC.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cliquez : l'outil s'ouvre sans nouveau mot de passe.</li></ol>]]></field>
+        </record>
+        <record id="tuto_outil_assistant" model="cultiveau.aide">
+            <field name="name">Outils du réseau</field>
+            <field name="sequence">112</field>
+            <field name="action_xmlid">cultiveau_base.action_outil_assistant</field>
+            <field name="resume">Un outil Cultiveau ouvert sur votre compte, sans nouveau mot de passe.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cliquez : l'outil s'ouvre dans l'ERP ou dans un nouvel onglet.</li></ol>]]></field>
+        </record>
+        <record id="tuto_outil_dte" model="cultiveau.aide">
+            <field name="name">Outils du réseau</field>
+            <field name="sequence">113</field>
+            <field name="action_xmlid">cultiveau_base.action_outil_dte</field>
+            <field name="resume">Un outil Cultiveau ouvert sur votre compte, sans nouveau mot de passe.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cliquez : l'outil s'ouvre dans l'ERP ou dans un nouvel onglet.</li></ol>]]></field>
+        </record>
+        <record id="tuto_outil_disc" model="cultiveau.aide">
+            <field name="name">Outils du réseau</field>
+            <field name="sequence">114</field>
+            <field name="action_xmlid">cultiveau_base.action_outil_disc</field>
+            <field name="resume">Un outil Cultiveau ouvert sur votre compte, sans nouveau mot de passe.</field>
+            <field name="etapes"><![CDATA[<ol><li>Cliquez : l'outil s'ouvre dans l'ERP ou dans un nouvel onglet.</li></ol>]]></field>
+        </record>
+        <record id="tuto_contacts" model="cultiveau.aide">
+            <field name="name">Contacts</field>
+            <field name="sequence">115</field>
+            <field name="action_xmlid">contacts.action_contacts</field>
+            <field name="resume">Tous les contacts : clients, fournisseurs, partenaires, collectivités ; pour vos agriculteurs, préférez Cultiveau › Clients.</field>
+            <field name="etapes"><![CDATA[<ol><li>Le type de contact (agriculteur, paysagiste, collectivité, fournisseur…) règle la grille de remises et les écrans.</li></ol>]]></field>
+        </record>
+        <record id="tuto_produits" model="cultiveau.aide">
+            <field name="name">Produits (Ventes)</field>
+            <field name="sequence">116</field>
+            <field name="action_xmlid">sale.product_template_action</field>
+            <field name="resume">La fiche complète d'un article : prix, fournisseurs, stock, fiche technique, informations du référentiel.</field>
+            <field name="etapes"><![CDATA[<ol><li>Pour corriger des prix en série, préférez Cultiveau › Base articles (ligne par ligne).</li><li>Onglet Référentiel : ce que le référentiel V4 dit de cette famille d'articles.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/DEVIS-PLUS.md</field>
+        </record>
+        <record id="tuto_achats" model="cultiveau.aide">
+            <field name="name">Achats</field>
+            <field name="sequence">117</field>
+            <field name="action_xmlid">purchase.purchase_rfq</field>
+            <field name="resume">Les demandes de prix et commandes fournisseurs : celles créées par le devis signé (les manquants) et les vôtres.</field>
+            <field name="etapes"><![CDATA[<ol><li>Vérifiez la demande de prix créée à la signature ; « Confirmer » la passe en commande ; la réception met à jour le stock et le chantier.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/DECLENCHE.md</field>
+        </record>
+        <record id="tuto_stock_inventaire" model="cultiveau.aide">
+            <field name="name">Ajustements d'inventaire</field>
+            <field name="sequence">118</field>
+            <field name="action_xmlid">stock.action_view_inventory_tree</field>
+            <field name="resume">Le stock compté : la quantité réelle par article et emplacement ; « Appliquer » met le stock à jour.</field>
+            <field name="etapes"><![CDATA[<ol><li>Comptez sur cultiveau.fr (Mon Inventaire) : un inventaire validé arrive ici tout seul ; ou saisissez les quantités ici et « Appliquer ».</li></ol>]]></field>
+            <field name="pieges"><![CDATA[<ul><li>Le stock se gère dans l'ERP seul : cultiveau.fr n'a pas de quantités.</li></ul>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
+        </record>
+        <record id="tuto_calendrier" model="cultiveau.aide">
+            <field name="name">Calendrier</field>
+            <field name="sequence">119</field>
+            <field name="action_xmlid">calendar.action_calendar_event</field>
+            <field name="resume">Les réunions et rendez-vous de l'équipe ; la salle de réunion de la map les suit en direct ; visio intégrée.</field>
+            <field name="etapes"><![CDATA[<ol><li>« Nouveau » : les participants, la salle ou la visio ; les créneaux libres de tous sont proposés.</li></ol>]]></field>
+            <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/REUNIONS.md</field>
+        </record>
+        <record id="tuto_projet_taches" model="cultiveau.aide">
+            <field name="name">Interventions (tâches)</field>
+            <field name="sequence">120</field>
+            <field name="res_model">project.task</field>
+            <field name="resume">Une intervention : client, installation, nature, urgence, technicien, bon d'intervention, registre.</field>
+            <field name="etapes"><![CDATA[<ol><li>Planifiez, intervenez (bon), clôturez : le registre de l'installation se met à jour.</li></ol>]]></field>
+        </record>
+    </data>
+</odoo>
