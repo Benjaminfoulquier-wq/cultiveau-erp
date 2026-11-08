@@ -76,6 +76,28 @@ class Company(models.Model):
                 else "pas de clé reçue de cultiveau.fr : la synchronisation attend la prochaine entrée"}
 
     @api.model
+    def cultiveau_personne_depuis_site(self, charge):
+        """Une case cochée ou décochée dans Admin › Adhérents de cultiveau.fr : le compte de cette personne dans l'ERP suit.
+        Décochée → compte désactivé (ses devis, chantiers et appels restent lisibles par les autres) ; cochée → compte réactivé s'il existe
+        (sinon il naîtra à sa première entrée). Réponse {ok, utilisateur_id, actif}."""
+        personne = charge.get("personne") or {}
+        email = (personne.get("email") or "").strip().lower()
+        acces = charge.get("acces") is True
+        if not email:
+            return {"ok": False, "erreur": "personne : e-mail requis"}
+        Users = self.env["res.users"].sudo().with_context(active_test=False)
+        company = self._cultiveau_societe_site(charge.get("entreprise") or {}, creer=False)
+        user = Users.search([("login", "=ilike", email), ("share", "=", False)], limit=1)
+        if not user:
+            return {"ok": True, "utilisateur_id": None, "actif": acces, "note": "pas encore de compte dans l'ERP : il sera créé à la première entrée" if acces else "aucun compte à fermer"}
+        if user == self.env.ref("base.user_admin") or (company and user.company_id != company and len(user.company_ids) > 1):
+            return {"ok": False, "erreur": "ce compte n'appartient pas qu'à cette entreprise : rien n'est changé"}
+        if user.active != acces:
+            user.write({"active": acces})
+            _logger.info("cultiveau.fr : accès ERP de %s %s", email, "rouvert" if acces else "fermé")
+        return {"ok": True, "utilisateur_id": user.id, "actif": user.active}
+
+    @api.model
     def cultiveau_fermer_depuis_site(self, charge):
         """L'accès coupé depuis Admin › Adhérents : la société est fermée et ses utilisateurs venus du site ne peuvent plus entrer."""
         e = charge.get("entreprise") or {}

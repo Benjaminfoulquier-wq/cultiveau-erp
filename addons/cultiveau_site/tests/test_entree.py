@@ -83,6 +83,25 @@ class TestEntree(HttpCase):
         nord.invalidate_recordset()
         jean.invalidate_recordset()
         self.assertFalse(nord.cultiveau_erp_ouvert or jean.active)
+        # personne par personne : décochée dans Admin › Adhérents → compte désactivé ; recochée → réactivé
+        nord.cultiveau_erp_ouvert = True
+        jean.active = True
+        personne = {"v": 1, "outil": "erp", "source": "cultiveau", "action": "personne", "exp": int(time.time()) + 60, "n": "p1",
+                    "entreprise": {"id": 99, "nom": "Irrigation Nord"}, "personne": {"cultiveau_id": 501, "email": "jean@irrigation-nord.fr"}, "acces": False}
+        r = self.url_open("/cultiveau/entree/personne", data=json.dumps({"t": fabriquer_jeton(personne, SECRET)}), headers={"Content-Type": "application/json"})
+        self.assertEqual((r.status_code, r.json()["ok"], r.json()["actif"]), (200, True, False), r.text)
+        jean.invalidate_recordset()
+        self.assertFalse(jean.active)
+        r = self.url_open("/cultiveau/entree/personne", data=json.dumps({"t": fabriquer_jeton(dict(personne, n="p2", acces=True), SECRET)}), headers={"Content-Type": "application/json"})
+        self.assertEqual(r.json()["actif"], True)
+        jean.invalidate_recordset()
+        self.assertTrue(jean.active)
+        # une personne sans compte : rien à fermer, pas d'erreur ; l'admin n'est jamais touché
+        r = self.url_open("/cultiveau/entree/personne", data=json.dumps({"t": fabriquer_jeton(dict(personne, n="p3", personne={"email": "inconnu@irrigation-nord.fr"}), SECRET)}), headers={"Content-Type": "application/json"})
+        self.assertEqual((r.json()["ok"], r.json()["utilisateur_id"]), (True, None))
+        r = self.url_open("/cultiveau/entree/personne", data=json.dumps({"t": fabriquer_jeton(dict(personne, n="p4", personne={"email": "admin"}), SECRET)}), headers={"Content-Type": "application/json"})
+        self.assertFalse(r.json()["ok"])
+        self.assertTrue(self.env.ref("base.user_admin").active)
         # une action qui ne correspond pas à l'adresse est refusée
         r = self.url_open("/cultiveau/entree/ouvrir", data=json.dumps({"t": fabriquer_jeton(dict(fermer, n="f2"), SECRET)}), headers={"Content-Type": "application/json"})
         self.assertEqual(r.status_code, 400)

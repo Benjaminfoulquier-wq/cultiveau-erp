@@ -126,3 +126,8 @@ place pour les six sociétés.
 
 Vue vivante : l'équipe d'une société = les comptes dont c'est la société principale ; un compte Cultiveau autorisé sur toutes les sociétés
 n'y figure plus (« Cultiveau n'est pas gérant »).
+
+- **Personne par personne** (08/11/2026, lot 08g de cultiveau.fr) : `POST /cultiveau/entree/personne`, charge `action: "personne"`, `entreprise`,
+  `personne: {cultiveau_id, email}`, `acces: true/false`. Décochée dans Admin › Adhérents → compte de l'ERP désactivé (ses devis, chantiers et
+  appels restent lisibles) ; cochée → réactivé s'il existe, sinon il naîtra à la première entrée. L'admin et un compte qui a d'autres sociétés
+  ne sont jamais touchés. Réponse `{ok, utilisateur_id, actif}`.
