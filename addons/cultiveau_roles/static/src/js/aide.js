@@ -78,14 +78,13 @@ class AideDialog extends Component {
             return;
         }
         window.speechSynthesis.cancel();
-        this.state.lecture = true;
         this.state.termine = false;
         this.state.index = -1;
         this.segments.forEach((texte, i) => {
             const u = new SpeechSynthesisUtterance(texte);
             u.lang = "fr-FR";
             u.rate = 1.0;
-            u.onstart = () => { this.state.index = i; };
+            u.onstart = () => { this.state.lecture = true; this.state.index = i; };
             if (i === this.segments.length - 1) {
                 u.onend = () => { this.state.lecture = false; this.state.termine = true; };
             }
@@ -132,6 +131,17 @@ export class AideSystray extends Component {
             return;
         }
         this.state.occupe = true;
+        // Débloquer la synthèse vocale pendant le clic (les navigateurs ne l'autorisent que sur un vrai geste) : le tuto pourra se lire tout seul.
+        if (typeof window !== "undefined" && "speechSynthesis" in window) {
+            try {
+                window.speechSynthesis.cancel();
+                const amorce = new SpeechSynthesisUtterance(" ");
+                amorce.volume = 0;
+                window.speechSynthesis.speak(amorce);
+            } catch (e) {
+                // sans importance : le bouton « Lire le tuto » reste disponible
+            }
+        }
         try {
             const { xmlid, modele, id, type } = this.courant;
             const aide = await this.orm.call("cultiveau.aide", "pour", [xmlid, modele, id, type]);
