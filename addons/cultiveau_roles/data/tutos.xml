@@ -26,7 +26,7 @@
             <field name="sequence">23</field>
             <field name="action_xmlid">cultiveau_pilotage.action_tableau</field>
             <field name="resume">Les chiffres de l'entreprise : chiffre d'affaires, marge, devis en cours, interventions, trésorerie, bilan et compte de résultat.</field>
-            <field name="etapes"><![CDATA[<ol><li>Choisissez la période en haut (mois, trimestre, année).</li><li>Chaque chiffre s'ouvre : cliquez pour voir la liste qui le compose.</li><li>Les écarts (devis expirés, factures impayées) sont en couleur : ce sont vos priorités.</li><li>Le gérant du réseau voit aussi la vue réseau, anonymisée.</li></ol>]]></field>
+            <field name="etapes"><![CDATA[<ol><li>Les chiffres sont ceux du mois et de l'année en cours, recalculés à l'ouverture.</li><li>Chaque chiffre s'ouvre : cliquez pour voir la liste qui le compose.</li><li>Les écarts (devis expirés, factures impayées) sont en couleur : ce sont vos priorités.</li><li>Le gérant du réseau voit aussi la vue réseau, anonymisée.</li></ol>]]></field>
             <field name="texte"><![CDATA[<ul><li>Regardez-le le lundi matin, avec le rapport du lundi reçu par courriel.</li></ul>]]></field>
             <field name="pieges"><![CDATA[<ul><li>Un chiffre à zéro est le plus souvent une saisie manquante (facture non validée, bon non facturé).</li></ul>]]></field>
         </record>
@@ -334,7 +334,7 @@
             <field name="sequence">59</field>
             <field name="action_xmlid">sale.action_quotations_with_onboarding</field>
             <field name="resume">Le devis d'irrigation : par lots (station, filtration, réseau, secteurs, automatisme, pose), avec les marges pour vous, les fiches techniques et l'avis du référentiel pour le client.</field>
-            <field name="etapes"><![CDATA[<ol><li>« Nouveau » : le client, l'installation (ou le type d'installation), et un modèle par lots si vous en avez un.</li><li>Les lignes : tapez une référence du catalogue Cultiveau ou de votre base ; une nomenclature pose un ensemble d'un coup ; « Depuis mon stock » filtre sur ce que vous avez.</li><li>Onglet « Marges et référentiel » : achat, marge et taux par ligne et par lot (jamais sur le PDF) ; « Relire le référentiel » ajoute les notes techniques.</li><li>« Envoyer » : le PDF à la marque de l'entreprise, les fiches techniques jointes, la signature et l'acompte en ligne.</li><li>À la confirmation : le chantier, l'acompte, les demandes de prix des manquants et la mise en service se créent seuls.</li></ol>]]></field>
+            <field name="etapes"><![CDATA[<ol><li>« Nouveau » : le client, l'installation (ou le type d'installation), et un modèle par lots si vous en avez un.</li><li>Les lignes : tapez une référence du catalogue Cultiveau ou de votre base ; une nomenclature pose un ensemble d'un coup ; « Depuis mon stock » filtre sur ce que vous avez.</li><li>Onglet « Marges et référentiel » : achat, marge et taux par ligne et par lot (jamais sur le PDF) ; « Relire avec le référentiel » montre ce que le référentiel dit du devis, « Écrire ces notes sur le devis » les ajoute en notes techniques.</li><li>« Envoyer » : le PDF à la marque de l'entreprise, les fiches techniques jointes, la signature et l'acompte en ligne.</li><li>À la confirmation : le chantier, l'acompte, les demandes de prix des manquants et la mise en service se créent seuls.</li></ol>]]></field>
             <field name="texte"><![CDATA[<ul><li>Faites d'abord l'analyse des besoins (A1.1) sur l'installation : le devis en découle.</li></ul>]]></field>
             <field name="pieges"><![CDATA[<ul><li>Une marge sous le minimum de l'entreprise s'affiche en rouge : corrigez le prix ou l'achat avant d'envoyer.</li></ul>]]></field>
             <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/DEVIS-PLUS.md</field>
@@ -344,7 +344,7 @@
             <field name="sequence">60</field>
             <field name="action_xmlid">sale.action_orders</field>
             <field name="resume">Les devis signés : ce qui est à livrer, à poser, à facturer.</field>
-            <field name="etapes"><![CDATA[<ol><li>Les boutons du haut : la livraison, le chantier, les achats, les factures et les heures pointées.</li><li>« Lancer le chantier » si le chantier n'a pas été créé à la confirmation.</li><li>« Créer la facture » pour l'acompte ou le solde ; les jalons se facturent depuis les phases du chantier.</li></ol>]]></field>
+            <field name="etapes"><![CDATA[<ol><li>Les boutons du haut : la livraison, le chantier, les achats, les factures et les heures pointées.</li><li>« Lancer le chantier » si le chantier n'a pas été créé à la confirmation.</li><li>« Créer une facture » pour l'acompte ou le solde ; les jalons se facturent depuis les phases du chantier.</li></ol>]]></field>
             <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/DECLENCHE.md</field>
         </record>
         <record id="tuto_factures" model="cultiveau.aide">
@@ -646,7 +646,7 @@
             <field name="sequence">99</field>
             <field name="action_xmlid">cultiveau_quotidien.action_regles</field>
             <field name="resume">Les règles du métier qui tournent seules : devis à relancer, chantier à lancer, entretien à proposer, et celles que vous ajoutez.</field>
-            <field name="etapes"><![CDATA[<ol><li>Activez ou désactivez une règle ; réglez ses délais.</li><li>« Et si… ? » teste une règle sur une copie avant de la lancer.</li></ol>]]></field>
+            <field name="etapes"><![CDATA[<ol><li>Activez ou désactivez une règle ; réglez ses délais.</li><li>Une règle se lit « Si… alors… » ; « Lancer maintenant » l'exécute tout de suite pour voir ce qu'elle fait.</li></ol>]]></field>
             <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/QUOTIDIEN.md</field>
         </record>
         <record id="tuto_cles_api" model="cultiveau.aide">
@@ -663,7 +663,7 @@
             <field name="sequence">101</field>
             <field name="action_xmlid">cultiveau_site.action_site_connexions</field>
             <field name="resume">Pour chaque société : la clé reçue de cultiveau.fr, ce qui est synchronisé (clients, interventions, chantiers, bons, articles, inventaires), le dernier passage et son résultat.</field>
-            <field name="etapes"><![CDATA[<ol><li>« Synchroniser maintenant » force un passage ; sinon toutes les heures.</li><li>Décochez ce que vous ne voulez pas recevoir (par exemple les inventaires si le stock se tient ailleurs).</li><li>« Tout relire » efface les curseurs pour un passage complet.</li></ol>]]></field>
+            <field name="etapes"><![CDATA[<ol><li>« Synchroniser maintenant » force un passage ; sinon toutes les heures.</li><li>Décochez ce que vous ne voulez pas recevoir (par exemple les inventaires si le stock se tient ailleurs).</li><li>« Tout relire au prochain passage » efface les curseurs : le passage suivant reprend tout depuis le début.</li></ol>]]></field>
             <field name="pieges"><![CDATA[<ul><li>La clé arrive toute seule quand quelqu'un de l'entreprise entre depuis cultiveau.fr : ne la saisissez pas à la main.</li></ul>]]></field>
             <field name="doc">https://github.com/Benjaminfoulquier-wq/cultiveau-erp/blob/main/docs/CULTIVEAU-FR.md</field>
         </record>

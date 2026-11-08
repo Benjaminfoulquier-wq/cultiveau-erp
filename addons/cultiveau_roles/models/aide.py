@@ -57,3 +57,30 @@ class Aide(models.Model):
         """Les textes d'origine qui pointaient sur un identifiant qui n'existe pas (la Map) laissent la place au tuto de la page."""
         self.sudo().search([("action_xmlid", "=", "cultiveau_vue3d.action_map")]).unlink()
         return True
+
+    RELECTURES = {  # 08/11/2026 : les libellés vérifiés sur les vrais écrans
+        "cultiveau_roles.tuto_devis": [("« Relire le référentiel » ajoute les notes techniques.", "« Relire avec le référentiel » montre ce que le référentiel dit du devis, « Écrire ces notes sur le devis » les ajoute en notes techniques.")],
+        "cultiveau_roles.tuto_automatisations": [("« Et si… ? » teste une règle sur une copie avant de la lancer.", "Une règle se lit « Si… alors… » ; « Lancer maintenant » l'exécute tout de suite pour voir ce qu'elle fait.")],
+        "cultiveau_roles.tuto_liaison_site": [("« Tout relire » efface les curseurs pour un passage complet.", "« Tout relire au prochain passage » efface les curseurs : le passage suivant reprend tout depuis le début.")],
+        "cultiveau_roles.tuto_tableau_bord": [("Choisissez la période en haut (mois, trimestre, année).", "Les chiffres sont ceux du mois et de l'année en cours, recalculés à l'ouverture.")],
+        "cultiveau_roles.tuto_commandes": [("« Créer la facture » pour l'acompte ou le solde", "« Créer une facture » pour l'acompte ou le solde")],
+    }
+
+    @api.model
+    def _relecture_20261108(self):
+        """Les corrections de la relecture, appliquées aux tutos déjà en base (ils sont en noupdate pour garder les modifications de l'adhérent)."""
+        from markupsafe import escape as _esc  # noqa: PLC0415
+        for xmlid, paires in self.RELECTURES.items():
+            aide = self.env.ref(xmlid, raise_if_not_found=False)
+            if not aide:
+                continue
+            for champ in ("etapes", "texte"):
+                valeur = aide[champ] or ""
+                nouveau = valeur
+                for avant, apres in paires:
+                    for a, b in ((avant, apres), (str(_esc(avant)), str(_esc(apres)))):
+                        if a in nouveau:
+                            nouveau = nouveau.replace(a, b)
+                if nouveau != valeur:
+                    aide.write({champ: nouveau})
+        return True
