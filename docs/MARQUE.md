@@ -25,3 +25,11 @@ correspondante plutôt que corriger l'écran seul.
   mise à jour sur les sociétés qui n'en ont pas). Le logo de l'adhérent le remplace dès qu'il entre depuis cultiveau.fr.
 - Portail client : « Généré par Cultiveau » sous le devis ou la facture, plus de logo de l'éditeur ; « The conversation is empty »
   traduit (i18n/fr_FR.po du module).
+
+## Polices, arrondis, couleurs (08/11/2026)
+
+« Exactement la même chose, juste des polices différentes, des choses plus arrondies que carrées et des couleurs plus jolies. » Les polices de
+cultiveau.fr (Plus Jakarta Sans pour les titres, Inter pour le texte) étaient déclarées mais jamais chargées : c'était la police système qui
+s'affichait. Elles sont maintenant chargées dans `web.layout` (Google Fonts, comme sur le site). Palette alignée sur celle du site : encre
+#1b2735, turquoise #2a7f8f (actions, liens), turquoise clair #6ebfcc, papier #f6f4ef, or #e2b14f (compteurs). Arrondis : 14 px par défaut,
+20 px pour les cartes, boutons, onglets, étiquettes et avatars en pilule ; exemples de champs en gris plus léger.

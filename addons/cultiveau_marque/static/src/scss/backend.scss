@@ -1,13 +1,19 @@
-// L'ERP habillé comme cultiveau.fr : bleu nuit, cyan, fond chaud, cartes arrondies, Plus Jakarta Sans pour ce qui se lit en grand.
-$cv-nuit: #15283a;
-$cv-nuit-2: #1b2f4a;
-$cv-cyan: #1d9fbd;
-$cv-cyan-clair: #35c9e8;
-$cv-turquoise: #22d3c5;
-$cv-fond: #f5f3ee;
+// L'ERP habillé comme cultiveau.fr : encre, turquoise, papier, or ; cartes et boutons bien ronds ; Plus Jakarta Sans pour ce qui se lit en grand.
+// 08/11/2026 : « exactement la même chose, juste des polices différentes, des choses plus arrondies que carrées et des couleurs plus jolies ».
+$cv-nuit: #1b2735;
+$cv-nuit-2: #243447;
+$cv-cyan: #2a7f8f;          // turquoise de cultiveau.fr (actions, liens)
+$cv-cyan-clair: #6ebfcc;    // turquoise clair (accents, compteurs)
+$cv-turquoise: #8fd3dc;
+$cv-or: #e2b14f;            // or de cultiveau.fr (mise en avant)
+$cv-fond: #f6f4ef;          // papier
 $cv-carte: #ffffff;
-$cv-bord: #e3e6ea;
-$cv-texte: #182838;
+$cv-bord: #e6e2d9;          // bord chaud, assorti au papier
+$cv-texte: #1b2735;
+$cv-texte-2: #5f6b78;
+$cv-rayon: 14px;
+$cv-rayon-grand: 20px;
+$cv-rayon-pilule: 999px;
 
 body, .o_web_client { font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: $cv-texte; }
 h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5, .o_form_view .oe_title h1, .o_kanban_record .o_kanban_record_title, .o_control_panel .o_breadcrumb .active,
@@ -26,16 +32,20 @@ h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5, .o_form_view .oe_title h1, .o_kanba
 // le fond chaud du site, les cartes blanches arrondies qui flottent légèrement
 .o_action_manager, .o_content { background-color: $cv-fond; }
 .o_form_view .o_form_sheet_bg { background: $cv-fond; }
-.o_form_view .o_form_sheet { border: 1px solid $cv-bord; border-radius: 16px; box-shadow: 0 10px 30px rgba(21, 40, 58, 0.06); }
+.o_form_view .o_form_sheet { border: 1px solid $cv-bord; border-radius: $cv-rayon-grand; box-shadow: 0 12px 34px rgba(27, 39, 53, 0.06); }
 .o_control_panel { background: $cv-fond; border-bottom: 1px solid $cv-bord; }
-.o_kanban_view .o_kanban_record { border-radius: 14px; border: 1px solid $cv-bord; box-shadow: 0 4px 14px rgba(21, 40, 58, 0.05); }
+.o_kanban_view .o_kanban_record { border-radius: 18px; border: 1px solid $cv-bord; box-shadow: 0 4px 16px rgba(27, 39, 53, 0.05); }
 .o_kanban_view .o_kanban_record:hover { box-shadow: 0 10px 26px rgba(21, 40, 58, 0.10); }
-.o_list_view .o_list_renderer { border-radius: 14px; overflow: hidden; border: 1px solid $cv-bord; background: $cv-carte; }
-.o_list_view .table thead th { background: #eef2f5; color: $cv-texte; font-weight: 600; text-transform: none; letter-spacing: 0; }
-.o_notebook .nav-tabs .nav-link { border-radius: 10px 10px 0 0; font-weight: 600; }
+.o_list_view .o_list_renderer { border-radius: 18px; overflow: hidden; border: 1px solid $cv-bord; background: $cv-carte; }
+.o_list_view .table thead th { background: #f1eee7; color: $cv-texte; font-weight: 600; text-transform: none; letter-spacing: 0; }
+.o_notebook .nav-tabs { border-bottom: 0; gap: 6px; padding: 4px; }
+.o_notebook .nav-tabs .nav-link { border-radius: $cv-rayon-pilule; font-weight: 600; border: 1px solid transparent; color: $cv-texte-2; padding: 6px 14px; }
+.o_notebook .nav-tabs .nav-link.active { background: rgba(42, 127, 143, 0.10); color: $cv-cyan; border-color: rgba(42, 127, 143, 0.18); }
+.o_notebook .nav-tabs .nav-link:hover:not(.active) { background: rgba(27, 39, 53, 0.05); }
 .o_notebook .nav-tabs .nav-link.active { color: $cv-cyan; border-bottom-color: $cv-cyan; }
 // boutons : arrondis, le principal en cyan foncé, le texte en blanc lisible
-.btn { border-radius: 10px; font-weight: 600; }
+.btn { border-radius: $cv-rayon-pilule; font-weight: 600; padding-left: 16px; padding-right: 16px; }
+.btn-secondary, .btn-light { border-color: $cv-bord; }
 .btn-primary { background: $cv-cyan; border-color: $cv-cyan; color: #fff; &:hover, &:focus { background: darken($cv-cyan, 7%); border-color: darken($cv-cyan, 7%); } }
 .btn-secondary { background: #fff; border-color: $cv-bord; color: $cv-texte; &:hover { background: #eef2f5; } }
 .o_statusbar_status .o_arrow_button.o_arrow_button_current { background: $cv-cyan; color: #fff; }
@@ -44,12 +54,13 @@ h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5, .o_form_view .oe_title h1, .o_kanba
 .badge.text-bg-primary, .o_tag.o_tag_color_0 { background: $cv-cyan !important; }
 a, .o_form_view .o_field_widget a { color: $cv-cyan; }
 // le menu des applications : lisible, arrondi, l'application active en cyan
-.o-dropdown--menu .dropdown-item { border-radius: 8px; }
+.o-dropdown--menu { border-radius: 16px; border-color: $cv-bord; box-shadow: 0 16px 40px rgba(27, 39, 53, 0.12); padding: 6px; }
+.o-dropdown--menu .dropdown-item { border-radius: 10px; }
 .o-dropdown--menu .dropdown-item.active, .o-dropdown--menu .dropdown-item:active { background: $cv-cyan; color: #fff; }
 // dialogues et notifications
-.modal-content { border-radius: 16px; border: 0; box-shadow: 0 24px 60px rgba(21, 40, 58, 0.25); }
+.modal-content { border-radius: 22px; border: 0; box-shadow: 0 24px 60px rgba(21, 40, 58, 0.25); }
 .modal-header { border-bottom-color: $cv-bord; .modal-title { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; } }
-.o_notification { border-radius: 12px; }
+.o_notification { border-radius: 16px; }
 // les illustrations des listes vides, redessinées aux couleurs Cultiveau ; la vidéo promotionnelle de l'éditeur sur les devis n'apparaît pas
 .o_sale_action_preview { display: none !important; }
 .o_view_nocontent .o_nocontent_help, .o_nocontent_help {
@@ -58,3 +69,32 @@ a, .o_form_view .o_field_widget a { color: $cv-cyan; }
 }
 // barre de défilement discrète
 ::-webkit-scrollbar { width: 10px; height: 10px; } ::-webkit-scrollbar-thumb { background: #c7ced6; border-radius: 10px; border: 2px solid $cv-fond; }
+
+// champs, recherche, étiquettes, avatars : ronds et doux ; les exemples en gris plus léger pour que le vide ne crie pas
+.o_form_view .o_field_widget input, .o_form_view .o_field_widget textarea, .o_form_view .o_input, .o_input_dropdown input, .o_searchview .o_searchview_input_container,
+.o_control_panel .o_searchview { border-radius: 12px; }
+.o_searchview { border: 1px solid $cv-bord !important; background: $cv-carte; padding: 2px 6px; }
+.o_form_view .o_form_sheet .o_field_widget input::placeholder, .o_form_view .o_form_sheet .o_field_widget textarea::placeholder { color: rgba(95, 107, 120, 0.55); }
+.o_form_view .o_form_sheet .o_field_widget:not(.o_field_invalid) input, .o_form_view .o_form_sheet .o_field_widget textarea { border-bottom-color: #ece8e0; }
+.badge, .o_tag, .o_field_badge .badge, .o_statusbar_status .o_arrow_button { border-radius: $cv-rayon-pilule !important; }
+.o_statusbar_status .o_arrow_button { padding-left: 14px; padding-right: 14px; }
+.o_avatar, .o_m2o_avatar img, .o_user_avatar, .o_mail_thread .o-mail-Message-avatar img, .o-mail-Message-avatarContainer img { border-radius: $cv-rayon-pilule !important; }
+.o_form_view .oe_avatar, .o_form_view .oe_avatar img, .o_field_image img { border-radius: 18px !important; }
+.o_form_view .o_form_statusbar { background: transparent; border-bottom: 1px solid $cv-bord; }
+.o_form_view .oe_button_box .oe_stat_button { border-radius: 14px; border: 1px solid transparent; }
+.o_form_view .oe_button_box .oe_stat_button:hover { background: rgba(42, 127, 143, 0.06); border-color: $cv-bord; }
+.o_form_view .oe_button_box .oe_stat_button .o_stat_value, .o_form_view .oe_button_box .oe_stat_button .fa { color: $cv-cyan; }
+.o-mail-Chatter, .o-mail-Form-chatter { background: $cv-fond; border-left: 1px solid $cv-bord; }
+.o-mail-Chatter .btn-primary, .o-mail-Chatter .btn { border-radius: $cv-rayon-pilule; }
+.o_control_panel .o_breadcrumb .active, .o_control_panel .o_last_breadcrumb_item { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; }
+.o_kanban_view .o_kanban_group .o_kanban_header_title { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; color: $cv-texte; }
+.o_kanban_view .o_column_progress .progress-bar.bg-success { background: $cv-cyan !important; }
+.o_kanban_view .o_kanban_record .o_kanban_record_title { font-weight: 700; }
+.o_list_view .o_data_row:hover > td { background: rgba(42, 127, 143, 0.04) !important; }
+.o_list_view .table tbody td { border-color: #f1eee7; }
+a, .o_form_view .o_field_widget a { color: $cv-cyan; }
+.text-primary, .o_form_view .o_form_label .o_field_widget.text-primary { color: $cv-cyan !important; }
+.btn-link { color: $cv-cyan; }
+.form-check-input:checked { background-color: $cv-cyan; border-color: $cv-cyan; }
+.o_main_navbar .o_menu_sections .o_nav_entry, .o_main_navbar .o_menu_sections .dropdown-toggle { border-radius: $cv-rayon-pilule; }
+.o_main_navbar .o_menu_systray .o_notification_counter { background: $cv-or !important; color: $cv-nuit !important; }

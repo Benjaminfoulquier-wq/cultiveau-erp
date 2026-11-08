@@ -5,6 +5,12 @@
         <xpath expr="//title" position="replace">
             <title t-esc="title or 'Cultiveau'"/>
         </xpath>
+        <xpath expr="//title" position="after">
+            <!-- Les polices de cultiveau.fr, chargées pour de vrai (déclarées sans être chargées, c'était la police système qui s'affichait) -->
+            <link rel="preconnect" href="https://fonts.googleapis.com"/>
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap"/>
+        </xpath>
         <xpath expr="//link[@rel='shortcut icon']" position="replace">
             <link type="image/png" rel="shortcut icon" href="/cultiveau_marque/static/src/img/favicon.png"/>
             <!-- les polices de cultiveau.fr : Plus Jakarta Sans pour les titres, Inter pour le texte -->
