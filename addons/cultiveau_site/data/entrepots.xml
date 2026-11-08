@@ -2,4 +2,6 @@
 <odoo>
     <!-- Chaque société a son entrepôt, au nom de la société : sans lui, aucun stock n'est possible. Rejoué à chaque mise à jour. -->
     <function model="res.company" name="cultiveau_entrepots_manquants"/>
+    <!-- Chaque compte ne voit que sa société ; seul le compte technique admin garde toutes les sociétés. -->
+    <function model="res.users" name="cultiveau_cloisonner_societes"/>
 </odoo>

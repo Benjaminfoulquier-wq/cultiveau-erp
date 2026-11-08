@@ -122,6 +122,21 @@ class TestEntree(HttpCase):
         charge = lire_jeton(unquote(parse_qs(urlparse(r.headers["Location"]).query)["t"][0]), SECRET)
         self.assertEqual(charge["vers"], "/adherent/espace")
 
+    def test_chaque_compte_ne_voit_que_sa_societe(self):
+        """Un compte Cultiveau autorisé sur toutes les sociétés est ramené à la sienne ; admin garde tout ; on ne peut pas en rajouter."""
+        Users = self.env["res.users"]
+        principale = self.env.ref("base.main_company")
+        contact = Users.create({"name": "Contact Cultiveau", "login": "contact@test-cultiveau.fr", "company_id": principale.id,
+                                "company_ids": [(6, 0, [principale.id, self.ouverte.id])], "groups_id": [(4, self.env.ref("base.group_user").id)]})
+        self.assertEqual(contact.company_ids, principale, "le write ramène déjà à la seule société")
+        contact.with_context(cultiveau_cloisonnement=True).write({"company_ids": [(6, 0, [principale.id, self.ouverte.id])]})
+        self.assertEqual(len(contact.company_ids), 2)
+        self.assertEqual(Users.cultiveau_cloisonner_societes(), 1)
+        self.assertEqual(contact.company_ids, principale)
+        admin = self.env.ref("base.user_admin")
+        admin.write({"company_ids": [(4, self.ouverte.id)]})
+        self.assertIn(self.ouverte, admin.company_ids)
+
     def test_si_pas_erp_dans_l_admin_pas_d_acces(self):
         """Mot de passe ou session ouverte : un compte d'une société fermée n'entre pas ; l'admin et Cultiveau passent toujours."""
         from odoo.exceptions import AccessDenied

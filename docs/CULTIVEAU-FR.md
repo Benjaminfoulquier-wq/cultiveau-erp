@@ -139,3 +139,8 @@ par toutes les portes : laissez-passer (déjà filtré par le site), mot de pass
 ouverte (`ir.http._auth_method_user` la termine au premier écran suivant). Passent toujours : l'administrateur et les comptes de la société
 Cultiveau (`base.main_company`). Une personne décochée est désactivée par `/cultiveau/entree/personne`. État au 08/11 : seules Cultiveau et
 Modern Irrigation 81 sont ouvertes ; les quatre autres sociétés n'ont aucun compte actif.
+
+- **Chaque compte ne voit que sa société** (08/11/2026, « depuis le compte contact@cultiveau.fr je peux avoir accès à l'ERP de Frédéric Honoré
+  et ça, c'est pas bon ») : `res.users.cultiveau_cloisonner_societes` (rejoué à chaque mise à jour) et `res.users.write` ramènent tout compte
+  interne à sa seule société ; seul le compte technique `admin` garde toutes les sociétés. Côté assistant, l'entrée par laissez-passer efface
+  le mode « voir comme » du superviseur et le pose sur sa propre entreprise.
