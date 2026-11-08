@@ -104,9 +104,12 @@ a, .o_form_view .o_field_widget a { color: $cv-cyan; }
 // listes qui respirent, titres plus grands en Jakarta, compteurs en pastilles, messages du fil en bulles. Même structure, autre peau.
 // ---------------------------------------------------------------------------------------------------------------------
 // les titres d'écran et de fiche
-.o_control_panel .o_breadcrumb .active, .o_control_panel .o_last_breadcrumb_item, .o_control_panel .o_last_breadcrumb_item > span { font-size: 20px; line-height: 1.2; }
+.o_control_panel .o_breadcrumb .active, .o_control_panel .o_last_breadcrumb_item, .o_control_panel .o_last_breadcrumb_item > span { font-size: 18px; line-height: 1.2; }
 .o_control_panel { padding-top: 10px; padding-bottom: 10px; }
-.o_form_view .oe_title h1, .o_form_view .oe_title .o_field_widget input.o_input { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 30px; }
+.o_form_view .oe_title h1, .o_form_view .oe_title h1 .o_field_widget input.o_input { font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 800; letter-spacing: -0.02em; font-size: 28px; }
+.o_form_view .oe_title h1 .o_field_widget input.o_input { background: transparent; border-color: transparent !important; padding-left: 6px !important; }
+.o_form_view .oe_title h1 .o_field_widget input.o_input:hover, .o_form_view .oe_title h1 .o_field_widget input.o_input:focus { background: #f8f6f1; border-color: #ebe7de !important; }
+.o_form_view .oe_title .o_field_widget:not(h1 *) input.o_input { font-size: 14px; }
 // les champs : une pastille douce, arrondie, au lieu d'un trait sous le texte
 .o_form_view .o_form_sheet .o_field_widget:not(.o_field_boolean):not(.o_field_many2many_tags):not(.o_field_html):not(.o_field_image) > .o_input,
 .o_form_view .o_form_sheet .o_field_widget:not(.o_field_boolean):not(.o_field_html):not(.o_field_image) input.o_input,
