@@ -27,3 +27,10 @@ Non fait : les fichiers des fiches ne sont pas copiés dans l'ERP (lien vers la 
 « Cultiveau Logistique », prix de vente, fiches, photo) et la recherche reprend : l'article apparaît comme s'il avait toujours
 été là. Le robot horaire ne crée plus rien : il rafraîchit les articles déjà utilisés (prix, fiches, retraits). La copie complète
 reste possible par le réglage « Copier tout le catalogue dans l'ERP » ou le bouton « Tout synchroniser maintenant ».
+
+## Prix public : jamais moins de trois fois le prix d'achat (08/11/2026)
+
+« Mets un minimum de ×3 sur les prix du catalogue Cultiveau pour le prix public. » `_prix_public(prix_achat, prix_brut)` = max(prix brut du
+fabricant, 3 × prix d'achat), arrondi au centime (`COEF_PUBLIC_MINI`). Appliqué à chaque article lu sur la logistique (synchronisation,
+recherche à la volée depuis un devis) et rejoué sur les articles déjà dans l'ERP à chaque mise à jour (`cultiveau_prix_public_minimum`,
+`data/prix_public.xml`). Les articles des adhérents (leur base cultiveau.fr) ne sont pas concernés : leurs prix sont les leurs.

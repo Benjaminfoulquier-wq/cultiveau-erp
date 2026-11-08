@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Le prix public du catalogue Cultiveau ne descend jamais sous trois fois le prix d'achat. Rejoué à chaque mise à jour. -->
+    <function model="product.template" name="cultiveau_prix_public_minimum"/>
+</odoo>

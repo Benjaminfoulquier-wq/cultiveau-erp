@@ -12,6 +12,7 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 PARTENAIRE_LOGISTIQUE = "Cultiveau Logistique"
+COEF_PUBLIC_MINI = 3.0  # prix public du catalogue Cultiveau : jamais moins de trois fois le prix d'achat
 
 
 class Reglages(models.TransientModel):
@@ -161,6 +162,28 @@ class Produit(models.Model):
             self.env.invalidate_all()
 
     @api.model
+    def _prix_public(self, prix_achat, prix_brut=None):
+        """Le prix public d'un article du catalogue Cultiveau : le prix brut du fabricant, et jamais moins de trois fois le prix d'achat
+        (règle de Benjamin, 08/11/2026 : « un minimum de x3 sur les prix du catalogue Cultiveau pour le prix public »)."""
+        prix_achat = float(prix_achat or 0.0)
+        prix_brut = float(prix_brut or 0.0)
+        return round(max(prix_brut, prix_achat * COEF_PUBLIC_MINI), 2)
+
+    @api.model
+    def cultiveau_prix_public_minimum(self):
+        """Rejoué à chaque mise à jour : les articles du catalogue déjà dans l'ERP respectent la règle."""
+        Produit = self.sudo().with_context(active_test=False)
+        n = 0
+        for produit in Produit.search([("cultiveau_source", "=", "logistique"), ("company_id", "=", False)]):
+            mini = self._prix_public(produit.standard_price)
+            if produit.standard_price and produit.list_price < mini:
+                produit.list_price = mini
+                n += 1
+        if n:
+            _logger.info("Catalogue Cultiveau : prix public relevé à 3 × le prix d'achat sur %s article(s).", n)
+        return n
+
+    @api.model
     def _logistique_appliquer(self, produits, bilan, creer=True):
         Fiche = self.env["cultiveau.fiche"].sudo()
         cache_f, cache_c = {}, {}
@@ -184,7 +207,7 @@ class Produit(models.Model):
             except ValueError:
                 maj_dt = None
             prix_achat = p.get("prix") if p.get("prix") is not None else 0.0
-            prix_vente = p.get("prix_brut") if p.get("prix_brut") else (prix_achat * 1.3 if prix_achat else 0.0)
+            prix_vente = self._prix_public(prix_achat, p.get("prix_brut"))
             valeurs = {
                 "name": (p.get("nom") or p.get("reference") or "Produit")[:255], "default_code": (p.get("reference") or f"LOG-{p['id']}")[:64], "type": "consu", "is_storable": True,
                 "categ_id": categorie.id, "description_sale": description or False, "weight": p.get("poids") or 0.0,

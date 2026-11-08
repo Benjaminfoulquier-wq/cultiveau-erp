@@ -34,7 +34,7 @@ class TestSynchroLogistique(TransactionCase):
         self.assertFalse(gaine.company_id)
         self.assertEqual(gaine.categ_id.name, "Gaine (paroi mince)")
         self.assertEqual(gaine.categ_id.parent_id.name, "Goutte à goutte / micro-irrigation")
-        self.assertEqual(gaine.list_price, 0.18)
+        self.assertEqual(gaine.list_price, 0.36)  # prix brut 0,18 mais jamais moins de 3 × 0,12 d'achat
         self.assertEqual(gaine.standard_price, 0.12)
         self.assertIn("Le mot de RIVULIS", gaine.description_sale)
         self.assertEqual(set(gaine.seller_ids.mapped("partner_id.name")), {"RIVULIS", "Cultiveau Logistique"})
@@ -44,7 +44,11 @@ class TestSynchroLogistique(TransactionCase):
         self.assertIn("d5000.pdf", gaine.cultiveau_fiche_url)
         self.assertEqual(gaine.cultiveau_logistique_id, 101)
         filtre = P.search([("default_code", "=", "ODIS-FD3")])
-        self.assertAlmostEqual(filtre.list_price, 310.0 * 1.3)  # pas de prix brut : une marge indicative
+        self.assertAlmostEqual(filtre.list_price, 310.0 * 3)  # pas de prix brut : trois fois le prix d'achat, jamais moins
+        # un article déjà dans l'ERP sous la règle est relevé à la mise à jour
+        filtre.with_context(active_test=False).write({"list_price": 400.0})
+        self.assertEqual(self.env["product.template"].cultiveau_prix_public_minimum(), 1)
+        self.assertAlmostEqual(filtre.list_price, 930.0)
         self.assertFalse(P.with_context(active_test=False).search([("default_code", "=", "VIEUX-1")]))  # retiré et inconnu : pas créé
         # deuxième passage : mise à jour, et un produit retiré s'archive
         PAGE2 = {"total": 1, "page": 1, "taille": 500, "produits": [dict(PAGE["produits"][0], actif=False, nom="Gaine D5000 retirée")]}

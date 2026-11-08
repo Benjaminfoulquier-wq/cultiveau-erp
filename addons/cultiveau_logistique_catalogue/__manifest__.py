@@ -16,7 +16,7 @@ bibliothèque des fiches, reliées à l'article). Un produit retiré de la logis
     "website": "https://cultiveau.fr",
     "license": "LGPL-3",
     "depends": ["cultiveau_catalogue"],
-    "data": ["data/cron.xml", "views/views.xml"],
+    "data": ["data/cron.xml", "views/views.xml", "data/prix_public.xml"],
     "installable": True,
     "auto_install": False,
 }
