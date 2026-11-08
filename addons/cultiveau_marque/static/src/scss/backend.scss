@@ -169,3 +169,64 @@ a, .o_form_view .o_field_widget a { color: $cv-cyan; }
 .o_statusbar_status .o_arrow_button::before, .o_statusbar_status .o_arrow_button::after { display: none !important; }
 // les boîtes de dialogue et menus : coins ronds et ombre douce (déjà), avec un titre en Jakarta
 .modal-header .modal-title { font-size: 20px; }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Troisième passage (« plus loin encore ») : une lueur dans le fond, des boutons qui ont du relief, des couleurs d'état de la même
+// famille, des coins ronds jusqu'aux icônes d'applications et aux infobulles. Toujours la même structure.
+// ---------------------------------------------------------------------------------------------------------------------
+$cv-succes: #2f8f6b;
+$cv-rouge: #b5473a;
+// le fond : papier, avec une lueur turquoise en haut à gauche et une lueur or en bas à droite, très légères
+.o_action_manager, .o_content {
+    background-color: $cv-fond;
+    background-image: radial-gradient(900px 420px at -10% -20%, rgba(110, 191, 204, 0.18), transparent 60%), radial-gradient(700px 360px at 110% 120%, rgba(226, 177, 79, 0.12), transparent 60%);
+    background-attachment: fixed;
+}
+.o_form_view .o_form_sheet_bg { background: transparent; }
+.o_form_view .o_form_sheet { border-radius: 24px; box-shadow: 0 18px 44px rgba(27, 39, 53, 0.07), 0 1px 0 rgba(255, 255, 255, 0.8) inset; }
+.o_list_view .o_list_renderer, .o_kanban_view .o_kanban_record { box-shadow: 0 8px 24px rgba(27, 39, 53, 0.05); }
+// les boutons : le principal plein, turquoise, avec un halo ; le secondaire blanc ; tous avec une transition
+.btn { transition: background .15s, box-shadow .15s, transform .1s, border-color .15s; }
+.btn-primary { box-shadow: 0 6px 16px rgba(42, 127, 143, 0.28); }
+.btn-primary:hover { box-shadow: 0 8px 20px rgba(42, 127, 143, 0.36); transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); box-shadow: 0 3px 8px rgba(42, 127, 143, 0.3); }
+.btn-secondary, .btn-light, .btn-outline-primary, .btn-outline-secondary { background: #fff; color: $cv-texte; border-color: $cv-bord; }
+.btn-secondary:hover, .btn-light:hover, .btn-outline-primary:hover, .btn-outline-secondary:hover { background: #f8f6f1; color: $cv-cyan; border-color: #d9d3c7; }
+.o_control_panel .o_control_panel_main_buttons .btn-primary, .o_control_panel .o_list_button_add, .o_control_panel .o-kanban-button-new, .o_control_panel .o_form_button_create { background: $cv-cyan; color: #fff; border-color: $cv-cyan; }
+.o_control_panel .o_form_button_save, .o_form_view .o_form_button_save { background: $cv-cyan; border-color: $cv-cyan; color: #fff; }
+// les couleurs d'état : une seule famille
+.badge.text-bg-success, .bg-success, .btn-success, .alert-success, .o_tag.o_tag_color_10, .progress-bar.bg-success { background-color: $cv-succes !important; border-color: $cv-succes !important; color: #fff !important; }
+.text-success, .o_field_badge .text-success { color: $cv-succes !important; }
+.badge.text-bg-warning, .bg-warning, .btn-warning, .alert-warning, .o_tag.o_tag_color_3 { background-color: $cv-or !important; border-color: $cv-or !important; color: $cv-nuit !important; }
+.text-warning { color: darken($cv-or, 18%) !important; }
+.badge.text-bg-danger, .bg-danger, .btn-danger, .alert-danger, .o_tag.o_tag_color_1 { background-color: $cv-rouge !important; border-color: $cv-rouge !important; color: #fff !important; }
+.text-danger { color: $cv-rouge !important; }
+.badge.text-bg-info, .bg-info, .alert-info, .o_tag.o_tag_color_4 { background-color: $cv-cyan-clair !important; border-color: $cv-cyan-clair !important; color: $cv-nuit !important; }
+.alert { border-radius: 16px; border: 0; }
+.o_list_view .o_data_row.text-danger > td, .o_list_view .o_data_row.text-danger .o_data_cell { color: $cv-rouge !important; }
+// les icônes d'applications (menu des applications et accueil) et les avatars : arrondis
+.o_navbar_apps_menu .dropdown-menu, .o-dropdown--menu.o_navbar_apps_menu { border-radius: 18px; }
+.o_navbar_apps_menu .dropdown-item img, .o_app img, .o_app_icon, .o_main_navbar .o_menu_brand img { border-radius: 14px !important; }
+.o_home_menu .o_app .o_app_icon, .o_apps .o_app .o_app_icon { border-radius: 18px !important; box-shadow: 0 8px 20px rgba(27, 39, 53, 0.12); }
+.o_user_avatar, .o_avatar, .o_m2o_avatar img, img.o_avatar, .o_user_menu img, .o_avatar_card img, .o-mail-Avatar img { border-radius: 999px !important; }
+.o_main_navbar .o_user_menu img, .o_main_navbar .o_user_menu .o_avatar { border: 2px solid rgba(255, 255, 255, 0.35); }
+// les listes modifiables (Base articles, lignes de devis) : la cellule en cours de saisie devient une pastille
+.o_list_view .o_data_row.o_selected_row .o_data_cell .o_input, .o_list_view .o_data_row.o_selected_row .o_data_cell .o_field_widget input { background: #f8f6f1; border: 1px solid #ebe7de !important; border-radius: 10px !important; padding: 4px 8px !important; }
+.o_list_view .o_data_row.o_selected_row .o_data_cell .o_input:focus, .o_list_view .o_data_row.o_selected_row .o_data_cell .o_field_widget input:focus { background: #fff; border-color: $cv-cyan !important; box-shadow: 0 0 0 3px rgba(42, 127, 143, 0.12); }
+.o_list_view .o_data_row.o_selected_row > td { background: rgba(42, 127, 143, 0.05) !important; }
+// infobulles, menus contextuels, notifications, barre de progression : coins ronds
+.tooltip .tooltip-inner, .popover { border-radius: 12px; }
+.o_popover { border-radius: 16px; box-shadow: 0 16px 40px rgba(27, 39, 53, 0.14); }
+.o_progressbar .o_progress, .progress { border-radius: 999px; overflow: hidden; height: 8px; }
+.o_progressbar .progress-bar { border-radius: 999px; }
+// le texte : un peu plus d'air
+body, .o_web_client { font-size: 14px; line-height: 1.5; }
+.o_form_view .o_form_sheet .o_field_widget, .o_list_view .table tbody td { font-size: 14px; }
+.o_form_view .o_form_sheet .o_horizontal_separator, .o_form_view .o_form_sheet .o_group > .o_horizontal_separator { color: $cv-cyan; font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; letter-spacing: 0; text-transform: none; font-size: 15px; border-bottom: 2px solid rgba(42, 127, 143, 0.18); padding-bottom: 6px; margin-bottom: 10px; }
+// le menu de l'application dans la barre (sections) et la barre Cultiveau : pilules, actif en turquoise clair
+.o_main_navbar .o_menu_sections .o_nav_entry.active, .o_main_navbar .o_menu_sections > a.active, .o_main_navbar .o_menu_sections .dropdown-toggle.active { background: rgba(110, 191, 204, 0.22); color: #fff; }
+.o_main_navbar { box-shadow: 0 6px 20px rgba(27, 39, 53, 0.25); border-bottom: 0; }
+// les cases à cocher et les interrupteurs
+.form-check-input { width: 18px; height: 18px; }
+.form-switch .form-check-input { width: 36px; border-radius: 999px; }
+.form-check-input:focus { box-shadow: 0 0 0 3px rgba(42, 127, 143, 0.18); border-color: $cv-cyan; }
