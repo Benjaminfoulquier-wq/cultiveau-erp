@@ -56,4 +56,39 @@
         <field name="context">{"vers": "logistique"}</field>
     </record>
     <menuitem id="menu_logistique" name="Logistique" parent="cultiveau_base.menu_cultiveau_root" action="action_ecran_logistique" sequence="3"/>
+
+    <!-- L'assistant téléphonique, réglé et lu depuis l'ERP (08/11/2026) : qui fait quoi, textes et horaires, appels à lire et à écouter,
+         demandes à suivre. Les écrans sont ceux d'assistant.cultiveau.fr, ouverts sur l'adhérent de la personne connectée (/moi/…). -->
+    <menuitem id="menu_assistant" name="Assistant téléphonique" parent="cultiveau_base.menu_cultiveau_root" sequence="24"/>
+    <record id="action_assistant_standard" model="ir.actions.client">
+        <field name="name">Mon standard</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "assistant:/moi/"}</field>
+    </record>
+    <menuitem id="menu_assistant_standard" name="Mon standard" parent="menu_assistant" action="action_assistant_standard" sequence="1"/>
+    <record id="action_assistant_reglages" model="ir.actions.client">
+        <field name="name">Qui fait quoi, textes, horaires</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "assistant:/moi/reglages/"}</field>
+    </record>
+    <menuitem id="menu_assistant_reglages" name="Qui fait quoi, textes, horaires" parent="menu_assistant" action="action_assistant_reglages" sequence="2"/>
+    <record id="action_assistant_appels" model="ir.actions.client">
+        <field name="name">Appels : lire et écouter</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "assistant:/moi/crm/"}</field>
+    </record>
+    <menuitem id="menu_assistant_appels" name="Appels : lire et écouter" parent="menu_assistant" action="action_assistant_appels" sequence="3"/>
+    <record id="action_assistant_demandes" model="ir.actions.client">
+        <field name="name">Demandes à suivre</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "assistant:/moi/demandes/"}</field>
+    </record>
+    <menuitem id="menu_assistant_demandes" name="Demandes à suivre" parent="menu_assistant" action="action_assistant_demandes" sequence="4"/>
+    <record id="action_assistant_agenda" model="ir.actions.client">
+        <field name="name">Agenda de l'assistant</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "assistant:/moi/agenda/"}</field>
+    </record>
+    <menuitem id="menu_assistant_agenda" name="Agenda de l'assistant" parent="menu_assistant" action="action_assistant_agenda" sequence="5"/>
+    <menuitem id="menu_assistant_appels_erp" name="Appels rangés dans l'ERP" parent="menu_assistant" action="cultiveau_connecteurs.action_appels" sequence="6" groups="base.group_user"/>
 </odoo>

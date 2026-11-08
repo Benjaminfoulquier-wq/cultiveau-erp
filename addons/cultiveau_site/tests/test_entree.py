@@ -87,6 +87,22 @@ class TestEntree(HttpCase):
         r = self.url_open("/cultiveau/entree/ouvrir", data=json.dumps({"t": fabriquer_jeton(dict(fermer, n="f2"), SECRET)}), headers={"Content-Type": "application/json"})
         self.assertEqual(r.status_code, 400)
 
+    def test_l_ecran_de_l_assistant_part_de_l_erp(self):
+        """Le cadre de l'ERP demande un écran de l'assistant : l'ERP renvoie vers cultiveau.fr avec vers=assistant:/moi/reglages/ signé."""
+        from ..controllers.entree import lire_jeton
+        from urllib.parse import parse_qs, urlparse, unquote
+        self.authenticate("admin", "admin")
+        r = self.url_open("/cultiveau/ecran?vers=assistant:/moi/reglages/", allow_redirects=False)
+        self.assertIn(r.status_code, (302, 303))
+        u = urlparse(r.headers["Location"])
+        self.assertEqual((u.scheme + "://" + u.netloc + u.path), "https://site.test/api/erp/entree")
+        charge = lire_jeton(unquote(parse_qs(u.query)["t"][0]), SECRET)
+        self.assertEqual((charge["outil"], charge["source"], charge["vers"]), ("cultiveau", "erp", "assistant:/moi/reglages/"))
+        # une destination hors liste retombe sur l'espace adhérent
+        r = self.url_open("/cultiveau/ecran?vers=assistant://ailleurs.example/x", allow_redirects=False)
+        charge = lire_jeton(unquote(parse_qs(urlparse(r.headers["Location"]).query)["t"][0]), SECRET)
+        self.assertEqual(charge["vers"], "/adherent/espace")
+
     def test_premiere_entree_cree_entreprise_et_acces(self):
         demandes = []
 

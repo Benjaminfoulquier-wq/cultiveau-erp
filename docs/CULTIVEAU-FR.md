@@ -112,3 +112,17 @@ setup et feu. » Côté ERP (`controllers/entree.py`, `models/entree.py`) :
   mise en sommeil (plus de synchronisation). Réponse `{ok, societe_id, utilisateurs_desactives}`.
 - À l'entrée et à la question d'éligibilité, `entreprise.erp_acces: true` dans le laissez-passer ouvre la société si elle ne l'était pas :
   la décision vient du site. Sans ce champ, comportement inchangé (comptes existants, sociétés cochées dans l'ERP).
+
+## L'assistant téléphonique réglé et lu depuis l'ERP (08/11/2026)
+
+« Il faudrait qu'on puisse régler aussi l'assistant téléphonique depuis cet accès : qui fait quoi, comment ; modifier ses textes ; entendre
+ce qui a été dit au téléphone. » Menu **Cultiveau › Assistant téléphonique** : Mon standard, Qui fait quoi / textes / horaires (le parcours
+de réglages), Appels : lire et écouter, Demandes à suivre, Agenda de l'assistant, et les appels déjà rangés dans l'ERP. Ce sont les écrans
+d'assistant.cultiveau.fr, affichés dans le cadre de l'ERP par la chaîne ERP → cultiveau.fr (`/cultiveau/ecran?vers=assistant:/moi/…`,
+pont dans `erpLien.ts`) → assistant (`/sso/cultiveau/?t=…` avec `vers`), ouverts sur l'adhérent de la personne connectée (`/moi/<écran>/`
+côté assistant). L'assistant autorise le cadre d'erp.cultiveau.fr (CSP `frame-ancestors`, cookies SameSite=None). Ce que l'assistant génère
+(fiches d'intervention, opportunités, appels sur la fiche du client) passe par le connecteur « ERP Cultiveau » de chaque adhérent, déjà en
+place pour les six sociétés.
+
+Vue vivante : l'équipe d'une société = les comptes dont c'est la société principale ; un compte Cultiveau autorisé sur toutes les sociétés
+n'y figure plus (« Cultiveau n'est pas gérant »).

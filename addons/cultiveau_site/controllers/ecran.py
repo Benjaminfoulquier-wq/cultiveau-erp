@@ -19,8 +19,8 @@ from markupsafe import escape
 from odoo import http
 from odoo.http import request
 
-# Seules ces destinations partent de l'ERP : un chemin de l'espace adhérent, ou la logistique
-DESTINATION = re.compile(r"^(logistique|/adherent/[A-Za-z0-9/_\-?=&.%]*)$")
+# Seules ces destinations partent de l'ERP : un chemin de l'espace adhérent, la logistique, ou un écran de l'assistant téléphonique (assistant:/moi/reglages/)
+DESTINATION = re.compile(r"^(logistique|assistant:/[A-Za-z0-9/_\-?=&.%]*|/adherent/[A-Za-z0-9/_\-?=&.%]*)$")
 
 
 def _b64(octets):

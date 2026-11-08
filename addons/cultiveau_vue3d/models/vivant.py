@@ -90,7 +90,9 @@ class Map(models.AbstractModel):
         return SECTEUR["accent_defaut"]
 
     def _utilisateurs(self, company):
-        return self.env["res.users"].sudo().search([("share", "=", False), ("active", "=", True), ("company_ids", "in", company.id),
+        """L'équipe de la société : les comptes dont c'est la société principale. Quelqu'un de Cultiveau autorisé sur toutes les sociétés
+        n'en fait pas partie (« Cultiveau n'est pas gérant », 08/11/2026)."""
+        return self.env["res.users"].sudo().search([("share", "=", False), ("active", "=", True), ("company_id", "=", company.id),
                                                     ("id", "!=", self.env.ref("base.user_root").id)], order="name", limit=40)
 
     def _personnes(self, company, local):
