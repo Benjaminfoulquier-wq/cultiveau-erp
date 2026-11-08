@@ -71,6 +71,16 @@ class TestApi(HttpCase):
         self.assertEqual(r.json()["type"], "activite")
         self.assertTrue(self.agri.activity_ids.filtered(lambda a: a.summary == "Demande les horaires"))
 
+    def test_retour_depuis_l_appel(self):
+        corps = {"numero_dedie": "+33970000001", "reference": "APL-2026-0400", "categorie": "panne", "client": {"telephone": "06 11 22 33 44"}, "resume": "Pompe arrêtée"}
+        self.url_open("/cultiveau/api/appel", data=json.dumps(corps), headers=self.entetes)
+        appel = self.env["cultiveau.appel"].search([("reference", "=", "APL-2026-0400")])
+        retour = appel.action_retour()
+        self.assertEqual((retour["res_model"], retour["res_id"]), ("res.partner", self.agri.id))
+        self.assertEqual(appel.action_ouvrir_suite()["res_model"], "project.task")
+        appel.sudo().write({"partner_id": False})
+        self.assertEqual(appel.action_retour()["res_model"], "cultiveau.appel")
+
     def test_un_appel_renvoye_complete_est_rafraichi_sans_doublon(self):
         corps = {"numero_dedie": "+33970000001", "reference": "APL-2026-0300", "categorie": "panne", "client": {"telephone": "06 11 22 33 44"}, "resume": "Pompe arrêtée"}
         r1 = self.url_open("/cultiveau/api/appel", data=json.dumps(corps), headers=self.entetes).json()

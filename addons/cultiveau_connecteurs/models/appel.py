@@ -74,6 +74,23 @@ class Appel(models.Model):
         self.ensure_one()
         return f"/app/action-cultiveau_connecteurs.action_appels/{self.id}"
 
+    def action_retour(self):
+        """« Il faut une touche pour revenir en arrière » (08/11/2026) : la page de l'appel s'ouvre depuis le lien de la fiche du client, sans
+        fil d'Ariane. Retour à la fiche du client ; sans client, à la liste des appels."""
+        self.ensure_one()
+        if self.partner_id:
+            return {"type": "ir.actions.act_window", "res_model": "res.partner", "res_id": self.partner_id.id, "view_mode": "form", "target": "current",
+                    "name": self.partner_id.display_name}
+        return self.env["ir.actions.act_window"]._for_xml_id("cultiveau_connecteurs.action_appels")
+
+    def action_ouvrir_suite(self):
+        """L'intervention ou l'opportunité née de l'appel, en un clic."""
+        self.ensure_one()
+        rec = self.task_id or self.lead_id
+        if not rec:
+            return False
+        return {"type": "ir.actions.act_window", "res_model": rec._name, "res_id": rec.id, "view_mode": "form", "target": "current", "name": rec.display_name}
+
     def _ligne_du_fil(self, avec_recueilli=False):
         """Ce qu'on voit dans le fil : une ligne, le sujet, et de quoi ouvrir le reste. Sur la fiche du client, aussi tout ce que
         l'assistant a retenu de lui pendant l'appel : c'est son CRM, rien ne doit rester seulement dans l'assistant."""

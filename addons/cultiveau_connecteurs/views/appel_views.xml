@@ -5,6 +5,12 @@
         <field name="model">cultiveau.appel</field>
         <field name="arch" type="xml">
             <form create="false">
+                <header>
+                    <button name="action_retour" type="object" string="← Retour à la fiche du client" class="btn-secondary" invisible="not partner_id"/>
+                    <button name="action_retour" type="object" string="← Retour aux appels" class="btn-secondary" invisible="partner_id"/>
+                    <button name="action_ouvrir_suite" type="object" string="Ouvrir l'intervention" class="btn-primary" invisible="not task_id"/>
+                    <button name="action_ouvrir_suite" type="object" string="Ouvrir l'opportunité" class="btn-primary" invisible="not lead_id"/>
+                </header>
                 <sheet>
                     <div class="oe_title">
                         <field name="entete" class="text-muted"/>
