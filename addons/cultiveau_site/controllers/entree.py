@@ -90,6 +90,41 @@ class Entree(http.Controller):
                 reponse = {"eligible": False, "raison": str(e)}
         return request.make_response(json.dumps(reponse), headers=[("Content-Type", "application/json"), ("Cache-Control", "no-store")])
 
+    @http.route(["/cultiveau/entree/ouvrir", "/cultiveau/entree/fermer"], type="http", auth="none", methods=["POST"], csrf=False, readonly=False, save_session=False)
+    def ouvrir_ou_fermer(self, t="", **_kw):
+        """Serveur à serveur, depuis Admin › Adhérents de cultiveau.fr : ouvrir l'ERP à une entreprise (société, gérant, liaison, première
+        synchronisation) ou le lui fermer. Corps JSON {"t": <jeton signé>} ; action 'ouvrir' ou 'fermer' dans la charge ; nonce à usage unique."""
+        env = request.env(user=SUPERUSER_ID)
+        attendue = "ouvrir" if request.httprequest.path.endswith("/ouvrir") else "fermer"
+        repondre = lambda d, statut=200: request.make_response(json.dumps(d, ensure_ascii=False), status=statut,  # noqa: E731
+                                                                headers=[("Content-Type", "application/json"), ("Cache-Control", "no-store")])
+        secret = env["ir.config_parameter"].sudo().get_param("cultiveau.erp_lien_secret")
+        if not secret:
+            return repondre({"ok": False, "erreur": "secret partagé absent dans l'ERP"}, 503)
+        if not t:
+            try:
+                t = (json.loads(request.httprequest.get_data(as_text=True) or "{}") or {}).get("t") or ""
+            except ValueError:
+                return repondre({"ok": False, "erreur": "corps JSON illisible"}, 400)
+        try:
+            charge = lire_jeton(t, secret)
+        except (ValueError, TypeError) as e:
+            return repondre({"ok": False, "erreur": f"laissez-passer refusé : {e}"}, 401)
+        if charge.get("v") != 1 or charge.get("outil") != "erp" or charge.get("source") != "cultiveau" or charge.get("action") != attendue:
+            return repondre({"ok": False, "erreur": "demande inattendue"}, 400)
+        LP = env["cultiveau.site.laissez_passer"].sudo()
+        if not charge.get("n") or LP.search_count([("nonce", "=", charge["n"])]):
+            return repondre({"ok": False, "erreur": "laissez-passer déjà utilisé"}, 409)
+        LP.create({"nonce": charge["n"], "login": ((charge.get("gerant") or {}).get("email") or attendue), "expire_le": datetime.utcfromtimestamp(int(charge["exp"])), "consomme": True})
+        try:
+            Company = env["res.company"].sudo()
+            resultat = Company.cultiveau_ouvrir_depuis_site(charge) if attendue == "ouvrir" else Company.cultiveau_fermer_depuis_site(charge)
+        except Exception as e:  # noqa: BLE001 — le site affiche la raison
+            _logger.exception("cultiveau.fr : %s impossible", attendue)
+            request.env.cr.rollback()
+            return repondre({"ok": False, "erreur": str(e)}, 500)
+        return repondre(resultat)
+
     def _message(self, texte):
         return request.make_response(
             f"<!doctype html><html lang='fr'><head><meta charset='utf-8'><title>Cultiveau</title></head><body style='font-family:sans-serif;"

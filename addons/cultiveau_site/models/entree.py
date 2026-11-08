@@ -44,9 +44,53 @@ class Company(models.Model):
             return True, "compte existant"
         e = charge.get("entreprise") or {}
         company = self._cultiveau_societe_site(e, creer=False)
+        if e.get("erp_acces") is True:
+            # depuis le 08/11/2026, c'est cultiveau.fr (Admin › Adhérents) qui décide qui a l'ERP : l'ERP suit
+            if company and not company.cultiveau_erp_ouvert:
+                company.write({"cultiveau_erp_ouvert": True})
+            return True, "accès accordé par cultiveau.fr"
         if company and company.cultiveau_erp_ouvert:
             return True, "entreprise ouverte"
         return False, "Votre entreprise n'a pas encore accès à l'ERP Cultiveau : demandez-le à Cultiveau."
+
+    @api.model
+    def cultiveau_ouvrir_depuis_site(self, charge):
+        """Le « setup » lancé depuis Admin › Adhérents de cultiveau.fr : la société existe et est ouverte, le gérant a son accès, la liaison
+        aux données est demandée et la première synchronisation lancée. Renvoie le compte rendu attendu par le site."""
+        e = dict(charge.get("entreprise") or {}, erp_acces=True)
+        gerant = charge.get("gerant") or {}
+        Users = self.env["res.users"].sudo()
+        company = Users._cultiveau_societe_depuis_site(e, gerant)
+        if not company.cultiveau_erp_ouvert:
+            company.write({"cultiveau_erp_ouvert": True})
+        utilisateur = None
+        if (gerant.get("email") or "").strip():
+            utilisateur = Users.cultiveau_depuis_site({**gerant, "role": gerant.get("role") or "gerant", "entreprise": e})
+        else:
+            self.env["cultiveau.site.connexion"].sudo()._cultiveau_relier_si_besoin(company, gerant)
+        connexion = self.env["cultiveau.site.connexion"].sudo().with_context(active_test=False).search([("company_id", "=", company.id)], limit=1)
+        n = Users.with_context(active_test=False).search_count([("company_id", "=", company.id), ("share", "=", False), ("active", "=", True)])
+        return {"ok": True, "societe_id": company.id, "societe": company.name, "utilisateurs": n, "gerant_id": utilisateur.id if utilisateur else None,
+                "cle": bool(connexion and connexion.cle), "ouverte": True,
+                "synchro": "première synchronisation lancée (clients, interventions, chantiers, articles arrivent dans les minutes qui suivent)" if connexion and connexion.cle
+                else "pas de clé reçue de cultiveau.fr : la synchronisation attend la prochaine entrée"}
+
+    @api.model
+    def cultiveau_fermer_depuis_site(self, charge):
+        """L'accès coupé depuis Admin › Adhérents : la société est fermée et ses utilisateurs venus du site ne peuvent plus entrer."""
+        e = charge.get("entreprise") or {}
+        company = self._cultiveau_societe_site(e, creer=False)
+        if not company:
+            return {"ok": True, "societe_id": None, "utilisateurs_desactives": 0}
+        company.write({"cultiveau_erp_ouvert": False})
+        Users = self.env["res.users"].sudo()
+        a_fermer = Users.search([("company_id", "=", company.id), ("share", "=", False), ("id", "!=", self.env.ref("base.user_admin").id)]) \
+            .filtered(lambda u: u.company_ids <= company)  # seulement ceux qui n'ont que cette société
+        a_fermer.write({"active": False})
+        connexion = self.env["cultiveau.site.connexion"].sudo().search([("company_id", "=", company.id)], limit=1)
+        if connexion:
+            connexion.write({"active": False})  # plus de synchronisation tant que l'accès est coupé
+        return {"ok": True, "societe_id": company.id, "utilisateurs_desactives": len(a_fermer)}
 
     @api.model
     def _cultiveau_societe_site(self, e, creer=False):
@@ -130,6 +174,8 @@ class Users(models.Model):
             if not ok:
                 raise PermissionError(raison)
         company = self._cultiveau_societe_depuis_site(charge.get("entreprise") or {}, charge)
+        if (charge.get("entreprise") or {}).get("erp_acces") is True and company and not company.cultiveau_erp_ouvert:
+            company.write({"cultiveau_erp_ouvert": True})  # cultiveau.fr a accordé l'accès : la société est ouverte
         role = charge.get("role") if charge.get("role") in ROLES_SITE else "technicien"
         if user:
             vals = {}

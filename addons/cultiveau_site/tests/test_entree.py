@@ -1,4 +1,5 @@
 import base64
+import json
 import time
 from unittest.mock import patch
 
@@ -41,6 +42,50 @@ class TestEntree(HttpCase):
         q["email"] = "admin"
         r = self.url_open("/cultiveau/entree/eligible?t=" + fabriquer_jeton(q, SECRET))
         self.assertTrue(r.json()["eligible"])
+
+    def test_cultiveau_fr_decide_qui_a_l_erp(self):
+        """Depuis Admin › Adhérents : « ouvrir » crée la société, le gérant, demande la clé et lance la synchro ; un laissez-passer portant
+        erp_acces ouvre une société fermée ; « fermer » coupe l'accès et désactive les comptes de la société."""
+        demandes = []
+
+        def relier(self_, company, ch, forcer=False):
+            demandes.append((company.name, ch.get("cultiveau_id")))
+            return False
+        entreprise = {"id": 99, "nom": "Irrigation Nord", "telephone": "03 20 00 00 00", "email": "contact@irrigation-nord.fr", "erp_acces": True}
+        ouvrir = {"v": 1, "outil": "erp", "source": "cultiveau", "action": "ouvrir", "exp": int(time.time()) + 60, "n": "o1", "entreprise": entreprise,
+                  "gerant": {"cultiveau_id": 501, "email": "jean@irrigation-nord.fr", "nom": "Jean Nord", "telephone": "06 00 00 00 01", "fonction": "Gérant"}}
+        with patch.object(ConnexionModele, "_cultiveau_relier_si_besoin", relier):
+            r = self.url_open("/cultiveau/entree/ouvrir", data=json.dumps({"t": fabriquer_jeton(ouvrir, SECRET)}), headers={"Content-Type": "application/json"})
+        self.assertEqual(r.status_code, 200, r.text)
+        rep = r.json()
+        nord = self.env["res.company"].search([("cultiveau_site_id", "=", 99)])
+        jean = self.env["res.users"].search([("login", "=", "jean@irrigation-nord.fr")])
+        self.assertTrue(rep["ok"] and nord.cultiveau_erp_ouvert and jean)
+        self.assertEqual((rep["societe_id"], rep["utilisateurs"], rep["cle"], jean.company_id, jean.cultiveau_role), (nord.id, 1, False, nord, "gerant"))
+        self.assertEqual(demandes, [("Irrigation Nord", 501)])
+        self.assertTrue(nord.cultiveau_entrepot())
+        # le même jeton ne sert pas deux fois
+        r = self.url_open("/cultiveau/entree/ouvrir", data=json.dumps({"t": fabriquer_jeton(ouvrir, SECRET)}), headers={"Content-Type": "application/json"})
+        self.assertEqual(r.status_code, 409)
+        # un laissez-passer d'entrée portant erp_acces ouvre une société fermée
+        nord.cultiveau_erp_ouvert = False
+        with patch.object(ConnexionModele, "_cultiveau_relier_si_besoin", relier):
+            ch = charge(email="marie@irrigation-nord.fr", n="o2", entreprise=entreprise)
+            r = self.url_open("/cultiveau/entree?t=" + fabriquer_jeton(ch, SECRET), allow_redirects=False)
+        self.assertEqual(r.status_code, 303, r.text)
+        nord.invalidate_recordset()
+        self.assertTrue(nord.cultiveau_erp_ouvert)
+        # fermer : plus d'accès, comptes de la société désactivés
+        fermer = {"v": 1, "outil": "erp", "source": "cultiveau", "action": "fermer", "exp": int(time.time()) + 60, "n": "f1", "entreprise": {"id": 99, "nom": "Irrigation Nord"}}
+        r = self.url_open("/cultiveau/entree/fermer", data=json.dumps({"t": fabriquer_jeton(fermer, SECRET)}), headers={"Content-Type": "application/json"})
+        self.assertEqual(r.status_code, 200, r.text)
+        self.assertEqual(r.json()["utilisateurs_desactives"], 2)
+        nord.invalidate_recordset()
+        jean.invalidate_recordset()
+        self.assertFalse(nord.cultiveau_erp_ouvert or jean.active)
+        # une action qui ne correspond pas à l'adresse est refusée
+        r = self.url_open("/cultiveau/entree/ouvrir", data=json.dumps({"t": fabriquer_jeton(dict(fermer, n="f2"), SECRET)}), headers={"Content-Type": "application/json"})
+        self.assertEqual(r.status_code, 400)
 
     def test_premiere_entree_cree_entreprise_et_acces(self):
         demandes = []

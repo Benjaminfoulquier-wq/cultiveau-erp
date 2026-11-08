@@ -98,3 +98,17 @@ accéder à la base articles pour mettre à jour les prix de vente et les prix d
   référence, désignation, famille, prix d'achat, prix de vente HT, TVA, stock ; filtres « sans prix d'achat », « sans prix de vente »,
   « venus de cultiveau.fr », « à envoyer » ; modification en masse.
 - Le stock se gère dans l'ERP seul ; l'étape « Inventaires » (Mon Inventaire validé → stock) reste disponible et peut se décocher par société.
+
+## C'est cultiveau.fr qui décide qui a l'ERP (08/11/2026)
+
+« Pour le moment j'aimerais pouvoir être seul à décider qui a accès à l'ERP ou pas, depuis Admin › Adhérents de cultiveau.fr : on fait un
+setup et feu. » Côté ERP (`controllers/entree.py`, `models/entree.py`) :
+
+- `POST /cultiveau/entree/ouvrir`, corps `{"t": <jeton signé>}` (charge `action: "ouvrir"`, `entreprise` avec `erp_acces: true`, `gerant`) :
+  société retrouvée ou créée (avec son entrepôt), marquée ouverte, gérant créé sans invitation (il entre par les tuiles), clé demandée au
+  site (`POST /api/erp/lier`), première synchronisation déclenchée. Réponse `{ok, societe_id, utilisateurs, cle, synchro}`. Nonce à usage
+  unique, 409 s'il resservait, 400 si l'action ne correspond pas à l'adresse.
+- `POST /cultiveau/entree/fermer` (`action: "fermer"`) : société fermée, comptes internes qui n'ont que cette société désactivés, liaison
+  mise en sommeil (plus de synchronisation). Réponse `{ok, societe_id, utilisateurs_desactives}`.
+- À l'entrée et à la question d'éligibilité, `entreprise.erp_acces: true` dans le laissez-passer ouvre la société si elle ne l'était pas :
+  la décision vient du site. Sans ce champ, comportement inchangé (comptes existants, sociétés cochées dans l'ERP).
