@@ -16,6 +16,7 @@
                 <field name="prix_ht"/>
                 <field name="unite" optional="hide"/>
                 <field name="date_releve"/>
+                <field name="a_valider"/>
                 <field name="company_id" optional="hide" groups="cultiveau_base.group_equipe"/>
                 <field name="note" optional="hide"/>
             </list>
@@ -57,6 +58,7 @@
             <search>
                 <field name="product_tmpl_id"/>
                 <field name="source"/>
+                <filter name="a_valider" string="À valider" domain="[('a_valider', '=', True)]"/>
                 <filter name="web" string="Sites internet" domain="[('origine', '=', 'web')]"/>
                 <filter name="reseau" string="Réseau" domain="[('origine', '=', 'reseau')]"/>
                 <filter name="recents" string="Moins de 12 mois" domain="[('date_releve', '>=', (context_today() - relativedelta(months=12)).strftime('%Y-%m-%d'))]"/>
@@ -154,4 +156,56 @@
 
     <menuitem id="menu_positionnement" name="Positionnement prix" parent="cultiveau_catalogue.menu_catalogue" action="action_positionnement"
               sequence="28" groups="sales_team.group_sale_manager,purchase.group_purchase_manager"/>
+
+    <!-- Le benchmark web : prépare les recherches, ingère les relevés trouvés -->
+    <record id="view_benchmark_form" model="ir.ui.view">
+        <field name="name">cultiveau.benchmark.form</field>
+        <field name="model">cultiveau.benchmark</field>
+        <field name="arch" type="xml">
+            <form string="Benchmark des prix">
+                <sheet>
+                    <div class="oe_title"><h1>Benchmark des prix sur internet</h1>
+                        <p class="text-muted">Prépare les recherches, puis ingère les prix trouvés dans la base. Les relevés arrivent « à valider » et ne comptent qu'une fois acceptés. Aucun prix de vente n'est modifié.</p>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="perimetre" widget="radio"/>
+                            <field name="categ_id" invisible="perimetre != 'famille'" required="perimetre == 'famille'"/>
+                            <field name="product_ids" widget="many2many_tags" invisible="perimetre != 'selection'" required="perimetre == 'selection'"/>
+                        </group>
+                        <group>
+                            <field name="limite"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="mb-2">
+                        <button name="action_preparer" type="object" string="1. Préparer les recherches" class="btn-primary" icon="fa-search"/>
+                        <button name="action_ingerer" type="object" string="2. Ingérer les résultats" class="btn-secondary" icon="fa-download"/>
+                    </div>
+                    <notebook>
+                        <page string="Recherches à lancer" name="recherches">
+                            <p class="text-muted">À confier à un assistant qui a accès au web. Il rend une liste de relevés au même format d'article_id.</p>
+                            <field name="recherches" widget="ace" options="{'mode': 'json'}" readonly="1"/>
+                        </page>
+                        <page string="Résultats à ingérer" name="resultats">
+                            <field name="resultats_json" widget="ace" options="{'mode': 'json'}" placeholder='[{"article_id": 12, "source": "Site X", "url": "https://…", "prix": 19.90, "ttc": true, "tva": 20, "date": "2026-11-09"}]'/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_benchmark" model="ir.actions.act_window">
+        <field name="name">Benchmark des prix</field>
+        <field name="res_model">cultiveau.benchmark</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_benchmark" name="Benchmark des prix" parent="cultiveau_catalogue.menu_catalogue" action="action_benchmark"
+              sequence="31" groups="sales_team.group_sale_manager,purchase.group_purchase_manager"/>
 </odoo>

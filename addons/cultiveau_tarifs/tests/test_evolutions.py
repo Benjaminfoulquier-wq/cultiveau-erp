@@ -109,3 +109,38 @@ class TestPositionnement(TransactionCase):
         w.action_calculer()
         self.assertEqual(self.article.list_price, 100.0)
         self.assertEqual(self.article.with_company(self.company).standard_price, 60.0)
+
+
+@tagged("post_install", "-at_install", "cultiveau_tarifs")
+class TestBenchmark(TransactionCase):
+    def setUp(self):
+        super().setUp()
+        self.article = self.env["product.template"].create({
+            "name": "Goutteur benchmark", "default_code": "GB-001", "type": "consu",
+            "standard_price": 1.0, "list_price": 2.0, "sale_ok": True, "company_id": False})
+
+    def test_ingerer_matche_par_reference(self):
+        res = self.env["cultiveau.prix.marche"].ingerer(
+            [{"ref": "GB-001", "source": "Site A", "url": "https://a", "prix": 2.4, "ttc": True, "tva": 20.0},
+             {"ref": "INCONNU-999", "source": "Site B", "prix": 3.0}], a_valider=True)
+        self.assertEqual(res["crees"], 1)
+        self.assertEqual(res["ignores"], 1)
+        self.assertEqual(self.article.cultiveau_marche_ids.source, "Site A")
+        self.assertTrue(self.article.cultiveau_marche_ids.a_valider)
+
+    def test_a_valider_exclu_du_calcul(self):
+        self.env["cultiveau.prix.marche"].ingerer([{"article_id": self.article.id, "source": "X", "prix": 2.4, "ttc": False}], a_valider=True)
+        self.assertEqual(self.article.cultiveau_marche_nb, 0)  # à valider : ne compte pas
+        self.article.cultiveau_marche_ids.action_valider()
+        self.assertEqual(self.article.cultiveau_marche_nb, 1)
+        self.assertAlmostEqual(self.article.cultiveau_marche_median, 2.4, 2)
+
+    def test_benchmark_prepare_et_ingere(self):
+        w = self.env["cultiveau.benchmark"].create({"perimetre": "selection", "product_ids": [(6, 0, [self.article.id])]})
+        w.action_preparer()
+        self.assertIn("GB-001", w.recherches)
+        w.resultats_json = f'[{{"article_id": {self.article.id}, "source": "ManoMano", "url": "https://m", "prix": 2.6, "ttc": true, "tva": 20}}]'
+        w.action_ingerer()
+        releve = self.article.cultiveau_marche_ids.filtered(lambda r: r.source == "ManoMano")
+        self.assertTrue(releve)
+        self.assertTrue(releve.a_valider)

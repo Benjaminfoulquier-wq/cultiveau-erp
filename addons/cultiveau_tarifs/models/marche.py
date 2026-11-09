@@ -2,6 +2,8 @@
 positionnement qui la lit pour conseiller un prix. L'outil ne touche jamais aux prix de vente ni à la grille : il informe,
 l'adhérent décide. Les prix relevés sont ramenés en HT pour être comparés au prix d'achat et au prix catalogue."""
 
+import json
+
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
@@ -32,12 +34,58 @@ class PrixMarche(models.Model):
     unite = fields.Char("Unité")
     date_releve = fields.Date("Relevé le", required=True, default=fields.Date.context_today, index=True)
     note = fields.Char("Remarque")
+    a_valider = fields.Boolean("À valider", default=False, index=True,
+                               help="Relevé trouvé par un benchmark et pas encore vérifié. Les relevés à valider ne comptent pas dans le calcul tant que vous ne les avez pas acceptés.")
     company_id = fields.Many2one("res.company", "Société", help="Vide : relevé partagé par le réseau.", index=True)
 
     @api.depends("prix", "ttc", "taux_tva")
     def _compute_prix_ht(self):
         for r in self:
             r.prix_ht = r.prix / (1 + (r.taux_tva or 0.0) / 100.0) if r.ttc and r.taux_tva else r.prix
+
+    def action_valider(self):
+        self.write({"a_valider": False})
+
+    @api.model
+    def _article_pour(self, ref=None, ean=None, nom=None):
+        """Retrouve l'article Cultiveau d'un relevé : par code-barres, puis référence interne, puis désignation exacte."""
+        Produit = self.env["product.template"].sudo()
+        if ean:
+            p = Produit.search([("barcode", "=", str(ean).strip())], limit=1)
+            if p:
+                return p
+        if ref:
+            p = Produit.search([("default_code", "=ilike", str(ref).strip())], limit=1)
+            if p:
+                return p
+        if nom:
+            p = Produit.search([("name", "=ilike", str(nom).strip())], limit=1)
+            if p:
+                return p
+        return Produit.browse()
+
+    @api.model
+    def ingerer(self, releves, origine="web", a_valider=True, company_id=False):
+        """Charge une liste de relevés trouvés par un benchmark. Chaque relevé : {article_id | ref | ean | nom, source, url, prix,
+        ttc, tva, date, unite, note}. L'article est retrouvé, jamais inventé ; un prix sans article reconnu est laissé de côté et signalé.
+        Ne touche à aucun prix de vente. Renvoie {crees, ignores, inconnus:[...]}."""
+        crees, inconnus = 0, []
+        for r in releves or []:
+            if not r.get("prix"):
+                continue
+            produit = self.env["product.template"].sudo().browse(r["article_id"]).exists() if r.get("article_id") else \
+                self._article_pour(r.get("ref"), r.get("ean"), r.get("nom"))
+            if not produit:
+                inconnus.append(r.get("nom") or r.get("ref") or r.get("ean") or "?")
+                continue
+            vals = {"product_tmpl_id": produit.id, "origine": origine, "source": (r.get("source") or "")[:255], "url": (r.get("url") or "")[:1024],
+                    "prix": float(r["prix"]), "ttc": bool(r.get("ttc", True)), "taux_tva": float(r.get("tva", 20.0)),
+                    "unite": (r.get("unite") or "")[:16], "note": (r.get("note") or "")[:255], "a_valider": a_valider, "company_id": company_id or False}
+            if r.get("date"):
+                vals["date_releve"] = r["date"]
+            self.create(vals)
+            crees += 1
+        return {"crees": crees, "ignores": len(inconnus), "inconnus": inconnus[:30]}
 
 
 class Product(models.Model):
@@ -47,10 +95,10 @@ class Product(models.Model):
     cultiveau_marche_nb = fields.Integer("Relevés de prix", compute="_compute_marche")
     cultiveau_marche_median = fields.Float("Marché médian HT", compute="_compute_marche", digits="Product Price")
 
-    @api.depends("cultiveau_marche_ids.prix_ht")
+    @api.depends("cultiveau_marche_ids.prix_ht", "cultiveau_marche_ids.a_valider")
     def _compute_marche(self):
         for p in self:
-            prix = p.cultiveau_marche_ids.mapped("prix_ht")
+            prix = p.cultiveau_marche_ids.filtered(lambda r: not r.a_valider).mapped("prix_ht")
             p.cultiveau_marche_nb = len(prix)
             p.cultiveau_marche_median = mediane(prix)
 
@@ -58,6 +106,70 @@ class Product(models.Model):
         self.ensure_one()
         return {"type": "ir.actions.act_window", "name": "Prix du marché", "res_model": "cultiveau.prix.marche", "view_mode": "list,form",
                 "domain": [("product_tmpl_id", "=", self.id)], "context": {"default_product_tmpl_id": self.id}}
+
+
+class Benchmark(models.TransientModel):
+    _name = "cultiveau.benchmark"
+    _description = "Benchmark des prix sur internet (prépare la recherche, ingère les relevés)"
+
+    company_id = fields.Many2one("res.company", default=lambda self: self.env.company)
+    perimetre = fields.Selection([("sans", "Les articles sans relevé"), ("famille", "Une famille"), ("selection", "Une sélection d'articles")],
+                                 "Sur quoi", required=True, default="sans")
+    categ_id = fields.Many2one("product.category", "Famille")
+    product_ids = fields.Many2many("product.template", string="Articles")
+    limite = fields.Integer("Nombre d'articles au maximum", default=50)
+    recherches = fields.Text("Recherches à lancer", readonly=True,
+                             help="La liste des articles et des requêtes, au format JSON, à confier à un assistant qui a accès au web.")
+    resultats_json = fields.Text("Résultats du benchmark (JSON)",
+                                 help="Collez ici la liste des prix trouvés : [{\"article_id\": 12, \"source\": \"Site X\", \"url\": \"…\", \"prix\": 19.9, \"ttc\": true, \"tva\": 20, \"date\": \"2026-11-09\"}, …]")
+
+    def _articles(self):
+        self.ensure_one()
+        company = self.company_id or self.env.company
+        if self.perimetre == "selection":
+            return self.product_ids
+        if self.perimetre == "famille":
+            if not self.categ_id:
+                raise UserError("Choisissez la famille.")
+            familles = self.env["product.category"].search([("id", "child_of", self.categ_id.id)])
+            domaine = [("categ_id", "in", familles.ids), ("sale_ok", "=", True)]
+        else:
+            domaine = [("sale_ok", "=", True), ("cultiveau_marche_ids", "=", False)]
+        domaine += ["|", ("company_id", "=", False), ("company_id", "=", company.id)]
+        return self.env["product.template"].with_company(company).search(domaine, limit=self.limite or 50)
+
+    def action_preparer(self):
+        self.ensure_one()
+        articles = self._articles()
+        if not articles:
+            raise UserError("Aucun article à benchmarker avec ce choix.")
+        lignes = []
+        for p in articles:
+            termes = " ".join(x for x in [p.name, p.default_code or "", p.barcode or ""] if x).strip()
+            lignes.append({"article_id": p.id, "ref": p.default_code or None, "ean": p.barcode or None, "nom": p.name,
+                           "requete": f"{termes} prix"})
+        self.recherches = json.dumps(lignes, ensure_ascii=False, indent=2)
+        return {"type": "ir.actions.act_window", "res_model": "cultiveau.benchmark", "res_id": self.id, "view_mode": "form", "target": "new",
+                "name": "Benchmark des prix"}
+
+    def action_ingerer(self):
+        self.ensure_one()
+        if not self.resultats_json:
+            raise UserError("Collez d'abord les résultats du benchmark dans la case prévue.")
+        try:
+            releves = json.loads(self.resultats_json)
+        except (ValueError, TypeError) as e:
+            raise UserError(f"Le texte collé n'est pas du JSON valide : {e}.") from e
+        if not isinstance(releves, list):
+            raise UserError("Les résultats doivent être une liste JSON de relevés.")
+        res = self.env["cultiveau.prix.marche"].ingerer(releves, origine="web", a_valider=True, company_id=self.company_id.id)
+        message = f"{res['crees']} relevé(s) ajouté(s), à valider dans « Prix du marché »."
+        if res["inconnus"]:
+            message += f" {res['ignores']} laissé(s) de côté (article non reconnu) : {', '.join(res['inconnus'][:8])}."
+        return {"type": "ir.actions.client", "tag": "display_notification",
+                "params": {"title": "Benchmark ingéré", "message": message, "type": "success", "sticky": bool(res["inconnus"]),
+                           "next": {"type": "ir.actions.act_window", "res_model": "cultiveau.prix.marche", "view_mode": "list,form",
+                                    "domain": [("a_valider", "=", True)], "name": "Prix du marché à valider"}}}
 
 
 class Positionnement(models.TransientModel):
@@ -98,7 +210,7 @@ class Positionnement(models.TransientModel):
         limite = fields.Date.subtract(fields.Date.context_today(self), months=self.mois_fraicheur) if self.mois_fraicheur else False
         valeurs = []
         for p in self._articles().with_company(company):
-            releves = p.cultiveau_marche_ids.filtered(lambda r: not limite or r.date_releve >= limite)
+            releves = p.cultiveau_marche_ids.filtered(lambda r: not r.a_valider and (not limite or r.date_releve >= limite))
             prix_marche = releves.mapped("prix_ht")
             if not prix_marche:
                 continue
