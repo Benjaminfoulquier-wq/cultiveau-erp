@@ -14,16 +14,36 @@ export class Comptoir extends Component {
         this.orm = useService("orm");
         this.action = useService("action");
         this.notification = useService("notification");
+        this.bus = useService("bus_service");
         this.scan = useRef("scan");
         this.state = useState({
             contexte: null, texte: "", candidats: [], cherche: false, panier: [], client: null, rechercheClient: "", clients: [], choixClient: false,
-            note: "", occupe: false, vente: null,
+            note: "", occupe: false, vente: null, scanPhone: false,
         });
+        this.urlScanner = (typeof window !== "undefined" ? window.location.origin : "") + "/comptoir/scanner";
         onWillStart(async () => {
             this.state.contexte = await this.orm.call("cultiveau.comptoir", "contexte", []);
             this.state.client = { id: this.state.contexte.client_defaut, nom: "Client de passage", ville: "", telephone: "" };
         });
-        onMounted(() => this.focus());
+        onMounted(() => {
+            this.focus();
+            this.ecouterTelephone();
+        });
+    }
+
+    // Le téléphone de l'utilisateur scanne et pousse l'article ici, en direct, par le bus (même compte).
+    ecouterTelephone() {
+        try {
+            this.bus.addChannel("cultiveau_comptoir_" + this.state.contexte.uid);
+            this.bus.subscribe("cultiveau_comptoir_scan", (payload) => {
+                if (payload?.article) {
+                    this.ajouter(payload.article);
+                    this.notification.add("📱 " + payload.article.nom, { type: "success" });
+                }
+            });
+        } catch (e) {
+            console.warn("Comptoir : pas de scan téléphone en direct", e);
+        }
     }
 
     focus() {

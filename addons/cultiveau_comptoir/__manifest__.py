@@ -18,7 +18,7 @@ encaissement.
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
-    "depends": ["cultiveau_ventes", "cultiveau_vue3d", "stock", "l10n_fr_account"],
+    "depends": ["cultiveau_ventes", "cultiveau_vue3d", "stock", "l10n_fr_account", "bus"],
     "data": ["views/menus.xml"],
     "assets": {"web.assets_backend": ["cultiveau_comptoir/static/src/js/comptoir.js", "cultiveau_comptoir/static/src/xml/comptoir.xml", "cultiveau_comptoir/static/src/scss/comptoir.scss"]},
     "installable": True,

@@ -5,7 +5,16 @@
             <div class="o_cultiveau_comptoir_entete d-flex align-items-center gap-3 px-3 py-2">
                 <h2 class="m-0">Comptoir</h2>
                 <span class="text-muted" t-esc="state.contexte.societe.nom"/>
-                <div class="ms-auto d-flex align-items-center gap-2">
+                <div class="ms-auto d-flex align-items-center gap-2 position-relative">
+                    <button class="btn btn-sm btn-outline-secondary" t-on-click="() => this.state.scanPhone = !this.state.scanPhone" title="Scanner avec le téléphone">
+                        <i class="fa fa-mobile me-1"/>Scanner au téléphone
+                    </button>
+                    <div t-if="state.scanPhone" class="o_cultiveau_comptoir_qr card shadow position-absolute end-0 p-3 text-center" style="top:110%;z-index:1050;width:260px">
+                        <div class="fw-bold mb-1">Scanner avec le téléphone</div>
+                        <small class="text-muted d-block mb-2">Ouvrez cette page sur votre téléphone (même compte). Chaque code scanné s'ajoute ici en direct.</small>
+                        <img t-att-src="'/report/barcode/?barcode_type=QR&amp;value=' + encodeURIComponent(urlScanner) + '&amp;width=360&amp;height=360'" class="img-fluid mb-2" alt="QR du scanner"/>
+                        <a t-att-href="urlScanner" target="_blank" class="small d-block text-truncate" t-esc="urlScanner"/>
+                    </div>
                     <span class="text-muted">Client :</span>
                     <button class="btn btn-sm btn-outline-primary" t-on-click="ouvrirClients">
                         <i class="fa fa-user me-1"/><t t-esc="state.client ? state.client.nom : 'Client de passage'"/>

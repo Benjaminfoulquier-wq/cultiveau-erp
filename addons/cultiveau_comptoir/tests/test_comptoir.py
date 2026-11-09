@@ -60,3 +60,36 @@ class TestComptoir(TransactionCase):
         self.assertTrue(commande.picking_ids)
         self.assertNotIn("done", commande.picking_ids.mapped("state"))
         self.assertEqual(self.raccord.qty_available, 40)
+
+    def test_scanner_pousser(self):
+        """Le code-barres lu au téléphone retrouve l'article et part vers le canal du compte."""
+        messages = []
+        Bus = type(self.env["bus.bus"])
+        origine = Bus._sendone
+
+        def espion(self2, cible, typ, charge, *a, **k):
+            messages.append((cible, typ, charge))
+            return origine(self2, cible, typ, charge, *a, **k)
+
+        self.patch(Bus, "_sendone", espion)
+        ok = self.Comptoir.scanner_pousser("3700000000017")
+        self.assertTrue(ok["ok"])
+        self.assertEqual(ok["nom"], self.raccord.display_name)
+        self.assertEqual(messages[-1][0], "cultiveau_comptoir_%s" % self.env.user.id)
+        self.assertEqual(messages[-1][1], "cultiveau_comptoir_scan")
+        self.assertEqual(messages[-1][2]["article"]["id"], self.raccord.id)
+        self.assertFalse(self.Comptoir.scanner_pousser("rien-du-tout")["ok"])
+        self.assertFalse(self.Comptoir.scanner_pousser("")["ok"])
+
+
+from odoo.tests import HttpCase, tagged as tagged2
+
+
+@tagged2("post_install", "-at_install", "cultiveau")
+class TestScannerPage(HttpCase):
+    def test_page_scanner_servie(self):
+        self.authenticate("admin", "admin")
+        r = self.url_open("/comptoir/scanner")
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("Scanner", r.text)
+        self.assertIn("/comptoir/scanner/push", r.text)

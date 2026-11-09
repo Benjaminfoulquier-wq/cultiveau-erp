@@ -32,6 +32,7 @@ class Comptoir(models.AbstractModel):
             "client_defaut": self._client_de_passage(societe).id,
             "journaux": self._journaux(societe),
             "comptabilite": bool(self._journal_vente(societe)),
+            "uid": self.env.user.id,
         }
 
     def _journal_vente(self, societe):
@@ -83,6 +84,24 @@ class Comptoir(models.AbstractModel):
         calcul = taxes.compute_all(ht, societe.currency_id, 1.0, produit, partner)
         return {"prix_ht": round(calcul["total_excluded"], 2), "prix_ttc": round(calcul["total_included"], 2),
                 "tva": ", ".join(t.name for t in taxes) if taxes else "sans TVA", "taux": sum(t.amount for t in taxes if t.amount_type == "percent")}
+
+    @api.model
+    def scanner_pousser(self, code, partner_id=None):
+        """Un code-barres lu sur le téléphone : on trouve l'article et on l'envoie en direct à l'écran du comptoir.
+
+        Le téléphone et le comptoir sont sur le même compte : la notification part vers le partenaire de
+        l'utilisateur, donc vers tous ses onglets ouverts. L'écran du comptoir l'ajoute au panier tout seul.
+        """
+        code = (code or "").strip()
+        if not code:
+            return {"ok": False, "raison": "vide"}
+        resultats = self.chercher(code, partner_id)
+        exact = next((r for r in resultats if r.get("exact")), None) or (resultats[0] if resultats else None)
+        if not exact:
+            return {"ok": False, "raison": "introuvable", "code": code}
+        canal = "cultiveau_comptoir_%s" % self.env.user.id
+        self.env["bus.bus"].sudo()._sendone(canal, "cultiveau_comptoir_scan", {"article": exact})
+        return {"ok": True, "nom": exact["nom"], "code": exact["code"] or code, "stock": exact.get("stock")}
 
     @api.model
     def clients(self, texte, limite=10):
