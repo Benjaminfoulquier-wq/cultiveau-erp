@@ -23,11 +23,16 @@ class Devis(models.Model):
     cultiveau_relances = fields.Integer("Relances", copy=False, readonly=True)
     cultiveau_derniere_relance = fields.Date("Dernière relance", copy=False, readonly=True)
 
-    @api.depends("amount_total", "cultiveau_acompte_pct", "order_line.is_downpayment")
+    @api.depends("amount_total", "cultiveau_acompte_pct", "order_line.is_downpayment", "order_line.invoice_lines.move_id.state")
     def _compute_acompte(self):
         for o in self:
             o.cultiveau_acompte_montant = o.currency_id.round(o.amount_total * (o.cultiveau_acompte_pct or 0) / 100)
-            o.cultiveau_acompte_facture = any(o.order_line.filtered("is_downpayment").invoice_lines)
+            o.cultiveau_acompte_facture = bool(o._factures_acompte())
+
+    def _factures_acompte(self):
+        """Les factures d'acompte vivantes de ce devis (une annulée ne compte pas)."""
+        self.ensure_one()
+        return self.order_line.filtered("is_downpayment").invoice_lines.move_id.filtered(lambda m: m.state != "cancel")
 
     def write(self, vals):
         res = super().write(vals)
@@ -48,6 +53,10 @@ class Devis(models.Model):
         self.ensure_one()
         if not self.cultiveau_acompte_pct:
             raise UserError("Indiquez le pourcentage d'acompte sur le devis.")
+        deja = self._factures_acompte()
+        if deja:
+            return {"type": "ir.actions.act_window", "name": "Facture d'acompte", "res_model": "account.move",
+                    "res_id": deja[:1].id, "view_mode": "form", "target": "current"}
         ctx = dict(self.env.context, active_model="sale.order", active_ids=self.ids, active_id=self.id,
                    default_advance_payment_method="percentage", default_amount=self.cultiveau_acompte_pct)
         return {"type": "ir.actions.act_window", "name": "Facture d'acompte", "res_model": "sale.advance.payment.inv", "view_mode": "form",

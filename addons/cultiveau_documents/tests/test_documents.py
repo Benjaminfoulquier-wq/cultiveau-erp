@@ -62,13 +62,15 @@ class TestDocuments(TransactionCase):
         self.assertTrue(self.devis.activity_ids.filtered(lambda a: a.summary.startswith("Appeler")))
 
     def test_acompte_facture_et_rappel(self):
+        # À la confirmation, « le devis déclenche tout » prépare déjà la facture d'acompte.
         self.devis.action_confirm()
-        action = self.devis.action_facture_acompte()
-        wizard = self.env["sale.advance.payment.inv"].with_context(action["context"]).create({})
-        self.assertEqual((wizard.advance_payment_method, wizard.amount), ("percentage", 30))
-        wizard.create_invoices()
         self.assertTrue(self.devis.cultiveau_acompte_facture)
         facture = self.devis.invoice_ids
+        self.assertEqual(len(facture), 1, "un seul acompte préparé à la confirmation")
+        # Le bouton « Facture d'acompte » n'en crée pas un deuxième : il ouvre celui qui existe.
+        action = self.devis.action_facture_acompte()
+        self.assertEqual((action["res_model"], action["res_id"]), ("account.move", facture.id))
+        self.assertEqual(len(self.devis.invoice_ids), 1, "pas de facture d'acompte en double")
         facture.invoice_date = fields.Date.today() - timedelta(days=40)
         facture.action_post()
         facture.invoice_date_due = fields.Date.today() - timedelta(days=10)
@@ -77,3 +79,22 @@ class TestDocuments(TransactionCase):
         self.env["account.move"]._cron_relancer_factures()
         self.assertEqual((facture.cultiveau_relances, facture.cultiveau_jours_retard), (1, 10))
         self.assertTrue(facture.message_ids.filtered(lambda m: m.subject and "rappel" in m.subject))
+
+    def test_acompte_annule_redevient_a_facturer(self):
+        devis = self.env["sale.order"].create({"partner_id": self.agri.id, "company_id": self.societe.id,
+                                               "order_line": [(0, 0, {"product_id": self.pompe.id, "product_uom_qty": 1})]})
+        devis.action_confirm()
+        facture = devis.invoice_ids
+        self.assertEqual(len(facture), 1)
+        self.assertTrue(devis.cultiveau_acompte_facture)
+        facture.button_cancel()
+        self.assertEqual(facture.state, "cancel")
+        self.assertFalse(devis.cultiveau_acompte_facture, "un acompte annulé ne compte plus comme facturé")
+        # Le bouton redevient disponible et crée un nouvel acompte vivant (le devis n'en a jamais deux).
+        action = devis.action_facture_acompte()
+        self.assertEqual(action["res_model"], "sale.advance.payment.inv")
+        wizard = self.env["sale.advance.payment.inv"].with_context(action["context"]).create({})
+        wizard.create_invoices()
+        vivantes = devis.invoice_ids.filtered(lambda m: m.state != "cancel")
+        self.assertEqual(len(vivantes), 1, "un seul acompte vivant après ré-émission")
+        self.assertTrue(devis.cultiveau_acompte_facture)
