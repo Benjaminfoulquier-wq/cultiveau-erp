@@ -20,6 +20,13 @@
                         <h4 style="margin-bottom:6px">L'Agent — ce mois-ci</h4>
                         <field name="cultiveau_agent_html" nolabel="1" readonly="1"/>
                     </div>
+                    <div class="alert alert-light border" role="status" style="margin-bottom:12px" invisible="not cultiveau_est_client">
+                        <div class="d-flex align-items-center" style="gap:8px">
+                            <h4 style="margin:0">À accompagner ?</h4>
+                            <button name="action_cultiveau_calculer_accompagnement" type="object" string="Recalculer" class="btn btn-link btn-sm"/>
+                        </div>
+                        <field name="cultiveau_accompagner_html" nolabel="1" readonly="1"/>
+                    </div>
                     <div invisible="cultiveau_persona_id">
                         <p class="text-muted">Pas encore de persona : huit questions suffisent (Lion, Jaguar, Chat, Tortue ou Abeille, d'après l'étude PRISM 2023).</p>
                         <button name="action_evaluer_persona" type="object" string="Évaluer le persona" class="btn btn-primary"/>
@@ -40,6 +47,28 @@
                             <group string="Les pièges"><field name="cultiveau_persona_pieges" nolabel="1"/></group>
                         </group>
                         <button name="action_evaluer_persona" type="object" string="Réévaluer" class="btn btn-secondary"/>
+                    </div>
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="d-flex align-items-center" style="gap:8px">
+                            <h4 style="margin:0">Ce que son comportement montre</h4>
+                            <button name="action_cultiveau_comportement_lire" type="object" string="Relire maintenant" class="btn btn-link btn-sm"/>
+                        </div>
+                        <p invisible="cultiveau_persona_observe_id" class="text-muted">Pas encore assez de signaux (appels, devis, commandes, projets) pour déduire un comportement.</p>
+                        <div invisible="not cultiveau_persona_observe_id">
+                            <div class="alert alert-warning" role="alert" invisible="not cultiveau_persona_ecart">
+                                Il <b>se décrit autrement qu'il ne se comporte</b> : le questionnaire dit
+                                <field name="cultiveau_persona_id" readonly="1" options="{'no_open': True}" class="oe_inline"/>,
+                                ses actes disent <field name="cultiveau_persona_observe_id" readonly="1" options="{'no_open': True}" class="oe_inline"/>.
+                                À creuser, sans trancher à sa place.
+                            </div>
+                            <p>
+                                Observé : <field name="cultiveau_persona_observe_id" readonly="1" options="{'no_open': True}" class="oe_inline"/>
+                                — confiance <field name="cultiveau_persona_confiance" readonly="1" class="oe_inline" widget="integer"/>/100,
+                                le <field name="cultiveau_persona_observe_le" readonly="1" class="oe_inline"/>.
+                            </p>
+                            <field name="cultiveau_persona_elements" readonly="1" nolabel="1" class="text-muted" style="white-space:pre-line"/>
+                            <p class="text-muted"><i>Indices tirés de ses actes, jamais une vérité : à corriger si vous le connaissez mieux.</i></p>
+                        </div>
                     </div>
                 </page>
             </xpath>
@@ -67,4 +96,31 @@
             </filter>
         </field>
     </record>
+    <record id="view_partner_list_accompagner" model="ir.ui.view">
+        <field name="name">res.partner.list.accompagner</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <list string="À accompagner" default_order="cultiveau_accompagner_priorite desc" create="false">
+                <field name="cultiveau_accompagner_priorite" string="Prio" widget="integer"/>
+                <field name="display_name" string="Client"/>
+                <field name="cultiveau_persona_id" optional="show"/>
+                <field name="cultiveau_accompagner_motif" string="Pourquoi maintenant"/>
+                <field name="cultiveau_posture" optional="show"/>
+                <field name="user_id" optional="hide"/>
+                <field name="phone" optional="hide"/>
+                <field name="cultiveau_est_client" column_invisible="1"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_a_accompagner" model="ir.actions.act_window">
+        <field name="name">À accompagner</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[("cultiveau_accompagner", "=", True)]</field>
+        <field name="view_id" ref="view_partner_list_accompagner"/>
+        <field name="context">{"search_default_group_persona": 0}</field>
+        <field name="help" type="html"><p class="o_view_nocontent_smiling_face">Personne à accompagner pour l'instant.</p><p>Les deux horloges, la frise culturale et le comportement du client, n'ouvrent aucune fenêtre ce mois-ci. La liste se recalcule chaque nuit.</p></field>
+    </record>
+
 </odoo>

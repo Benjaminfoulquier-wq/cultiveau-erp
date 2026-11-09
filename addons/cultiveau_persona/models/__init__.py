@@ -1,1 +1,1 @@
-from . import agent, persona, questionnaire, res_partner
+from . import agent, persona, questionnaire, res_partner, comportement, accompagnement

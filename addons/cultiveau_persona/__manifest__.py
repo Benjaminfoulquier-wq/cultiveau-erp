@@ -35,6 +35,7 @@ de suite ».
     "data": [
         "security/ir.model.access.csv",
         "data/personas.xml",
+        "data/cron.xml",
         "views/persona_views.xml",
         "wizard/persona_wizard_views.xml",
         "views/res_partner_views.xml",

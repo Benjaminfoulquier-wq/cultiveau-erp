@@ -44,12 +44,24 @@ class CodePac(models.Model):
 
     @api.model
     def _completer_codes(self, codes):
-        for code, libelle, sans_culture in codes:
+        """Crée les codes manquants, complète ceux déjà rencontrés, sans jamais écraser un choix de culture.
+
+        Chaque entrée est (code, libellé, sans_culture[, xmlid_culture]). La culture n'est reliée que si
+        l'xmlid est fourni et que le code n'a pas déjà une culture choisie à la main.
+        """
+        for ligne in codes:
+            code, libelle, sans_culture = ligne[0], ligne[1], ligne[2]
+            xmlid = ligne[3] if len(ligne) > 3 else None
+            culture = self.env.ref(xmlid, raise_if_not_found=False) if xmlid else None
             existant = self.search([("code", "=", code)], limit=1)
             if not existant:
-                self.create({"code": code, "libelle": libelle, "sans_culture": sans_culture})
+                self.create({"code": code, "libelle": libelle, "sans_culture": sans_culture,
+                             "culture_id": culture.id if culture else False})
             elif not existant.culture_id:
-                existant.write({"libelle": existant.libelle or libelle, "sans_culture": sans_culture})
+                vals = {"libelle": existant.libelle or libelle, "sans_culture": sans_culture}
+                if culture and not sans_culture:
+                    vals["culture_id"] = culture.id
+                existant.write(vals)
 
     def _compute_nb(self):
         compte = {c.id: n for c, n in self.env["cultiveau.parcelle"]._read_group([("code_id", "in", self.ids)], ["code_id"], ["__count"])}
