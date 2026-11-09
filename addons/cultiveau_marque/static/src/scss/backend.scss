@@ -24,6 +24,11 @@ h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5, .o_form_view .oe_title h1, .o_kanba
     background: linear-gradient(90deg, $cv-nuit 0%, $cv-nuit-2 100%);
     border-bottom: 2px solid $cv-cyan;
     .o_menu_brand, .o_navbar_apps_menu .dropdown-toggle { color: #fff; font-family: "Plus Jakarta Sans", "Inter", sans-serif; font-weight: 700; letter-spacing: -0.01em; }
+    // « Cultiveau » dans la barre : CULTIV en blanc, EAU dans le bleu clair de la marque. On masque le texte brut et on le réécrit en deux couleurs.
+    .o_menu_brand { font-size: 0 !important;
+        &::before { content: "Cultiv"; font-size: 1.0625rem; color: #fff; }
+        &::after { content: "eau"; font-size: 1.0625rem; color: $cv-cyan-clair; }
+    }
     .o_menu_sections .dropdown-toggle, .o_menu_sections > a, .o_menu_sections .o_nav_entry { color: rgba(255, 255, 255, 0.86); border-radius: 8px; }
     .o_menu_sections .dropdown-toggle:hover, .o_menu_sections > a:hover, .o_menu_sections .o_nav_entry:hover, .o_menu_sections .dropdown-toggle.show { background: rgba(255, 255, 255, 0.10); color: #fff; }
     .o_menu_systray .dropdown-toggle, .o_menu_systray a, .o_menu_systray .fa { color: rgba(255, 255, 255, 0.88); }
