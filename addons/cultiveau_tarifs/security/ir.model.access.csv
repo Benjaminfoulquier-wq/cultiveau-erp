@@ -7,3 +7,6 @@ access_marge_user,cultiveau.marge,model_cultiveau_marge,base.group_user,1,1,1,1
 access_groupee_user,cultiveau.commande.groupee lecture,model_cultiveau_commande_groupee,base.group_user,1,0,0,0
 access_groupee_equipe,cultiveau.commande.groupee équipe,model_cultiveau_commande_groupee,cultiveau_base.group_equipe,1,1,1,1
 access_groupee_ligne_user,cultiveau.commande.groupee.ligne,model_cultiveau_commande_groupee_ligne,base.group_user,1,1,1,1
+access_hausse_prix_user,cultiveau.hausse.prix,model_cultiveau_hausse_prix,base.group_user,1,1,1,1
+access_commission_user,cultiveau.commission,model_cultiveau_commission,base.group_user,1,1,1,1
+access_commission_ligne_user,cultiveau.commission.ligne,model_cultiveau_commission_ligne,base.group_user,1,1,1,1

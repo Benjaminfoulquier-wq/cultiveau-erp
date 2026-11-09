@@ -13,6 +13,10 @@
                         <button name="action_cultiveau_appliquer_marges" type="object" string="Appliquer mes marges" class="btn-link" icon="fa-percent"/>
                         <button name="action_cultiveau_marges_familles" type="object" string="Marges par famille…" class="btn-link" icon="fa-sitemap"/>
                     </setting>
+                    <setting string="Commissions des commerciaux" help="Le taux appliqué aux commerciaux qui n'ont pas leur propre taux, et ce sur quoi la commission se calcule. Chaque commercial peut avoir son taux sur sa fiche utilisateur.">
+                        <div class="row mt8"><label for="cultiveau_commission_pct" class="col-lg-5 o_light_label"/><field name="cultiveau_commission_pct"/></div>
+                        <div class="row mt8"><label for="cultiveau_commission_base" class="col-lg-5 o_light_label"/><field name="cultiveau_commission_base"/></div>
+                    </setting>
                 </block>
             </xpath>
         </field>

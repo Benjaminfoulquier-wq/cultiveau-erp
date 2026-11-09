@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_commission_form" model="ir.ui.view">
+        <field name="name">cultiveau.commission.form</field>
+        <field name="model">cultiveau.commission</field>
+        <field name="arch" type="xml">
+            <form string="Commissions des commerciaux">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Commissions des commerciaux</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="date_debut"/>
+                            <field name="date_fin"/>
+                        </group>
+                        <group>
+                            <field name="base" widget="radio"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="mb-2">
+                        <button name="action_calculer" type="object" string="Calculer" class="btn-primary" icon="fa-calculator"/>
+                    </div>
+                    <field name="ligne_ids" readonly="1">
+                        <list string="Par commercial" create="false" delete="false">
+                            <field name="commercial_id"/>
+                            <field name="ca" sum="Chiffre d'affaires"/>
+                            <field name="marge" sum="Marge estimée"/>
+                            <field name="taux"/>
+                            <field name="commission" sum="Commissions" decoration-bf="1"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                    <group class="oe_subtotal_footer">
+                        <field name="total_ca"/>
+                        <field name="total_marge"/>
+                        <field name="total_commission" class="oe_subtotal_footer_separator"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+                    <p class="text-muted">La marge est estimée à partir du prix d'achat des articles au jour du calcul. Les avoirs sont déduits.</p>
+                </sheet>
+                <footer>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_users_form_commission" model="ir.ui.view">
+        <field name="name">res.users.form.cultiveau.commission</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="inside">
+                <group string="Commission" name="commission_cultiveau">
+                    <field name="cultiveau_commission_pct"/>
+                    <div colspan="2" class="text-muted small">Son taux de commission. Laissé à 0, c'est le taux par défaut de la société qui s'applique (Réglages Cultiveau).</div>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="action_commissions" model="ir.actions.act_window">
+        <field name="name">Commissions des commerciaux</field>
+        <field name="res_model">cultiveau.commission</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_commissions" name="Commissions" parent="cultiveau_base.menu_cultiveau_root" action="action_commissions"
+              sequence="15" groups="sales_team.group_sale_manager"/>
+</odoo>

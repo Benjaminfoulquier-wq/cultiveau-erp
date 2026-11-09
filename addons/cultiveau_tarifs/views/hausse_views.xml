@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_hausse_prix_form" model="ir.ui.view">
+        <field name="name">cultiveau.hausse.prix.form</field>
+        <field name="model">cultiveau.hausse.prix</field>
+        <field name="arch" type="xml">
+            <form string="Augmenter les prix">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Augmenter ou baisser les prix</h1>
+                        <p class="text-muted">Une variation en pourcentage d'un seul coup, sur toute une liste, une famille ou un fournisseur.</p>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="cible" widget="radio"/>
+                            <field name="perimetre" widget="radio"/>
+                            <field name="categ_id" invisible="perimetre != 'famille'" required="perimetre == 'famille'"/>
+                            <field name="fournisseur_id" invisible="perimetre != 'fournisseur'" required="perimetre == 'fournisseur'"/>
+                        </group>
+                        <group>
+                            <field name="pct"/>
+                            <field name="repercuter" invisible="cible != 'achat'"/>
+                            <field name="nb" readonly="1"/>
+                        </group>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        <field name="nb" nolabel="1" class="fw-bold d-inline"/> article(s) seront modifiés. La modification est immédiate ; relancez l'outil avec le pourcentage inverse pour revenir en arrière.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_appliquer" type="object" string="Appliquer" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_hausse_prix" model="ir.actions.act_window">
+        <field name="name">Augmenter les prix</field>
+        <field name="res_model">cultiveau.hausse.prix</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_hausse_prix" name="Augmenter les prix" parent="cultiveau_catalogue.menu_catalogue" action="action_hausse_prix"
+              sequence="29" groups="sales_team.group_sale_manager,purchase.group_purchase_manager"/>
+</odoo>
