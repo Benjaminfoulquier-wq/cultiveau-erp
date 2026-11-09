@@ -7,6 +7,8 @@ class Reglages(models.TransientModel):
     cultiveau_acompte_pct = fields.Float(related="company_id.cultiveau_acompte_pct", readonly=False)
     cultiveau_cgv = fields.Html(related="company_id.cultiveau_cgv", readonly=False)
     cultiveau_mention_reseau = fields.Boolean(related="company_id.cultiveau_mention_reseau", readonly=False)
+    cultiveau_police = fields.Selection(related="company_id.cultiveau_police", readonly=False)
+    cultiveau_taille = fields.Integer(related="company_id.cultiveau_taille", readonly=False)
     cultiveau_relances_devis = fields.Boolean(related="company_id.cultiveau_relances_devis", readonly=False)
     cultiveau_relance_devis_jours = fields.Integer(related="company_id.cultiveau_relance_devis_jours", readonly=False)
     cultiveau_relance_devis_max = fields.Integer(related="company_id.cultiveau_relance_devis_max", readonly=False)

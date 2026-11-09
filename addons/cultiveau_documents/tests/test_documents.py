@@ -28,6 +28,14 @@ class TestDocuments(TransactionCase):
             self.assertIn(attendu, html)
         self.assertEqual(self.devis._find_mail_template(), self.env.ref("cultiveau_documents.modele_mail_devis"))
 
+    def test_police_des_documents(self):
+        self.assertEqual(self.societe.cultiveau_police, "sans")
+        self.assertIn("Helvetica", self.societe.cultiveau_police_css())
+        self.societe.write({"cultiveau_police": "serif", "cultiveau_taille": 11})
+        html = self.env["ir.actions.report"]._render_qweb_html("sale.report_saleorder", self.devis.ids)[0].decode()
+        self.assertIn("Georgia", html)
+        self.assertIn("font-size: 11px", html)
+
     def test_relances_devis_puis_activite(self):
         self.devis.action_quotation_sent()
         self.assertEqual(self.devis.cultiveau_envoye_le, fields.Date.today())

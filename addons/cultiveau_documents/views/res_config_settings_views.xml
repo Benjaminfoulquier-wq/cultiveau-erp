@@ -12,6 +12,10 @@
                         <div class="mt8"><field name="cultiveau_mention_reseau"/><label for="cultiveau_mention_reseau"/></div>
                         <div class="mt8 text-muted">Logo et couleur : Réglages → Mise en page des documents.</div>
                     </setting>
+                    <setting string="Police des documents" help="La police et la taille du texte de vos devis et factures. Les couleurs se règlent dans la mise en page des documents.">
+                        <div class="row mt8"><label for="cultiveau_police" class="col-lg-4 o_light_label"/><field name="cultiveau_police"/></div>
+                        <div class="row mt8"><label for="cultiveau_taille" class="col-lg-4 o_light_label"/><field name="cultiveau_taille" style="width: 4rem;"/> pt</div>
+                    </setting>
                     <setting string="Relances automatiques" help="Les devis envoyés sans réponse et les factures échues sont relancés par e-mail, puis une activité « appeler le client » est créée.">
                         <div class="mt8"><field name="cultiveau_relances_devis"/><label for="cultiveau_relances_devis"/></div>
                         <div class="row mt8" invisible="not cultiveau_relances_devis">

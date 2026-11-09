@@ -33,6 +33,21 @@ class Societe(models.Model):
     cultiveau_cgv = fields.Html("Conditions générales de vente", translate=False, sanitize=True,
                                 help="Imprimées en dernière page des devis. Le texte proposé est un modèle : faites-le relire.")
     cultiveau_mention_reseau = fields.Boolean("Mentionner « membre du réseau Cultiveau »", default=True)
+    cultiveau_police = fields.Selection([("sans", "Moderne (sans serif)"), ("serif", "Classique (serif)"),
+                                         ("humaniste", "Humaniste (sans serif douce)"), ("mono", "Machine à écrire")],
+                                        "Police des documents", default="sans")
+    cultiveau_taille = fields.Integer("Taille du texte (pt)", default=10, help="La taille de base du texte des documents. Les titres et totaux suivent.")
+
+    POLICES_CSS = {
+        "sans": "Helvetica, Arial, 'Liberation Sans', sans-serif",
+        "serif": "Georgia, 'Times New Roman', 'Liberation Serif', serif",
+        "humaniste": "'Segoe UI', 'Noto Sans', 'Liberation Sans', sans-serif",
+        "mono": "'Courier New', 'Liberation Mono', monospace",
+    }
+
+    def cultiveau_police_css(self):
+        self.ensure_one()
+        return self.POLICES_CSS.get(self.cultiveau_police or "sans", self.POLICES_CSS["sans"])
     cultiveau_relances_devis = fields.Boolean("Relancer les devis sans réponse", default=True)
     cultiveau_relance_devis_jours = fields.Integer("Après (jours)", default=7)
     cultiveau_relance_devis_max = fields.Integer("Relances de devis au plus", default=2,

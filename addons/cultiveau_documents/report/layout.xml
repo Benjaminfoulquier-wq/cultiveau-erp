@@ -4,7 +4,9 @@
     <template id="external_layout_cultiveau">
         <t t-set="couleur" t-value="company.primary_color or '#0b8aa3'"/>
         <t t-set="sombre" t-value="company.secondary_color or '#183840'"/>
-        <div t-attf-class="header o_company_#{company.id}_layout">
+        <t t-set="police" t-value="company.cultiveau_police_css()"/>
+        <t t-set="taille" t-value="company.cultiveau_taille or 10"/>
+        <div t-attf-class="header o_company_#{company.id}_layout" t-attf-style="font-family: {{police}};">
             <div class="d-flex justify-content-between align-items-end pb-2" t-attf-style="border-bottom: 3px solid {{couleur}};">
                 <div>
                     <img t-if="company.logo" t-att-src="image_data_uri(company.logo)" alt="Logo" style="max-height: 56px; max-width: 220px;"/>
@@ -22,13 +24,14 @@
         </div>
 
         <div t-attf-class="article o_report_layout_standard o_table_standard o_company_#{company.id}_layout o_snail_mail"
+             t-attf-style="font-family: {{police}}; font-size: {{taille}}px;"
              t-att-data-oe-model="o and o._name" t-att-data-oe-id="o and o.id" t-att-data-oe-lang="o and o.env.context.get('lang')">
             <t t-call="web.address_layout"/>
             <h2 t-attf-style="color: {{sombre}};" t-out="layout_document_title"/>
             <t t-out="0"/>
         </div>
 
-        <div t-attf-class="footer o_company_#{company.id}_layout {{report_type != 'pdf' and 'mt-auto'}}">
+        <div t-attf-class="footer o_company_#{company.id}_layout {{report_type != 'pdf' and 'mt-auto'}}" t-attf-style="font-family: {{police}};">
             <div class="d-flex align-items-center pt-2" t-attf-style="border-top: 1px solid {{couleur}}; font-size: 9px; color: #555;">
                 <div class="flex-grow-1">
                     <div t-if="company.report_footer and not is_html_empty(company.report_footer)" t-field="company.report_footer"/>
