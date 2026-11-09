@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Le texte mis en forme des sections et des notes s'affiche aussi sur le devis en ligne (portail). -->
+    <template id="portal_devis_mise_en_forme" inherit_id="sale.sale_order_portal_content" name="Cultiveau : sections et notes mises en forme">
+        <xpath expr="//t[@t-if=&quot;line.display_type == 'line_section' or line.product_type == 'combo'&quot;]/td/span" position="replace">
+            <span t-if="not is_html_empty(line.cultiveau_html)" t-out="line.cultiveau_html"/>
+            <span t-else="" t-field="line.name"/>
+        </xpath>
+        <xpath expr="//t[@t-if=&quot;line.display_type == 'line_note'&quot;]/td/span" position="replace">
+            <span t-if="not is_html_empty(line.cultiveau_html)" t-out="line.cultiveau_html"/>
+            <span t-else="" t-field="line.name"/>
+        </xpath>
+    </template>
+</odoo>

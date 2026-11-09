@@ -68,6 +68,16 @@
                 </tr>
             </t>
         </xpath>
+        <!-- Le texte mis en forme (gras, italique, souligné, couleur) remplace le texte simple des sections et des notes. -->
+        <xpath expr="//td[@name='td_section_line']/span" position="replace">
+            <span t-if="not is_html_empty(line.cultiveau_html)" t-out="line.cultiveau_html"/>
+            <span t-else="" t-field="line.name"/>
+        </xpath>
+        <xpath expr="//td[@name='td_note_line']/span" position="replace">
+            <span t-if="not is_html_empty(line.cultiveau_html)" t-out="line.cultiveau_html"/>
+            <span t-else="" t-field="line.name"/>
+        </xpath>
+
         <!-- Les CGV en dernière page. -->
         <xpath expr="//span[@name='order_note']/.." position="after">
             <t t-if="doc.company_id.cultiveau_cgv and not is_html_empty(doc.company_id.cultiveau_cgv) and not env.context.get('proforma')">

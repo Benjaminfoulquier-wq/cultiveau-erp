@@ -5,6 +5,14 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 
 
+class DevisLigne(models.Model):
+    _inherit = "sale.order.line"
+
+    cultiveau_html = fields.Html("Mise en forme", sanitize=True,
+                                 help="Pour une section ou une note : le texte mis en forme (gras, italique, souligné, couleur, taille). "
+                                      "S'il est rempli, il remplace le texte simple sur le devis et le portail.")
+
+
 class Devis(models.Model):
     _inherit = "sale.order"
 

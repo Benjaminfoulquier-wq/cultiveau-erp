@@ -28,6 +28,14 @@ class TestDocuments(TransactionCase):
             self.assertIn(attendu, html)
         self.assertEqual(self.devis._find_mail_template(), self.env.ref("cultiveau_documents.modele_mail_devis"))
 
+    def test_mise_en_forme_section(self):
+        devis = self.env["sale.order"].create({"partner_id": self.agri.id, "company_id": self.societe.id, "order_line": [
+            (0, 0, {"display_type": "line_section", "name": "Station de pompage", "cultiveau_html": "<span style='color:#c00'><strong>Station de pompage</strong></span>"}),
+            (0, 0, {"product_id": self.pompe.id, "product_uom_qty": 1})]})
+        html = self.env["ir.actions.report"]._render_qweb_html("sale.report_saleorder", devis.ids)[0].decode()
+        self.assertIn("color:#c00", html.replace('"', "'"))
+        self.assertIn("<strong>Station de pompage</strong>", html)
+
     def test_police_des_documents(self):
         self.assertEqual(self.societe.cultiveau_police, "sans")
         self.assertIn("Helvetica", self.societe.cultiveau_police_css())

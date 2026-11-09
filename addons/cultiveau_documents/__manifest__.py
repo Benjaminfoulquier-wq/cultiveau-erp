@@ -23,6 +23,7 @@ Les documents qu'un adhérent envoie à ses clients, propres et à sa marque :
         "data/cron.xml",
         "views/res_config_settings_views.xml",
         "views/sale_order_views.xml",
+        "views/portal_templates.xml",
         "views/account_move_views.xml",
         "data/defauts.xml",
     ],
