@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- La base de données des prix du marché -->
+    <record id="view_prix_marche_list" model="ir.ui.view">
+        <field name="name">cultiveau.prix.marche.list</field>
+        <field name="model">cultiveau.prix.marche</field>
+        <field name="arch" type="xml">
+            <list editable="bottom" default_order="product_tmpl_id, date_releve desc">
+                <field name="product_tmpl_id"/>
+                <field name="origine"/>
+                <field name="source"/>
+                <field name="url" widget="url" optional="show"/>
+                <field name="prix"/>
+                <field name="ttc"/>
+                <field name="taux_tva" optional="hide"/>
+                <field name="prix_ht"/>
+                <field name="unite" optional="hide"/>
+                <field name="date_releve"/>
+                <field name="company_id" optional="hide" groups="cultiveau_base.group_equipe"/>
+                <field name="note" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_prix_marche_form" model="ir.ui.view">
+        <field name="name">cultiveau.prix.marche.form</field>
+        <field name="model">cultiveau.prix.marche</field>
+        <field name="arch" type="xml">
+            <form string="Prix du marché">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="product_tmpl_id"/>
+                            <field name="origine"/>
+                            <field name="source"/>
+                            <field name="url" widget="url"/>
+                        </group>
+                        <group>
+                            <field name="prix"/>
+                            <field name="ttc"/>
+                            <field name="taux_tva" invisible="not ttc"/>
+                            <field name="prix_ht"/>
+                            <field name="unite"/>
+                            <field name="date_releve"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Remarque (conditionnement différent, promotion, port compris…)"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_prix_marche_search" model="ir.ui.view">
+        <field name="name">cultiveau.prix.marche.search</field>
+        <field name="model">cultiveau.prix.marche</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="product_tmpl_id"/>
+                <field name="source"/>
+                <filter name="web" string="Sites internet" domain="[('origine', '=', 'web')]"/>
+                <filter name="reseau" string="Réseau" domain="[('origine', '=', 'reseau')]"/>
+                <filter name="recents" string="Moins de 12 mois" domain="[('date_releve', '>=', (context_today() - relativedelta(months=12)).strftime('%Y-%m-%d'))]"/>
+                <group expand="0" string="Regrouper par">
+                    <filter name="par_article" string="Article" context="{'group_by': 'product_tmpl_id'}"/>
+                    <filter name="par_origine" string="Origine" context="{'group_by': 'origine'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_prix_marche" model="ir.actions.act_window">
+        <field name="name">Prix du marché</field>
+        <field name="res_model">cultiveau.prix.marche</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Aucun relevé de prix</p>
+            <p>La base des prix observés sur le marché, article par article. Elle sert à se situer : elle ne change jamais vos prix de vente.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_prix_marche" name="Prix du marché" parent="cultiveau_catalogue.menu_catalogue" action="action_prix_marche" sequence="27"/>
+
+    <!-- Le bouton sur la fiche article -->
+    <record id="product_template_form_marche" model="ir.ui.view">
+        <field name="name">product.template.form.cultiveau.marche</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_cultiveau_marche" type="object" class="oe_stat_button" icon="fa-line-chart">
+                    <field name="cultiveau_marche_nb" widget="statinfo" string="Prix du marché"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Le calculateur de positionnement -->
+    <record id="view_positionnement_form" model="ir.ui.view">
+        <field name="name">cultiveau.positionnement.form</field>
+        <field name="model">cultiveau.positionnement</field>
+        <field name="arch" type="xml">
+            <form string="Positionnement prix">
+                <sheet>
+                    <div class="oe_title"><h1>Où me situer par rapport au marché</h1>
+                        <p class="text-muted">Une estimation indicative à partir de vos relevés de prix. L'outil ne modifie ni vos prix de vente ni votre grille.</p>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="perimetre" widget="radio"/>
+                            <field name="categ_id" invisible="perimetre != 'famille'" required="perimetre == 'famille'"/>
+                            <field name="product_tmpl_id" invisible="perimetre != 'article'" required="perimetre == 'article'"/>
+                        </group>
+                        <group>
+                            <field name="marge_cible"/>
+                            <field name="mois_fraicheur"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <div class="mb-2">
+                        <button name="action_calculer" type="object" string="Calculer" class="btn-primary" icon="fa-calculator"/>
+                    </div>
+                    <field name="ligne_ids" readonly="1">
+                        <list string="Positionnement" create="false" delete="false" default_order="ecart_marche desc"
+                              decoration-danger="position == 'cher'" decoration-success="position == 'bas'">
+                            <field name="product_tmpl_id"/>
+                            <field name="nb" string="Relevés"/>
+                            <field name="prix_achat"/>
+                            <field name="prix_vente"/>
+                            <field name="marche_min" optional="hide"/>
+                            <field name="marche_median"/>
+                            <field name="marche_max" optional="hide"/>
+                            <field name="marge_actuelle"/>
+                            <field name="ecart_marche"/>
+                            <field name="prix_conseille"/>
+                            <field name="position"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+                </sheet>
+                <footer>
+                    <button string="Fermer" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_positionnement" model="ir.actions.act_window">
+        <field name="name">Positionnement prix</field>
+        <field name="res_model">cultiveau.positionnement</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_positionnement" name="Positionnement prix" parent="cultiveau_catalogue.menu_catalogue" action="action_positionnement"
+              sequence="28" groups="sales_team.group_sale_manager,purchase.group_purchase_manager"/>
+</odoo>

@@ -7,13 +7,13 @@ visibles, prix d'achat de chaque adhérent mis à jour), la marge cible par adh�
 construit seule), et la commande groupée réseau (les besoins de plusieurs adhérents chez un fournisseur référencé, une commande d'achat
 par adhérent au tarif négocié, le récapitulatif pour le fournisseur).
 """,
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "website": "https://cultiveau.fr",
     "license": "LGPL-3",
     "depends": ["cultiveau_catalogue", "cultiveau_compta", "purchase", "sale"],
-    "data": ["security/ir.model.access.csv", "security/regles.xml", "views/tarif_views.xml", "views/groupee_views.xml", "views/hausse_views.xml", "views/commission_views.xml", "views/res_config_settings_views.xml", "views/menus.xml"],
+    "data": ["security/ir.model.access.csv", "security/regles.xml", "views/tarif_views.xml", "views/groupee_views.xml", "views/hausse_views.xml", "views/commission_views.xml", "views/marche_views.xml", "views/res_config_settings_views.xml", "views/menus.xml"],
     "installable": True,
     "auto_install": False,
 }

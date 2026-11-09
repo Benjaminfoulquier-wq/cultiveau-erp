@@ -71,3 +71,41 @@ class TestCommissions(TransactionCase):
         w.action_calculer()
         ligne = w.ligne_ids.filtered(lambda l: l.commercial_id == autre)
         self.assertAlmostEqual(ligne.commission, 10.0, 2)
+
+
+@tagged("post_install", "-at_install", "cultiveau_tarifs")
+class TestPositionnement(TransactionCase):
+    def setUp(self):
+        super().setUp()
+        self.company = self.env.company
+        self.famille = self.env["product.category"].create({"name": "Marché test"})
+        self.article = self.env["product.template"].create({
+            "name": "Article marché", "categ_id": self.famille.id, "type": "consu",
+            "standard_price": 60.0, "list_price": 100.0, "sale_ok": True, "company_id": self.company.id})
+        Marche = self.env["cultiveau.prix.marche"]
+        Marche.create({"product_tmpl_id": self.article.id, "origine": "web", "source": "Site A", "prix": 120.0, "ttc": True, "taux_tva": 20.0})
+        Marche.create({"product_tmpl_id": self.article.id, "origine": "reseau", "source": "Réseau", "prix": 90.0, "ttc": False})
+        Marche.create({"product_tmpl_id": self.article.id, "origine": "web", "source": "Site B", "prix": 110.0, "ttc": True, "taux_tva": 20.0})
+
+    def test_prix_ht_ttc(self):
+        releve = self.article.cultiveau_marche_ids.filtered(lambda r: r.source == "Site A")
+        self.assertAlmostEqual(releve.prix_ht, 100.0, 2)
+
+    def test_mediane_et_nb(self):
+        self.assertEqual(self.article.cultiveau_marche_nb, 3)
+        # HT : 100, 90, 91,67 -> médiane 91,67
+        self.assertAlmostEqual(self.article.cultiveau_marche_median, 91.67, 1)
+
+    def test_positionnement_cher(self):
+        w = self.env["cultiveau.positionnement"].create({"perimetre": "releves", "marge_cible": 30.0})
+        w.action_calculer()
+        ligne = w.ligne_ids.filtered(lambda l: l.product_tmpl_id == self.article)
+        self.assertTrue(ligne)
+        self.assertEqual(ligne.position, "cher")  # 100 au-dessus de la médiane 91,67
+        self.assertAlmostEqual(ligne.prix_conseille, 85.71, 1)  # 60 / 0,7, sous la médiane
+
+    def test_ne_modifie_pas_le_prix(self):
+        w = self.env["cultiveau.positionnement"].create({"perimetre": "releves", "marge_cible": 30.0})
+        w.action_calculer()
+        self.assertEqual(self.article.list_price, 100.0)
+        self.assertEqual(self.article.with_company(self.company).standard_price, 60.0)

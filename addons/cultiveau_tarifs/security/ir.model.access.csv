@@ -10,3 +10,6 @@ access_groupee_ligne_user,cultiveau.commande.groupee.ligne,model_cultiveau_comma
 access_hausse_prix_user,cultiveau.hausse.prix,model_cultiveau_hausse_prix,base.group_user,1,1,1,1
 access_commission_user,cultiveau.commission,model_cultiveau_commission,base.group_user,1,1,1,1
 access_commission_ligne_user,cultiveau.commission.ligne,model_cultiveau_commission_ligne,base.group_user,1,1,1,1
+access_prix_marche_user,cultiveau.prix.marche,model_cultiveau_prix_marche,base.group_user,1,1,1,1
+access_positionnement_user,cultiveau.positionnement,model_cultiveau_positionnement,base.group_user,1,1,1,1
+access_positionnement_ligne_user,cultiveau.positionnement.ligne,model_cultiveau_positionnement_ligne,base.group_user,1,1,1,1
