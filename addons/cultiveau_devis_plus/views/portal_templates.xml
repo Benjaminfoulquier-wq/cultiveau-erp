@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Un bouton « Retour » en haut du devis du portail, pour revenir à la liste sans la flèche du navigateur. -->
+    <template id="portal_devis_retour" inherit_id="sale.sale_order_portal_template" name="Cultiveau : bouton Retour sur le devis">
+        <xpath expr="//t[@t-call='portal.portal_back_in_edit_mode']" position="after">
+            <div class="mb-3">
+                <a href="/my/home" onclick="if (document.referrer) { history.back(); return false; }"
+                   class="btn btn-outline-secondary btn-sm">
+                    <i class="fa fa-arrow-left me-1"/>Retour
+                </a>
+            </div>
+        </xpath>
+    </template>
+</odoo>

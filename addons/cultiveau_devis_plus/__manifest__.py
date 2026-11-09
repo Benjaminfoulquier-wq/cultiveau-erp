@@ -26,6 +26,7 @@ Le devis qui en dit plus
         "views/sale_order_views.xml",
         "views/product_views.xml",
         "views/res_config_settings_views.xml",
+        "views/portal_templates.xml",
         "report/devis.xml",
     ],
     "installable": True,
