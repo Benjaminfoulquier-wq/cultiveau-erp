@@ -58,14 +58,14 @@ export function bibliotheque(THREE) {
     };
     /** Ajoute à g un pavé arrondi de w × h × d, posé avec son bas en (x, y, z) (centre en x et z). */
     const bloc = (g, w, h, d, couleur, x = 0, y = 0, z = 0, o = {}) => {
-        const m = ombre(new THREE.Mesh(o.vif ? new THREE.BoxGeometry(w, h, d) : geoRonde(w, h, d, o.rayon ?? Math.min(0.06, w / 5, h / 5, d / 5)), mat(couleur, o)), o.ombre ?? true);
+        const m = ombre(new THREE.Mesh(o.vif ? new THREE.BoxGeometry(w, h, d) : geoRonde(w, h, d, o.rayon ?? Math.min(0.06, w / 5, h / 5, d / 5)), o.mat ?? mat(couleur, o)), o.ombre ?? true);
         m.position.set(x, y + h / 2, z);
         g.add(m);
         return m;
     };
     /** Un cylindre d'axe vertical (axe « y »), horizontal (« x » ou « z »), posé avec son centre en (x, y, z). */
     const cyl = (g, r1, r2, h, couleur, x = 0, y = 0, z = 0, axe = "y", o = {}) => {
-        const m = ombre(new THREE.Mesh(geo(`c${r1}|${r2}|${h}|${o.seg || 20}`, () => new THREE.CylinderGeometry(r1, r2, h, o.seg || 20)), mat(couleur, o)), o.ombre ?? true);
+        const m = ombre(new THREE.Mesh(geo(`c${r1}|${r2}|${h}|${o.seg || 20}`, () => new THREE.CylinderGeometry(r1, r2, h, o.seg || 20)), o.mat ?? mat(couleur, o)), o.ombre ?? true);
         m.position.set(x, y, z);
         if (axe === "x") {
             m.rotation.z = Math.PI / 2;
@@ -101,16 +101,164 @@ export function bibliotheque(THREE) {
         g.add(m);
         return m;
     };
-    const roue = (g, r, l, x, y, z, jante = T.gris) => {
+    // ------------------------------------------------------------ le dessin fin (10/11/2026, « beaucoup plus réel »)
+    const matiere = (cle, fabrique) => {
+        if (!materiaux.has(cle)) {
+            materiaux.set(cle, fabrique());
+        }
+        return materiaux.get(cle);
+    };
+    /** La peinture de carrosserie : une laque sous vernis, qui prend les reflets du ciel. */
+    const peinture = (c) => matiere(`laque${c}`, () => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.42, metalness: 0.3, clearcoat: 1, clearcoatRoughness: 0.07 }));
+    /** Le vitrage teinté des véhicules, et le vitrage clair des cabines. */
+    const verre = () => matiere("verre", () => new THREE.MeshPhysicalMaterial({ color: 0x1b2931, roughness: 0.04, metalness: 0.55, transparent: true, opacity: 0.86, envMapIntensity: 1.8 }));
+    const verreClair = () => matiere("verreClair", () => new THREE.MeshPhysicalMaterial({ color: 0xa9d6e4, roughness: 0.04, metalness: 0.3, transparent: true, opacity: 0.38, envMapIntensity: 1.8 }));
+    const teintes = () => matiere("teintes", () => new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.78, metalness: 0.02 }));
+    /** Plusieurs pièces en un seul maillage (positions, normales, couleur par pièce ou par sommet). */
+    const fusion = (pieces) => {
+        let n = 0;
+        const parts = pieces.map((p) => {
+            const q = p.g.index ? p.g.toNonIndexed() : p.g.clone();
+            if (p.m) {
+                q.applyMatrix4(p.m);
+            }
+            n += q.attributes.position.count;
+            return [q, p.c];
+        });
+        const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), col = new Float32Array(n * 3);
+        let k = 0;
+        for (const [q, c] of parts) {
+            const nb = q.attributes.position.count;
+            pos.set(q.attributes.position.array, k * 3);
+            nor.set(q.attributes.normal.array, k * 3);
+            if (q.attributes.color) {
+                col.set(q.attributes.color.array, k * 3);
+            } else {
+                for (let i = 0; i < nb; i++) {
+                    col[(k + i) * 3] = c ? c.r : 1;
+                    col[(k + i) * 3 + 1] = c ? c.g : 1;
+                    col[(k + i) * 3 + 2] = c ? c.b : 1;
+                }
+            }
+            k += nb;
+            q.dispose();
+        }
+        const out = new THREE.BufferGeometry();
+        out.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        out.setAttribute("normal", new THREE.BufferAttribute(nor, 3));
+        out.setAttribute("color", new THREE.BufferAttribute(col, 3));
+        return out;
+    };
+    const pose = (x, y, z, rx = 0, ry = 0, rz = 0) => new THREE.Matrix4().compose(new THREE.Vector3(x, y, z), new THREE.Quaternion().setFromEuler(new THREE.Euler(rx, ry, rz)), new THREE.Vector3(1, 1, 1));
+    /** Une pièce tirée de son profil de côté (points [x, y, rayon d'angle]), large de `l` le long de z, aux arêtes adoucies :
+     *  une vraie silhouette de carrosserie au lieu d'un empilement de pavés. */
+    const profil = (g, pts, l, materiau, o = {}) => {
+        const r0 = o.rayon ?? 0.08, bev = Math.min(o.biseau ?? 0.05, l / 2.5);
+        const m = ombre(new THREE.Mesh(geo(`pf${JSON.stringify(pts)}|${l}|${r0}|${bev}`, () => {
+            const s = new THREE.Shape(), n = pts.length;
+            for (let i = 0; i < n; i++) {
+                const q = pts[i], a = pts[(i + n - 1) % n], b = pts[(i + 1) % n], r = q[2] ?? r0;
+                const da = Math.hypot(a[0] - q[0], a[1] - q[1]), db = Math.hypot(b[0] - q[0], b[1] - q[1]);
+                const ra = Math.min(r, da / 2.2), rb = Math.min(r, db / 2.2);
+                const p1 = [q[0] + ((a[0] - q[0]) / da) * ra, q[1] + ((a[1] - q[1]) / da) * ra], p2 = [q[0] + ((b[0] - q[0]) / db) * rb, q[1] + ((b[1] - q[1]) / db) * rb];
+                i ? s.lineTo(p1[0], p1[1]) : s.moveTo(p1[0], p1[1]);
+                s.quadraticCurveTo(q[0], q[1], p2[0], p2[1]);
+            }
+            s.closePath();
+            const e = new THREE.ExtrudeGeometry(s, { depth: l - 2 * bev, bevelEnabled: true, bevelSize: bev, bevelOffset: -bev, bevelThickness: bev, bevelSegments: 3, curveSegments: 6 });
+            e.translate(0, 0, -(l - 2 * bev) / 2);
+            return e;
+        }), typeof materiau === "number" ? mat(materiau, o) : materiau), o.ombre ?? true);
+        m.position.z = o.z ?? 0;
+        g.add(m);
+        return m;
+    };
+    /** Les points d'un arc épais (une aile, un garde-boue), à donner à `profil`. */
+    const arc = (cx, cy, r, e, a0, a1, n = 12) => {
+        const p = [];
+        for (let i = 0; i <= n; i++) {
+            const a = a0 + ((a1 - a0) * i) / n;
+            p.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r, 0.005]);
+        }
+        for (let i = n; i >= 0; i--) {
+            const a = a0 + ((a1 - a0) * i) / n;
+            p.push([cx + Math.cos(a) * (r - e), cy + Math.sin(a) * (r - e), 0.005]);
+        }
+        return p;
+    };
+    /** Une roue : pneu aux flancs bombés, jante ajourée, moyeu ; des crampons pour les engins agricoles. */
+    const roue = (g, r, l, x, y, z, jante = T.gris, o = {}) => {
         const s = new THREE.Group();
         s.name = "roue";
-        cyl(s, r, r, l, T.pneu, 0, 0, 0, "z", { r: 0.9 });
-        cyl(s, r * 0.55, r * 0.55, l + 0.02, jante, 0, 0, 0, "z", { r: 0.4, m: 0.4 });
-        cyl(s, r * 0.16, r * 0.16, l + 0.05, T.anthracite, 0, 0, 0, "z", { r: 0.5 });
+        const h = l / 2;
+        s.add(ombre(new THREE.Mesh(geo(`pneu${r}|${l}`, () => {
+            const ri = r * 0.6;
+            const pts = [[ri, -h * 0.82], [r * 0.82, -h], [r * 0.96, -h * 0.86], [r, -h * 0.5], [r, h * 0.5], [r * 0.96, h * 0.86], [r * 0.82, h], [ri, h * 0.82]].map(([a, b]) => new THREE.Vector2(a, b));
+            const q = new THREE.LatheGeometry(pts, 30);
+            q.rotateX(Math.PI / 2);
+            return q;
+        }), mat(T.pneu, { r: 0.93 }))));
+        if (o.crampons) {
+            s.add(ombre(new THREE.Mesh(geo(`crampons${r}|${l}`, () => {
+                const boite = new THREE.BoxGeometry(r * 0.2, r * 0.1, l * 0.56), n = Math.max(12, Math.round(r * 22)), pieces = [];
+                for (let i = 0; i < n; i++) {
+                    const a = (i / n) * Math.PI * 2, cote = i % 2 ? 1 : -1;
+                    pieces.push({ g: boite, m: new THREE.Matrix4().makeRotationZ(a).multiply(pose(0, r * 1.0, cote * l * 0.2, 0, cote * 0.5, 0)) });
+                }
+                const f = fusion(pieces);
+                boite.dispose();
+                return f;
+            }), mat(T.pneu, { r: 0.93 }))));
+        }
+        s.add(ombre(new THREE.Mesh(geo(`jante${r}|${l}`, () => {
+            const R = r * 0.62, f = new THREE.Shape();
+            f.absarc(0, 0, R, 0, Math.PI * 2, false);
+            for (let i = 0; i < 5; i++) {
+                const a = (i / 5) * Math.PI * 2, trou = new THREE.Path();
+                trou.absarc(Math.cos(a) * R * 0.62, Math.sin(a) * R * 0.62, R * 0.2, 0, Math.PI * 2, true);
+                f.holes.push(trou);
+            }
+            const e = new THREE.ExtrudeGeometry(f, { depth: l * 0.74, bevelEnabled: true, bevelSize: 0.012, bevelOffset: -0.012, bevelThickness: 0.02, bevelSegments: 2, curveSegments: 10 });
+            e.translate(0, 0, -l * 0.37);
+            return e;
+        }), mat(jante, { r: 0.32, m: 0.7 })), false));
+        cyl(s, r * 0.17, r * 0.17, l * 0.86, 0x1d2023, 0, 0, 0, "z", { r: 0.5, m: 0.6, seg: 12, ombre: false });
         s.position.set(x, y, z);
         s.userData.rayon = r;
         g.add(s);
         return s;
+    };
+    /** Le socle commun d'un véhicule routier : caisse profilée et laquée, soubassement, passages de roue, roues, vitrage,
+     *  pare-chocs, calandre, phares, feux, plaques, rétroviseurs. */
+    const vehicule = (g, d) => {
+        const xs = d.pts.map((q) => q[0]), xa = Math.max(...xs), xr = Math.min(...xs), y0 = Math.min(...d.pts.map((q) => q[1]));
+        const l = d.l, rr = d.rr, lr = d.lr ?? rr * 0.72, sombre = 0x1b1e21;
+        profil(g, d.pts, l, peinture(d.couleur), { rayon: d.rayon ?? 0.14, biseau: 0.09 });
+        bloc(g, xa - xr - 0.3, 0.2, l - 0.3, sombre, (xa + xr) / 2, y0 - 0.14, 0, { vif: true, r: 0.9 });
+        for (const x of d.roues) {
+            cyl(g, rr * 1.2, rr * 1.2, l + 0.012, 0x121416, x, rr, 0, "z", { seg: 26, r: 0.95, ombre: false });
+            for (const cote of [1, -1]) {
+                roue(g, rr, lr, x, rr, cote * (l / 2 - lr / 2 + 0.03), d.jante ?? 0xcfd4d8);
+            }
+        }
+        for (const v of d.vitres || []) {
+            profil(g, v, l + 0.014, verre(), { rayon: 0.05, biseau: 0.004, ombre: false });
+        }
+        if (d.parebrise) {
+            profil(g, d.parebrise, l - 0.24, verre(), { rayon: 0.02, biseau: 0.012, ombre: false });
+        }
+        bloc(g, 0.2, 0.26, l + 0.02, sombre, xa - 0.07, y0 - 0.06, 0, { rayon: 0.08, r: 0.75 });
+        bloc(g, 0.2, 0.26, l + 0.02, sombre, xr + 0.07, y0 - 0.06, 0, { rayon: 0.08, r: 0.75 });
+        bloc(g, 0.05, 0.17, l * 0.44, 0x0e1012, xa - 0.015, y0 + (d.yCalandre ?? 0.3), 0, { rayon: 0.02, r: 0.6 });
+        bloc(g, 0.02, 0.11, 0.5, 0xf4f4f0, xa + 0.035, y0 - 0.02, 0, { vif: true });
+        bloc(g, 0.02, 0.11, 0.5, 0xf4f4f0, xr - 0.035, y0 + 0.02, 0, { vif: true });
+        for (const cote of [1, -1]) {
+            bloc(g, 0.07, 0.15, 0.34, 0xfff6c8, xa - (d.reculPhare ?? 0.06), d.yPhare, cote * (l / 2 - 0.27), { rayon: 0.05, e: 0.9 });
+            bloc(g, 0.05, d.hFeu ?? 0.24, 0.13, T.rouge, xr + 0.005, d.yFeu, cote * (l / 2 - 0.13), { rayon: 0.02, e: 0.5 });
+            if (d.xRetro !== undefined) {
+                bloc(g, 0.1, 0.17, 0.2, sombre, d.xRetro, d.yRetro, cote * (l / 2 + 0.1), { rayon: 0.04 });
+            }
+        }
     };
     const groupe = () => new THREE.Group();
 
@@ -136,24 +284,22 @@ export function bibliotheque(THREE) {
 
     // ---------------------------------------------------------------- les véhicules
     M.utilitaire = (o = {}) => {
-        // la camionnette d'intervention : caisse blanche, bandeau à la couleur, cabine vitrée, quatre roues
+        // la camionnette d'intervention (un fourgon tôlé) : caisse blanche laquée, bandeau à la couleur, pare-brise incliné
         const g = groupe();
         const c = o.couleur ?? T.bleu;
-        bloc(g, 3.2, 1.75, 1.9, T.blanc, -0.55, 0.42, 0, { rayon: 0.18 });
-        bloc(g, 1.4, 1.25, 1.86, T.blanc, 1.55, 0.42, 0, { rayon: 0.3 });
-        bloc(g, 0.06, 0.62, 1.6, T.vitreFoncee, 2.2, 1.0, 0, { rayon: 0.03, r: 0.2, m: 0.3 });
-        bloc(g, 0.9, 0.5, 0.05, T.vitreFoncee, 1.5, 1.08, 0.94, { rayon: 0.02, r: 0.2 });
-        bloc(g, 0.9, 0.5, 0.05, T.vitreFoncee, 1.5, 1.08, -0.94, { rayon: 0.02, r: 0.2 });
-        bloc(g, 4.5, 0.32, 1.94, c, 0.1, 0.62, 0, { rayon: 0.05 });
-        bloc(g, 0.18, 0.28, 1.9, T.anthracite, 2.27, 0.32, 0, { rayon: 0.06 });
-        bloc(g, 0.18, 0.28, 1.9, T.anthracite, -2.2, 0.32, 0, { rayon: 0.06 });
-        bloc(g, 0.05, 0.14, 0.3, 0xfff6c8, 2.25, 0.85, 0.65, { e: 0.8 });
-        bloc(g, 0.05, 0.14, 0.3, 0xfff6c8, 2.25, 0.85, -0.65, { e: 0.8 });
-        bloc(g, 0.05, 0.2, 0.18, T.rouge, -2.17, 1.2, 0.82, { e: 0.4 });
-        bloc(g, 0.05, 0.2, 0.18, T.rouge, -2.17, 1.2, -0.82, { e: 0.4 });
-        for (const x of [1.45, -1.4]) {
-            roue(g, 0.36, 0.26, x, 0.36, 0.88);
-            roue(g, 0.36, 0.26, x, 0.36, -0.88);
+        vehicule(g, { pts: [[-2.3, 0.4], [-2.3, 2.08, 0.22], [0.8, 2.15, 0.3], [1.3, 1.92, 0.2], [1.78, 1.24, 0.18], [2.24, 1.04, 0.2], [2.33, 0.4, 0.1]], l: 1.9, couleur: T.blanc,
+                      roues: [1.45, -1.4], rr: 0.36, lr: 0.26, vitres: [[[0.86, 1.3], [0.86, 1.84], [1.22, 1.84], [1.62, 1.3]]],
+                      parebrise: [[1.27, 1.9], [1.34, 1.93], [1.8, 1.27], [1.73, 1.23]], yPhare: 0.86, yFeu: 1.2, xRetro: 1.72, yRetro: 1.3 });
+        bloc(g, 4.4, 0.3, 1.916, c, 0.0, 0.62, 0, { rayon: 0.04, r: 0.4, m: 0.2 });
+        for (const z of [0.953, -0.953]) {
+            bloc(g, 0.012, 1.4, 0.012, 0x8f969c, 0.78, 0.5, z, { vif: true, ombre: false });
+            bloc(g, 0.012, 1.5, 0.012, 0x8f969c, -0.55, 0.5, z, { vif: true, ombre: false });
+            bloc(g, 0.14, 0.035, 0.025, 0x1b1e21, 0.6, 1.14, z, { vif: true, ombre: false });
+            bloc(g, 1.2, 0.03, 0.02, 0x8f969c, -1.25, 1.5, z, { vif: true, ombre: false });
+        }
+        bloc(g, 0.012, 1.55, 0.014, 0x8f969c, -2.303, 0.5, 0, { vif: true, ombre: false });
+        for (const x of [-1.8, -1.1, -0.4, 0.3]) {
+            bloc(g, 0.07, 0.03, 1.5, T.blanc, x, 2.1, 0, { rayon: 0.012 });
         }
         if (o.gyrophare) {
             bloc(g, 0.5, 0.14, 0.22, T.orange, 0.6, 2.17, 0, { e: 0.6 });
@@ -189,52 +335,77 @@ export function bibliotheque(THREE) {
         const g = groupe();
         const c = o.couleur ?? T.rouge;
         if (o.pickup) {
-            bloc(g, 4.6, 0.75, 1.8, c, 0, 0.4, 0, { rayon: 0.2 });
-            bloc(g, 1.9, 0.75, 1.7, c, 0.5, 1.1, 0, { rayon: 0.25 });
-            bloc(g, 1.7, 0.55, 1.74, T.vitreFoncee, 0.5, 1.2, 0, { rayon: 0.2, r: 0.2 });
-            bloc(g, 1.6, 0.4, 1.6, T.anthracite, -1.4, 1.1, 0, { rayon: 0.05 });
+            vehicule(g, { pts: [[-2.3, 0.42], [-2.3, 1.12, 0.1], [-0.42, 1.12, 0.05], [-0.36, 1.78, 0.2], [0.85, 1.78, 0.25], [1.4, 1.2, 0.15], [2.25, 1.08, 0.22], [2.33, 0.42, 0.1]], l: 1.8, couleur: c,
+                          roues: [1.5, -1.5], rr: 0.37, lr: 0.27, vitres: [[[-0.25, 1.24], [-0.25, 1.7], [0.82, 1.7], [1.22, 1.24]]],
+                          parebrise: [[0.88, 1.76], [0.94, 1.79], [1.43, 1.22], [1.37, 1.19]], yPhare: 0.9, yFeu: 0.82, hFeu: 0.3, xRetro: 1.3, yRetro: 1.28 });
+            bloc(g, 1.7, 0.05, 1.5, 0x1b1e21, -1.38, 1.1, 0, { vif: true, r: 0.9 });
         } else {
-            bloc(g, 4.0, 0.7, 1.75, c, 0, 0.35, 0, { rayon: 0.25 });
-            bloc(g, 2.2, 0.62, 1.6, c, -0.2, 1.0, 0, { rayon: 0.28 });
-            bloc(g, 2.0, 0.48, 1.64, T.vitreFoncee, -0.2, 1.06, 0, { rayon: 0.22, r: 0.2 });
-        }
-        bloc(g, 0.05, 0.12, 0.3, 0xfff6c8, o.pickup ? 2.3 : 2.0, 0.75, 0.6, { e: 0.7 });
-        bloc(g, 0.05, 0.12, 0.3, 0xfff6c8, o.pickup ? 2.3 : 2.0, 0.75, -0.6, { e: 0.7 });
-        const ex = o.pickup ? 1.5 : 1.3;
-        for (const x of [ex, -ex]) {
-            roue(g, 0.34, 0.24, x, 0.34, 0.82);
-            roue(g, 0.34, 0.24, x, 0.34, -0.82);
+            vehicule(g, { pts: [[-2.0, 0.38], [-2.0, 0.96, 0.2], [-1.5, 1.04, 0.12], [-0.98, 1.44, 0.25], [0.32, 1.44, 0.25], [0.98, 1.02, 0.14], [1.93, 0.88, 0.25], [2.03, 0.38, 0.1]], l: 1.75, couleur: c,
+                          roues: [1.3, -1.3], rr: 0.33, lr: 0.23, vitres: [[[-0.9, 1.04], [-0.78, 1.37], [0.28, 1.37], [0.8, 1.04]]],
+                          parebrise: [[0.36, 1.42], [0.42, 1.45], [1.02, 1.03], [0.96, 1.0]], yPhare: 0.74, yFeu: 0.84, hFeu: 0.14, xRetro: 0.9, yRetro: 1.06, yCalandre: 0.22 });
+            profil(g, [[-1.46, 1.05], [-1.4, 1.08], [-0.98, 1.42], [-1.04, 1.39]], 1.5, verre(), { rayon: 0.02, biseau: 0.012, ombre: false });
+            for (const z of [0.878, -0.878]) {
+                bloc(g, 0.012, 0.62, 0.012, 0x00000, -0.2, 0.42, z, { vif: true, ombre: false, o: 0.35 });
+                bloc(g, 0.12, 0.03, 0.02, 0x1b1e21, -0.42, 0.95, z, { vif: true, ombre: false });
+                bloc(g, 0.12, 0.03, 0.02, 0x1b1e21, 0.55, 0.95, z, { vif: true, ombre: false });
+            }
         }
         return g;
     };
     M.tracteur = (o = {}) => {
-        // un tracteur de ferme : long capot, masses à l'avant, cabine vitrée, grandes roues arrière à jantes jaunes, pot qui fume
+        // un tracteur de ferme : capot plongeant laqué, calandre, masses à l'avant, cabine vitrée à montants, ailes arrondies,
+        // grandes roues arrière à crampons et jantes de couleur, pot chromé qui fume
         const g = groupe();
         const c = o.couleur ?? 0x2f9a3e;
         const jante = o.jante ?? 0xf2c230;
-        bloc(g, 2.0, 0.82, 0.95, c, 1.0, 0.72, 0, { rayon: 0.2 });
-        bloc(g, 0.05, 0.55, 0.75, T.anthracite, 2.0, 0.84, 0, { rayon: 0.02 });
-        bloc(g, 0.32, 0.42, 1.0, T.anthracite, 2.18, 0.5, 0, { rayon: 0.06 });
-        bloc(g, 0.05, 0.12, 0.22, 0xfff6c8, 2.02, 1.3, 0.3, { e: 0.8 });
-        bloc(g, 0.05, 0.12, 0.22, 0xfff6c8, 2.02, 1.3, -0.3, { e: 0.8 });
-        bloc(g, 1.45, 0.9, 1.3, c, -0.55, 0.75, 0, { rayon: 0.12 });
-        bloc(g, 1.32, 1.2, 1.26, T.vitre, -0.55, 1.65, 0, { rayon: 0.08, o: 0.5, r: 0.1 });
+        const P = peinture(c), fonte = 0x23272a;
+        bloc(g, 3.3, 0.4, 0.62, fonte, 0.35, 0.5, 0, { rayon: 0.08, m: 0.4, r: 0.6 });
+        bloc(g, 1.5, 0.34, 0.8, 0x1b1e21, 1.15, 0.66, 0, { rayon: 0.05, m: 0.5, r: 0.5 });
+        profil(g, [[0.08, 0.92], [0.08, 1.56, 0.1], [1.55, 1.48, 0.2], [2.08, 1.3, 0.22], [2.12, 0.92, 0.08]], 0.94, P, { rayon: 0.12, biseau: 0.11 });
+        bloc(g, 0.04, 0.44, 0.66, 0x0e1012, 2.118, 0.98, 0, { rayon: 0.02 });
+        for (let i = 0; i < 4; i++) {
+            bloc(g, 0.05, 0.022, 0.6, 0x4a5056, 2.13, 1.04 + i * 0.09, 0, { vif: true, m: 0.6, ombre: false });
+        }
+        for (const z of [0.3, -0.3]) {
+            bloc(g, 0.06, 0.1, 0.17, 0xfff6c8, 2.09, 1.4, z, { rayon: 0.03, e: 0.9 });
+            bloc(g, 1.1, 0.5, 0.012, 0x1b1e21, 1.05, 0.95, z * 1.58, { vif: true, ombre: false, r: 0.6 });
+        }
+        for (let k = 0; k < 6; k++) {
+            bloc(g, 0.34, 0.4, 0.105, fonte, 2.36, 0.42, -0.3125 + k * 0.125, { rayon: 0.04, m: 0.3 });
+        }
+        cyl(g, 0.07, 0.07, 1.5, fonte, 1.45, 0.5, 0, "z", { m: 0.4 });
+        // la cabine : plancher, montants, vitrage clair, toit
+        bloc(g, 1.45, 0.9, 1.3, c, -0.55, 0.75, 0, { rayon: 0.12, mat: P });
+        bloc(g, 1.3, 1.2, 1.24, T.vitre, -0.55, 1.65, 0, { rayon: 0.06, mat: verreClair(), ombre: false });
         for (const [x, z] of [[0.08, 0.6], [0.08, -0.6], [-1.18, 0.6], [-1.18, -0.6]]) {
-            bloc(g, 0.08, 1.2, 0.08, c, x, 1.65, z, { rayon: 0.02 });
+            bloc(g, 0.08, 1.22, 0.08, 0x1d2023, x, 1.64, z, { rayon: 0.025 });
         }
-        bloc(g, 1.62, 0.14, 1.5, c, -0.55, 2.85, 0, { rayon: 0.06 });
-        bloc(g, 0.06, 0.14, 0.4, T.orange, -0.55, 2.99, 0, { e: 0.5 });
+        bloc(g, 0.42, 0.12, 0.46, 0x1d2023, -0.72, 1.66, 0, { rayon: 0.05 });
+        bloc(g, 0.1, 0.5, 0.44, 0x1d2023, -0.93, 1.7, 0, { rayon: 0.04 });
+        tore(g, 0.17, 0.02, 0x1d2023, -0.3, 2.05, 0, [0.9, Math.PI / 2, 0]);
+        bloc(g, 1.64, 0.16, 1.5, c, -0.55, 2.84, 0, { rayon: 0.07, mat: P });
+        bloc(g, 1.3, 0.04, 1.2, T.blanc, -0.55, 2.99, 0, { rayon: 0.015 });
+        cyl(g, 0.07, 0.08, 0.13, T.orange, -1.0, 3.09, 0.45, "y", { e: 0.6 });
+        // les ailes arrière, les roues
         for (const z of [1.0, -1.0]) {
-            bloc(g, 1.5, 0.1, 0.62, c, -0.6, 1.62, z, { rayon: 0.04 });
-            roue(g, 0.82, 0.58, -0.6, 0.82, z, jante);
+            profil(g, arc(-0.6, 0.82, 0.98, 0.06, 0.2, 2.9), 0.64, P, { biseau: 0.02, z });
+            roue(g, 0.82, 0.56, -0.6, 0.82, z, jante, { crampons: true });
+            bloc(g, 0.1, 0.18, 0.16, 0x1b1e21, 0.2, 2.35, z * 0.86, { rayon: 0.03 });
         }
-        for (const z of [0.72, -0.72]) {
-            roue(g, 0.48, 0.36, 1.45, 0.48, z, jante);
+        for (const z of [0.74, -0.74]) {
+            roue(g, 0.5, 0.36, 1.45, 0.5, z, jante, { crampons: true });
+            profil(g, arc(1.45, 0.5, 0.6, 0.035, 0.5, 2.6, 8), 0.36, 0x1b1e21, { biseau: 0.01, z, r: 0.7 });
         }
-        cyl(g, 0.06, 0.06, 1.15, T.anthracite, 0.55, 2.0, 0.32, "y", { m: 0.5, r: 0.4 });
+        // le relevage arrière, le marchepied, l'échappement chromé et sa fumée
+        for (const z of [0.36, -0.36]) {
+            barre(g, [-1.3, 0.72, z], [-1.95, 0.48, z * 1.15], 0.045, fonte, { m: 0.4 });
+        }
+        bloc(g, 0.4, 0.04, 0.3, fonte, 0.3, 0.45, 0.72, { vif: true });
+        cyl(g, 0.055, 0.055, 1.2, 0xd5dade, 0.55, 2.05, 0.34, "y", { m: 1, r: 0.15 });
+        cyl(g, 0.075, 0.075, 0.3, 0x2a2d30, 0.55, 1.75, 0.34, "y", { m: 0.6, r: 0.4 });
         const fumee = groupe();
         fumee.name = "fumee";
-        fumee.position.set(0.55, 2.6, 0.32);
+        fumee.position.set(0.55, 2.7, 0.34);
         for (let i = 0; i < 3; i++) {
             boule(fumee, 0.16, 0xb9c0c6, 0, 0, 0, { o: 0.6, ombre: false });
         }
@@ -245,26 +416,16 @@ export function bibliotheque(THREE) {
         // la fourgonnette d'un artisan (Partner, Berlingo) : capot court, caisse haute, galerie, échelle ou bande à la couleur
         const g = groupe();
         const c = o.couleur ?? T.blanc;
-        bloc(g, 4.3, 0.72, 1.8, c, 0, 0.32, 0, { rayon: 0.2 });
-        bloc(g, 2.75, 0.88, 1.76, c, -0.72, 0.98, 0, { rayon: 0.24 });
-        const pare = bloc(g, 0.9, 0.62, 1.7, c, 0.95, 0.98, 0, { rayon: 0.24 });
-        pare.rotation.z = -0.22;
-        bloc(g, 0.06, 0.5, 1.5, T.vitreFoncee, 1.42, 1.05, 0, { rayon: 0.03, r: 0.2, m: 0.3 }).rotation.z = -0.55;
-        for (const z of [0.89, -0.89]) {
-            bloc(g, 0.78, 0.42, 0.05, T.vitreFoncee, 0.82, 1.18, z, { rayon: 0.02, r: 0.2 });
+        vehicule(g, { pts: [[-2.15, 0.4], [-2.15, 1.84, 0.25], [0.5, 1.88, 0.3], [1.18, 1.3, 0.15], [2.05, 1.04, 0.25], [2.16, 0.4, 0.1]], l: 1.8, couleur: c,
+                      roues: [1.35, -1.35], rr: 0.34, lr: 0.24, vitres: [[[0.36, 1.26], [0.36, 1.74], [0.56, 1.74], [1.02, 1.26]]],
+                      parebrise: [[0.55, 1.85], [0.61, 1.88], [1.22, 1.3], [1.16, 1.27]], yPhare: 0.8, yFeu: 1.1, xRetro: 1.08, yRetro: 1.3 });
+        for (const z of [0.903, -0.903]) {
+            bloc(g, 0.012, 1.3, 0.012, 0x8f969c, 0.3, 0.48, z, { vif: true, ombre: false });
+            bloc(g, 0.012, 1.3, 0.012, 0x8f969c, -0.75, 0.48, z, { vif: true, ombre: false });
+            bloc(g, 0.13, 0.035, 0.025, 0x1b1e21, 0.14, 1.12, z, { vif: true, ombre: false });
             if (o.bande) {
-                bloc(g, 2.6, 0.24, 0.04, o.bande, -0.72, 1.22, z * 1.005, { rayon: 0.02, e: o.bande === T.blanc ? 0.15 : 0 });
+                bloc(g, 2.6, 0.24, 0.02, o.bande, -0.72, 1.22, z * 1.005, { vif: true, ombre: false, e: o.bande === T.blanc ? 0.15 : 0 });
             }
-        }
-        bloc(g, 0.18, 0.26, 1.82, T.anthracite, 2.12, 0.3, 0, { rayon: 0.06 });
-        bloc(g, 0.18, 0.26, 1.82, T.anthracite, -2.12, 0.3, 0, { rayon: 0.06 });
-        bloc(g, 0.05, 0.12, 0.3, 0xfff6c8, 2.13, 0.78, 0.6, { e: 0.8 });
-        bloc(g, 0.05, 0.12, 0.3, 0xfff6c8, 2.13, 0.78, -0.6, { e: 0.8 });
-        bloc(g, 0.05, 0.22, 0.14, T.rouge, -2.14, 1.1, 0.78, { e: 0.4 });
-        bloc(g, 0.05, 0.22, 0.14, T.rouge, -2.14, 1.1, -0.78, { e: 0.4 });
-        for (const x of [1.35, -1.35]) {
-            roue(g, 0.34, 0.24, x, 0.34, 0.86);
-            roue(g, 0.34, 0.24, x, 0.34, -0.86);
         }
         if (o.galerie || o.echelle || o.tuyaux) {
             for (const z of [0.68, -0.68]) {
@@ -299,17 +460,19 @@ export function bibliotheque(THREE) {
         const g = groupe();
         const c = o.couleur ?? T.orange;
         bloc(g, 4.9, 0.24, 1.5, T.anthracite, -0.1, 0.42, 0, { vif: true });
-        bloc(g, 1.45, 1.42, 1.95, c, 1.55, 0.55, 0, { rayon: 0.22 });
-        bloc(g, 0.06, 0.62, 1.7, T.vitreFoncee, 2.29, 1.25, 0, { rayon: 0.03, r: 0.2, m: 0.3 });
+        profil(g, [[0.84, 0.55], [0.84, 1.97, 0.2], [1.85, 1.97, 0.25], [2.24, 1.34, 0.2], [2.36, 1.1, 0.1], [2.36, 0.55, 0.1]], 1.95, peinture(c), { rayon: 0.12, biseau: 0.09 });
+        profil(g, [[1.87, 1.93], [1.93, 1.96], [2.3, 1.36], [2.24, 1.33]], 1.7, verre(), { rayon: 0.02, biseau: 0.012, ombre: false });
+        profil(g, [[1.15, 1.32], [1.15, 1.84], [1.8, 1.84], [2.1, 1.32]], 1.964, verre(), { rayon: 0.05, biseau: 0.004, ombre: false });
         for (const z of [0.98, -0.98]) {
-            bloc(g, 0.88, 0.5, 0.05, T.vitreFoncee, 1.62, 1.35, z, { rayon: 0.02, r: 0.2 });
+            bloc(g, 0.1, 0.17, 0.2, 0x1b1e21, 2.02, 1.4, z * 1.1, { rayon: 0.04 });
             if (o.tricolore) {
-                [[0x1f4ea1, 0.66], [0xf7f6f2, 0.82], [0xd94f45, 0.98]].forEach(([couleur, y]) => bloc(g, 1.2, 0.16, 0.04, couleur, 1.55, y, z * 1.005, { vif: true }));
+                [[0x1f4ea1, 0.66], [0xf7f6f2, 0.82], [0xd94f45, 0.98]].forEach(([couleur, y]) => bloc(g, 1.2, 0.16, 0.02, couleur, 1.55, y, z * 1.005, { vif: true, ombre: false }));
             }
         }
-        bloc(g, 0.2, 0.28, 2.0, T.anthracite, 2.32, 0.42, 0, { rayon: 0.06 });
-        bloc(g, 0.05, 0.14, 0.3, 0xfff6c8, 2.31, 0.85, 0.65, { e: 0.8 });
-        bloc(g, 0.05, 0.14, 0.3, 0xfff6c8, 2.31, 0.85, -0.65, { e: 0.8 });
+        bloc(g, 0.2, 0.28, 2.0, 0x1b1e21, 2.32, 0.42, 0, { rayon: 0.08 });
+        bloc(g, 0.05, 0.18, 0.9, 0x0e1012, 2.365, 0.78, 0, { rayon: 0.02 });
+        bloc(g, 0.06, 0.15, 0.32, 0xfff6c8, 2.34, 0.9, 0.7, { rayon: 0.05, e: 0.9 });
+        bloc(g, 0.06, 0.15, 0.32, 0xfff6c8, 2.34, 0.9, -0.7, { rayon: 0.05, e: 0.9 });
         bloc(g, 3.35, 0.16, 2.0, T.grisFonce, -0.95, 0.66, 0, { rayon: 0.03 });
         for (const z of [0.96, -0.96]) {
             bloc(g, 3.35, 0.2, 0.06, T.gris, -0.95, 0.82, z, { vif: true });
@@ -348,26 +511,46 @@ export function bibliotheque(THREE) {
         return g;
     };
     M.chariot = () => {
-        // le chariot élévateur, jaune, mât et fourches
+        // le chariot élévateur : caisse jaune laquée, contrepoids, protège-conducteur, mât double, tablier et fourches
         const g = groupe();
-        bloc(g, 1.7, 0.75, 1.1, T.jaune, -0.1, 0.3, 0, { rayon: 0.12 });
-        bloc(g, 0.6, 0.65, 1.12, T.anthracite, -0.75, 0.4, 0, { rayon: 0.15 });
-        bloc(g, 0.5, 0.45, 0.6, T.anthracite, -0.2, 1.05, 0, { rayon: 0.1 });
+        const P = peinture(T.jaune), acier = 0x2a2d30;
+        profil(g, [[-1.08, 0.2], [-1.08, 0.98, 0.3], [-0.52, 1.1, 0.12], [-0.46, 0.8, 0.05], [0.5, 0.8, 0.1], [0.7, 0.2, 0.08]], 1.12, P, { rayon: 0.1, biseau: 0.08 });
+        bloc(g, 0.05, 0.5, 0.8, 0x15181b, -1.085, 0.35, 0, { rayon: 0.02 });
+        bloc(g, 0.5, 0.12, 0.52, 0x1b1e21, -0.2, 0.8, 0, { rayon: 0.05 });
+        bloc(g, 0.12, 0.5, 0.5, 0x1b1e21, -0.44, 0.9, 0, { rayon: 0.05 });
+        barre(g, [0.42, 0.8, 0], [0.22, 1.32, 0], 0.03, acier);
+        tore(g, 0.16, 0.022, 0x15181b, 0.2, 1.34, 0, [0.35, Math.PI / 2, 0]);
         for (const z of [0.5, -0.5]) {
-            barre(g, [-0.75, 1.0, z], [-0.7, 2.1, z], 0.04, T.anthracite);
-            barre(g, [0.45, 1.0, z], [0.4, 2.1, z], 0.04, T.anthracite);
+            barre(g, [-0.85, 1.02, z], [-0.72, 2.12, z], 0.04, acier);
+            barre(g, [0.5, 0.8, z], [0.42, 2.12, z], 0.04, acier);
+            barre(g, [-0.72, 2.12, z], [0.42, 2.12, z], 0.04, acier);
         }
-        bloc(g, 1.3, 0.06, 1.1, T.anthracite, -0.15, 2.1, 0, { rayon: 0.02 });
-        bloc(g, 0.12, 2.6, 0.9, T.grisFonce, 0.85, 0.05, 0, { rayon: 0.03, m: 0.5 });
-        bloc(g, 1.0, 0.06, 0.12, T.grisFonce, 1.4, 0.12, 0.3, { vif: true, m: 0.5 });
-        bloc(g, 1.0, 0.06, 0.12, T.grisFonce, 1.4, 0.12, -0.3, { vif: true, m: 0.5 });
-        roue(g, 0.28, 0.22, 0.45, 0.28, 0.5);
-        roue(g, 0.28, 0.22, 0.45, 0.28, -0.5);
-        roue(g, 0.24, 0.2, -0.65, 0.24, 0.5);
-        roue(g, 0.24, 0.2, -0.65, 0.24, -0.5);
+        for (const x of [-0.5, -0.15, 0.2]) {
+            barre(g, [x, 2.12, -0.5], [x, 2.12, 0.5], 0.025, acier);
+        }
+        cyl(g, 0.07, 0.08, 0.12, T.orange, -0.6, 2.22, 0, "y", { e: 0.6 });
+        // le mât, le vérin, le tablier, les fourches
+        for (const z of [0.36, -0.36]) {
+            bloc(g, 0.12, 2.75, 0.1, T.grisFonce, 0.84, 0.06, z, { vif: true, m: 0.6, r: 0.4 });
+            bloc(g, 1.05, 0.05, 0.12, acier, 1.48, 0.1, z * 0.85, { rayon: 0.015, m: 0.5 });
+            bloc(g, 0.06, 0.5, 0.12, acier, 0.98, 0.1, z * 0.85, { rayon: 0.015, m: 0.5 });
+        }
+        for (const y of [0.4, 1.5, 2.72]) {
+            bloc(g, 0.1, 0.09, 0.82, T.grisFonce, 0.84, y, 0, { vif: true, m: 0.6, r: 0.4 });
+        }
+        cyl(g, 0.045, 0.045, 2.2, 0xd5dade, 0.84, 1.3, 0, "y", { m: 1, r: 0.15 });
+        bloc(g, 0.05, 0.42, 0.95, acier, 0.94, 0.3, 0, { rayon: 0.02 });
+        for (let k = 0; k < 5; k++) {
+            bloc(g, 0.03, 0.7, 0.03, acier, 0.95, 0.72, -0.44 + k * 0.22, { vif: true });
+        }
+        bloc(g, 0.03, 0.03, 0.95, acier, 0.95, 1.4, 0, { vif: true });
+        for (const z of [0.5, -0.5]) {
+            roue(g, 0.28, 0.22, 0.42, 0.28, z, T.jaune);
+            roue(g, 0.24, 0.2, -0.72, 0.24, z, T.jaune);
+        }
         const pilote = M.personne({ chemise: T.orange });
         pilote.scale.setScalar(0.85);
-        pilote.position.set(-0.2, 0.25, 0);
+        pilote.position.set(-0.2, 0.3, 0);
         g.add(pilote);
         return g;
     };
@@ -701,15 +884,28 @@ export function bibliotheque(THREE) {
         bloc(g, 4.0, 1.6, 0.2, T.blanc, 0, 0, 0, { rayon: 0.04 });
         bloc(g, 4.0, 0.12, 1.0, T.blanc, 0, 0, 0, { rayon: 0.04 });
         bloc(g, 4.06, 0.22, 0.24, o.couleur ?? T.bleu, 0, 1.6, 0, { rayon: 0.05 });
-        const teintes = [o.couleur ?? T.bleu, T.blanc, T.orange, T.vert, T.jaune];
+        const palette = [o.couleur ?? T.bleu, T.blanc, T.orange, T.vert, T.jaune];
         for (const y of [0.15, 0.6, 1.05]) {
             bloc(g, 4.0, 0.04, 0.95, T.gris, 0, y, 0, { vif: true });
-            for (let k = 0; k < 9; k++) {
-                for (const s of [-1, 1]) {
-                    bloc(g, 0.3, 0.26 + ((k * 7) % 3) * 0.04, 0.3, teintes[(k + (s > 0 ? 2 : 0) + Math.round(y * 3)) % teintes.length], -1.8 + k * 0.45, y + 0.04, s * 0.27, { rayon: 0.03, ombre: false });
+            bloc(g, 4.0, 0.05, 0.012, 0xf4f4f0, 0, y - 0.01, 0.48, { vif: true, ombre: false });
+            bloc(g, 4.0, 0.05, 0.012, 0xf4f4f0, 0, y - 0.01, -0.48, { vif: true, ombre: false });
+        }
+        g.add(ombre(new THREE.Mesh(geo(`boites${o.couleur ?? T.bleu}`, () => {
+            const pieces = [];
+            for (const y of [0.15, 0.6, 1.05]) {
+                for (let k = 0; k < 13; k++) {
+                    for (const cote of [-1, 1]) {
+                        const hb = 0.2 + ((k * 7 + Math.round(y * 5)) % 4) * 0.045, lb = 0.2 + ((k * 3) % 3) * 0.03;
+                        const boite = new THREE.BoxGeometry(lb, hb, 0.26);
+                        const c = new THREE.Color(palette[(k + (cote > 0 ? 2 : 0) + Math.round(y * 3)) % palette.length]).offsetHSL(0, 0, ((k * 5) % 3 - 1) * 0.03);
+                        pieces.push({ g: boite, m: pose(-1.83 + k * 0.305, y + 0.04 + hb / 2, cote * 0.3), c });
+                    }
                 }
             }
-        }
+            const f = fusion(pieces);
+            pieces.forEach((q) => q.g.dispose());
+            return f;
+        }), teintes()), false));
         return g;
     };
     M.comptoir = () => {
@@ -914,13 +1110,46 @@ export function bibliotheque(THREE) {
                 g.add(m);
             }
         } else {
-            boule(g, h * 0.3, o.couleur ?? T.feuillage, 0, h * 0.68, 0, { seg: 12 });
-            boule(g, h * 0.2, o.couleur ?? T.feuillage, h * 0.18, h * 0.55, h * 0.1, { seg: 10 });
-            boule(g, h * 0.22, teinteClaire(o.couleur ?? T.feuillage), -h * 0.12, h * 0.82, -h * 0.05, { seg: 10 });
+            const c = o.couleur ?? T.feuillage, v = Math.round(h * 10) % 4;
+            const houppier = ombre(new THREE.Mesh(geo(`houppier${v}|${c}`, () => feuillage(v, c)), teintes()));
+            houppier.scale.setScalar(h);
+            g.add(houppier);
+            barre(g, [0, h * 0.3, 0], [h * 0.14, h * 0.5, h * 0.06], h * 0.018, 0x6a4a30);
+            barre(g, [0, h * 0.26, 0], [-h * 0.12, h * 0.48, -h * 0.08], h * 0.016, 0x6a4a30);
         }
         return g;
     };
     const teinteClaire = (c) => new THREE.Color(c).offsetHSL(0, 0, 0.06).getHex();
+    /** Le houppier d'un feuillu (hauteur 1) : des masses bosselées fondues en un maillage, plus sombres dessous. */
+    const feuillage = (v, c) => {
+        let graine = 11 + v * 37;
+        const alea = () => ((graine = (graine * 16807) % 2147483647) / 2147483647);
+        const masses = [[0, 0.68, 0, 0.3]];
+        for (let k = 0; k < 7; k++) {
+            const a = (k / 7) * Math.PI * 2 + alea(), d = 0.14 + alea() * 0.1;
+            masses.push([Math.cos(a) * d, 0.52 + alea() * 0.34, Math.sin(a) * d, 0.15 + alea() * 0.09]);
+        }
+        const pieces = masses.map(([x, y, z, r], i) => {
+            const q = new THREE.IcosahedronGeometry(r, 3), p = q.attributes.position, n = q.attributes.normal;
+            const base = new THREE.Color(c).offsetHSL((alea() - 0.5) * 0.04, (alea() - 0.5) * 0.1, (alea() - 0.5) * 0.09);
+            const col = new Float32Array(p.count * 3), f1 = 5 + alea() * 4, f2 = 6 + alea() * 5, ph = alea() * 6;
+            for (let j = 0; j < p.count; j++) {
+                const dx = p.getX(j) / r, dy = p.getY(j) / r, dz = p.getZ(j) / r;
+                const k = 1 + 0.16 * Math.sin(dx * f1 + ph) * Math.sin(dy * f2 + ph * 1.7) + 0.1 * Math.sin(dz * f1 * 1.3 + dx * 3 + ph);
+                p.setXYZ(j, dx * r * k, dy * r * k * 0.92, dz * r * k);
+                n.setXYZ(j, dx, dy, dz);
+                const ombrage = 0.62 + 0.5 * (dy * 0.5 + 0.5) + 0.08 * Math.sin(dx * 19 + dz * 23 + ph);
+                col[j * 3] = base.r * ombrage;
+                col[j * 3 + 1] = base.g * ombrage;
+                col[j * 3 + 2] = base.b * ombrage;
+            }
+            q.setAttribute("color", new THREE.BufferAttribute(col, 3));
+            return { g: q, m: pose(x, y, z, 0, i * 1.3, 0) };
+        });
+        const f = fusion(pieces);
+        pieces.forEach((q) => q.g.dispose());
+        return f;
+    };
     M.haie = (o = {}) => {
         const g = groupe();
         bloc(g, o.l ?? 6, 0.9, 0.8, T.feuillageFonce, 0, 0, 0, { rayon: 0.35 });

@@ -74,6 +74,8 @@ uniform sampler2D tColor;
 uniform float seuil;
 void main() {
     vec3 c = texture2D(tColor, vUv).rgb;
+    if (isnan(c.r) || isnan(c.g) || isnan(c.b) || isinf(c.r) || isinf(c.g) || isinf(c.b)) { c = vec3(0.0); }
+    c = clamp(c, 0.0, 40.0);
     float l = max(c.r, max(c.g, c.b));
     float k = clamp((l - seuil) / max(l, 0.0001), 0.0, 1.0);
     gl_FragColor = vec4(min(c * k * k, vec3(12.0)), 1.0);
@@ -116,10 +118,15 @@ vec3 filmique(vec3 x) {
 }
 void main() {
     vec3 c = texture2D(tColor, vUv).rgb;
+    // un reflet spéculaire peut déborder la demi-précision : on écarte les valeurs invalides au lieu de noircir l'image
+    if (isnan(c.r) || isnan(c.g) || isnan(c.b) || isinf(c.r) || isinf(c.g) || isinf(c.b)) { c = vec3(4.0); }
+    c = clamp(c, 0.0, 40.0);
     float ao = mix(1.0, texture2D(tAO, vUv).r, aoForce);
     // l'occlusion teinte l'ombre (un peu de bleu du ciel) au lieu de la noircir
     c *= mix(teinteOmbre, vec3(1.0), ao);
-    c += texture2D(tHalo, vUv).rgb * halo;
+    vec3 lueur = texture2D(tHalo, vUv).rgb;
+    if (isnan(lueur.r) || isnan(lueur.g) || isnan(lueur.b)) { lueur = vec3(0.0); }
+    c += lueur * halo;
     c = filmique(c * exposition);
     float l = dot(c, vec3(0.2126, 0.7152, 0.0722));
     c = mix(vec3(l), c, saturation);
