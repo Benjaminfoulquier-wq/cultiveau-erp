@@ -91,7 +91,7 @@ PORTES = {
     "stockage": [("inventaire", "Inventaire", "fa-archive"), ("reappro", "Règles de réassort", "fa-refresh"), ("mouvements", "Mouvements de stock", "fa-exchange"),
                  ("achats", "Commandes fournisseurs", "fa-shopping-cart"), ("achat_nouveau", "Nouvelle commande fournisseur", "fa-plus"), ("tarifs_fournisseurs", "Tarifs fournisseurs", "fa-tags"),
                  ("commandes_groupees", "Commandes groupées réseau", "fa-cubes"), ("fournisseurs", "Fournisseurs", "fa-truck")],
-    "atelier": [("interventions", "Interventions", "fa-bolt"), ("depannage_nouveau", "Nouveau dépannage", "fa-plus"), ("depannages", "Dépannages en cours", "fa-wrench"),
+    "atelier": [("interventions", "Interventions", "fa-bolt"), ("demande", "Demande d'intervention", "fa-plus"), ("depannages", "Dépannages en cours", "fa-wrench"),
                 ("entretiens", "Entretiens et diagnostics", "fa-calendar-check-o"), ("bons", "Bons d'intervention", "fa-pencil-square-o"), ("suivi", "Tableau de suivi", "fa-table"), ("bons_a_facturer", "Bons à facturer", "fa-euro"),
                 ("contrats", "Contrats d'entretien", "fa-file-text-o"), ("equipements_a_renouveler", "Équipements à renouveler", "fa-cogs"), ("registre", "Registre des installations", "fa-book"),
                 ("techniciens", "Techniciens et camions", "fa-id-badge")],

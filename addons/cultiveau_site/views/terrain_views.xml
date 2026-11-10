@@ -12,6 +12,13 @@
         <field name="tag">cultiveau_site.ecran</field>
         <field name="context">{"vers": "/adherent/sav/calendrier"}</field>
     </record>
+    <record id="action_ecran_demande" model="ir.actions.client">
+        <field name="name">Demande d'intervention</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/sav/fiches-intervention"}</field>
+    </record>
+    <menuitem id="menu_ecran_demande" name="Demande d'intervention" parent="menu_espace" action="action_ecran_demande" sequence="3"/>
+    <menuitem id="menu_terrain_demande" name="Demande d'intervention" parent="cultiveau_interventions.menu_interventions_racine" action="action_ecran_demande" sequence="11"/>
     <menuitem id="menu_ecran_suivi" name="Tableau de suivi" parent="menu_espace" action="action_ecran_suivi" sequence="4"/>
     <menuitem id="menu_ecran_calendrier" name="Planning des interventions" parent="menu_espace" action="action_ecran_calendrier" sequence="4"/>
 
