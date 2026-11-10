@@ -15,7 +15,7 @@ Le jumeau de l'entreprise de l'adhérent, dessiné en isométrie à partir des d
 C'est la page d'accueil de l'ERP : le parcours client s'y lit station par station (accueil et comptoir, bureau
 d'étude, magasin et cour, chantiers, atelier et SAV, parcelles en service, caisse) et chaque élément s'ouvre d'un clic.
 """,
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
@@ -28,7 +28,9 @@ d'étude, magasin et cour, chantiers, atelier et SAV, parcelles en service, cais
             "cultiveau_vue3d/static/src/js/decor.js",
             "cultiveau_vue3d/static/src/js/moteur.js",
             "cultiveau_vue3d/static/src/js/map.js",
+            "cultiveau_vue3d/static/src/js/schema.js",
             "cultiveau_vue3d/static/src/xml/map.xml",
+            "cultiveau_vue3d/static/src/xml/schema.xml",
             "cultiveau_vue3d/static/src/scss/map.scss",
         ],
     },

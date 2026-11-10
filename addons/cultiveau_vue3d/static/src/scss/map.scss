@@ -183,3 +183,102 @@
     @keyframes cv-monte { from { transform: translateY(16px); opacity: 0; } to { transform: none; opacity: 1; } }
     @keyframes cv-anneau { 0%, 100% { box-shadow: 0 0 0 4px rgba(11, 155, 184, 0.2); } 50% { box-shadow: 0 0 0 8px rgba(11, 155, 184, 0.08); } }
 }
+
+// L'éditeur de schéma de câblage (ouvert depuis l'armoire de l'atelier câblage).
+.o_cv_schema {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: #eef1f3;
+    color: #1d2f38;
+    font-size: 14px;
+
+    .o_cv_schema_barre {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        background: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        z-index: 2;
+    }
+    .o_cv_schema_titre { font-weight: 600; font-size: 16px; }
+    .o_cv_schema_etat {
+        margin-left: auto;
+        font-size: 12px;
+        color: #8a949c;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 999px;
+        padding: 2px 10px;
+    }
+    .o_cv_bouton {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+        background: #fff;
+        border-radius: 8px;
+        padding: 6px 12px;
+        cursor: pointer;
+        &:hover { background: #f4f6f7; }
+    }
+
+    .o_cv_schema_corps { flex: 1; display: flex; min-height: 0; }
+
+    .o_cv_schema_palette {
+        width: 220px;
+        background: #fff;
+        border-right: 1px solid rgba(0, 0, 0, 0.08);
+        padding: 14px 12px;
+        overflow-y: auto;
+    }
+    .o_cv_schema_palette_titre {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #8a949c;
+        margin-bottom: 10px;
+    }
+    .o_cv_schema_comp {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        text-align: left;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: #fbfcfd;
+        border-radius: 8px;
+        padding: 9px 10px;
+        margin-bottom: 7px;
+        cursor: grab;
+        transition: border-color 0.12s, box-shadow 0.12s;
+        &:hover { border-color: #0b9bb8; box-shadow: 0 2px 8px rgba(11, 155, 184, 0.14); }
+        i { color: #0b9bb8; }
+    }
+
+    .o_cv_schema_toile {
+        position: relative;
+        flex: 1;
+        overflow: hidden;
+    }
+    .o_cv_schema_grille {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+        background-size: 26px 26px;
+    }
+    .o_cv_schema_vide {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px;
+        color: #8a949c;
+        pointer-events: none;
+        > i { font-size: 54px; opacity: 0.35; margin-bottom: 14px; }
+        .t { font-size: 18px; font-weight: 600; color: #5d6b78; }
+        .s { max-width: 420px; margin-top: 6px; line-height: 1.5; }
+    }
+}

@@ -13,4 +13,19 @@
         <field name="tag">cultiveau_vue3d.vue</field>
         <field name="params" eval="{'variante': 'concessionnaire'}"/>
     </record>
+
+    <!-- L'atelier de câblage électrique : une salle dédiée, pour tous les adhérents, avec l'armoire ouverte d'où
+         l'on ouvre l'éditeur de schéma de câblage. -->
+    <record id="action_vue3d_cablage" model="ir.actions.client">
+        <field name="name">Atelier câblage</field>
+        <field name="tag">cultiveau_vue3d.vue</field>
+        <field name="params" eval="{'variante': 'cablage'}"/>
+    </record>
+    <menuitem id="menu_vue3d_cablage" name="Atelier câblage" parent="cultiveau_base.menu_cultiveau_root" action="action_vue3d_cablage" sequence="2"/>
+
+    <!-- L'éditeur de schéma de câblage, ouvert depuis l'armoire (et accessible au menu). -->
+    <record id="action_vue3d_schema" model="ir.actions.client">
+        <field name="name">Schéma de câblage</field>
+        <field name="tag">cultiveau_vue3d.schema</field>
+    </record>
 </odoo>

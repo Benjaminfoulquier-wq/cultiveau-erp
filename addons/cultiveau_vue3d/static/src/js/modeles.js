@@ -429,6 +429,97 @@ export function bibliotheque(THREE) {
         return g;
     };
 
+    // ---------------------------------------------------------------- l'atelier de câblage électrique
+    M.armoire_elec = (o = {}) => {
+        // une armoire électrique ouverte, portes battantes : la tôle, la platine de montage, les rails DIN, les rangées
+        // de disjoncteurs modulaires, les goulottes, un jeu de fils de couleur et l'interrupteur général. Le cœur de
+        // l'espace de câblage : on clique dessus pour ouvrir le schéma.
+        const g = groupe();
+        const toleE = 0xb9c0c6, toleI = 0x9aa2a8, platine = 0xdfe3e6;
+        // --- le caisson (fond, côtés, chapeau, socle), face avant ouverte
+        bloc(g, 0.44, 0.12, 1.24, T.grisFonce, 0, 0, 0, { rayon: 0.02, m: 0.3 });          // socle
+        bloc(g, 0.05, 2.0, 1.24, toleI, -0.19, 0.12, 0, { rayon: 0.02, m: 0.3 });          // fond
+        bloc(g, 0.44, 0.08, 1.24, toleE, 0, 2.04, 0, { rayon: 0.02, m: 0.3 });             // chapeau
+        for (const z of [-0.6, 0.6]) {
+            bloc(g, 0.44, 1.92, 0.05, toleI, 0, 0.12, z, { rayon: 0.02, m: 0.3 });          // flancs
+        }
+        // --- la platine de montage (tôle claire du fond)
+        bloc(g, 0.03, 1.74, 1.08, platine, -0.15, 0.2, 0, { vif: true, m: 0.35, r: 0.5 });
+        // --- goulottes verticales de câblage (passage des fils, gris clair)
+        for (const z of [-0.5, 0.5]) {
+            bloc(g, 0.07, 1.62, 0.11, 0xcfd4d8, -0.11, 0.26, z, { rayon: 0.015 });
+        }
+        // --- trois rails DIN et leurs rangées de disjoncteurs modulaires
+        const rails = [0.55, 1.0, 1.45];
+        rails.forEach((y, ri) => {
+            bloc(g, 0.04, 0.055, 0.86, 0xaab1b7, -0.125, y, 0, { vif: true, m: 0.7 });       // rail DIN
+            bloc(g, 0.075, 0.12, 0.9, 0xeef1f3, -0.09, y + 0.005, 0, { rayon: 0.01 });        // bandeau de modules
+            for (let k = 0; k < 10; k++) {
+                const z = -0.4 + k * 0.09;
+                bloc(g, 0.085, 0.145, 0.078, k % 3 === 0 ? 0xf3f4f5 : 0xe7e9eb, -0.085, y, z, { rayon: 0.006 }); // module
+                bloc(g, 0.02, 0.05, 0.03, [T.bleu, T.vert, T.orange, T.rouge][(ri + k) % 4], -0.04, y + 0.055, z, { vif: true, e: 0.25 }); // manette
+            }
+        });
+        // --- l'interrupteur général, plus gros, en haut à gauche
+        bloc(g, 0.11, 0.26, 0.2, T.grisFonce, -0.075, 1.72, -0.46, { rayon: 0.02 });
+        cyl(g, 0.045, 0.045, 0.05, T.rouge, -0.02, 1.85, -0.46, "x", { e: 0.3 });
+        bloc(g, 0.02, 0.06, 0.02, T.jaune, 0.01, 1.85, -0.46, { vif: true });
+        // --- le bornier en bas (rangée de bornes)
+        bloc(g, 0.05, 0.1, 0.9, 0x3a4149, -0.12, 0.24, 0, { rayon: 0.008 });
+        for (let k = 0; k < 16; k++) {
+            bloc(g, 0.055, 0.1, 0.03, k % 2 ? 0x8a949c : 0xd7dbdf, -0.1, 0.24, -0.42 + k * 0.056, { vif: true });
+        }
+        // --- un faisceau de fils de couleur reliant goulottes, rails et bornier
+        const fils = [[T.bleu, 0.55], [0x7a4a2a, 1.0], [0x3f8f3a, 1.45], [T.rouge, 0.78], [T.jaune, 1.22]];
+        fils.forEach(([c, y], i) => {
+            cyl(g, 0.009, 0.009, 0.84, c, -0.085, y + 0.09, 0, "z", { ombre: false, r: 0.4 });     // courant le long du rail
+            cyl(g, 0.009, 0.009, Math.abs(y - 0.3), c, -0.085, (y + 0.3) / 2 + 0.05, -0.5 + i * 0.012, "y", { ombre: false, r: 0.4 }); // descente vers le bornier
+        });
+        // --- deux portes battantes grandes ouvertes
+        [[-0.6, -1], [0.6, 1]].forEach(([zc, sens]) => {
+            const porte = groupe();
+            bloc(porte, 0.035, 1.88, 0.56, toleE, 0, 0, sens * 0.29, { rayon: 0.02, m: 0.3 });        // vantail (gond en z = 0)
+            bloc(porte, 0.015, 1.4, 0.4, T.vitre, 0.028, 0, sens * 0.3, { vif: true, o: 0.35, ombre: false }); // fenêtre
+            cyl(porte, 0.012, 0.012, 0.18, T.grisFonce, 0.07, 0, sens * 0.5, "y", { m: 0.6 });          // poignée
+            porte.position.set(0.2, 1.06, zc);
+            porte.rotation.y = sens * 1.85; // grand ouvert vers l'avant
+            g.add(porte);
+        });
+        // --- la pochette à schéma collée dans la porte gauche
+        bloc(g, 0.01, 0.34, 0.26, T.papier, 0.42, 1.2, -1.02, { vif: true, ombre: false });
+        return g;
+    };
+    M.touret = (o = {}) => {
+        // un touret de câble électrique : deux flasques, le moyeu et le câble enroulé, sur son axe
+        const g = groupe();
+        for (const z of [-0.34, 0.34]) {
+            cyl(g, 0.62, 0.62, 0.07, o.flasque ?? T.bois, 0, 0.64, z, "z", { seg: 22, r: 0.6 });
+        }
+        cyl(g, 0.46, 0.46, 0.58, o.couleur ?? 0x2c2f33, 0, 0.64, 0, "z", { seg: 22, r: 0.7 });   // câble enroulé
+        cyl(g, 0.12, 0.12, 0.8, T.anthracite, 0, 0.64, 0, "z", { seg: 12, m: 0.5 });              // axe
+        for (const x of [-0.5, 0.5]) {
+            barre(g, [x, 0.64, 0.42], [x, 0.02, 0.5], 0.04, T.grisFonce);
+            barre(g, [x, 0.64, -0.42], [x, 0.02, -0.5], 0.04, T.grisFonce);
+        }
+        return g;
+    };
+    M.coffret = (o = {}) => {
+        // un coffret de commande sur pied : boîtier, voyants, boutons et un petit écran, l'automate de l'installation
+        const g = groupe();
+        const c = o.couleur ?? 0x3a4149;
+        bloc(g, 0.5, 0.04, 0.5, T.grisFonce, 0, 0, 0, { rayon: 0.02 });
+        bloc(g, 0.1, 1.0, 0.1, T.grisFonce, 0, 0.04, 0, { vif: true });
+        bloc(g, 0.26, 0.6, 0.46, c, 0.03, 1.02, 0, { rayon: 0.03 });
+        bloc(g, 0.02, 0.22, 0.3, 0x7fd4e8, 0.17, 1.28, 0, { vif: true, e: 0.5, ombre: false });     // écran
+        for (let k = 0; k < 3; k++) {
+            cyl(g, 0.025, 0.025, 0.03, [T.vert, T.jaune, T.rouge][k], 0.17, 1.12, -0.12 + k * 0.12, "x", { e: 0.6, ombre: false });
+        }
+        for (let k = 0; k < 2; k++) {
+            cyl(g, 0.03, 0.03, 0.04, k ? T.rouge : T.vert, 0.17, 0.92, -0.08 + k * 0.16, "x", { e: 0.3 });
+        }
+        return g;
+    };
+
     // ---------------------------------------------------------------- l'irrigation
     M.enrouleur = (o = {}) => {
         // l'enrouleur : châssis sur deux roues, grand tambour couvert de tuyau PE noir, flasques à la couleur, timon

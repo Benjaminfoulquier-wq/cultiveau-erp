@@ -538,14 +538,15 @@ export class Moteur {
         return entree;
     }
     _genreObjet(o) {
-        return { borne: "borne", bureau: "poste", rack: "rayon_fixe", gondole: "rayon_fixe", comptoir: "comptoir", etabli: "etabli" }[o.type] || "objet";
+        return { borne: "borne", bureau: "poste", rack: "rayon_fixe", gondole: "rayon_fixe", comptoir: "comptoir", etabli: "etabli", armoire_elec: "cablage" }[o.type] || "objet";
     }
     _nomObjet(o) {
         const noms = { bureau: "Poste de travail", rack: "Rayonnage", gondole: "Gondole", comptoir: "Comptoir", borne: "Badgeuse", etabli: "Établi", soudeuse: "Poste à souder",
                        machine_cafe: "Machine à café", babyfoot: "Baby-foot", ecran_mural: "Écran", serveur: "Serveur", imprimante: "Imprimante", quai: "Quai de livraison",
                        cantilever: "Tubes et barres", bobines: "Bobines de PE", prefa: "Cuves", benne: "Benne", tracteur: "Tracteur", minipelle: "Mini-pelle", chariot: "Chariot élévateur",
                        plans: "Table à plans", totem: "Totem", panneau: "Panneau", canape: "Canapé", table: "Table", armoire: "Armoire", plante: "Plante", lampadaire: "Lampadaire",
-                       palette: "Palette", liasse: "Dossiers", dossiers: "Dossiers", bac: "Bac de lavage", nettoyeur: "Nettoyeur haute pression", pompe: "Pompe" };
+                       palette: "Palette", liasse: "Dossiers", dossiers: "Dossiers", bac: "Bac de lavage", nettoyeur: "Nettoyeur haute pression", pompe: "Pompe",
+                       armoire_elec: "Armoire électrique", touret: "Touret de câble", coffret: "Coffret de commande" };
         return noms[o.type] || o.type;
     }
     _placesVisuelles() {

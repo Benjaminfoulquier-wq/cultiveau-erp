@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_vue3d.Schema">
+        <div class="o_cv_schema">
+            <div class="o_cv_schema_barre">
+                <button class="o_cv_bouton" t-on-click="retour"><i class="fa fa-arrow-left me-1"/>Retour à l'atelier</button>
+                <div class="o_cv_schema_titre"><i class="fa fa-sitemap me-2"/>Schéma de câblage</div>
+                <span class="o_cv_schema_etat">Brouillon</span>
+            </div>
+            <div class="o_cv_schema_corps">
+                <div class="o_cv_schema_palette">
+                    <div class="o_cv_schema_palette_titre">Composants</div>
+                    <button t-foreach="state.composants" t-as="c" t-key="c.cle" class="o_cv_schema_comp" t-att-data-cle="c.cle">
+                        <i t-att-class="'fa fa-fw me-2 ' + c.icone"/><t t-esc="c.nom"/>
+                    </button>
+                </div>
+                <div class="o_cv_schema_toile">
+                    <div class="o_cv_schema_grille"/>
+                    <div class="o_cv_schema_vide">
+                        <i class="fa fa-sitemap"/>
+                        <div class="t">La toile du schéma</div>
+                        <div class="s">Les composants se poseront ici et se relieront par des fils. Prochaine étape : rendre la toile active.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

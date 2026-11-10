@@ -214,6 +214,12 @@ export class MapVivante extends Component {
     quitterConcessionnaire() {
         this.action.doAction("cultiveau_vue3d.action_vue3d", { clearBreadcrumbs: true });
     }
+    ouvrirSchema() {
+        this.action.doAction("cultiveau_vue3d.action_vue3d_schema", { clearBreadcrumbs: true });
+    }
+    quitterCablage() {
+        this.action.doAction("cultiveau_vue3d.action_vue3d", { clearBreadcrumbs: true });
+    }
     demonter() {
         try {
             if (this.moteur && this.state.v) {
@@ -386,6 +392,13 @@ export class MapVivante extends Component {
         }
         if (o.genre === "assistant") {
             this.state.fiche = { genre: "assistant", nom: o.nom, sousTitre: o.sousTitre, cle, appels: (this.state.v.assistant || {}).appels || [], actions: [] };
+            return;
+        }
+        if (o.genre === "cablage") {
+            // l'armoire électrique ouverte : d'ici on ouvre l'outil de schéma de câblage
+            this.state.fiche = { genre: "objet", nom: o.nom || "Armoire électrique", cle, icone: "fa-bolt",
+                                 sousTitre: "Dessinez le schéma de câblage de l'installation : disjoncteurs, bornes, moteurs et liaisons.",
+                                 actions: [{ nom: "Ouvrir le schéma de câblage", icone: "fa-sitemap", doaction: "cultiveau_vue3d.action_vue3d_schema" }] };
             return;
         }
         if (o.genre === "porte" || o.genre === "objet" || o.genre === "comptoir" || o.genre === "etabli" || o.genre === "rayon_fixe") {
