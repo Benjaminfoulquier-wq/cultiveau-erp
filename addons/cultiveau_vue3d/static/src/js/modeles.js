@@ -387,6 +387,48 @@ export function bibliotheque(THREE) {
         return g;
     };
 
+    // ---------------------------------------------------------------- le concessionnaire agricole (démonstration)
+    M.pont = (o = {}) => {
+        // un pont élévateur deux colonnes pour l'atelier : socle, deux colonnes, traverse haute, quatre bras,
+        // et au besoin un tracteur levé dessus (o.charge === "tracteur"), pour montrer l'engin en réparation
+        const g = groupe();
+        const c = o.couleur ?? 0xef7d1a;
+        const h = o.charge ? 1.55 : 0.32; // la hauteur des bras : levé si une machine est dessus
+        for (const z of [-1.2, 1.2]) {
+            bloc(g, 0.72, 0.08, 0.72, T.anthracite, 0, 0.04, z, { rayon: 0.03 });   // platine au sol
+            bloc(g, 0.34, 2.7, 0.34, c, 0, 1.39, z, { rayon: 0.04 });               // colonne
+            bloc(g, 0.13, 2.5, 0.13, T.anthracite, 0, 1.3, z, { vif: true, m: 0.5 }); // glissière du chariot
+        }
+        bloc(g, 0.3, 0.34, 2.96, c, 0, 2.78, 0, { rayon: 0.04 });                   // traverse haute
+        bloc(g, 0.12, 0.2, 0.3, 0xffd34d, 0.0, 1.0, 1.38, { e: 0.5 });              // boîtier de commande
+        for (const z of [-1.2, 1.2]) {                                              // les quatre bras à la hauteur de levage
+            for (const x of [-0.95, 0.95]) {
+                bloc(g, 1.5, 0.16, 0.18, T.grisFonce, x, h, z + (z > 0 ? -0.1 : 0.1), { rayon: 0.04 });
+                bloc(g, 0.24, 0.14, 0.24, 0x2a2f33, x + (x > 0 ? 0.72 : -0.72), h + 0.1, z + (z > 0 ? -0.1 : 0.1), { rayon: 0.03 }); // tampon
+            }
+        }
+        if (o.charge === "tracteur") {
+            const t = M.tracteur({ couleur: o.couleurTracteur });
+            t.position.y = h + 0.2;
+            t.rotation.y = Math.PI / 2; // de profil entre les colonnes
+            g.add(t);
+        }
+        return g;
+    };
+    M.presse = (o = {}) => {
+        // une presse à balles rondes, machine très reconnaissable du parc : timon, grand corps cylindrique, trappe arrière, roues
+        const g = groupe();
+        const c = o.couleur ?? 0x3a7d3a;
+        barre(g, [1.5, 0.7, 0], [2.6, 0.4, 0], 0.07, c);                   // timon d'attelage
+        cyl(g, 0.95, 0.95, 1.7, c, 0.1, 1.05, 0, "z", { seg: 22, rayon: 0.04 }); // corps
+        cyl(g, 0.52, 0.52, 1.74, 0x23272b, 0.1, 1.05, 0, "z", { seg: 16 });      // flanc sombre
+        bloc(g, 1.3, 1.5, 1.86, c, -0.95, 1.0, 0, { rayon: 0.1 });         // trappe arrière
+        bloc(g, 1.2, 0.1, 1.9, 0xffd34d, -0.3, 1.9, 0, { rayon: 0.03, e: 0.2 }); // bandeau à la couleur de marque
+        roue(g, 0.56, 0.3, 0.2, 0.5, 1.08);
+        roue(g, 0.56, 0.3, 0.2, 0.5, -1.08);
+        return g;
+    };
+
     // ---------------------------------------------------------------- l'irrigation
     M.enrouleur = (o = {}) => {
         // l'enrouleur : châssis sur deux roues, grand tambour couvert de tuyau PE noir, flasques à la couleur, timon

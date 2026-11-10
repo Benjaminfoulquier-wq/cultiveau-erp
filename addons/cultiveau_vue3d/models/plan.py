@@ -216,6 +216,86 @@ class Plan(models.Model):
             "secteur": SECTEUR["nom"],
         }
 
+    # ---------------------------------------------------------------- la démonstration « concessionnaire agricole »
+
+    @api.model
+    def layout_concessionnaire(self, company=None):
+        """Le même bâtiment, re-thématisé en concession de matériel agricole : un atelier mécanique avec ses ponts
+        élévateurs et des tracteurs levés en réparation, un comptoir pièces détachées, un pôle ventes, et dehors un
+        parc d'exposition de tracteurs et de machines à vendre. Pour montrer à un concessionnaire ce que l'outil
+        ferait pour lui. Rien n'est enregistré : le plan est calculé et rendu tel quel."""
+        company = company or self.env.company
+        base = self.generer(company)
+        base["site"] = {"nom": "Concession", "largeur": 64, "profondeur": 64, "variante": "concessionnaire"}
+        noms = {"accueil": "Accueil et pièces", "magasin": "Pièces détachées", "stockage": "Atelier mécanique",
+                "atelier": "Hydraulique et moteur", "bureau": "Ventes neuf et occasion", "reunion": "Salle de réunion",
+                "administratif": "Administratif et SAV", "pause": "Pause", "parking": "Parking clients",
+                "cour": "Parc d'exposition", "champs": "Démonstration au champ"}
+        for z in base["zones"]:
+            z["nom"] = noms.get(z["cle"], z["nom"])
+
+        o, n, places = [], [0], base["places"]
+
+        def obj(type_, x, z, rot=0, zone=None, params=None):
+            n[0] += 1
+            o.append({"id": f"{type_}-{n[0]}", "type": type_, "x": round(x, 2), "z": round(z, 2), "rot": rot, "zone": zone, "params": params or {}, "entite": None})
+
+        # --- l'accueil et le comptoir pièces
+        obj("comptoir", 15, 23.2, 0, "accueil")
+        obj("plante", 11, 27, 0, "accueil"); obj("plante", 19, 27, 0, "accueil")
+        obj("borne", 12.2, 26.6, 0, "accueil", {"badgeuse": True})
+        obj("table", 17.5, 26.3, 0, "accueil", {"l": 1.1, "p": 0.7, "basse": True}); obj("canape", 17.5, 27.3, 180, "accueil")
+        obj("ecran_mural", 10.3, 24, 90, "accueil", {"contenu": "bienvenue"})
+        obj("liasse", 13.6, 23.3, 0, "accueil")
+        # --- le magasin pièces et un tracteur neuf en vitrine
+        for i in range(3):
+            obj("gondole", 22.5 + i * 3.4, 25.2, 90, "magasin", {"famille": i})
+        obj("panneau", 31, 27.2, 180, "magasin", {"texte": "PIÈCES DÉTACHÉES"})
+        obj("tracteur", 23.5, 22, -90, "magasin", {"couleur": 0x2f9a3e, "jante": 0xf2c230})
+        obj("totem", 26, 22, 0, "magasin", {"logo": True})
+        # --- l'atelier mécanique : trois ponts élévateurs, deux avec un tracteur levé
+        obj("pont", 14, 12, 0, "stockage", {"charge": "tracteur", "couleur": 0xef7d1a, "couleurTracteur": 0x2f9a3e})
+        obj("pont", 19.5, 12, 0, "stockage", {"charge": "tracteur", "couleur": 0xef7d1a, "couleurTracteur": 0xd94f45})
+        obj("pont", 25, 12, 0, "stockage", {"couleur": 0xef7d1a})
+        obj("minipelle", 30, 12, -90, "stockage", {"couleur": 0xf2a900})
+        obj("etabli", 12, 17, 0, "stockage"); obj("etabli", 30, 17.5, 0, "stockage")
+        obj("armoire", 11, 9, 90, "stockage"); obj("armoire", 11, 10.5, 90, "stockage")
+        obj("chariot", 30, 18.8, 0, "stockage"); obj("bac", 27.5, 9, 0, "stockage"); obj("nettoyeur", 23, 18.5, 0, "stockage")
+        obj("panneau", 21, 8.6, 0, "stockage", {"texte": "ATELIER MÉCANIQUE"})
+        # --- l'atelier hydraulique et moteur
+        obj("etabli", 34, 10, 90, "atelier"); obj("etabli", 34, 14, 90, "atelier")
+        obj("soudeuse", 33.5, 18, 0, "atelier"); obj("bac", 33.5, 20.5, 0, "atelier"); obj("nettoyeur", 38.5, 20, 0, "atelier")
+        obj("armoire", 33, 25, 90, "atelier"); obj("armoire", 33, 26.5, 90, "atelier")
+        obj("presse", 37, 24.5, 90, "atelier", {"couleur": 0x3a7d3a})
+        obj("panneau", 36, 8.6, 0, "atelier", {"texte": "HYDRAULIQUE · MOTEUR"})
+        # --- le pôle ventes neuf et occasion
+        obj("bureau", 42.3, 10.2, 0, "bureau", {"ecran": "crm"}); obj("bureau", 45.3, 10.2, 0, "bureau", {"ecran": "tableur"})
+        obj("plans", 41.6, 12.6, 0, "bureau"); obj("imprimante", 44.6, 12.9, 0, "bureau"); obj("plante", 40.6, 8.6, 0, "bureau")
+        # --- la salle de réunion, l'administratif, la pause (comme le dépôt)
+        obj("table", 43.5, 16.8, 0, "reunion", {"l": 3.6, "p": 1.4})
+        obj("ecran_mural", 40.25, 16.8, 0, "reunion", {"contenu": "presentation", "salle": True})
+        obj("plante", 46.5, 19.4, 0, "reunion"); obj("plante", 46.5, 14.2, 0, "reunion")
+        obj("bureau", 50.5, 10.5, 0, "administratif", {"ecran": "compta"}); obj("bureau", 50.5, 13, 0, "administratif", {"ecran": "crm"})
+        obj("armoire", 53.2, 9.2, -90, "administratif"); obj("dossiers", 52.8, 12.6, 0, "administratif"); obj("serveur", 53.3, 15.5, -90, "administratif")
+        obj("machine_cafe", 53.2, 17.2, -90, "pause"); obj("table", 49.5, 18, 0, "pause", {"l": 1.4, "p": 0.8})
+        obj("canape", 48, 19.2, 0, "pause"); obj("babyfoot", 51.5, 19.1, 0, "pause"); obj("plante", 47.5, 16.5, 0, "pause")
+        # --- le parc d'exposition : des tracteurs et des machines à vendre, en deux rangées
+        for i, coul in enumerate((0x2f9a3e, 0xd94f45, 0x2f6fb0)):
+            obj("tracteur", 26 + i * 5, 32.8, 180, "cour", {"couleur": coul, "jante": 0xf2c230})
+            obj("panneau", 26 + i * 5, 30.4, 0, "cour", {"texte": "À VENDRE"})
+        obj("minipelle", 43, 33, 180, "cour", {"couleur": 0xf2a900}); obj("minipelle", 48, 33, 180, "cour", {"couleur": 0xef7d1a})
+        obj("presse", 54, 33.5, 90, "cour", {"couleur": 0x3a7d3a})
+        obj("tracteur", 28, 38, 0, "cour", {"couleur": 0x6c7883}); obj("presse", 34, 38, 90, "cour", {"couleur": 0xd94f45})
+        obj("minipelle", 40, 38, 0, "cour", {"couleur": 0xf2a900})
+        obj("totem", 20.5, 30.5, 0, "cour", {"logo": True})
+        obj("panneau", 58, 28, 180, "cour", {"texte": "PARC D'EXPOSITION"}); obj("lampadaire", 58, 34, 0, "cour")
+        # --- la démonstration au champ : un tracteur et sa presse
+        obj("tracteur", 22, 54, -90, "champs", {"couleur": 0x2f9a3e}); obj("presse", 26, 54, 90, "champs", {"couleur": 0x3a7d3a})
+
+        base["objets"] = o
+        base["places"] = places
+        return base
+
     def layout_json(self):
         self.ensure_one()
         return json.dumps(self.layout or {})

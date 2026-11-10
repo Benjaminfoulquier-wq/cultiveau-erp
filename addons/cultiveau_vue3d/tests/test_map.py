@@ -33,6 +33,29 @@ class TestMap(TransactionCase):
         with self.assertRaises(Exception):
             Plan.enregistrer({"contour": []})
 
+    def test_demo_concessionnaire_reservee(self):
+        Map = self.env["cultiveau.map"]
+        Plan = self.env["cultiveau.plan"]
+        # le plan concessionnaire : le même bâtiment, des ponts et des machines à vendre
+        layout = Plan.layout_concessionnaire(self.societe)
+        self.assertEqual(layout["site"]["variante"], "concessionnaire")
+        self.assertTrue(any(o["type"] == "pont" for o in layout["objets"]), "des ponts élévateurs dans l'atelier")
+        self.assertTrue(any(o["type"] in ("tracteur", "presse", "minipelle") for o in layout["objets"]), "des machines à vendre")
+        self.assertEqual(len({o["id"] for o in layout["objets"]}), len(layout["objets"]))
+        self.assertEqual(next(z["nom"] for z in layout["zones"] if z["cle"] == "stockage"), "Atelier mécanique")
+        # un compte lambda n'a pas le bouton et ne peut pas basculer en démo
+        d = Map.with_user(self.tech).vivant("concessionnaire")
+        self.assertFalse(d["utilisateur"]["peut_concessionnaire"])
+        self.assertIsNone(d["societe"]["variante"])
+        self.assertEqual(d["societe"]["nom"], self.societe.name)
+        # contact@cultiveau.fr y a droit : la vue bascule en concession
+        self.tech.write({"email": "contact@cultiveau.fr"})
+        d = Map.with_user(self.tech).vivant("concessionnaire")
+        self.assertTrue(d["utilisateur"]["peut_concessionnaire"])
+        self.assertEqual(d["societe"]["variante"], "concessionnaire")
+        self.assertIn("démonstration", d["societe"]["nom"].lower())
+        self.assertTrue(any(o["type"] == "pont" for o in d["plan"]["objets"]))
+
     def test_donnees_vivantes_et_evenements(self):
         d = self.env["cultiveau.map"].vivant()
         self.assertEqual(d["societe"]["id"], self.societe.id)

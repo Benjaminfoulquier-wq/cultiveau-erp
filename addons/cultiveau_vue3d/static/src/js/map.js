@@ -64,6 +64,7 @@ export class MapVivante extends Component {
         this.traites = new Set();
         this.minuteries = [];
         this.focusDemande = this.props.action?.params?.focus || router.current?.focus || new URLSearchParams(window.location.search).get("focus") || null;
+        this.variante = this.props.action?.params?.variante || null; // "concessionnaire" pour la démonstration
         window.cultiveauMap = this; // pour le débogage dans la console
         onWillStart(async () => {
             try {
@@ -81,7 +82,7 @@ export class MapVivante extends Component {
 
     async charger() {
         try {
-            this.state.v = await this.orm.call("cultiveau.map", "vivant", []);
+            this.state.v = await this.orm.call("cultiveau.map", "vivant", [this.variante]);
             this.state.kpi = this.state.v.kpi;
             this._zones();
         } catch (e) {
@@ -108,7 +109,7 @@ export class MapVivante extends Component {
         this._rafraichit = true;
         try {
             const avant = this.state.kpi;
-            const v = await this.orm.call("cultiveau.map", "vivant", []);
+            const v = await this.orm.call("cultiveau.map", "vivant", [this.variante]);
             this.state.v = v;
             for (const k of v.kpi) {
                 const a = avant.find((x) => x.cle === k.cle);
@@ -206,6 +207,12 @@ export class MapVivante extends Component {
         if (this.state.v.societe.demo) {
             this.demarrerDemo();
         }
+    }
+    ouvrirConcessionnaire() {
+        this.action.doAction("cultiveau_vue3d.action_vue3d_concessionnaire", { clearBreadcrumbs: true });
+    }
+    quitterConcessionnaire() {
+        this.action.doAction("cultiveau_vue3d.action_vue3d", { clearBreadcrumbs: true });
     }
     demonter() {
         try {

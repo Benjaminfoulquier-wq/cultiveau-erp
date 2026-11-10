@@ -14,7 +14,7 @@ Planifier une réunion depuis la map, une fiche client ou Mathis : l'ERP cherche
 Chaque personne connecte son agenda Google ou Outlook en un clic depuis la salle de réunion ; les réunions vont et viennent
 dans les deux sens.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.0.1",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "website": "https://cultiveau.fr",

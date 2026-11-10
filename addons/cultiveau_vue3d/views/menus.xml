@@ -5,4 +5,12 @@
         <field name="tag">cultiveau_vue3d.vue</field>
     </record>
     <menuitem id="menu_vue3d" name="Map vivante" parent="cultiveau_base.menu_cultiveau_root" action="action_vue3d" sequence="1"/>
+
+    <!-- La démonstration « concessionnaire agricole » : la même vue, re-thématisée. Lancée par un bouton réservé à
+         contact@cultiveau.fr (aucun menu), pour montrer le réseau à un concessionnaire de matériel agricole. -->
+    <record id="action_vue3d_concessionnaire" model="ir.actions.client">
+        <field name="name">Démonstration concessionnaire</field>
+        <field name="tag">cultiveau_vue3d.vue</field>
+        <field name="params" eval="{'variante': 'concessionnaire'}"/>
+    </record>
 </odoo>

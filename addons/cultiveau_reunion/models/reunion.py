@@ -311,8 +311,8 @@ class Map(models.AbstractModel):
         return self.env["cultiveau.reunion"].en_cours(users)
 
     @api.model
-    def vivant(self):
-        d = super().vivant()
+    def vivant(self, variante=None):
+        d = super().vivant(variante=variante)
         R = self.env["cultiveau.reunion"]
         d["reunion"] = {"salle_nom": R.salle_nom(), "salle": R.etat_salle(self.env.company), "synchro": R.synchro(),
                         "visio_defaut": R._param("cultiveau.visio_defaut", "erp") or "erp"}

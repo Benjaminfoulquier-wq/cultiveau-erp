@@ -746,10 +746,10 @@ export function creerKit(THREE) {
         { type: "comptoir", nom: "Comptoir", categorie: "Magasin" }, { type: "gondole", nom: "Gondole", categorie: "Magasin" }, { type: "rack", nom: "Rayonnage", categorie: "Magasin" },
         { type: "palette", nom: "Palette", categorie: "Magasin" }, { type: "chariot", nom: "Chariot élévateur", categorie: "Magasin" }, { type: "borne", nom: "Badgeuse", categorie: "Magasin" },
         { type: "etabli", nom: "Établi", categorie: "Atelier" }, { type: "soudeuse", nom: "Poste à souder", categorie: "Atelier" }, { type: "bac", nom: "Bac", categorie: "Atelier" },
-        { type: "nettoyeur", nom: "Nettoyeur", categorie: "Atelier" }, { type: "pompe", nom: "Pompe", categorie: "Atelier" },
+        { type: "nettoyeur", nom: "Nettoyeur", categorie: "Atelier" }, { type: "pompe", nom: "Pompe", categorie: "Atelier" }, { type: "pont", nom: "Pont élévateur", categorie: "Atelier" },
         { type: "cantilever", nom: "Cantilever tubes", categorie: "Cour" }, { type: "bobines", nom: "Bobines", categorie: "Cour" }, { type: "prefa", nom: "Cuves", categorie: "Cour" },
         { type: "benne", nom: "Benne", categorie: "Cour" }, { type: "quai", nom: "Quai", categorie: "Cour" }, { type: "tracteur", nom: "Tracteur", categorie: "Cour" },
-        { type: "minipelle", nom: "Mini-pelle", categorie: "Cour" }, { type: "lampadaire", nom: "Lampadaire", categorie: "Cour" }, { type: "panneau", nom: "Panneau", categorie: "Cour" },
+        { type: "minipelle", nom: "Mini-pelle", categorie: "Cour" }, { type: "presse", nom: "Presse à balles", categorie: "Cour" }, { type: "lampadaire", nom: "Lampadaire", categorie: "Cour" }, { type: "panneau", nom: "Panneau", categorie: "Cour" },
         { type: "totem", nom: "Totem", categorie: "Cour" }, { type: "arbre", nom: "Arbre", categorie: "Cour" }, { type: "haie", nom: "Haie", categorie: "Cour" },
     ];
 

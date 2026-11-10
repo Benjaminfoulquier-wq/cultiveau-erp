@@ -48,6 +48,8 @@
                     <button class="o_cv_bouton accent" t-if="state.v.assistant" t-on-click="() => this.ouvrirMathis()" title="Demander à Mathis"><i class="fa fa-comments-o me-1"/><t t-esc="state.v.assistant.prenom"/></button>
                     <button class="o_cv_bouton" t-on-click="visiteGuidee" t-att-class="{ actif: state.visite }" title="Visite guidée (T)"><i class="fa fa-play me-1"/>Visite</button>
                     <button class="o_cv_bouton" t-if="state.v.utilisateur.editeur" t-on-click="basculerEdition" t-att-class="{ actif: state.edition }" title="Modifier le plan"><i class="fa fa-pencil me-1"/>Plan</button>
+                    <button class="o_cv_bouton" t-if="state.v.utilisateur.peut_concessionnaire and state.v.societe.variante !== 'concessionnaire'" t-on-click="ouvrirConcessionnaire" title="Démonstration concessionnaire agricole"><i class="fa fa-wrench me-1"/>Démo concession</button>
+                    <button class="o_cv_bouton actif" t-if="state.v.societe.variante === 'concessionnaire'" t-on-click="quitterConcessionnaire" title="Revenir au dépôt"><i class="fa fa-arrow-left me-1"/>Quitter la démo</button>
                     <div class="position-relative">
                         <button class="o_cv_bouton accent" t-on-click="() => state.creerOuvert = !state.creerOuvert"><i class="fa fa-plus me-1"/>Créer</button>
                         <div class="o_cv_menu" t-if="state.creerOuvert">

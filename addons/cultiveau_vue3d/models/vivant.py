@@ -28,8 +28,16 @@ class Map(models.AbstractModel):
 
     # ---------------------------------------------------------------- tout d'un coup
 
+    # l'adresse qui a droit à la démonstration « concessionnaire agricole » (un bouton réservé)
+    COURRIEL_DEMO = "contact@cultiveau.fr"
+
     @api.model
-    def vivant(self):
+    def _peut_concessionnaire(self):
+        u = self.env.user
+        return (u.email or "").strip().lower() == self.COURRIEL_DEMO or (u.login or "").strip().lower() == self.COURRIEL_DEMO
+
+    @api.model
+    def vivant(self, variante=None):
         company = self.env.company
         maintenant = fields.Datetime.now()
         local = fields.Datetime.context_timestamp(self.with_context(tz=company.partner_id.tz or "Europe/Paris"), maintenant)
@@ -38,15 +46,25 @@ class Map(models.AbstractModel):
         dossiers = self._dossiers(company)
         chantiers = self._chantiers(company)
         stock = self._stock(company)
-        plan = self.env["cultiveau.plan"].courant(company)
+        # la démonstration concessionnaire : le même moteur et les mêmes données vivantes, mais le plan re-thématisé.
+        # Réservée à contact@cultiveau.fr : demandée par un autre compte, on retombe sur le dépôt normal.
+        concessionnaire = variante == "concessionnaire" and self._peut_concessionnaire()
+        if concessionnaire:
+            plan_layout, plan_version = self.env["cultiveau.plan"].layout_concessionnaire(company), 0
+        else:
+            plan = self.env["cultiveau.plan"].courant(company)
+            plan_layout, plan_version = plan.layout, plan.version
         return {
-            "societe": {"id": company.id, "nom": company.name, "accent": self._accent(company), "demo": bool(company.cultiveau_map_demo),
+            "societe": {"id": company.id, "nom": "Concession agricole (démonstration)" if concessionnaire else company.name,
+                        "accent": self._accent(company), "demo": bool(company.cultiveau_map_demo),
+                        "variante": "concessionnaire" if concessionnaire else None,
                         "adherent": company.cultiveau_adherent, "logo": bool(company.logo)},
             "utilisateur": {"id": self.env.user.id, "nom": self.env.user.name, "role": self._role(self.env.user),
                             "editeur": self.env.user.has_group("base.group_system") or self.env.user.has_group("sales_team.group_sale_manager"),
+                            "peut_concessionnaire": self._peut_concessionnaire(),
                             "rh": self.env.user.has_group("sales_team.group_sale_manager")},
             "heure": local.strftime("%H:%M"), "date": self._date_fr(local),
-            "secteur": SECTEUR, "plan": plan.layout, "plan_version": plan.version,
+            "secteur": SECTEUR, "plan": plan_layout, "plan_version": plan_version,
             "personnes": personnes, "vehicules": self._vehicules(company, personnes, taches), "clients": self._clients_presents(company, local),
             "interventions": taches, "dossiers": dossiers, "chantiers": chantiers, "stock": stock, "parcelles": self._parcelles(company, dossiers),
             "atelier": self._atelier(company, taches), "livraisons": self._livraisons(company, local),
