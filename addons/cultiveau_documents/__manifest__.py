@@ -9,7 +9,7 @@ Les documents qu'un adhérent envoie à ses clients, propres et à sa marque :
 - les e-mails en français : envoi du devis avec le bouton « voir et signer », envoi de la facture ;
 - les relances automatiques : devis sans réponse, factures en retard, puis une activité pour le commercial.
 """,
-    "version": "18.0.1.2.0",
+    "version": "18.0.1.3.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "website": "https://cultiveau.fr",
@@ -27,6 +27,13 @@ Les documents qu'un adhérent envoie à ses clients, propres et à sa marque :
         "views/account_move_views.xml",
         "data/defauts.xml",
     ],
+    "assets": {
+        "web.assets_backend": [
+            "cultiveau_documents/static/src/barre_format/barre_format.js",
+            "cultiveau_documents/static/src/barre_format/barre_format.xml",
+            "cultiveau_documents/static/src/barre_format/barre_format.scss",
+        ],
+    },
     "installable": True,
     "auto_install": False,
 }

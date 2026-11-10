@@ -3,7 +3,10 @@
     <!-- La police choisie et la mise en forme des textes s'affichent aussi sur le devis en ligne (portail). -->
     <template id="portal_devis_mise_en_forme" inherit_id="sale.sale_order_portal_content" name="Cultiveau : police et mise en forme des lignes">
         <xpath expr="//td[@id='product_name']/span" position="replace">
-            <span t-attf-style="{{ ('font-family: ' + line.cultiveau_police_css() + ';') if line.cultiveau_police else '' }}" t-field="line.name"/>
+            <span t-attf-style="{{ ('font-family: ' + line.cultiveau_police_css() + ';') if line.cultiveau_police else '' }}">
+                <span t-if="not is_html_empty(line.cultiveau_html)" t-out="line.cultiveau_html"/>
+                <span t-else="" t-field="line.name"/>
+            </span>
         </xpath>
         <xpath expr="//t[@t-if=&quot;line.display_type == 'line_section' or line.product_type == 'combo'&quot;]/td/span" position="replace">
             <span t-attf-style="{{ ('font-family: ' + line.cultiveau_police_css() + ';') if line.cultiveau_police else '' }}">

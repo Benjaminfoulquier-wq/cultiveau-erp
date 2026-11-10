@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_documents.BarreFormat">
+        <div t-if="state.ouverte" class="o_cv_bf" t-attf-style="left: {{ state.x }}px; top: {{ state.y }}px;">
+            <div class="o_cv_bf_tete" t-on-pointerdown="demarrerDrag" title="Déplacer la barre">
+                <i class="fa fa-arrows"/>
+                <span class="o_cv_bf_titre">Mise en forme</span>
+                <button class="o_cv_bf_x" t-on-pointerdown.stop="" t-on-click="() => this.state.ouverte = false" title="Fermer">×</button>
+            </div>
+            <div class="o_cv_bf_corps">
+                <button class="o_cv_bf_b" t-on-mousedown.prevent="" t-on-click="() => this.commande('bold')" title="Gras"><b>G</b></button>
+                <button class="o_cv_bf_b" t-on-mousedown.prevent="" t-on-click="() => this.commande('italic')" title="Italique"><i>I</i></button>
+                <button class="o_cv_bf_b" t-on-mousedown.prevent="" t-on-click="() => this.commande('underline')" title="Souligné"><u>S</u></button>
+                <label class="o_cv_bf_couleur" title="Couleur du texte">
+                    <i class="fa fa-tint"/>
+                    <input type="color" t-on-input="couleur"/>
+                </label>
+                <select class="o_cv_bf_sel" t-on-change="police" title="Police">
+                    <option t-foreach="POLICES" t-as="p" t-key="p[0]" t-att-value="p[0]" t-esc="p[1]"/>
+                </select>
+                <select class="o_cv_bf_sel" t-on-change="taille" title="Taille">
+                    <option t-foreach="TAILLES" t-as="t" t-key="t[0]" t-att-value="t[0]" t-esc="t[1]"/>
+                </select>
+            </div>
+        </div>
+        <button t-if="!state.ouverte" class="o_cv_bf_pastille" t-attf-style="left: {{ state.x }}px; top: {{ state.y }}px;"
+                t-on-click="() => this.state.ouverte = true" title="Mise en forme du texte">
+            <i class="fa fa-font"/>
+        </button>
+    </t>
+</templates>

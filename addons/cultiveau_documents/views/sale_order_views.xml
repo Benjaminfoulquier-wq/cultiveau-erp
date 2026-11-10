@@ -10,6 +10,9 @@
                         invisible="state != 'sale' or cultiveau_acompte_facture or not cultiveau_acompte_pct or invoice_status == 'invoiced'"/>
                 <button name="action_relancer" type="object" string="Relancer" invisible="state != 'sent'"/>
             </xpath>
+            <xpath expr="//sheet/notebook" position="before">
+                <widget name="cultiveau_barre_format"/>
+            </xpath>
             <xpath expr="//field[@name='order_line']/list/field[@name='name']" position="after">
                 <field name="cultiveau_police" optional="show" string="Police"/>
                 <field name="cultiveau_html" widget="html" optional="show" string="Mise en forme"

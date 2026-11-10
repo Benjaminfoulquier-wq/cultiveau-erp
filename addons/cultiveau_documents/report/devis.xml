@@ -68,9 +68,12 @@
                 </tr>
             </t>
         </xpath>
-        <!-- La police choisie pour la ligne (vide = la police du document) habille le texte de l'article. -->
+        <!-- La police choisie et le texte mis en forme (barre flottante) habillent aussi le texte de l'article. -->
         <xpath expr="//td[@name='td_name']/span" position="replace">
-            <span t-attf-style="{{ ('font-family: ' + line.cultiveau_police_css() + ';') if line.cultiveau_police else '' }}" t-field="line.name"/>
+            <span t-attf-style="{{ ('font-family: ' + line.cultiveau_police_css() + ';') if line.cultiveau_police else '' }}">
+                <span t-if="not is_html_empty(line.cultiveau_html)" t-out="line.cultiveau_html"/>
+                <span t-else="" t-field="line.name"/>
+            </span>
         </xpath>
         <!-- Le texte mis en forme (gras, italique, souligné, couleur) et la police choisie remplacent le texte simple des sections et des notes. -->
         <xpath expr="//td[@name='td_section_line']/span" position="replace">

@@ -1,0 +1,98 @@
+// La barre de mise en forme flottante du devis (déplaçable), aux couleurs de la marque.
+.o_cv_bf {
+    position: fixed;
+    z-index: 1045;
+    background: #1b2735;
+    color: #f6f4ef;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    user-select: none;
+    width: max-content;
+    font-size: 13px;
+
+    .o_cv_bf_tete {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 8px;
+        cursor: move;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+
+        .fa-arrows { opacity: 0.6; font-size: 11px; }
+        .o_cv_bf_titre { flex: 1; font-weight: 600; letter-spacing: 0.02em; }
+        .o_cv_bf_x {
+            border: 0;
+            background: transparent;
+            color: #f6f4ef;
+            font-size: 18px;
+            line-height: 1;
+            padding: 0 2px;
+            cursor: pointer;
+            opacity: 0.7;
+            &:hover { opacity: 1; }
+        }
+    }
+
+    .o_cv_bf_corps {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 7px 8px;
+
+        .o_cv_bf_b {
+            width: 28px;
+            height: 28px;
+            border: 0;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f6f4ef;
+            cursor: pointer;
+            font-size: 14px;
+            &:hover { background: #6ebfcc; color: #14212b; }
+        }
+        .o_cv_bf_couleur {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 0;
+            &:hover { background: #6ebfcc; color: #14212b; }
+            input[type="color"] {
+                position: absolute;
+                inset: 0;
+                opacity: 0;
+                cursor: pointer;
+            }
+        }
+        .o_cv_bf_sel {
+            height: 28px;
+            border: 0;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f6f4ef;
+            padding: 0 6px;
+            cursor: pointer;
+            max-width: 110px;
+            option { color: #14212b; }
+        }
+    }
+}
+
+.o_cv_bf_pastille {
+    position: fixed;
+    z-index: 1045;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: #1b2735;
+    color: #6ebfcc;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    &:hover { background: #6ebfcc; color: #14212b; }
+}
