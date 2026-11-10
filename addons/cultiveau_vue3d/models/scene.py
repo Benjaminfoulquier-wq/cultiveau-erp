@@ -343,7 +343,7 @@ class Scene(models.AbstractModel):
     # Une seule appli de terrain : quand le lien avec cultiveau.fr est installé, ces postes ouvrent l'écran du site
     # (là où l'équipe saisit) plutôt que la liste propre à l'ERP.
     ECRANS_DU_SITE = {
-        "demande": "cultiveau_site.action_ecran_demande", "depannage_nouveau": "cultiveau_site.action_ecran_demande", "bons": "cultiveau_site.action_ecran_bons", "bon_nouveau": "cultiveau_site.action_ecran_bon_nouveau", "tableau_sav": "cultiveau_site.action_ecran_tableau_sav", "suivi": "cultiveau_site.action_ecran_suivi",
+        "demande": "cultiveau_site.action_ecran_demande", "depannage_nouveau": "cultiveau_site.action_ecran_demande", "bons": "cultiveau_site.action_ecran_bons", "bons_a_facturer": "cultiveau_site.action_site_bons_a_facturer", "bon_nouveau": "cultiveau_site.action_ecran_bon_nouveau", "tableau_sav": "cultiveau_site.action_ecran_tableau_sav", "suivi": "cultiveau_site.action_ecran_suivi",
         "planning_techniciens": "cultiveau_site.action_ecran_calendrier", "planning": "cultiveau_site.action_ecran_chantier",
         "chantiers": "cultiveau_site.action_ecran_chantier",
     }
@@ -364,7 +364,7 @@ class Scene(models.AbstractModel):
         actions = self._actions()
         ecran = self.ECRANS_DU_SITE.get(cle)
         if ecran and self.env.ref(ecran, raise_if_not_found=False):
-            action = self.env["ir.actions.client"]._for_xml_id(ecran)
+            action = self.env[self.env.ref(ecran)._name]._for_xml_id(ecran)
             if isinstance(action.get("context"), str):
                 import json
                 try:

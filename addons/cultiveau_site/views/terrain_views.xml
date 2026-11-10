@@ -74,4 +74,10 @@
     </record>
     <menuitem id="menu_ecran_parametres_sav" name="Paramètres SAV" parent="menu_espace" action="action_ecran_parametres_sav" sequence="9"/>
     <menuitem id="menu_terrain_bon_nouveau" name="Nouveau bon d'intervention" parent="cultiveau_interventions.menu_interventions_racine" action="action_ecran_bon_nouveau" sequence="14"/>
+    <!-- Bons à facturer = les bons de cultiveau.fr signés ; ceux saisis dans l'ERP restent accessibles en second. -->
+    <record id="cultiveau_terrain.menu_bons_a_facturer" model="ir.ui.menu">
+        <field name="name">Bons à facturer</field>
+        <field name="action" ref="action_site_bons_a_facturer"/>
+    </record>
+    <menuitem id="menu_bons_erp_a_facturer" name="Bons de l'ERP à facturer" parent="cultiveau_interventions.menu_interventions_racine" action="cultiveau_terrain.action_bons_a_facturer" sequence="36"/>
 </odoo>

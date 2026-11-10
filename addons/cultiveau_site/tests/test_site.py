@@ -1,5 +1,6 @@
 from unittest.mock import patch
 
+from odoo.exceptions import UserError
 from odoo.tests import TransactionCase, tagged
 
 CLIENTS = {"success": True, "total": 2, "clients": [
@@ -250,3 +251,41 @@ class TestSite(TransactionCase):
             connexion._synchroniser()
         self.assertFalse(connexion.en_erreur, connexion.resultat)
         self.assertIn("2 article(s) lus", connexion.resultat)
+
+
+class TestFacturerBonDuSite(TransactionCase):
+    def _bon(self, **v):
+        societe = self.env.company
+        connexion = self.env["cultiveau.site.connexion"].search([("company_id", "=", societe.id)], limit=1) or self.env["cultiveau.site.connexion"].create(
+            {"company_id": societe.id, "cle": "cle-de-test"})
+        client = self.env["res.partner"].create({"name": "Client du bon"})
+        return self.env["cultiveau.site.bon"].create({
+            "connexion_id": connexion.id, "ref": v.pop("ref", "b1"), "numero": "BI-TEST-1", "date": "2026-11-03", "partner_id": client.id, "signe_client": True,
+            "total_ht": 250.0, "total_deplacement_ht": 30.0, "statut": "signe",
+            "ligne_ids": [(0, 0, {"genre": "article", "reference": "R1", "designation": "Vanne", "quantite": 2, "prix_unitaire_ht": 60.0, "remise": 0, "tva": 20, "total_ht": 120.0}),
+                          (0, 0, {"genre": "mo", "designation": "Main-d'œuvre", "quantite": 2, "prix_unitaire_ht": 50.0, "total_ht": 100.0}),
+                          (0, 0, {"genre": "machine", "designation": "Mini-pelle", "duree_minutes": 60})], **v})
+
+    def test_un_bon_signe_devient_une_facture_brouillon(self):
+        bon = self._bon()
+        self.assertTrue(bon.a_facturer)
+        bon.action_facturer()
+        f = bon.invoice_id
+        self.assertEqual((f.state, f.move_type, f.partner_id, f.amount_untaxed), ("draft", "out_invoice", bon.partner_id, 250.0))
+        self.assertEqual(len(f.invoice_line_ids.filtered(lambda l: l.display_type == "product")), 3)  # vanne, main-d'œuvre, déplacement
+        self.assertFalse(bon.a_facturer)
+        with self.assertRaises(UserError):
+            bon.action_facturer()  # jamais deux fois
+
+    def test_un_bon_exporte_en_compta_n_est_pas_refacture_par_megarde(self):
+        bon = self._bon(ref="b2", exporte=True)
+        self.assertFalse(bon.a_facturer)
+        with self.assertRaises(UserError):
+            bon.action_facturer()
+        bon.action_facturer_malgre_export()
+        self.assertTrue(bon.invoice_id)
+
+    def test_un_bon_non_signe_ne_se_facture_pas(self):
+        bon = self._bon(ref="b3", signe_client=False)
+        with self.assertRaises(UserError):
+            bon.action_facturer()
