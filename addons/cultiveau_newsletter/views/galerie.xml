@@ -37,6 +37,21 @@
             <div data-name="cultiveau_aides" title="Aides du moment" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/aides_thumb">
                 <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('aides')"/>
             </div>
+            <div data-name="cultiveau_famille_vigne" title="Vigne : besoins en eau" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/famille_vigne_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('famille_vigne')"/>
+            </div>
+            <div data-name="cultiveau_famille_arbo" title="Arboriculture : besoins en eau" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/famille_arbo_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('famille_arbo')"/>
+            </div>
+            <div data-name="cultiveau_famille_grandes_cultures" title="Grandes cultures : besoins en eau" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/famille_grandes_cultures_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('famille_grandes_cultures')"/>
+            </div>
+            <div data-name="cultiveau_famille_maraichage" title="Maraîchage : besoins en eau" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/famille_maraichage_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('famille_maraichage')"/>
+            </div>
+            <div data-name="cultiveau_famille_prairies" title="Prairies et fourrages : besoins en eau" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/famille_prairies_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('famille_prairies')"/>
+            </div>
         </xpath>
     </template>
 </odoo>

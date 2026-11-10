@@ -288,6 +288,10 @@ class Newsletter(models.TransientModel):
         company = self.env.company
         if cle == "vierge":
             titre, (sous_titre, contenu) = "Votre titre ici", self._contenu_vierge()
+        elif cle.startswith("famille_"):
+            categorie = cle[len("famille_"):]
+            fam = dict(self.env["cultiveau.culture"]._fields["categorie"].selection).get(categorie, "")
+            titre, (sous_titre, contenu) = f"Besoins en eau : {fam.lower()}, le point de la saison", self._contenu_famille(categorie)
         else:
             titre, (sous_titre, contenu) = dict(THEMES).get(cle, cle), self._contenu_saison(cle)
         return self._corps(company, titre, sous_titre, contenu)
