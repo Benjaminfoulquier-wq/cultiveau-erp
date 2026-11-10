@@ -4,6 +4,7 @@
 // (courbes de Catmull-Rom), les animations d'objets et l'éditeur de plan. `frame(dt)` est séparée de requestAnimationFrame.
 
 import { decorer, fenetres, zoneEn, champLibre } from "./decor";
+import { Rendu } from "./rendu";
 
 const FOV = 26;
 const POLAIRE = [0.28, 1.18];
@@ -80,14 +81,12 @@ export class Moteur {
         appoint.position.set(40, 30, -30);
         scene.add(appoint);
         this.lumieres = { ciel, soleil, appoint };
-        if (THREE.PMREMGenerator && THREE.RoomEnvironment) {
-            try {
-                const pmrem = new THREE.PMREMGenerator(renderer);
-                scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
-                scene.environmentIntensity = 0.4;
-            } catch {
-                /* pas d'environnement : la lumière suffit */
-            }
+        // le rendu « photo » : ciel en carte d'environnement, occlusion ambiante, halo, étalonnage (voir rendu.js)
+        try {
+            this.rendu = new Rendu(THREE, renderer, scene, this.camera);
+        } catch (e) {
+            console.warn("[Map vivante] rendu photo :", e);
+            this.rendu = null;
         }
         this.raycaster = new THREE.Raycaster();
         this.plan3d = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
@@ -107,6 +106,7 @@ export class Moteur {
         const w = Math.max(1, this.hote.clientWidth), h = Math.max(1, this.hote.clientHeight);
         this.taille = { w, h };
         this.renderer.setSize(w, h, false);
+        this.rendu?.mesurer();
         this.camera.aspect = w / h;
         this.camera.updateProjectionMatrix();
     }
@@ -119,6 +119,7 @@ export class Moteur {
                 [].concat(o.material).forEach((m) => { m.map?.dispose?.(); m.dispose?.(); });
             }
         });
+        this.rendu?.detruire();
         this.renderer.dispose();
         this.renderer.domElement.remove();
         for (const e of this.etiquettes.values()) {
@@ -143,12 +144,12 @@ export class Moteur {
         const ext = plan.exterieur || {};
         const [[x0, z0], [x1, z1]] = ext.sol || [[-8, -2], [72, 66]];
         // la plaine
-        const plaine = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ map: kit.sol("herbe", 900, 900), color: 0xd8e6c0, roughness: 1 }));
+        const plaine = new THREE.Mesh(new THREE.PlaneGeometry(900, 900), new THREE.MeshStandardMaterial({ map: kit.sol("herbe", 900, 900), color: 0xd8e6c0, roughness: 1, normalMap: kit.relief(kit.sol("herbe", 900, 900), 3) }));
         plaine.rotation.x = -Math.PI / 2;
         plaine.position.set((x0 + x1) / 2, -0.06, (z0 + z1) / 2);
         plaine.receiveShadow = true;
         this.statique.add(plaine);
-        const herbe = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1 - z0), new THREE.MeshStandardMaterial({ map: kit.sol("herbe", x1 - x0, z1 - z0), roughness: 1 }));
+        const herbe = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1 - z0), new THREE.MeshStandardMaterial({ map: kit.sol("herbe", x1 - x0, z1 - z0), roughness: 1, normalMap: kit.relief(kit.sol("herbe", x1 - x0, z1 - z0), 3) }));
         herbe.rotation.x = -Math.PI / 2;
         herbe.position.set((x0 + x1) / 2, -0.04, (z0 + z1) / 2);
         herbe.receiveShadow = true;
@@ -193,11 +194,18 @@ export class Moteur {
         if (soleil) {
             soleil.intensity = soir ? 0.55 : crepuscule ? 2.2 : 3.1;
             soleil.color.setHex(soir ? 0x9fb4d8 : crepuscule ? 0xffd2a0 : 0xffe9c8);
-            soleil.position.set(soir ? 30 : crepuscule ? -48 : -26, soir ? 40 : crepuscule ? 26 : 58, 24);
+            soleil.position.set(soir ? 30 : crepuscule ? -52 : -38, soir ? 40 : crepuscule ? 22 : 46, soir ? 24 : 34);
             ciel.intensity = soir ? 0.6 : crepuscule ? 1.2 : 1.55;
             ciel.color.setHex(soir ? 0x6f86b0 : 0xdcefff);
             appoint.intensity = soir ? 0.2 : 0.55;
             this.scene.fog.color.setHex(soir ? 0x3f4a63 : crepuscule ? 0xf0dcc6 : 0xe4edf0);
+            // le ciel éclaire par sa carte d'environnement : la lumière d'ambiance uniforme lui cède la place
+            const d = soleil.position.clone().sub(soleil.target.position).normalize();
+            if (this.rendu?.ciel(soir ? "soir" : crepuscule ? "crepuscule" : "jour", [d.x, d.y, d.z])) {
+                ciel.intensity *= 0.14;
+                appoint.intensity *= 0.25;
+                soleil.intensity *= 1.2;
+            }
         }
         for (const m of this.lampes || []) {
             m.emissiveIntensity = soir ? 1.6 : crepuscule ? 1.1 : 0.7;
@@ -227,7 +235,10 @@ export class Moteur {
         }
         const texture = kit.sol(z.sol || SOL_PAR_TYPE[z.type] || "beton", 4, 4);
         texture.repeat.set(1, 1);
-        const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: texture, roughness: 0.92 }));
+        // le sol accroche la lumière : un relief tiré de la texture (joints, veines, grain) et un brillant selon la matière
+        const typeSol = z.sol || SOL_PAR_TYPE[z.type] || "beton";
+        const brillant = { carrelage: 0.32, carrelage_chaud: 0.38, parquet: 0.48, beton: 0.66, beton_marque: 0.6, moquette: 1, enrobe: 0.88, beton_ext: 0.82, terre: 1 }[typeSol] ?? 0.9;
+        const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: texture, roughness: brillant, normalMap: kit.relief(texture, 2.4), normalScale: new THREE.Vector2(0.7, 0.7) }));
         m.rotation.x = -Math.PI / 2;
         m.position.y = z.exterieur ? -0.02 : 0.0;
         m.receiveShadow = true;
@@ -252,8 +263,8 @@ export class Moteur {
         dalle.position.y = -0.3;
         dalle.receiveShadow = true;
         this.statique.add(dalle);
-        const matMur = new THREE.MeshStandardMaterial({ map: kit.SOLS.enduit([1, 1]), roughness: 0.9 });
-        const matMurExt = new THREE.MeshStandardMaterial({ map: kit.SOLS.bardage([1, 1]), roughness: 0.85 });
+        const matMur = new THREE.MeshStandardMaterial({ map: kit.SOLS.enduit([1, 1]), roughness: 0.9, normalMap: kit.relief(kit.SOLS.enduit([1, 1]), 1.5) });
+        const matMurExt = new THREE.MeshStandardMaterial({ map: kit.SOLS.bardage([1, 1]), roughness: 0.55, metalness: 0.35, normalMap: kit.relief(kit.SOLS.bardage([1, 1]), 3) });
         const portes = plan.portes || [];
         for (const mur of plan.murs || []) {
             // le mur est découpé autour des portes qui sont sur son segment
@@ -1326,7 +1337,11 @@ export class Moteur {
         this._animerCamera(Math.min(dt, 0.05));
         this._animerMarqueurs(this.temps);
         this._placerEtiquettes();
-        this.renderer.render(this.scene, this.camera);
+        if (this.rendu) {
+            this.rendu.render(this.temps, dt * 1000);
+        } else {
+            this.renderer.render(this.scene, this.camera);
+        }
     }
     _simuler(dt) {
         this.temps += dt;

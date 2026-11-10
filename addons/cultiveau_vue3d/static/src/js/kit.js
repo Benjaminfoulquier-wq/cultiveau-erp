@@ -236,6 +236,36 @@ export function creerKit(THREE) {
             }
         }, rep),
     };
+    /** La carte de relief d'une texture dessinée : la luminance sert de hauteur (les joints et les veines sombres se creusent). */
+    function relief(t, force = 2) {
+        if (!t.userData.relief) {
+            const src = t.image, w = src.width, h = src.height;
+            const d = src.getContext("2d").getImageData(0, 0, w, h).data;
+            const H = (x, y) => {
+                const i = (((y + h) % h) * w + ((x + w) % w)) * 4;
+                return (d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11) / 255;
+            };
+            const n = new THREE.CanvasTexture(canvas(w, h, (ctx) => {
+                const out = ctx.createImageData(w, h);
+                for (let y = 0; y < h; y++) {
+                    for (let x = 0; x < w; x++) {
+                        const dx = (H(x + 1, y) - H(x - 1, y)) * force, dy = (H(x, y + 1) - H(x, y - 1)) * force;
+                        const l = Math.hypot(dx, dy, 1), o = (y * w + x) * 4;
+                        out.data[o] = (-dx / l * 0.5 + 0.5) * 255;
+                        out.data[o + 1] = (dy / l * 0.5 + 0.5) * 255;
+                        out.data[o + 2] = (1 / l * 0.5 + 0.5) * 255;
+                        out.data[o + 3] = 255;
+                    }
+                }
+                ctx.putImageData(out, 0, 0);
+            }));
+            n.wrapS = n.wrapT = THREE.RepeatWrapping;
+            n.anisotropy = 8;
+            t.userData.relief = n;
+        }
+        t.userData.relief.repeat.copy(t.repeat);
+        return t.userData.relief;
+    }
     function sol(type, l, p) {
         const f = SOLS[type] || SOLS.beton;
         return f([Math.max(1, l / 4), Math.max(1, p / 4)]);
@@ -753,6 +783,6 @@ export function creerKit(THREE) {
         { type: "totem", nom: "Totem", categorie: "Cour" }, { type: "arbre", nom: "Arbre", categorie: "Cour" }, { type: "haie", nom: "Haie", categorie: "Cour" },
     ];
 
-    return { ...base, THREE, texture, sol, SOLS, texteTexture, textePeint, logoTexture, ecranTexture, allumerEcran, personnage, poser, ombreContact, epingle, crochets, halo,
+    return { ...base, THREE, texture, sol, relief, SOLS, texteTexture, textePeint, logoTexture, ecranTexture, allumerEcran, personnage, poser, ombreContact, epingle, crochets, halo,
              etincelles, jet, fabriquer, modeles, PALETTE, TEINTES: T };
 }
