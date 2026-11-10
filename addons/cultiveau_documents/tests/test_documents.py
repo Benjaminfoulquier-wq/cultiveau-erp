@@ -36,6 +36,19 @@ class TestDocuments(TransactionCase):
         self.assertIn("color:#c00", html.replace('"', "'"))
         self.assertIn("<strong>Station de pompage</strong>", html)
 
+    def test_police_par_ligne(self):
+        devis = self.env["sale.order"].create({"partner_id": self.agri.id, "company_id": self.societe.id, "order_line": [
+            (0, 0, {"display_type": "line_section", "name": "Station de pompage", "cultiveau_police": "manuscrite"}),
+            (0, 0, {"product_id": self.pompe.id, "product_uom_qty": 1, "cultiveau_police": "bookman"})]})
+        ligne = devis.order_line.filtered(lambda l: l.product_id)
+        self.assertIn("URW Bookman", ligne.cultiveau_police_css())
+        html = self.env["ir.actions.report"]._render_qweb_html("sale.report_saleorder", devis.ids)[0].decode()
+        self.assertIn("URW Bookman", html)   # la police de la ligne d'article
+        self.assertIn("URW Chancery", html)  # la police manuscrite de la section
+        # une ligne sans police choisie ne force aucune police
+        autre = self.env["sale.order.line"].new({"order_id": devis.id, "product_id": self.pompe.id})
+        self.assertEqual(autre.cultiveau_police_css(), "")
+
     def test_police_des_documents(self):
         self.assertEqual(self.societe.cultiveau_police, "sans")
         self.assertIn("Helvetica", self.societe.cultiveau_police_css())

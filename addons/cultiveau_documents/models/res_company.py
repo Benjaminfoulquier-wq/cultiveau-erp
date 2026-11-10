@@ -1,6 +1,31 @@
 """Les réglages des documents de l'adhérent : acompte, CGV, relances, mise en page."""
 from odoo import api, fields, models
 
+# Les polices proposées, du document entier (Réglages) comme d'un texte précis (une ligne du devis).
+# Chaque pile CSS commence par un nom installé dans le moteur PDF : ce qu'on choisit est ce qui s'imprime.
+POLICES = [
+    ("sans", "Moderne (sans serif)"),
+    ("serif", "Classique (serif)"),
+    ("humaniste", "Humaniste (douce)"),
+    ("condensee", "Condensée (étroite)"),
+    ("bookman", "Élégante (Bookman)"),
+    ("gothic", "Géométrique (Gothic)"),
+    ("palatino", "Livre (Palatino)"),
+    ("manuscrite", "Manuscrite (à la plume)"),
+    ("mono", "Machine à écrire"),
+]
+POLICES_CSS = {
+    "sans": "Helvetica, Arial, 'Nimbus Sans', 'DejaVu Sans', sans-serif",
+    "serif": "Georgia, 'Times New Roman', 'Nimbus Roman', 'DejaVu Serif', serif",
+    "humaniste": "'Segoe UI', Roboto, 'Noto Sans', 'DejaVu Sans', sans-serif",
+    "condensee": "'Roboto Condensed', 'Nimbus Sans Narrow', 'Arial Narrow', sans-serif",
+    "bookman": "'URW Bookman', 'Bookman Old Style', Georgia, serif",
+    "gothic": "'URW Gothic', 'Century Gothic', 'Nimbus Sans', 'DejaVu Sans', sans-serif",
+    "palatino": "P052, Palatino, 'Palatino Linotype', 'URW Palladio L', Georgia, serif",
+    "manuscrite": "Z003, 'URW Chancery L', 'Apple Chancery', cursive",
+    "mono": "'Courier New', 'Nimbus Mono PS', 'DejaVu Sans Mono', monospace",
+}
+
 CGV_PAR_DEFAUT = """
 <p><strong>1. Objet.</strong> Les présentes conditions régissent les ventes de matériel d'irrigation, les études et les travaux d'installation
 réalisés par notre entreprise. Toute commande implique leur acceptation sans réserve.</p>
@@ -33,21 +58,12 @@ class Societe(models.Model):
     cultiveau_cgv = fields.Html("Conditions générales de vente", translate=False, sanitize=True,
                                 help="Imprimées en dernière page des devis. Le texte proposé est un modèle : faites-le relire.")
     cultiveau_mention_reseau = fields.Boolean("Mentionner « membre du réseau Cultiveau »", default=True)
-    cultiveau_police = fields.Selection([("sans", "Moderne (sans serif)"), ("serif", "Classique (serif)"),
-                                         ("humaniste", "Humaniste (sans serif douce)"), ("mono", "Machine à écrire")],
-                                        "Police des documents", default="sans")
+    cultiveau_police = fields.Selection(POLICES, "Police des documents", default="sans")
     cultiveau_taille = fields.Integer("Taille du texte (pt)", default=10, help="La taille de base du texte des documents. Les titres et totaux suivent.")
-
-    POLICES_CSS = {
-        "sans": "Helvetica, Arial, 'Liberation Sans', sans-serif",
-        "serif": "Georgia, 'Times New Roman', 'Liberation Serif', serif",
-        "humaniste": "'Segoe UI', 'Noto Sans', 'Liberation Sans', sans-serif",
-        "mono": "'Courier New', 'Liberation Mono', monospace",
-    }
 
     def cultiveau_police_css(self):
         self.ensure_one()
-        return self.POLICES_CSS.get(self.cultiveau_police or "sans", self.POLICES_CSS["sans"])
+        return POLICES_CSS.get(self.cultiveau_police or "sans", POLICES_CSS["sans"])
     cultiveau_relances_devis = fields.Boolean("Relancer les devis sans réponse", default=True)
     cultiveau_relance_devis_jours = fields.Integer("Après (jours)", default=7)
     cultiveau_relance_devis_max = fields.Integer("Relances de devis au plus", default=2,

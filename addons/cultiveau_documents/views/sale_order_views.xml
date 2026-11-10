@@ -11,7 +11,8 @@
                 <button name="action_relancer" type="object" string="Relancer" invisible="state != 'sent'"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/list/field[@name='name']" position="after">
-                <field name="cultiveau_html" widget="html" optional="hide" string="Mise en forme"
+                <field name="cultiveau_police" optional="show" string="Police"/>
+                <field name="cultiveau_html" widget="html" optional="show" string="Mise en forme"
                        options="{'collaborative': false}"/>
             </xpath>
             <xpath expr="//field[@name='payment_term_id']" position="after">

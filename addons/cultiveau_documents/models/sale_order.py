@@ -4,6 +4,8 @@ from datetime import timedelta
 from odoo import api, fields, models
 from odoo.exceptions import UserError
 
+from .res_company import POLICES, POLICES_CSS
+
 
 class DevisLigne(models.Model):
     _inherit = "sale.order.line"
@@ -11,6 +13,13 @@ class DevisLigne(models.Model):
     cultiveau_html = fields.Html("Mise en forme", sanitize=True,
                                  help="Pour une section ou une note : le texte mis en forme (gras, italique, souligné, couleur, taille). "
                                       "S'il est rempli, il remplace le texte simple sur le devis et le portail.")
+    cultiveau_police = fields.Selection(POLICES, "Police",
+                                        help="La police de cette ligne sur le devis (PDF et devis en ligne). Vide = la police du document.")
+
+    def cultiveau_police_css(self):
+        """La pile de polices à appliquer au texte de la ligne, ou vide pour suivre la police du document."""
+        self.ensure_one()
+        return POLICES_CSS.get(self.cultiveau_police, "") if self.cultiveau_police else ""
 
 
 class Devis(models.Model):
