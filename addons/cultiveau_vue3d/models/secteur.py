@@ -92,7 +92,7 @@ PORTES = {
                  ("achats", "Commandes fournisseurs", "fa-shopping-cart"), ("achat_nouveau", "Nouvelle commande fournisseur", "fa-plus"), ("tarifs_fournisseurs", "Tarifs fournisseurs", "fa-tags"),
                  ("commandes_groupees", "Commandes groupées réseau", "fa-cubes"), ("fournisseurs", "Fournisseurs", "fa-truck")],
     "atelier": [("interventions", "Interventions", "fa-bolt"), ("demande", "Demande d'intervention", "fa-plus"), ("depannages", "Dépannages en cours", "fa-wrench"),
-                ("entretiens", "Entretiens et diagnostics", "fa-calendar-check-o"), ("bons", "Bons d'intervention", "fa-pencil-square-o"), ("suivi", "Tableau de suivi", "fa-table"), ("bons_a_facturer", "Bons à facturer", "fa-euro"),
+                ("entretiens", "Entretiens et diagnostics", "fa-calendar-check-o"), ("bons", "Bons d'intervention", "fa-pencil-square-o"), ("bon_nouveau", "Nouveau bon d'intervention", "fa-pencil"), ("suivi", "Tableau de suivi", "fa-table"), ("tableau_sav", "Tableau de bord SAV", "fa-tachometer"), ("bons_a_facturer", "Bons à facturer", "fa-euro"),
                 ("contrats", "Contrats d'entretien", "fa-file-text-o"), ("equipements_a_renouveler", "Équipements à renouveler", "fa-cogs"), ("registre", "Registre des installations", "fa-book"),
                 ("techniciens", "Techniciens et camions", "fa-id-badge")],
     "bureau": [("etudes", "Études en cours", "fa-pencil"), ("etude_nouvelle", "Nouvelle étude", "fa-plus"), ("installations", "Installations", "fa-leaf"), ("devis", "Devis", "fa-file-text"),

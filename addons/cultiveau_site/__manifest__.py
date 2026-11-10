@@ -26,7 +26,7 @@ cadre de l'ERP, sans nouvelle connexion : l'ERP signe un laissez-passer d'une mi
 être celui de son compte adhérent) avec le secret ``cultiveau.erp_lien_secret`` (même valeur que « ERP_LIEN_SECRET » sur
 le site). Rien n'est recopié : une évolution du site ou de la logistique se voit aussitôt dans l'ERP.
 """,
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.4.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",

@@ -29,4 +29,49 @@
     <menuitem id="menu_terrain_suivi" name="Tableau de suivi" parent="cultiveau_interventions.menu_interventions_racine" action="action_ecran_suivi" sequence="12"/>
     <menuitem id="menu_terrain_calendrier" name="Planning des interventions" parent="cultiveau_interventions.menu_interventions_racine" action="action_ecran_calendrier" sequence="13"/>
     <menuitem id="menu_bons_suivi_erp" name="Bons saisis dans l'ERP" parent="cultiveau_interventions.menu_interventions_racine" action="cultiveau_terrain.action_bons" sequence="35"/>
+
+    <!-- Les autres écrans de terrain de cultiveau.fr, qui manquaient dans l'ERP (revue du 10/11/2026) -->
+    <record id="action_ecran_bon_nouveau" model="ir.actions.client">
+        <field name="name">Nouveau bon d'intervention</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/sav/bon-intervention"}</field>
+    </record>
+    <menuitem id="menu_ecran_bon_nouveau" name="Nouveau bon d'intervention" parent="menu_espace" action="action_ecran_bon_nouveau" sequence="3"/>
+    <record id="action_ecran_bon_livraison" model="ir.actions.client">
+        <field name="name">Bon de livraison</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/sav/bon-livraison"}</field>
+    </record>
+    <menuitem id="menu_ecran_bon_livraison" name="Bon de livraison" parent="menu_espace" action="action_ecran_bon_livraison" sequence="5"/>
+    <record id="action_ecran_pv_chantier" model="ir.actions.client">
+        <field name="name">PV de chantier</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/sav/pv-chantier"}</field>
+    </record>
+    <menuitem id="menu_ecran_pv_chantier" name="PV de chantier" parent="menu_espace" action="action_ecran_pv_chantier" sequence="5"/>
+    <record id="action_ecran_tableau_sav" model="ir.actions.client">
+        <field name="name">Tableau de bord SAV</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/sav/dashboard"}</field>
+    </record>
+    <menuitem id="menu_ecran_tableau_sav" name="Tableau de bord SAV" parent="menu_espace" action="action_ecran_tableau_sav" sequence="5"/>
+    <record id="action_ecran_parc_site" model="ir.actions.client">
+        <field name="name">Parc installé (cultiveau.fr)</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/sav/parc-installe"}</field>
+    </record>
+    <menuitem id="menu_ecran_parc_site" name="Parc installé (cultiveau.fr)" parent="menu_espace" action="action_ecran_parc_site" sequence="5"/>
+    <record id="action_ecran_clients_articles" model="ir.actions.client">
+        <field name="name">Clients et articles</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/espace?view=base_clients_articles"}</field>
+    </record>
+    <menuitem id="menu_ecran_clients_articles" name="Clients et articles" parent="menu_espace" action="action_ecran_clients_articles" sequence="6"/>
+    <record id="action_ecran_parametres_sav" model="ir.actions.client">
+        <field name="name">Paramètres SAV</field>
+        <field name="tag">cultiveau_site.ecran</field>
+        <field name="context">{"vers": "/adherent/sav/parametres"}</field>
+    </record>
+    <menuitem id="menu_ecran_parametres_sav" name="Paramètres SAV" parent="menu_espace" action="action_ecran_parametres_sav" sequence="9"/>
+    <menuitem id="menu_terrain_bon_nouveau" name="Nouveau bon d'intervention" parent="cultiveau_interventions.menu_interventions_racine" action="action_ecran_bon_nouveau" sequence="14"/>
 </odoo>

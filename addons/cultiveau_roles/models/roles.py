@@ -6,7 +6,7 @@ ROLES = [("gerant", "Gérant"), ("administratif", "Administratif"), ("technicien
 
 # rôle -> groupes (identifiants externes) ; un groupe absent (module non installé) est ignoré
 GROUPES = {
-    "gerant": ["cultiveau_base.group_adherent", "sales_team.group_sale_manager", "account.group_account_manager", "account.group_account_invoice", "purchase.group_purchase_manager",
+    "gerant": ["cultiveau_base.group_adherent", "sales_team.group_sale_manager", "account.group_account_manager", "account.group_account_invoice", "account.group_account_readonly", "purchase.group_purchase_manager",
                "stock.group_stock_manager", "project.group_project_manager", "hr.group_hr_user", "hr_holidays.group_hr_holidays_manager", "hr_expense.group_hr_expense_manager",
                "base.group_partner_manager"],
     "administratif": ["cultiveau_base.group_adherent", "sales_team.group_sale_salesman_all_leads", "account.group_account_invoice", "purchase.group_purchase_user", "stock.group_stock_user",
@@ -46,6 +46,27 @@ class Users(models.Model):
             tous = self._cultiveau_groupes_roles()
             garder = u.groups_id - tous
             u.sudo().write({"groups_id": [(6, 0, (garder | voulus | self.env.ref("base.group_user")).ids)]})
+        return True
+
+    @api.model
+    def _cultiveau_completer_roles(self):
+        """À chaque mise à jour : les comptes déjà créés reçoivent les groupes ajoutés depuis à leur rôle (jamais de retrait).
+        10/11/2026 : le gérant reçoit la lecture comptable, sans laquelle la TVA, le bilan, la clôture, les immobilisations
+        et l'export pour le comptable lui étaient refusés."""
+        for u in self.sudo().with_context(active_test=False).search([("cultiveau_role", "in", list(GROUPES))]):
+            manquants = self.env["res.groups"]
+            for x in GROUPES[u.cultiveau_role]:
+                g = self.env.ref(x, raise_if_not_found=False)
+                if g and g not in u.groups_id:
+                    manquants |= g
+            if manquants:
+                u.write({"groups_id": [(4, g.id) for g in manquants]})
+        # un responsable de la comptabilité (réglé à la main, l'administrateur) lit forcément la comptabilité
+        chef, lecture = self.env.ref("account.group_account_manager", raise_if_not_found=False), self.env.ref("account.group_account_readonly", raise_if_not_found=False)
+        if chef and lecture:
+            for u in self.sudo().with_context(active_test=False).search([("groups_id", "in", chef.id), ("share", "=", False)]):
+                if lecture not in u.groups_id:
+                    u.write({"groups_id": [(4, lecture.id)]})
         return True
 
     @api.model_create_multi

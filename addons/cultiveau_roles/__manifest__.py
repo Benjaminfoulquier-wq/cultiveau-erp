@@ -15,13 +15,13 @@ formé. Ici :
 - le bouton **?** en haut de chaque écran explique à quoi sert l'écran, par où commencer, et renvoie à la documentation ou à
   un tutoriel quand il existe. Les textes se modifient dans Réglages › Cultiveau › Aides des écrans.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "website": "https://cultiveau.fr",
     "license": "LGPL-3",
     "depends": ["cultiveau_base", "cultiveau_rh", "cultiveau_terrain", "cultiveau_chantier", "sales_team", "crm", "account", "purchase", "stock", "project"],
-    "data": ["security/ir.model.access.csv", "data/aides.xml", "data/tutos.xml", "data/tutos_nettoyage.xml", "views/views.xml"],
+    "data": ["security/ir.model.access.csv", "data/aides.xml", "data/tutos.xml", "data/tutos_nettoyage.xml", "data/roles_completer.xml", "views/views.xml"],
     "assets": {"web.assets_backend": ["cultiveau_roles/static/src/js/aide.js", "cultiveau_roles/static/src/xml/aide.xml", "cultiveau_roles/static/src/scss/aide.scss"]},
     "installable": True,
     "auto_install": False,
