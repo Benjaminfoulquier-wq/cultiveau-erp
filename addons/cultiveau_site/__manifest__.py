@@ -26,13 +26,13 @@ cadre de l'ERP, sans nouvelle connexion : l'ERP signe un laissez-passer d'une mi
 être celui de son compte adhérent) avec le secret ``cultiveau.erp_lien_secret`` (même valeur que « ERP_LIEN_SECRET » sur
 le site). Rien n'est recopié : une évolution du site ou de la logistique se voit aussitôt dans l'ERP.
 """,
-    "version": "18.0.1.1.0",
+    "version": "18.0.1.2.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "license": "LGPL-3",
-    "depends": ["stock", "sale_management", "uom", "cultiveau_connecteurs", "cultiveau_chantier", "cultiveau_interventions", "cultiveau_installation"],
+    "depends": ["stock", "sale_management", "uom", "cultiveau_connecteurs", "cultiveau_chantier", "cultiveau_interventions", "cultiveau_installation", "cultiveau_terrain"],
     "external_dependencies": {"python": ["requests"]},
-    "data": ["security/ir.model.access.csv", "views/site_views.xml", "views/ecrans.xml", "views/res_config_settings_views.xml", "views/company_views.xml", "views/chantier_views.xml", "views/articles_views.xml", "data/cron.xml", "data/erp_ouvert.xml", "data/entrepots.xml"],
+    "data": ["security/ir.model.access.csv", "views/site_views.xml", "views/ecrans.xml", "views/res_config_settings_views.xml", "views/company_views.xml", "views/chantier_views.xml", "views/terrain_views.xml", "views/articles_views.xml", "data/cron.xml", "data/erp_ouvert.xml", "data/entrepots.xml"],
     "assets": {
         "web.assets_backend": [
             "cultiveau_site/static/src/js/ecran.js",

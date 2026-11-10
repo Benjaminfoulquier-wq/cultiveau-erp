@@ -340,10 +340,21 @@ class Scene(models.AbstractModel):
             "parc": ("cultiveau_installation.action_installations", {"name": "Parc installé", "domain": [("etat", "in", ("en_service", "arretee"))]}),
         }
 
+    # Une seule appli de terrain : quand le lien avec cultiveau.fr est installé, ces postes ouvrent l'écran du site
+    # (là où l'équipe saisit) plutôt que la liste propre à l'ERP.
+    ECRANS_DU_SITE = {
+        "bons": "cultiveau_site.action_ecran_bons", "suivi": "cultiveau_site.action_ecran_suivi",
+        "planning_techniciens": "cultiveau_site.action_ecran_calendrier", "planning": "cultiveau_site.action_ecran_chantier",
+        "chantiers": "cultiveau_site.action_ecran_chantier",
+    }
+
     def _actions_disponibles(self):
         dispo = set()
         for cle, (xmlid, reglages) in self._actions().items():
             if reglages.get("url") or (xmlid and self.env.ref(xmlid, raise_if_not_found=False)):
+                dispo.add(cle)
+        for cle, xmlid in self.ECRANS_DU_SITE.items():
+            if self.env.ref(xmlid, raise_if_not_found=False):
                 dispo.add(cle)
         return dispo
 
@@ -351,6 +362,16 @@ class Scene(models.AbstractModel):
     def action(self, cle, parametre=None):
         """L'action à ouvrir pour un poste du plan : l'action standard, filtrée ou en formulaire vierge selon la clé."""
         actions = self._actions()
+        ecran = self.ECRANS_DU_SITE.get(cle)
+        if ecran and self.env.ref(ecran, raise_if_not_found=False):
+            action = self.env["ir.actions.client"]._for_xml_id(ecran)
+            if isinstance(action.get("context"), str):
+                import json
+                try:
+                    action["context"] = json.loads(action["context"])
+                except ValueError:
+                    pass
+            return action
         if cle not in actions:
             raise UserError(f"Rien n'est relié à « {cle} ».")
         xmlid, r = actions[cle]
