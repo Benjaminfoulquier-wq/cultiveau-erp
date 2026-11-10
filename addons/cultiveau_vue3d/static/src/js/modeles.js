@@ -524,46 +524,6 @@ export function bibliotheque(THREE) {
     };
 
     // ---------------------------------------------------------------- le concessionnaire agricole (démonstration)
-    M.pont = (o = {}) => {
-        // un pont élévateur deux colonnes pour l'atelier : socle, deux colonnes, traverse haute, quatre bras,
-        // et au besoin un tracteur levé dessus (o.charge === "tracteur"), pour montrer l'engin en réparation
-        const g = groupe();
-        const c = o.couleur ?? 0xef7d1a;
-        const h = o.charge ? 1.55 : 0.32; // la hauteur des bras : levé si une machine est dessus
-        for (const z of [-1.2, 1.2]) {
-            bloc(g, 0.72, 0.08, 0.72, T.anthracite, 0, 0.04, z, { rayon: 0.03 });   // platine au sol
-            bloc(g, 0.34, 2.7, 0.34, c, 0, 1.39, z, { rayon: 0.04 });               // colonne
-            bloc(g, 0.13, 2.5, 0.13, T.anthracite, 0, 1.3, z, { vif: true, m: 0.5 }); // glissière du chariot
-        }
-        bloc(g, 0.3, 0.34, 2.96, c, 0, 2.78, 0, { rayon: 0.04 });                   // traverse haute
-        bloc(g, 0.12, 0.2, 0.3, 0xffd34d, 0.0, 1.0, 1.38, { e: 0.5 });              // boîtier de commande
-        for (const z of [-1.2, 1.2]) {                                              // les quatre bras à la hauteur de levage
-            for (const x of [-0.95, 0.95]) {
-                bloc(g, 1.5, 0.16, 0.18, T.grisFonce, x, h, z + (z > 0 ? -0.1 : 0.1), { rayon: 0.04 });
-                bloc(g, 0.24, 0.14, 0.24, 0x2a2f33, x + (x > 0 ? 0.72 : -0.72), h + 0.1, z + (z > 0 ? -0.1 : 0.1), { rayon: 0.03 }); // tampon
-            }
-        }
-        if (o.charge === "tracteur") {
-            const t = M.tracteur({ couleur: o.couleurTracteur });
-            t.position.y = h + 0.2;
-            t.rotation.y = Math.PI / 2; // de profil entre les colonnes
-            g.add(t);
-        }
-        return g;
-    };
-    M.presse = (o = {}) => {
-        // une presse à balles rondes, machine très reconnaissable du parc : timon, grand corps cylindrique, trappe arrière, roues
-        const g = groupe();
-        const c = o.couleur ?? 0x3a7d3a;
-        barre(g, [1.5, 0.7, 0], [2.6, 0.4, 0], 0.07, c);                   // timon d'attelage
-        cyl(g, 0.95, 0.95, 1.7, c, 0.1, 1.05, 0, "z", { seg: 22, rayon: 0.04 }); // corps
-        cyl(g, 0.52, 0.52, 1.74, 0x23272b, 0.1, 1.05, 0, "z", { seg: 16 });      // flanc sombre
-        bloc(g, 1.3, 1.5, 1.86, c, -0.95, 1.0, 0, { rayon: 0.1 });         // trappe arrière
-        bloc(g, 1.2, 0.1, 1.9, 0xffd34d, -0.3, 1.9, 0, { rayon: 0.03, e: 0.2 }); // bandeau à la couleur de marque
-        roue(g, 0.56, 0.3, 0.2, 0.5, 1.08);
-        roue(g, 0.56, 0.3, 0.2, 0.5, -1.08);
-        return g;
-    };
 
     // ---------------------------------------------------------------- l'atelier de câblage électrique
     M.armoire_elec = (o = {}) => {
@@ -700,35 +660,6 @@ export function bibliotheque(THREE) {
         bloc(g, 0.02, 0.2, 0.5, T.vert, 0.07, 1.2, -0.3, { e: 0.6 });
         return g;
     };
-    M.bac = () => {
-        // le banc d'essai : la bâche d'eau en circuit fermé, une pompe en essai, un manomètre
-        const g = groupe();
-        bloc(g, 4.0, 0.8, 1.8, T.grisFonce, 0, 0, 0, { rayon: 0.05, m: 0.3 });
-        bloc(g, 3.8, 0.04, 1.6, T.eau, 0, 0.72, 0, { vif: true, o: 0.85, r: 0.1, ombre: false });
-        cyl(g, 0.15, 0.15, 0.05, T.blanc, 1.6, 1.2, -0.85, "z");
-        cyl(g, 0.03, 0.03, 0.4, T.gris, 1.6, 1.0, -0.85, "y");
-        return g;
-    };
-    M.soudeuse = () => {
-        const g = groupe();
-        bloc(g, 2.4, 0.15, 0.8, T.grisFonce, 0, 0.75, 0, { rayon: 0.03 });
-        for (const x of [-1.1, 1.1]) {
-            bloc(g, 0.08, 0.75, 0.7, T.grisFonce, x, 0, 0, { vif: true });
-        }
-        cyl(g, 0.16, 0.16, 2.2, T.noir, 0, 1.05, 0, "x", { r: 0.5 });
-        bloc(g, 0.15, 0.5, 0.6, T.jaune, 0, 0.9, 0, { rayon: 0.03 });
-        bloc(g, 0.5, 0.45, 0.4, T.rouge, 1.6, 0, 0.2, { rayon: 0.05 });
-        return g;
-    };
-    M.benne = (o = {}) => {
-        const g = groupe();
-        const forme = new THREE.Shape([new THREE.Vector2(-1.1, 0), new THREE.Vector2(1.1, 0), new THREE.Vector2(1.5, 1.1), new THREE.Vector2(-1.5, 1.1)]);
-        const m = ombre(new THREE.Mesh(geo("benne", () => new THREE.ExtrudeGeometry(forme, { depth: 1.5, bevelEnabled: true, bevelSize: 0.05, bevelThickness: 0.05, bevelSegments: 2 })),
-                                       mat(o.couleur ?? T.vert)));
-        m.position.z = -0.75;
-        g.add(m);
-        return g;
-    };
     M.liasse = (o = {}) => {
         const g = groupe();
         bloc(g, 0.45, o.h ?? 0.2, 0.32, T.papier, 0, 0, 0, { rayon: 0.01 });
@@ -801,36 +732,6 @@ export function bibliotheque(THREE) {
         cyl(g, 0.05, 0.05, 2.2, T.grisFonce, 0.5, 1.1, 0, "y", { m: 0.4 });
         bloc(g, 1.4, 0.9, 0.06, T.blanc, 0, 1.4, 0, { rayon: 0.04 });
         bloc(g, 1.42, 0.25, 0.08, o.couleur ?? T.orange, 0, 2.05, 0, { rayon: 0.03 });
-        return g;
-    };
-    M.totem = () => {
-        // l'enseigne Cultiveau à l'entrée : un totem marine, bande turquoise et goutte
-        const g = groupe();
-        bloc(g, 0.5, 4.0, 1.4, T.marine, 0, 0, 0, { rayon: 0.12 });
-        bloc(g, 0.52, 0.5, 1.42, T.bleu, 0, 3.0, 0, { rayon: 0.08, e: 0.15 });
-        boule(g, 0.32, T.eau, 0.28, 2.2, 0, { e: 0.3, ecrase: 1.25 });
-        return g;
-    };
-    M.lampadaire = () => {
-        const g = groupe();
-        cyl(g, 0.06, 0.08, 5, T.grisFonce, 0, 2.5, 0, "y", { m: 0.5 });
-        barre(g, [0, 5, 0], [0.8, 5.1, 0], 0.05, T.grisFonce);
-        bloc(g, 0.5, 0.12, 0.25, 0xfff3c4, 0.9, 4.95, 0, { rayon: 0.04, e: 0.6 });
-        return g;
-    };
-    M.quai = () => {
-        const g = groupe();
-        bloc(g, 2.4, 1.2, 10, T.beton, 0, 0, 0, { rayon: 0.04, r: 0.95 });
-        for (let k = -4; k <= 4; k++) {
-            bloc(g, 0.1, 0.35, 0.5, T.noir, 1.22, 0.6, k * 1.1, { rayon: 0.04 });
-        }
-        bloc(g, 0.04, 0.1, 10, T.jaune, 1.2, 1.15, 0, { vif: true });
-        return g;
-    };
-    M.nettoyeur = () => {
-        const g = groupe();
-        bloc(g, 0.6, 0.8, 0.5, T.jaune, 0, 0, 0, { rayon: 0.08 });
-        cyl(g, 0.02, 0.02, 1.2, T.noir, 0.4, 0.4, 0.2, "x");
         return g;
     };
 

@@ -823,4 +823,336 @@ export function modelesFins(THREE, outils) {
         }, teintesMetal());
         return g;
     };
+
+    // ---------------------------------------------------------------- lot 3 : détente, bureautique, cour, atelier
+    M.canape = (o = {}) => {
+        // un canapé deux places : socle sur pieds, coussins d'assise et de dossier, accoudoirs, un coussin jeté
+        const g = groupe();
+        const c = o.couleur ?? 0x5d8aa8;
+        fondu(g, `canape${c}`, () => {
+            const p = [], tissu = C(c), fonce = C(c, -0.05);
+            for (const x of [-0.8, 0.8]) {
+                for (const z of [-0.34, 0.34]) {
+                    p.push(P(tube(0.025, 0.1, 8), x, 0.05, z, 0x2a2e33));
+                }
+                p.push(P(geoRonde(0.2, 0.46, 0.85, 0.08), x, 0.4, 0, tissu));
+            }
+            p.push(P(geoRonde(1.5, 0.2, 0.85, 0.06), 0, 0.2, 0, fonce), P(geoRonde(1.5, 0.5, 0.16, 0.06), 0, 0.5, -0.345, fonce));
+            for (const x of [-0.355, 0.355]) {
+                p.push(P(geoRonde(0.69, 0.16, 0.62, 0.06), x, 0.38, 0.08, tissu), P(geoRonde(0.69, 0.42, 0.17, 0.07), x, 0.62, -0.22, tissu, -0.16));
+            }
+            p.push(P(geoRonde(0.34, 0.3, 0.12, 0.05), 0.48, 0.6, -0.08, C(T.orange, 0.05), -0.5, 0.3, 0));
+            return p;
+        });
+        return g;
+    };
+    M.babyfoot = () => {
+        // le baby-foot : caisse laquée sur pieds fuselés, terrain, huit barres chromées, joueurs, poignées
+        const g = groupe();
+        bloc(g, 1.4, 0.3, 0.75, 0, 0, 0.62, 0, { rayon: 0.04, mat: peinture(T.rouge) });
+        fondu(g, "babyfoot", () => {
+            const p = [P(boite(1.28, 0.012, 0.63), 0, 0.925, 0, C(0x3f9a45))], boisC = C(0xb98a55), acier = C(0xdfe3e6);
+            for (const x of [-0.6, 0.6]) {
+                for (const z of [-0.3, 0.3]) {
+                    p.push(tige([x, 0.64, z], [x * 1.08, 0, z * 1.12], 0.035, boisC, 8));
+                }
+                p.push(P(boite(0.02, 0.1, 0.2), x * 1.07, 0.87, 0, 0x16181b));
+            }
+            p.push(P(boite(1.28, 0.004, 0.01), 0, 0.932, 0, 0xf7f6f2), P(new THREE.TorusGeometry(0.1, 0.005, 4, 20), 0, 0.932, 0, 0xf7f6f2, QUART));
+            for (let i = 0; i < 8; i++) {
+                const x = -0.525 + i * 0.15, rouge = [0, 1, 3, 5].includes(i), n = [1, 2, 3, 5, 5, 3, 2, 1][i], cote = i % 2 ? 1 : -1;
+                p.push(P(tube(0.008, 1.06, 6), x, 0.975, cote * 0.05, acier, QUART), P(tube(0.02, 0.11, 8), x, 0.975, cote * 0.63, 0x16181b, QUART));
+                for (let k = 0; k < n; k++) {
+                    p.push(P(boite(0.03, 0.09, 0.03), x, 0.955, (k - (n - 1) / 2) * (0.5 / Math.max(n - 1, 1.5)), C(rouge ? T.rouge : T.bleuRoi), 0, 0, (i % 3) * 0.15));
+                }
+            }
+            return p;
+        }, teintesLisses());
+        return g;
+    };
+    M.imprimante = () => {
+        // le copieur multifonction : meuble à bacs papier, scanner à capot, pupitre incliné, plateau de sortie (la feuille sort)
+        const g = groupe();
+        bloc(g, 0.7, 0.75, 0.6, T.blanc, 0, 0, 0, { rayon: 0.03, r: 0.5 });
+        bloc(g, 0.72, 0.3, 0.62, 0xdfe2e5, 0, 0.75, 0, { rayon: 0.04, r: 0.45 });
+        fondu(g, "imprimante", () => {
+            const p = [], sombre = C(0x2a2e33);
+            for (const y of [0.16, 0.36, 0.56]) {
+                p.push(P(boite(0.006, 0.006, 0.54), 0.352, y + 0.08, 0, 0x9aa1a7), P(boite(0.012, 0.022, 0.16), 0.356, y, 0, 0x9aa1a7));
+            }
+            p.push(P(geoRonde(0.5, 0.035, 0.6, 0.012), -0.08, 1.068, 0, sombre), P(boite(0.2, 0.012, 0.3), 0.25, 1.07, 0.1, sombre, 0, 0, 0.35));
+            p.push(P(boite(0.3, 0.012, 0.36), 0.46, 0.68, 0, 0xdfe2e5, 0, 0, -0.12), P(boite(0.012, 0.05, 0.36), 0.36, 0.72, 0, sombre));
+            return p;
+        });
+        bloc(g, 0.1, 0.004, 0.14, 0x9ee6f5, 0.26, 1.085, 0.1, { vif: true, e: 0.5, ombre: false }).rotation.z = 0.35;
+        const feuille = bloc(g, 0.3, 0.004, 0.21, T.papier, 0.45, 0.7, 0, { vif: true, ombre: false });
+        feuille.name = "feuille";
+        return g;
+    };
+    M.serveur = () => {
+        // la baie informatique : armoire laquée, porte vitrée, serveurs empilés, voyants (nommés « led », ils clignotent)
+        const g = groupe();
+        bloc(g, 0.6, 1.9, 0.8, 0, 0, 0, 0, { rayon: 0.02, mat: peinture(0x23282d) });
+        fondu(g, "serveur", () => {
+            const p = [];
+            for (let i = 0; i < 9; i++) {
+                p.push(P(boite(0.012, 0.13, 0.66), 0.296, 0.3 + i * 0.165, 0, i % 3 === 2 ? 0x30363c : 0x4a5157), P(boite(0.014, 0.012, 0.6), 0.298, 0.3 + i * 0.165, 0, 0x16181b));
+                p.push(P(boite(0.016, 0.03, 0.08), 0.3, 0.3 + i * 0.165 + 0.035, 0.24, 0x8f969c));
+            }
+            p.push(P(boite(0.5, 0.02, 0.6), 0, 1.905, 0, 0x16181b), P(boite(0.022, 0.2, 0.02), 0.322, 1.0, 0.34, 0x8f969c));
+            return p;
+        }, teintesMetal(), false);
+        bloc(g, 0.008, 1.78, 0.7, 0, 0.312, 0.06, 0, { vif: true, mat: verreClair(), ombre: false });
+        for (let i = 0; i < 6; i++) {
+            bloc(g, 0.01, 0.025, 0.035, i % 2 ? 0x4fa83a : 0x0b9bb8, 0.305, 0.34 + i * 0.25, -0.25, { vif: true, e: 0.95, ombre: false }).name = "led";
+        }
+        return g;
+    };
+    M.benne = (o = {}) => {
+        // la benne à gravats : caisse trapézoïdale laquée, raidisseurs, rebord, crochets de levage, gravats
+        const g = groupe();
+        const c = o.couleur ?? T.vert;
+        const forme = new THREE.Shape([new THREE.Vector2(-1.1, 0), new THREE.Vector2(1.1, 0), new THREE.Vector2(1.5, 1.1), new THREE.Vector2(-1.5, 1.1)]);
+        const m = ombre(new THREE.Mesh(geo("benne", () => new THREE.ExtrudeGeometry(forme, { depth: 1.5, bevelEnabled: true, bevelSize: 0.05, bevelThickness: 0.05, bevelSegments: 2 })), peinture(c)));
+        m.position.z = -0.75;
+        g.add(m);
+        fondu(g, `benne${c}`, () => {
+            const p = [], cc = C(c, -0.04), r = alea(23);
+            for (const z of [-0.815, 0.815]) {
+                for (const x of [-0.85, 0, 0.85]) {
+                    p.push(P(boite(0.07, 1.0, 0.035), x, 0.58, z, cc));
+                }
+                p.push(P(boite(3.12, 0.07, 0.07), 0, 1.13, z, cc));
+                for (const x of [-1.2, 1.2]) {
+                    p.push(P(new THREE.TorusGeometry(0.07, 0.018, 5, 12), x, 0.85, z * 1.03, 0x4a5157));
+                }
+            }
+            for (const x of [-1.56, 1.56]) {
+                p.push(P(boite(0.07, 0.07, 1.7), x, 1.13, 0, cc));
+            }
+            p.push(P(boite(2.9, 0.06, 1.52), 0, 1.04, 0, 0x8a8378));
+            for (let k = 0; k < 16; k++) {
+                p.push(P(boite(0.2 + r() * 0.25, 0.1 + r() * 0.1, 0.15 + r() * 0.25), (r() - 0.5) * 2.5, 1.1, (r() - 0.5) * 1.2, C(r() > 0.6 ? 0xb9774a : 0x9a948a, (r() - 0.5) * 0.1), r(), r() * 3, r()));
+            }
+            return p;
+        }, teintesLisses());
+        return g;
+    };
+    M.quai = () => {
+        // le quai de chargement : dalle béton, butoirs caoutchouc, niveleurs acier bordés de jaune, garde-corps, escalier
+        const g = groupe();
+        bloc(g, 2.4, 1.2, 10, T.beton, 0, 0, 0, { rayon: 0.04, r: 0.95 });
+        fondu(g, "quai", () => {
+            const p = [], jaune = C(T.jaune), acier = C(0x7a828a);
+            for (let k = -4; k <= 4; k++) {
+                p.push(P(geoRonde(0.12, 0.4, 0.5, 0.03), 1.24, 0.78, k * 1.1, 0x16181b));
+            }
+            p.push(P(boite(0.04, 0.1, 10), 1.2, 1.2, 0, jaune));
+            for (const z of [-3.3, 0, 3.3]) {
+                p.push(P(boite(1.3, 0.025, 1.9), 0.52, 1.212, z, acier), P(boite(0.06, 0.03, 1.9), 1.14, 1.214, z, jaune), P(boite(1.3, 0.03, 0.05), 0.52, 1.214, z - 0.95, jaune), P(boite(1.3, 0.03, 0.05), 0.52, 1.214, z + 0.95, jaune));
+            }
+            for (let k = 0; k <= 10; k++) {
+                p.push(P(tube(0.025, 1.0, 6), -1.12, 1.7, -5 + k + (k === 0 ? 0.05 : k === 10 ? -0.05 : 0), jaune));
+            }
+            for (const y of [1.7, 2.2]) {
+                p.push(P(tube(0.025, 9.9, 6), -1.12, y, 0, jaune, QUART));
+            }
+            for (let k = 0; k < 5; k++) {
+                p.push(P(boite(1.0, 0.24, 0.3), 0.5, 0.12 + k * 0.24, 5.15 + (4 - k) * 0.3, 0xcfc8ba));
+            }
+            return p;
+        }, teintesLisses());
+        return g;
+    };
+    M.pont = (o = {}) => {
+        // un pont élévateur deux colonnes : platines, colonnes laquées, chariots, traverse et câbles, groupe hydraulique,
+        // quatre bras télescopiques à tampon ; au besoin un tracteur levé dessus (o.charge === "tracteur")
+        const g = groupe();
+        const c = o.couleur ?? 0xef7d1a, laque = peinture(c);
+        const h = o.charge ? 1.55 : 0.32; // la hauteur des bras : levé si une machine est dessus
+        for (const z of [-1.2, 1.2]) {
+            bloc(g, 0.34, 2.7, 0.34, 0, 0, 0.06, z, { rayon: 0.04, mat: laque });
+        }
+        bloc(g, 0.3, 0.3, 2.96, 0, 0, 2.76, 0, { rayon: 0.04, mat: laque });
+        bloc(g, 0.1, 0.16, 0.2, 0xffd34d, 0.0, 1.05, 1.42, { e: 0.5, rayon: 0.02 });
+        fondu(g, `pont${h}`, () => {
+            const p = [], sombre = C(0x2c3339), acier = C(0x6c7883);
+            for (const z of [-1.2, 1.2]) {
+                const vers = z > 0 ? -1 : 1;
+                p.push(P(boite(0.8, 0.03, 0.74), 0, 0.015, z, sombre), P(boite(0.14, 2.5, 0.06), 0, 1.33, z + vers * 0.17, sombre), P(boite(0.3, 0.4, 0.1), 0, h + 0.12, z + vers * 0.2, acier));
+                p.push(P(tube(0.008, 2.5, 5), 0.12, 1.4, z + vers * 0.19, 0x16181b));
+                for (const x of [-1, 1]) {
+                    p.push(P(boite(0.95, 0.1, 0.14), x * 0.52, h + 0.03, z + vers * 0.34, acier, 0, x * vers * 0.28, 0), P(boite(0.6, 0.07, 0.1), x * 1.1, h + 0.03, z + vers * 0.52, sombre, 0, x * vers * 0.28, 0));
+                    p.push(P(tube(0.09, 0.06, 12), x * 1.36, h + 0.1, z + vers * 0.6, 0x16181b));
+                    for (const dz of [-0.28, 0.28]) {
+                        p.push(P(tube(0.02, 0.03, 6), x * 0.3, 0.045, z + dz, acier));
+                    }
+                }
+            }
+            p.push(P(geoRonde(0.22, 0.42, 0.24, 0.04), 0.0, 1.5, 1.5, C(0x30363c)), P(tube(0.07, 0.3, 10), 0.0, 1.86, 1.5, C(0x8f969c)), P(tube(0.012, 2.9, 5), 0.1, 2.93, 0, 0x16181b, QUART));
+            return p;
+        }, teintesMetal());
+        if (o.charge === "tracteur") {
+            const t = M.tracteur({ couleur: o.couleurTracteur });
+            t.position.y = h + 0.2;
+            t.rotation.y = Math.PI / 2; // de profil entre les colonnes
+            g.add(t);
+        }
+        return g;
+    };
+    M.presse = (o = {}) => {
+        // une presse à balles rondes : chambre cylindrique laquée et ses courroies, porte arrière à vérins, carters latéraux,
+        // ramasseur à dents, boîte à filet, timon, cardan et béquille
+        const g = groupe();
+        const c = o.couleur ?? 0x3a7d3a, laque = peinture(c);
+        cyl(g, 0.95, 0.95, 1.6, 0, 0.1, 1.08, 0, "z", { seg: 30, mat: laque });
+        profil(g, [[-0.2, 0.25, 0.1], [-1.05, 0.5, 0.35], [-1.2, 1.4, 0.4], [-0.6, 2.05, 0.3], [-0.2, 2.05, 0.05]], 1.7, laque, { biseau: 0.06 });
+        for (const z of [-0.87, 0.87]) {
+            profil(g, [[-0.5, 0.35, 0.15], [-0.6, 1.75, 0.3], [0.85, 1.75, 0.3], [1.0, 0.6, 0.2], [0.5, 0.35, 0.1]], 0.08, laque, { biseau: 0.02, z });
+        }
+        roue(g, 0.56, 0.3, 0.1, 0.56, 1.12, 0xe6c84a);
+        roue(g, 0.56, 0.3, 0.1, 0.56, -1.12, 0xe6c84a);
+        fondu(g, `presse${c}`, () => {
+            const p = [], sombre = C(0x23272b), acier = C(0x8f969c), jaune = C(0xffd34d), cc = C(c);
+            for (const z of [-0.6, -0.2, 0.2, 0.6]) {
+                p.push(P(tube(0.957, 0.28, 30), 0.1, 1.08, z, sombre, QUART));
+            }
+            p.push(P(tube(0.2, 1.5, 12), 1.05, 0.34, 0, sombre, QUART));
+            for (let k = 0; k < 13; k++) {
+                for (let a = 0; a < 4; a++) {
+                    const an = a * QUART + (k % 2) * 0.6;
+                    p.push(tige([1.05, 0.34, -0.72 + k * 0.12], [1.05 + Math.cos(an) * 0.3, 0.34 + Math.sin(an) * 0.3, -0.72 + k * 0.12], 0.008, acier, 4));
+                }
+            }
+            p.push(P(geoRonde(0.4, 0.3, 1.5, 0.05), 0.95, 1.55, 0, cc), P(boite(0.02, 0.1, 1.72), -1.19, 1.0, 0, jaune));
+            for (const z of [-0.915, 0.915]) {
+                p.push(P(boite(1.2, 0.08, 0.006), 0.15, 1.5, z, jaune), tige([-0.1, 1.5, z], [-0.75, 0.9, z], 0.035, sombre, 8), tige([-0.45, 1.18, z], [-0.85, 0.8, z], 0.02, C(0xe6eaee), 8));
+            }
+            p.push(tige([0.9, 0.75, 0.35], [2.6, 0.45, 0], 0.05, cc), tige([0.9, 0.75, -0.35], [2.6, 0.45, 0], 0.05, cc), P(tube(0.07, 0.06, 10), 2.64, 0.45, 0, acier));
+            p.push(tige([1.0, 0.9, 0], [2.5, 0.62, 0], 0.035, jaune, 8), P(tube(0.03, 0.42, 6), 2.1, 0.24, 0, sombre), P(boite(0.14, 0.02, 0.14), 2.1, 0.01, 0, sombre));
+            return p;
+        }, teintesMetal());
+        return g;
+    };
+    M.soudeuse = () => {
+        // le poste de soudage bout à bout du PE : bâti, tube pris dans quatre mors, miroir chauffant sur son support,
+        // groupe hydraulique à manomètre
+        const g = groupe();
+        fondu(g, "soudeuse", () => {
+            const p = [], acier = C(0x3f4850), jaune = C(T.jaune), noir = C(0x15171a);
+            p.push(P(boite(2.4, 0.1, 0.8), 0, 0.8, 0, acier), P(boite(2.2, 0.03, 0.7), 0, 0.3, 0, acier));
+            for (const x of [-1.12, 1.12]) {
+                for (const z of [-0.34, 0.34]) {
+                    p.push(P(boite(0.07, 0.8, 0.07), x, 0.4, z, acier));
+                }
+            }
+            for (const s of [-1, 1]) {
+                p.push(P(tube(0.16, 1.05, 18), s * 0.56, 1.1, 0, noir, 0, 0, QUART), P(new THREE.CircleGeometry(0.135, 16), s * 0.032, 1.1, 0, 0x0a0b0c, 0, -s * QUART, 0), P(boite(1.05, 0.004, 0.03), s * 0.56, 1.26, 0, C(T.bleu)));
+                p.push(P(new THREE.CircleGeometry(0.135, 16), s * 1.087, 1.1, 0, 0x0a0b0c, 0, s * QUART, 0));
+                for (const x of [0.25, 0.75]) {
+                    p.push(P(new THREE.TorusGeometry(0.185, 0.035, 6, 20), s * x, 1.1, 0, jaune, 0, QUART, 0), P(boite(0.1, 0.12, 0.3), s * x, 0.91, 0, jaune));
+                }
+                p.push(P(tube(0.02, 2.0, 8), 0, 0.95, s * 0.28, C(0xdfe3e6), 0, 0, QUART));
+            }
+            p.push(P(tube(0.2, 0.03, 20), 0, 1.1, 0.42, C(0x8a3b2e), 0, 0, QUART), P(boite(0.04, 0.3, 0.04), 0, 0.98, 0.42, acier), P(tube(0.02, 0.2, 6), 0, 1.38, 0.42, noir));
+            p.push(P(geoRonde(0.5, 0.45, 0.4, 0.05), 1.6, 0.225, 0.2, C(T.rouge)), P(tube(0.07, 0.03, 12), 1.6, 0.5, 0.2, 0xf7f6f2), P(tube(0.025, 0.3, 6), 1.45, 0.55, 0.2, noir));
+            return p;
+        }, teintesLisses());
+        return g;
+    };
+    M.bac = () => {
+        // le banc d'essai : bâche d'eau en circuit fermé, raidisseurs, boucle d'essai bridée, débitmètre, manomètre
+        const g = groupe();
+        bloc(g, 4.0, 0.8, 1.8, T.grisFonce, 0, 0, 0, { rayon: 0.04, m: 0.4, r: 0.5 });
+        bloc(g, 3.8, 0.04, 1.6, T.eau, 0, 0.72, 0, { vif: true, o: 0.85, r: 0.08, ombre: false });
+        fondu(g, "bac", () => {
+            const p = [], acier = C(0x4a5157), bleu = C(T.bleuRoi), clair = C(0xb9c0c6);
+            for (const z of [-0.905, 0.905]) {
+                for (let k = 0; k < 5; k++) {
+                    p.push(P(boite(0.06, 0.74, 0.03), -1.6 + k * 0.8, 0.4, z, acier));
+                }
+                p.push(P(boite(4.04, 0.06, 0.08), 0, 0.8, z, clair));
+            }
+            for (const x of [-2.0, 2.0]) {
+                p.push(P(boite(0.08, 0.06, 1.84), x, 0.8, 0, clair));
+            }
+            p.push(tige([-1.4, 0.6, -0.5], [-1.4, 1.25, -0.5], 0.06, bleu, 10), tige([-1.4, 1.25, -0.5], [1.4, 1.25, -0.5], 0.06, bleu, 10), tige([1.4, 1.25, -0.5], [1.4, 0.6, -0.5], 0.06, bleu, 10));
+            for (const x of [-0.7, 0.7]) {
+                p.push(P(tube(0.11, 0.04, 14), x, 1.25, -0.5, clair, 0, 0, QUART));
+            }
+            p.push(P(geoRonde(0.3, 0.26, 0.24, 0.05), 0, 1.25, -0.5, C(0xe9e7df)), P(boite(0.16, 0.1, 0.006), 0, 1.3, -0.378, 0x16181b));
+            p.push(P(tube(0.015, 0.2, 6), 1.0, 1.4, -0.5, clair), P(tube(0.09, 0.04, 14), 1.0, 1.56, -0.5, 0x16181b, QUART), P(tube(0.078, 0.004, 14), 1.0, 1.56, -0.478, 0xf7f6f2, QUART));
+            p.push(P(new THREE.TorusGeometry(0.1, 0.02, 5, 14), -1.0, 1.42, -0.5, C(T.rouge), QUART), P(tube(0.015, 0.14, 6), -1.0, 1.35, -0.5, acier));
+            return p;
+        }, teintesMetal());
+        return g;
+    };
+    M.nettoyeur = () => {
+        // le nettoyeur haute pression : capot jaune, poignée, deux roues, flexible lové, lance
+        const g = groupe();
+        bloc(g, 0.5, 0.62, 0.46, 0, 0, 0.12, 0, { rayon: 0.1, mat: peinture(T.jaune) });
+        fondu(g, "nettoyeur", () => {
+            const p = [], noir = C(0x16181b);
+            for (const z of [-0.26, 0.26]) {
+                p.push(P(tube(0.13, 0.06, 14), -0.12, 0.13, z, noir, QUART), tige([-0.22, 0.6, z * 0.8], [-0.32, 1.02, z * 0.8], 0.016, noir));
+            }
+            p.push(tige([-0.32, 1.02, -0.21], [-0.32, 1.02, 0.21], 0.018, noir), P(boite(0.1, 0.12, 0.3), 0.22, 0.06, 0, noir));
+            for (let k = 0; k < 3; k++) {
+                p.push(P(new THREE.TorusGeometry(0.15, 0.018, 5, 18), 0.262 + k * 0.02, 0.5, 0, noir, 0, QUART, 0));
+            }
+            p.push(tige([0.3, 0.75, 0.2], [1.3, 0.5, 0.25], 0.012, C(0x8f969c)), tige([0.3, 0.75, 0.2], [0.18, 0.62, 0.2], 0.025, noir), P(boite(0.012, 0.12, 0.2), 0.253, 0.3, 0, C(0xf7f6f2)));
+            return p;
+        }, teintesLisses());
+        return g;
+    };
+    M.lampadaire = () => {
+        // le lampadaire de cour : embase, fût conique, crosse, lanterne à diodes
+        const g = groupe();
+        cyl(g, 0.05, 0.085, 5, T.grisFonce, 0, 2.5, 0, "y", { m: 0.6, r: 0.4, seg: 12 });
+        cyl(g, 0.14, 0.16, 0.3, T.grisFonce, 0, 0.15, 0, "y", { m: 0.6, r: 0.4, seg: 12 });
+        barre(g, [0, 5, 0], [0.35, 5.22, 0], 0.04, T.grisFonce, { m: 0.6, r: 0.4 });
+        barre(g, [0.35, 5.22, 0], [0.75, 5.2, 0], 0.035, T.grisFonce, { m: 0.6, r: 0.4 });
+        bloc(g, 0.62, 0.09, 0.3, 0x30363c, 1.0, 5.14, 0, { rayon: 0.04, m: 0.5, r: 0.4 });
+        bloc(g, 0.5, 0.02, 0.22, 0xfff3c4, 1.0, 5.125, 0, { vif: true, e: 0.9, ombre: false });
+        return g;
+    };
+    M.totem = () => {
+        // l'enseigne Cultiveau à l'entrée : un totem marine laqué sur socle, bande turquoise lumineuse et goutte
+        const g = groupe();
+        bloc(g, 0.6, 0.12, 1.5, 0x30363c, 0, 0, 0, { rayon: 0.03 });
+        bloc(g, 0.5, 3.9, 1.4, 0, 0, 0.1, 0, { rayon: 0.12, mat: peinture(T.marine) });
+        bloc(g, 0.52, 0.5, 1.42, T.bleu, 0, 3.0, 0, { rayon: 0.08, e: 0.25 });
+        boule(g, 0.32, T.eau, 0.28, 2.2, 0, { e: 0.3, ecrase: 1.25, r: 0.15 });
+        return g;
+    };
+    /** Un sapin (hauteur 1) : tronc et étages de branches aux bords irréguliers, plus sombres vers le cœur. */
+    const sapin = (v) => {
+        const r = alea(71 + v * 13), p = [P(tube(0.035, 0.3, 7, 0.028), 0, 0.15, 0, C(0x5f4530))];
+        for (let k = 0; k < 6; k++) {
+            const R = 0.3 - k * 0.043, hC = 0.26 - k * 0.012, q = new THREE.ConeGeometry(R, hC, 14, 2), pos = q.attributes.position;
+            const base = C(0x2f6f3c, (r() - 0.5) * 0.05, 0, (r() - 0.5) * 0.03), col = new Float32Array(pos.count * 3);
+            for (let j = 0; j < pos.count; j++) {
+                const x = pos.getX(j), y = pos.getY(j), z = pos.getZ(j), d = Math.hypot(x, z) / R, a = Math.atan2(z, x);
+                const k2 = 1 + (d > 0.4 ? 0.16 * Math.sin(a * 7 + k) : 0);
+                pos.setXYZ(j, x * k2, y - (d > 0.8 ? 0.03 * Math.sin(a * 7 + k) + 0.02 : 0), z * k2);
+                const o2 = 0.55 + 0.5 * d;
+                col[j * 3] = base.r * o2;
+                col[j * 3 + 1] = base.g * o2;
+                col[j * 3 + 2] = base.b * o2;
+            }
+            q.computeVertexNormals();
+            q.setAttribute("color", new THREE.BufferAttribute(col, 3));
+            p.push({ g: q, m: pose(0, 0.34 + k * 0.118, 0, 0, r() * 3, 0) });
+        }
+        return p;
+    };
+    const arbreFeuillu = M.arbre;
+    M.arbre = (o = {}) => {
+        if (!o.sapin) {
+            return arbreFeuillu(o);
+        }
+        const g = groupe(), h = o.h ?? 4, v = Math.round(h * 10) % 3;
+        fondu(g, `sapin${v}`, () => sapin(v)).scale.setScalar(h);
+        return g;
+    };
 }

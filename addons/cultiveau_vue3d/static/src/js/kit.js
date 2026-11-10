@@ -727,29 +727,6 @@ export function creerKit(THREE) {
     // ------------------------------------------------------------------ le mobilier qui manquait
 
     const modeles = {
-        canape: (o = {}) => {
-            const g = groupe();
-            const c = o.couleur ?? 0x5d8aa8;
-            bloc(g, 1.8, 0.42, 0.85, c, 0, 0, 0, { rayon: 0.12 });
-            bloc(g, 1.8, 0.42, 0.22, c, 0, 0.42, -0.32, { rayon: 0.1 });
-            bloc(g, 0.2, 0.26, 0.85, c, -0.8, 0.42, 0, { rayon: 0.08 });
-            bloc(g, 0.2, 0.26, 0.85, c, 0.8, 0.42, 0, { rayon: 0.08 });
-            return g;
-        },
-        babyfoot: () => {
-            const g = groupe();
-            bloc(g, 1.4, 0.3, 0.75, T.rouge, 0, 0.65, 0, { rayon: 0.05 });
-            bloc(g, 1.3, 0.02, 0.65, 0x4fa83a, 0, 0.95, 0, { vif: true });
-            for (const x of [-0.6, 0.6]) {
-                for (const z of [-0.3, 0.3]) {
-                    bloc(g, 0.07, 0.65, 0.07, T.bois, x, 0, z, { vif: true });
-                }
-            }
-            for (let i = 0; i < 4; i++) {
-                cyl(g, 0.015, 0.015, 1.0, T.gris, -0.45 + i * 0.3, 0.84, 0, "z", { m: 0.6 });
-            }
-            return g;
-        },
         ecran_mural: (o = {}) => {
             const g = groupe();
             bloc(g, 0.06, 1.1, 1.9, T.noir, 0, 1.3, 0, { rayon: 0.02 });
@@ -758,24 +735,6 @@ export function creerKit(THREE) {
             e.rotation.y = Math.PI / 2;
             e.position.set(0.035, 1.85, 0);
             g.add(e);
-            return g;
-        },
-        serveur: () => {
-            const g = groupe();
-            bloc(g, 0.6, 1.9, 0.8, T.anthracite, 0, 0, 0, { rayon: 0.03, m: 0.3 });
-            for (let i = 0; i < 6; i++) {
-                bloc(g, 0.02, 0.05, 0.05, i % 2 ? 0x4fa83a : 0x0b9bb8, 0.31, 0.4 + i * 0.22, -0.25, { vif: true, e: 0.9, ombre: false }).name = "led";
-                bloc(g, 0.02, 0.12, 0.55, 0x3a4a56, 0.31, 0.36 + i * 0.22, 0.08, { vif: true, ombre: false });
-            }
-            return g;
-        },
-        imprimante: () => {
-            const g = groupe();
-            bloc(g, 0.7, 0.75, 0.6, T.blanc, 0, 0, 0, { rayon: 0.04 });
-            bloc(g, 0.72, 0.3, 0.62, T.gris, 0, 0.75, 0, { rayon: 0.05 });
-            bloc(g, 0.4, 0.04, 0.3, T.anthracite, 0.1, 1.05, 0, { rayon: 0.01 });
-            const feuille = bloc(g, 0.3, 0.01, 0.3, T.papier, 0.45, 0.7, 0, { vif: true, ombre: false });
-            feuille.name = "feuille";
             return g;
         },
         pot_cafe: () => M.machineCafe(),
