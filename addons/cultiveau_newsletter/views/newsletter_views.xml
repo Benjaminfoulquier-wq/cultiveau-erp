@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cultiveau_newsletter_form" model="ir.ui.view">
+        <field name="name">cultiveau.newsletter.form</field>
+        <field name="model">cultiveau.newsletter</field>
+        <field name="arch" type="xml">
+            <form string="Créer une newsletter">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Créer une newsletter</h1>
+                        <p class="text-muted">À votre marque (logo, couleur), avec « Membre du réseau Cultiveau » en pied.
+                            On crée un brouillon : vous relisez, ajustez et envoyez vous-même.</p>
+                    </div>
+                    <group>
+                        <field name="genre" widget="radio"/>
+                        <field name="categorie" invisible="genre != 'famille'" required="genre == 'famille'"/>
+                        <field name="culture_id" invisible="genre != 'culture'" required="genre == 'culture'"
+                               options="{'no_create': True}"/>
+                        <field name="theme" invisible="genre != 'saison'" required="genre == 'saison'"/>
+                        <field name="titre" placeholder="Prérempli selon votre choix, à ajuster"/>
+                        <field name="cibler" invisible="genre not in ('famille', 'culture')"/>
+                    </group>
+                    <div class="alert alert-info" role="alert" invisible="genre != 'vierge'">
+                        Un modèle vierge à votre marque s'ouvre : écrivez votre texte, ou collez l'image de votre
+                        newsletter faite sur Canva (bloc Image de l'éditeur). Le bandeau et le pied restent en place.
+                    </div>
+                </sheet>
+                <footer>
+                    <button name="action_creer" type="object" string="Créer la newsletter" class="btn-primary"/>
+                    <button string="Annuler" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_cultiveau_newsletter" model="ir.actions.act_window">
+        <field name="name">Créer une newsletter</field>
+        <field name="res_model">cultiveau.newsletter</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_cultiveau_newsletter_root" name="Newsletters" parent="cultiveau_base.menu_cultiveau_root" sequence="35"/>
+    <menuitem id="menu_cultiveau_newsletter_creer" name="Créer une newsletter"
+              parent="menu_cultiveau_newsletter_root" action="action_cultiveau_newsletter" sequence="1"/>
+    <menuitem id="menu_cultiveau_newsletter_liste" name="Mes newsletters"
+              parent="menu_cultiveau_newsletter_root" action="mass_mailing.mailing_mailing_action_mail" sequence="2"/>
+</odoo>
