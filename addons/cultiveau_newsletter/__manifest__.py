@@ -11,7 +11,7 @@ Cultiveau » discrètement en pied. Un générateur monte des numéros prêts à
 Chaque newsletter cible les bons agriculteurs (par culture, par famille) grâce à la frise culturale. Tout est créé en
 brouillon : l'adhérent relit, ajuste et envoie lui-même.
 """,
-    "version": "18.0.1.3.0",
+    "version": "18.0.1.3.1",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "website": "https://cultiveau.fr",

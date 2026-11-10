@@ -234,9 +234,9 @@ class Newsletter(models.TransientModel):
             tableau,
             self._source("Ordres de grandeur, référentiel Cultiveau V4, tableau A2.1 p. 137."),
             self._carte(company, "✅", "Avant le pic, trois gestes",
-                self._p("<b>1.</b> Vérifier la filtration et la pression : un filtre colmaté fait chuter l'uniformité, donc l'eau, l'énergie et le rendement d'un coup.")
-                + self._p("<b>2.</b> Repérer les zones sèches et les fuites : index du compteur, baisse de pression.")
-                + self._p("<b>3.</b> Caler le tour d'eau sur la réserve du sol, pas sur l'habitude.")
+                self._p(Markup("<b>1.</b> Vérifier la filtration et la pression : un filtre colmaté fait chuter l'uniformité, donc l'eau, l'énergie et le rendement d'un coup."))
+                + self._p(Markup("<b>2.</b> Repérer les zones sèches et les fuites : index du compteur, baisse de pression."))
+                + self._p(Markup("<b>3.</b> Caler le tour d'eau sur la réserve du sol, pas sur l'habitude."))
                 + self._source("Référentiel Cultiveau V4 : § 1.3.1 p. 8, § 16.2.1 p. 109.")),
             self._cta(company, "Prendre rendez-vous", "On peut faire un contrôle d'avant-saison et un point de réglage. Répondez pour fixer une date."),
         ]
