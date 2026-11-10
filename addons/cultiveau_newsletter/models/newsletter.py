@@ -307,6 +307,9 @@ class Newsletter(models.TransientModel):
         else:
             sous_titre, contenu = self._contenu_vierge()
         corps = self._corps(company, titre, sous_titre, contenu)
+        # L'expéditeur du réseau : « Nom de l'adhérent <notification@cultiveau.fr> », réponses vers l'adhérent
+        # (même règle que le reste de l'ERP ; l'envoi le reforce de toute façon via mail.mail).
+        email_from, reply_to, _serveur = company.cultiveau_expediteur(self.env.user.partner_id)
         mailing = self.env["mailing.mailing"].create({
             "subject": titre,
             "body_arch": corps,
@@ -314,7 +317,9 @@ class Newsletter(models.TransientModel):
             "mailing_model_id": self.env["ir.model"]._get("res.partner").id,
             "mailing_domain": repr(self._domaine()),
             "mailing_type": "mail",
-            "reply_to_mode": "update",
+            "email_from": email_from,
+            "reply_to_mode": "new" if reply_to else "update",
+            "reply_to": reply_to or False,
         })
         return {
             "type": "ir.actions.act_window", "name": "Newsletter", "res_model": "mailing.mailing",

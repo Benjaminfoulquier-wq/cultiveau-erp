@@ -21,6 +21,8 @@ class TestNewsletter(TransactionCase):
     def test_newsletter_culture_ciblee_et_ancree(self):
         m = self._creer(genre="culture", culture_id=self.mais.id, titre="Vos besoins en eau : Maïs grain", cibler=True)
         self.assertEqual(m.state, "draft")  # brouillon, jamais envoyé
+        self.assertIn("notification@cultiveau.fr", m.email_from)  # part toujours du réseau...
+        self.assertIn(self.company.name, m.email_from)            # ...au nom de l'adhérent
         self.assertIn("Membre du réseau Cultiveau", m.body_arch)
         self.assertIn("A2.1", m.body_arch)          # ancrage référentiel
         self.assertIn("6 à 8 mm/j", m.body_arch)     # besoin de pointe du maïs
