@@ -18,7 +18,7 @@ const TENUES = {
 
 export function creerKit(THREE) {
     const base = bibliotheque(THREE);
-    const { M, mat, bloc, cyl, boule } = base;
+    const { M, mat, geo, bloc, cyl, boule, capsule } = base;
     const groupe = () => new THREE.Group();
     const textures = new Map();
 
@@ -395,71 +395,105 @@ export function creerKit(THREE) {
 
     // ------------------------------------------------------------------ les personnages articulés
 
-    /** Un personnage : jambes et bras sur pivots, tête, cheveux, casquette ou casque, accessoire. Les membres portent un nom. */
+    /** Un personnage articulé : buste, tête (visage, cheveux, casquette ou casque), bras et jambes sur pivots, genoux, mains,
+     *  chaussures, accessoire. Les membres portent un nom. Le corps est dessiné face à -x (le sens des poses) puis tourné
+     *  face à +z, le sens de la marche. */
     function personnage(o = {}) {
         const g = groupe();
+        const corps = groupe();
+        corps.rotation.y = Math.PI / 2;
+        g.add(corps);
         const tenue = TENUES[o.tenue] || TENUES.chemise;
         const haut = o.haut ?? tenue[0][Math.floor(Math.random() * tenue[0].length)];
         const bas = o.bas ?? tenue[1];
         const peau = o.peau ?? PEAUX[Math.floor(Math.random() * PEAUX.length)];
         const cheveux = o.cheveux ?? CHEVEUX[Math.floor(Math.random() * CHEVEUX.length)];
-        const r = o.rayon ?? 0.06;
-        // le bassin et le torse
+        const manches = o.manches ?? !["polo", "livreur"].includes(o.tenue);
+        const calotte = (parent, r, ouverture, couleur, y) => {
+            const m = new THREE.Mesh(geo(`calotte${r}|${ouverture}`, () => new THREE.SphereGeometry(r, 16, 10, 0, Math.PI * 2, 0, ouverture)), mat(couleur, { r: 0.85 }));
+            m.castShadow = true;
+            m.position.y = y;
+            parent.add(m);
+            return m;
+        };
+        // le bassin et le buste
         const torse = groupe();
         torse.name = "torse";
         torse.position.y = 0.78;
-        bloc(torse, 0.32, 0.6, 0.46, haut, 0, 0, 0, { rayon: 0.12 });
-        bloc(torse, 0.3, 0.1, 0.44, bas, 0, -0.06, 0, { rayon: 0.05 });
+        bloc(torse, 0.25, 0.17, 0.4, bas, 0, -0.05, 0, { rayon: 0.07 });
+        capsule(torse, 0.21, 0.64, haut, 0, 0.02, 0).scale.set(0.72, 1, 1.05);
         if (o.gilet) {
-            bloc(torse, 0.34, 0.36, 0.48, T.jaune, 0, 0.2, 0, { rayon: 0.1, e: 0.15 });
+            capsule(torse, 0.225, 0.5, T.jaune, 0, 0.14, 0, { e: 0.15 }).scale.set(0.74, 1, 1.06);
+            bloc(torse, 0.34, 0.035, 0.485, 0xd9dee3, 0, 0.3, 0, { rayon: 0.016, m: 0.4, r: 0.3 });
         }
-        // la tête
+        cyl(torse, 0.055, 0.06, 0.1, peau, 0, 0.66, 0);
+        // la tête : le visage regarde vers -x
         const tete = groupe();
         tete.name = "tete";
         tete.position.y = 0.64;
-        boule(tete, 0.16, peau, 0, 0.12, 0);
+        boule(tete, 0.15, peau, 0, 0.15, 0).scale.set(0.92, 1.08, 0.9);
+        boule(tete, 0.024, peau, -0.14, 0.13, 0, { ombre: false });
+        for (const z of [-0.055, 0.055]) {
+            boule(tete, 0.017, 0x1f1a17, -0.125, 0.178, z, { ombre: false, r: 0.3 });
+            boule(tete, 0.03, peau, 0, 0.14, z * 2.45, { ombre: false });
+        }
         if (o.casque) {
-            boule(tete, 0.185, o.casque === true ? T.jaune : o.casque, 0, 0.17, 0, { ecrase: 0.6 });
+            const c = o.casque === true ? T.jaune : o.casque;
+            calotte(tete, 0.178, Math.PI / 2, c, 0.17);
+            cyl(tete, 0.2, 0.2, 0.015, c, 0, 0.172, 0);
+            bloc(tete, 0.1, 0.02, 0.2, c, -0.2, 0.162, 0, { rayon: 0.008 });
         } else if (o.casquette) {
-            boule(tete, 0.168, o.casquette === true ? 0x1d4550 : o.casquette, 0, 0.17, 0, { ecrase: 0.5 });
-            bloc(tete, 0.16, 0.03, 0.2, o.casquette === true ? 0x1d4550 : o.casquette, 0.13, 0.19, 0, { rayon: 0.01 });
+            const c = o.casquette === true ? 0x1d4550 : o.casquette;
+            calotte(tete, 0.162, Math.PI / 2, c, 0.165);
+            bloc(tete, 0.15, 0.02, 0.19, c, -0.2, 0.165, 0, { rayon: 0.008 });
+            calotte(tete, 0.154, Math.PI * 0.62, cheveux, 0.15).rotation.z = -0.75;
         } else {
-            boule(tete, 0.165, cheveux, -0.02, 0.17, 0, { ecrase: o.cheveuxLongs ? 0.9 : 0.55 });
+            const h = calotte(tete, 0.158, Math.PI * (o.cheveuxLongs ? 0.72 : 0.56), cheveux, 0.16);
+            h.position.x = 0.012;
+            h.rotation.z = o.cheveuxLongs ? -0.55 : -0.4;
+            h.scale.set(0.96, 1.08, 0.93);
         }
         torse.add(tete);
-        // les bras (pivot à l'épaule)
+        // les bras (pivot à l'épaule) : manche, avant-bras, main
         for (const cote of [-1, 1]) {
             const bras = groupe();
             bras.name = cote < 0 ? "brasG" : "brasD";
-            bras.position.set(0, 0.26, cote * 0.3);
-            bloc(bras, 0.12, 0.3, 0.12, haut, 0, -0.3, 0, { rayon: r });
-            bloc(bras, 0.11, 0.26, 0.11, peau, 0, -0.56, 0, { rayon: r });
+            bras.position.set(0, 0.52, cote * 0.275);
+            capsule(bras, 0.055, 0.34, haut, 0, -0.32, 0);
+            capsule(bras, 0.048, 0.3, manches ? haut : peau, 0, -0.58, 0);
+            boule(bras, 0.052, peau, 0, -0.6, 0);
             torse.add(bras);
         }
-        g.add(torse);
-        // les jambes (pivot à la hanche)
+        corps.add(torse);
+        // les jambes (pivot à la hanche, genou articulé) : cuisse, mollet, chaussure
         for (const cote of [-1, 1]) {
             const jambe = groupe();
             jambe.name = cote < 0 ? "jambeG" : "jambeD";
             jambe.position.set(0, 0.78, cote * 0.1);
-            bloc(jambe, 0.16, 0.78, 0.16, bas, 0, -0.78, 0, { rayon: 0.07 });
-            bloc(jambe, 0.22, 0.08, 0.16, T.anthracite, 0.03, -0.8, 0, { rayon: 0.03 });
-            g.add(jambe);
+            capsule(jambe, 0.078, 0.44, bas, 0, -0.42, 0);
+            const tibia = groupe();
+            tibia.name = cote < 0 ? "tibiaG" : "tibiaD";
+            tibia.position.y = -0.4;
+            capsule(tibia, 0.064, 0.36, bas, 0, -0.34, 0);
+            bloc(tibia, 0.24, 0.085, 0.115, 0x23272b, -0.045, -0.38, 0, { rayon: 0.04 });
+            jambe.add(tibia);
+            corps.add(jambe);
         }
-        // l'accessoire dans la main droite
+        // l'accessoire dans la main
         if (o.accessoire) {
             const brasD = g.getObjectByName("brasD");
             const acc = groupe();
             acc.name = "accessoire";
-            acc.position.set(0.02, -0.72, 0);
+            acc.position.set(-0.02, -0.62, 0);
             if (o.accessoire === "tablette") {
-                bloc(acc, 0.02, 0.22, 0.16, T.anthracite, 0.08, -0.1, 0, { rayon: 0.01 });
+                bloc(acc, 0.02, 0.24, 0.17, T.anthracite, -0.06, -0.12, 0, { rayon: 0.008 });
+                bloc(acc, 0.004, 0.21, 0.145, 0x9ee6f5, -0.072, -0.105, 0, { vif: true, e: 0.4, ombre: false });
             } else if (o.accessoire === "carton") {
-                bloc(acc, 0.4, 0.3, 0.35, T.carton, 0.2, -0.15, 0, { rayon: 0.02 });
+                bloc(acc, 0.4, 0.3, 0.35, T.carton, -0.2, -0.15, 0, { rayon: 0.02 });
             } else if (o.accessoire === "outil") {
-                cyl(acc, 0.02, 0.02, 0.3, T.gris, 0.05, -0.02, 0, "x", { m: 0.5 });
+                cyl(acc, 0.02, 0.02, 0.3, T.gris, -0.05, -0.02, 0, "x", { m: 0.5 });
             } else if (o.accessoire === "tasse") {
-                cyl(acc, 0.05, 0.04, 0.09, T.blanc, 0.05, -0.02, 0);
+                cyl(acc, 0.05, 0.04, 0.09, T.blanc, -0.05, -0.02, 0);
             }
             brasD.add(acc);
         }
@@ -485,6 +519,7 @@ export function creerKit(THREE) {
             case "marche":
                 cible.bg = Math.sin(phase) * 0.7; cible.bd = -Math.sin(phase) * 0.7;
                 cible.jg = -Math.sin(phase) * 0.75; cible.jd = Math.sin(phase) * 0.75;
+                cible.jgK = Math.max(0, Math.cos(phase)) * 0.75; cible.jdK = Math.max(0, -Math.cos(phase)) * 0.75;
                 cible.bob = Math.abs(Math.sin(phase)) * 0.035;
                 break;
             case "debout":
@@ -492,15 +527,15 @@ export function creerKit(THREE) {
                 break;
             case "assis":
             case "assis_bureau":
-                cible.jg = cible.jd = -Math.PI / 2; cible.torseY = 0.52; cible.bg = cible.bd = -0.95 + Math.sin(t * 9 + (p.userData.phase ?? 0)) * 0.05;
+                cible.jg = cible.jd = -Math.PI / 2; cible.jgK = cible.jdK = Math.PI / 2; cible.torseY = 0.54; cible.bg = cible.bd = -0.95 + Math.sin(t * 9 + (p.userData.phase ?? 0)) * 0.05;
                 cible.teteY = Math.sin(t * 0.7) * 0.08;
                 break;
             case "assis_reunion":
-                cible.jg = cible.jd = -Math.PI / 2; cible.torseY = 0.52; cible.bg = -0.5; cible.bd = -0.5 + Math.max(0, Math.sin(t * 1.3 + (p.userData.phase ?? 0))) * 0.6;
+                cible.jg = cible.jd = -Math.PI / 2; cible.jgK = cible.jdK = Math.PI / 2; cible.torseY = 0.54; cible.bg = -0.5; cible.bd = -0.5 + Math.max(0, Math.sin(t * 1.3 + (p.userData.phase ?? 0))) * 0.6;
                 cible.teteY = Math.sin(t * 0.9 + 1) * 0.25;
                 break;
             case "assis_detendu":
-                cible.jg = cible.jd = -Math.PI / 2 + 0.3; cible.torseY = 0.52; cible.torseX = -0.15; cible.bg = cible.bd = -0.25;
+                cible.jg = cible.jd = -Math.PI / 2 + 0.3; cible.jgK = cible.jdK = Math.PI / 2 - 0.6; cible.torseY = 0.54; cible.torseX = -0.15; cible.bg = cible.bd = -0.25;
                 break;
             case "cafe":
                 cible.bd = -1.9 + Math.sin(t * 1.1) * 0.25; cible.bg = 0.1; cible.bob = Math.sin(t * 1.4) * 0.006;
@@ -515,7 +550,7 @@ export function creerKit(THREE) {
                 cible.jg = cible.jd = -2.0; cible.jgK = cible.jdK = 1.8; cible.torseY = 0.35; cible.torseX = 0.35; cible.bg = cible.bd = -1.0;
                 break;
             case "soudure":
-                cible.jg = cible.jd = -1.5; cible.torseY = 0.42; cible.torseX = 0.5; cible.bd = -1.3 + Math.sin(t * 6) * 0.08; cible.bg = -0.9;
+                cible.jg = cible.jd = -1.5; cible.jgK = cible.jdK = 1.5; cible.torseY = 0.42; cible.torseX = 0.5; cible.bd = -1.3 + Math.sin(t * 6) * 0.08; cible.bg = -0.9;
                 break;
             case "outil":
                 cible.bd = -1.1 + Math.sin(t * 5) * 0.25; cible.bg = -0.3; cible.torseX = 0.25;
@@ -527,7 +562,7 @@ export function creerKit(THREE) {
                 cible.torseX = 0.35; cible.bg = -1.2 + Math.sin(t * 9) * 0.2; cible.bd = -1.2 - Math.sin(t * 9) * 0.2;
                 break;
             case "porte":
-                cible.bg = cible.bd = -0.9; cible.jg = -Math.sin(phase) * 0.6; cible.jd = Math.sin(phase) * 0.6; cible.bob = Math.abs(Math.sin(phase)) * 0.03;
+                cible.bg = cible.bd = -0.9; cible.jg = -Math.sin(phase) * 0.6; cible.jd = Math.sin(phase) * 0.6; cible.jgK = Math.max(0, Math.cos(phase)) * 0.6; cible.jdK = Math.max(0, -Math.cos(phase)) * 0.6; cible.bob = Math.abs(Math.sin(phase)) * 0.03;
                 break;
             default:
                 break;
@@ -538,6 +573,11 @@ export function creerKit(THREE) {
         }
         m.bg.rotation.z = e.bg; m.bd.rotation.z = e.bd; m.bg.rotation.x = e.bgZ; m.bd.rotation.x = e.bdZ;
         m.jg.rotation.z = e.jg; m.jd.rotation.z = e.jd;
+        m.jg.position.y = m.jd.position.y = e.torseY;
+        const tg = m.jg.getObjectByName("tibiaG"), td = m.jd.getObjectByName("tibiaD");
+        if (tg && td) {
+            tg.rotation.z = e.jgK; td.rotation.z = e.jdK;
+        }
         m.torse.position.y = e.torseY + e.bob; m.torse.rotation.z = e.torseX; m.tete.rotation.y = e.teteY;
         if (p.userData.ombre) {
             p.userData.ombre.scale.setScalar(1 - e.bob * 4);

@@ -3,6 +3,8 @@
 // roues, vitres, phares). Unités : le mètre. Chaque modèle est un THREE.Group posé au sol (y = 0), centré sur son
 // emprise, sa longueur le long de l'axe x. Les pièces animées portent un nom : « bras » (pivot), « roue » (véhicules).
 
+import { modelesFins } from "./modeles_fins";
+
 export const TEINTES = {
     blanc: 0xf7f6f2, creme: 0xf1ece2, gris: 0xc3c9cf, grisFonce: 0x6c7883, anthracite: 0x2c3a43, noir: 0x1f2428, pneu: 0x24282c,
     marine: 0x1d4550, bleu: 0x0b9bb8, bleuRoi: 0x2a63b0, vert: 0x4fa83a, herbe: 0x8fcb6b, feuillage: 0x5fae45, feuillageFonce: 0x3f8f3a,
@@ -72,6 +74,13 @@ export function bibliotheque(THREE) {
         } else if (axe === "z") {
             m.rotation.x = Math.PI / 2;
         }
+        g.add(m);
+        return m;
+    };
+    /** Une gélule verticale (un membre, un buste) de hauteur h, posée avec son bas en (x, y, z). */
+    const capsule = (g, r, h, couleur, x = 0, y = 0, z = 0, o = {}) => {
+        const m = ombre(new THREE.Mesh(geo(`cap${r}|${h}`, () => new THREE.CapsuleGeometry(r, Math.max(0.001, h - 2 * r), 5, 12)), o.mat ?? mat(couleur, o)), o.ombre ?? true);
+        m.position.set(x, y + h / 2, z);
         g.add(m);
         return m;
     };
@@ -265,22 +274,6 @@ export function bibliotheque(THREE) {
     const M = {};
 
     // ---------------------------------------------------------------- les gens
-    M.personne = (o = {}) => {
-        const g = groupe();
-        const pantalon = o.pantalon ?? T.anthracite, chemise = o.chemise ?? T.bleu;
-        bloc(g, 0.16, 0.8, 0.16, pantalon, 0, 0, -0.1, { rayon: 0.07 });
-        bloc(g, 0.16, 0.8, 0.16, pantalon, 0, 0, 0.1, { rayon: 0.07 });
-        bloc(g, 0.3, 0.62, 0.48, chemise, 0, 0.76, 0, { rayon: 0.13 });
-        bloc(g, 0.13, 0.55, 0.13, chemise, 0, 0.82, -0.31, { rayon: 0.06 });
-        bloc(g, 0.13, 0.55, 0.13, chemise, 0, 0.82, 0.31, { rayon: 0.06 });
-        boule(g, 0.16, T.peau, 0, 1.55, 0);
-        if (o.casque) {
-            boule(g, 0.18, T.jaune, 0, 1.62, 0, { ecrase: 0.6 });
-        } else {
-            boule(g, 0.165, o.cheveux ?? 0x4a3527, -0.02, 1.6, 0, { ecrase: 0.55 });
-        }
-        return g;
-    };
 
     // ---------------------------------------------------------------- les véhicules
     M.utilitaire = (o = {}) => {
@@ -303,31 +296,6 @@ export function bibliotheque(THREE) {
         }
         if (o.gyrophare) {
             bloc(g, 0.5, 0.14, 0.22, T.orange, 0.6, 2.17, 0, { e: 0.6 });
-        }
-        return g;
-    };
-    M.semi = (o = {}) => {
-        // le semi-remorque d'un fournisseur : tracteur à cabine haute, remorque bâchée à la couleur, trois essieux
-        const g = groupe();
-        const c = o.couleur ?? T.bleuRoi;
-        bloc(g, 2.3, 2.3, 2.45, c, 5.0, 0.8, 0, { rayon: 0.22 });
-        bloc(g, 0.06, 0.95, 2.1, T.vitreFoncee, 6.15, 2.0, 0, { rayon: 0.04, r: 0.2 });
-        bloc(g, 0.08, 0.6, 1.6, T.grisFonce, 6.17, 1.0, 0, { rayon: 0.04, m: 0.5, r: 0.4 });
-        bloc(g, 1.1, 0.6, 2.4, T.blanc, 4.6, 3.1, 0, { rayon: 0.2 });
-        cyl(g, 0.07, 0.07, 1.4, T.gris, 3.8, 2.6, 1.15, "y", { m: 0.7, r: 0.3 });
-        cyl(g, 0.3, 0.3, 1.0, T.gris, 4.6, 0.75, 1.15, "x", { m: 0.6, r: 0.3 });
-        bloc(g, 0.05, 0.14, 0.4, 0xfff6c8, 6.18, 0.75, 0.85, { e: 0.8 });
-        bloc(g, 0.05, 0.14, 0.4, 0xfff6c8, 6.18, 0.75, -0.85, { e: 0.8 });
-        bloc(g, 9.6, 0.25, 2.2, T.anthracite, -0.9, 0.95, 0, { vif: true });
-        bloc(g, 9.4, 2.75, 2.5, T.blanc, -1.0, 1.2, 0, { rayon: 0.1 });
-        bloc(g, 9.42, 0.5, 2.52, c, -1.0, 3.2, 0, { rayon: 0.08 });
-        for (const x of [5.4, 3.6]) {
-            roue(g, 0.5, 0.36, x, 0.5, 1.05);
-            roue(g, 0.5, 0.36, x, 0.5, -1.05);
-        }
-        for (const x of [-3.4, -4.5, -5.6]) {
-            roue(g, 0.48, 0.36, x, 0.48, 1.0);
-            roue(g, 0.48, 0.36, x, 0.48, -1.0);
         }
         return g;
     };
@@ -554,21 +522,6 @@ export function bibliotheque(THREE) {
         g.add(pilote);
         return g;
     };
-    M.minipelle = (o = {}) => {
-        // la mini-pelle du chantier : chenilles, tourelle, bras et godet
-        const g = groupe();
-        const c = o.couleur ?? T.orange;
-        for (const z of [0.55, -0.55]) {
-            bloc(g, 2.0, 0.45, 0.4, T.anthracite, 0, 0, z, { rayon: 0.2, r: 0.9 });
-        }
-        bloc(g, 1.6, 0.55, 1.3, c, -0.1, 0.5, 0, { rayon: 0.18 });
-        bloc(g, 0.9, 0.95, 0.9, T.vitre, -0.25, 1.05, 0.15, { rayon: 0.1, o: 0.6 });
-        bloc(g, 1.0, 0.1, 1.0, c, -0.25, 2.0, 0.15, { rayon: 0.05 });
-        barre(g, [0.5, 1.0, -0.3], [1.6, 2.0, -0.3], 0.1, c);
-        barre(g, [1.6, 2.0, -0.3], [2.2, 0.6, -0.3], 0.08, c);
-        bloc(g, 0.4, 0.35, 0.5, T.anthracite, 2.25, 0.25, -0.3, { rayon: 0.06 });
-        return g;
-    };
 
     // ---------------------------------------------------------------- le concessionnaire agricole (démonstration)
     M.pont = (o = {}) => {
@@ -704,180 +657,8 @@ export function bibliotheque(THREE) {
     };
 
     // ---------------------------------------------------------------- l'irrigation
-    M.enrouleur = (o = {}) => {
-        // l'enrouleur : châssis sur deux roues, grand tambour couvert de tuyau PE noir, flasques à la couleur, timon
-        const g = groupe();
-        const c = o.couleur ?? T.rouge;
-        bloc(g, 2.6, 0.18, 1.5, c, 0, 0.55, 0, { rayon: 0.04 });
-        roue(g, 0.55, 0.32, -0.4, 0.55, 1.0);
-        roue(g, 0.55, 0.32, -0.4, 0.55, -1.0);
-        barre(g, [1.3, 0.65, 0], [2.6, 0.35, 0], 0.06, c);
-        cyl(g, 0.6, 0.65, 0.18, c, 0, 0.82, 0, "y");
-        const tambour = groupe();
-        tambour.name = "tambour";
-        cyl(tambour, 1.0, 1.0, 1.0, T.noir, 0, 0, 0, "z", { r: 0.6, seg: 28 });
-        for (let k = -2; k <= 2; k++) {
-            tore(tambour, 1.0, 0.07, 0x111417, 0, 0, k * 0.2, [0, 0, 0], { r: 0.5 });
-        }
-        cyl(tambour, 1.25, 1.25, 0.08, c, 0, 0, 0.55, "z", { seg: 28 });
-        cyl(tambour, 1.25, 1.25, 0.08, c, 0, 0, -0.55, "z", { seg: 28 });
-        cyl(tambour, 0.15, 0.15, 1.3, T.grisFonce, 0, 0, 0, "z", { m: 0.5 });
-        tambour.position.set(0, 2.15, 0);
-        g.add(tambour);
-        for (const z of [0.68, -0.68]) {
-            barre(g, [-0.7, 0.9, z], [0, 2.15, z], 0.06, c);
-            barre(g, [0.7, 0.9, z], [0, 2.15, z], 0.06, c);
-        }
-        bloc(g, 0.5, 0.45, 0.5, T.grisFonce, 0.95, 0.9, 0.45, { rayon: 0.08, m: 0.4 });
-        if (o.tuyau) {
-            // le tuyau déroulé jusqu'au chariot-canon
-            barre(g, [0.6, 1.4, 0], [o.tuyau, 0.12, 0], 0.07, T.noir, { r: 0.6 });
-        }
-        return g;
-    };
-    M.canon = () => {
-        // le chariot porte-canon au bout du tuyau
-        const g = groupe();
-        bloc(g, 1.2, 0.12, 0.9, T.grisFonce, 0, 0.35, 0, { rayon: 0.03, m: 0.4 });
-        roue(g, 0.32, 0.18, 0, 0.32, 0.55);
-        roue(g, 0.32, 0.18, 0, 0.32, -0.55);
-        cyl(g, 0.06, 0.06, 0.8, T.grisFonce, 0, 0.85, 0, "y", { m: 0.5 });
-        const canon = barre(g, [0, 1.2, 0], [-0.7, 1.75, 0], 0.08, T.gris, { m: 0.6, r: 0.3 });
-        canon.name = "canon";
-        return g;
-    };
-    M.pivot = (o = {}) => {
-        // le pivot : tour centrale, une longue rampe galvanisée en treillis, deux tours à roues, cannes de descente,
-        // et le cercle arrosé dans la culture
-        const g = groupe();
-        const c = o.couleur ?? 0xb9c2c9;
-        const L = o.longueur ?? 7;
-        const cercle = ombre(new THREE.Mesh(geo(`disque${L}`, () => new THREE.CircleGeometry(L + 0.3, 48)), mat(0x9fd27a, { r: 1 })), false);
-        cercle.rotation.x = -Math.PI / 2;
-        cercle.position.y = 0.13;
-        g.add(cercle);
-        for (const [x, z] of [[-0.7, -0.7], [0.7, -0.7], [0.7, 0.7], [-0.7, 0.7]]) {
-            barre(g, [x, 0.1, z], [0, 2.5, 0], 0.06, c, { m: 0.5, r: 0.4 });
-        }
-        cyl(g, 0.22, 0.22, 0.5, T.grisFonce, 0, 2.55, 0, "y", { m: 0.4 });
-        bloc(g, 0.4, 0.5, 0.3, T.grisFonce, 0.5, 0.2, 0.5, { rayon: 0.05 });
-        const bras = groupe();
-        bras.name = "bras";
-        const tours = [L * 0.5, L];
-        let x0 = 0;
-        const hTube = 2.35;
-        for (const xt of tours) {
-            barre(bras, [x0, hTube + 0.15, 0], [xt, hTube, 0], 0.09, c, { m: 0.5, r: 0.35 });
-            // le treillis sous la rampe : deux tirants et des montants
-            const mi = (x0 + xt) / 2;
-            barre(bras, [x0 + 0.2, hTube, 0], [mi, hTube - 0.55, 0], 0.025, c, { m: 0.5 });
-            barre(bras, [xt - 0.2, hTube, 0], [mi, hTube - 0.55, 0], 0.025, c, { m: 0.5 });
-            for (let k = 1; k < 5; k++) {
-                const xd = x0 + ((xt - x0) * k) / 5;
-                const creux = hTube - 0.55 * (1 - Math.abs(xd - mi) / ((xt - x0) / 2));
-                barre(bras, [xd, hTube, 0], [xd, creux, 0], 0.02, c, { m: 0.5 });
-                barre(bras, [xd, creux, 0], [xd, 0.9, 0], 0.012, T.anthracite);
-                cyl(bras, 0.07, 0.03, 0.08, T.bleu, xd, 0.86, 0);
-            }
-            // la tour : un A sur un chariot à deux roues
-            barre(bras, [xt, hTube, 0], [xt, 0.55, 0.75], 0.05, c, { m: 0.5 });
-            barre(bras, [xt, hTube, 0], [xt, 0.55, -0.75], 0.05, c, { m: 0.5 });
-            bloc(bras, 0.18, 0.18, 1.7, c, xt, 0.42, 0, { m: 0.5 });
-            bloc(bras, 0.25, 0.25, 0.3, T.grisFonce, xt, 0.55, 0, { rayon: 0.04 });
-            roue(bras, 0.42, 0.26, xt, 0.42, 0.95);
-            roue(bras, 0.42, 0.26, xt, 0.42, -0.95);
-            x0 = xt;
-        }
-        // le porte-à-faux et son canon d'extrémité
-        barre(bras, [L, hTube, 0], [L + 0.9, hTube - 0.15, 0], 0.05, c, { m: 0.5 });
-        cyl(bras, 0.06, 0.06, 0.25, T.bleu, L + 0.95, hTube - 0.25, 0);
-        g.add(bras);
-        return g;
-    };
-    M.asperseur = () => {
-        const g = groupe();
-        cyl(g, 0.025, 0.025, 1.0, T.grisFonce, 0, 0.5, 0, "y", { m: 0.5 });
-        cyl(g, 0.07, 0.07, 0.12, T.bleu, 0, 1.05, 0);
-        barre(g, [0, 1.1, 0], [0.18, 1.2, 0], 0.025, T.grisFonce);
-        return g;
-    };
-    M.culture = (o = {}) => {
-        // une parcelle et sa culture : rangs de maïs, de vigne ou d'arbres ; la terre nue d'un projet
-        const g = groupe();
-        const L = o.l ?? 8, P = o.p ?? 6.4;
-        bloc(g, L, 0.12, P, o.nu ? T.terre : 0x7fb85a, 0, 0, 0, { rayon: 0.05, r: 0.95 });
-        if (o.nu) {
-            for (let k = 0; k < 6; k++) {
-                bloc(g, L - 0.6, 0.05, 0.12, 0x946640, 0, 0.12, -P / 2 + 0.7 + k * ((P - 1.4) / 5), { vif: true });
-            }
-            return g;
-        }
-        const rangs = o.genre === "verger" ? 3 : 5;
-        for (let r = 0; r < rangs; r++) {
-            const z = -P / 2 + 0.8 + (r * (P - 1.6)) / (rangs - 1);
-            if (o.goutte) {
-                barre(g, [-L / 2 + 0.3, 0.16, z + 0.15], [L / 2 - 0.3, 0.16, z + 0.15], 0.02, T.noir);
-            }
-            const pas = o.genre === "verger" ? 1.6 : o.genre === "vigne" ? 0.8 : 0.55;
-            for (let x = -L / 2 + 0.5; x < L / 2 - 0.3; x += pas) {
-                if (o.genre === "verger") {
-                    cyl(g, 0.07, 0.09, 0.8, 0x7a5434, x, 0.52, z);
-                    boule(g, 0.6, T.feuillage, x, 1.25, z, { ecrase: 0.85 });
-                } else if (o.genre === "vigne") {
-                    cyl(g, 0.04, 0.05, 0.5, 0x7a5434, x, 0.37, z);
-                    bloc(g, 0.6, 0.45, 0.35, T.feuillageFonce, x, 0.5, z, { rayon: 0.15 });
-                } else {
-                    bloc(g, 0.18, 0.9, 0.18, T.feuillage, x, 0.12, z, { rayon: 0.08 });
-                    bloc(g, 0.08, 0.25, 0.08, 0xe8c25a, x + 0.05, 0.95, z, { rayon: 0.03 });
-                }
-            }
-        }
-        return g;
-    };
 
     // ---------------------------------------------------------------- l'atelier et le stock
-    M.pompe = (o = {}) => {
-        // une pompe : moteur à ailettes, volute, socle, brides
-        const g = groupe();
-        const c = o.couleur ?? T.bleuRoi;
-        bloc(g, 1.4, 0.12, 0.6, T.grisFonce, 0, 0, 0, { rayon: 0.03, m: 0.4 });
-        cyl(g, 0.24, 0.24, 0.7, c, -0.3, 0.42, 0, "x", { r: 0.5, m: 0.2 });
-        for (let k = 0; k < 5; k++) {
-            cyl(g, 0.26, 0.26, 0.03, c, -0.55 + k * 0.12, 0.42, 0, "x", { r: 0.5 });
-        }
-        cyl(g, 0.2, 0.22, 0.12, T.grisFonce, -0.68, 0.42, 0, "x");
-        cyl(g, 0.28, 0.28, 0.24, c, 0.3, 0.42, 0, "z", { r: 0.5 });
-        cyl(g, 0.09, 0.09, 0.5, T.gris, 0.55, 0.42, 0, "x", { m: 0.6 });
-        cyl(g, 0.09, 0.09, 0.45, T.gris, 0.3, 0.7, 0, "y", { m: 0.6 });
-        cyl(g, 0.14, 0.14, 0.04, T.gris, 0.8, 0.42, 0, "x", { m: 0.6 });
-        return g;
-    };
-    M.rack = (o = {}) => {
-        // un rack à palettes : échelles bleues, lisses orange, palettes filmées dont la couleur dit la famille
-        const g = groupe();
-        const L = 3.6, P = 1.1, H = 3.4;
-        for (const x of [-L / 2, 0, L / 2]) {
-            for (const z of [-P / 2, P / 2]) {
-                bloc(g, 0.08, H, 0.08, T.bleuRoi, x, 0, z, { vif: true, m: 0.3 });
-            }
-        }
-        let n = 0;
-        for (let niveau = 0; niveau < 3; niveau++) {
-            const y = 0.12 + niveau * 1.12;
-            if (niveau) {
-                bloc(g, L, 0.12, 0.06, T.orange, 0, y - 0.12, -P / 2, { vif: true });
-                bloc(g, L, 0.12, 0.06, T.orange, 0, y - 0.12, P / 2, { vif: true });
-            }
-            for (const x of [-L / 4, L / 4]) {
-                if (n++ < (o.remplissage ?? 6)) {
-                    bloc(g, 1.2, 0.14, 1.0, T.boisClair, x, y, 0, { rayon: 0.02 });
-                    bloc(g, 1.1, 0.7, 0.9, niveau % 2 ? T.carton : 0xe2b06a, x, y + 0.14, 0, { rayon: 0.05 });
-                    bloc(g, 1.12, 0.16, 0.92, o.couleur ?? T.bleu, x, y + 0.5, 0, { rayon: 0.04 });
-                }
-            }
-        }
-        return g;
-    };
     M.gondole = (o = {}) => {
         // une gondole du libre-service : étagères blanches et petites boîtes colorées
         const g = groupe();
@@ -908,73 +689,6 @@ export function bibliotheque(THREE) {
         }), teintes()), false));
         return g;
     };
-    M.comptoir = () => {
-        const g = groupe();
-        bloc(g, 1.0, 1.0, 6.0, T.marine, 0, 0, 0, { rayon: 0.06 });
-        bloc(g, 1.15, 0.08, 6.1, T.boisClair, 0, 1.0, 0, { rayon: 0.03 });
-        bloc(g, 0.04, 0.3, 4.5, T.bleu, -0.52, 0.55, 0, { e: 0.2 });
-        bloc(g, 0.45, 0.3, 0.4, T.anthracite, 0.1, 1.08, -1.5, { rayon: 0.05 });
-        bloc(g, 0.05, 0.35, 0.5, T.anthracite, 0.25, 1.38, -1.5, { rayon: 0.02 });
-        bloc(g, 0.02, 0.28, 0.42, T.bleu, 0.22, 1.42, -1.5, { e: 0.5 });
-        bloc(g, 0.08, 0.35, 0.5, T.anthracite, 0.2, 1.08, 1.4, { rayon: 0.02 });
-        bloc(g, 0.02, 0.3, 0.44, 0x9ee6f5, 0.15, 1.1, 1.4, { e: 0.5 });
-        return g;
-    };
-    M.bureau = (o = {}) => {
-        const g = groupe();
-        const L = o.l ?? 1.8;
-        bloc(g, L, 0.05, 0.85, T.boisClair, 0, 0.72, 0, { rayon: 0.02 });
-        for (const x of [-L / 2 + 0.06, L / 2 - 0.06]) {
-            bloc(g, 0.05, 0.72, 0.8, T.gris, x, 0, 0, { vif: true });
-        }
-        bloc(g, 0.6, 0.38, 0.04, T.anthracite, 0, 0.9, -0.25, { rayon: 0.02 });
-        bloc(g, 0.55, 0.32, 0.02, T.bleu, 0, 0.93, -0.22, { e: 0.35 });
-        bloc(g, 0.08, 0.15, 0.08, T.anthracite, 0, 0.77, -0.27, { vif: true });
-        bloc(g, 0.45, 0.02, 0.15, T.gris, 0, 0.77, 0.05, { vif: true });
-        const chaise = M.chaise();
-        chaise.position.set(0, 0, 0.75);
-        g.add(chaise);
-        return g;
-    };
-    M.chaise = () => {
-        const g = groupe();
-        cyl(g, 0.25, 0.25, 0.05, T.anthracite, 0, 0.05, 0);
-        cyl(g, 0.03, 0.03, 0.4, T.grisFonce, 0, 0.27, 0);
-        bloc(g, 0.48, 0.08, 0.46, T.anthracite, 0, 0.47, 0, { rayon: 0.04 });
-        bloc(g, 0.48, 0.5, 0.06, T.anthracite, 0, 0.55, 0.22, { rayon: 0.04 });
-        return g;
-    };
-    M.table = (o = {}) => {
-        const g = groupe();
-        const L = o.l ?? 4, P = o.p ?? 1.6;
-        bloc(g, L, 0.06, P, T.boisClair, 0, 0.72, 0, { rayon: 0.05 });
-        bloc(g, 0.12, 0.72, P * 0.6, T.gris, -L / 2 + 0.4, 0, 0, { rayon: 0.03 });
-        bloc(g, 0.12, 0.72, P * 0.6, T.gris, L / 2 - 0.4, 0, 0, { rayon: 0.03 });
-        const n = Math.max(2, Math.round(L / 1.2));
-        for (let k = 0; k < n; k++) {
-            const x = -L / 2 + 0.6 + (k * (L - 1.2)) / (n - 1);
-            for (const s of [-1, 1]) {
-                const c = M.chaise();
-                c.position.set(x, 0, s * (P / 2 + 0.25));
-                c.rotation.y = s > 0 ? 0 : Math.PI;
-                g.add(c);
-            }
-        }
-        return g;
-    };
-    M.plans = () => {
-        // la table à dessin du bureau d'étude, couverte de plans
-        const g = groupe();
-        bloc(g, 2.6, 0.06, 1.4, T.blanc, 0, 0.9, 0, { rayon: 0.03 });
-        for (const x of [-1.2, 1.2]) {
-            bloc(g, 0.06, 0.9, 1.2, T.gris, x, 0, 0, { vif: true });
-        }
-        for (const [x, z, r] of [[-0.6, -0.2, 0.1], [0.4, 0.15, -0.15], [0.8, -0.3, 0.3]]) {
-            const f = bloc(g, 0.9, 0.01, 0.62, 0xdbeaf7, x, 0.96, z, { vif: true, ombre: false });
-            f.rotation.y = r;
-        }
-        return g;
-    };
     M.borne = () => {
         // le coin conseil : grand écran sur pied, la 3D du réseau à l'écran
         const g = groupe();
@@ -984,25 +698,6 @@ export function bibliotheque(THREE) {
         bloc(g, 0.02, 0.86, 1.46, 0x9ee6f5, 0.05, 1.07, 0, { e: 0.6 });
         bloc(g, 0.02, 0.3, 0.3, T.bleu, 0.07, 1.3, 0.2, { e: 0.8 });
         bloc(g, 0.02, 0.2, 0.5, T.vert, 0.07, 1.2, -0.3, { e: 0.6 });
-        return g;
-    };
-    M.armoire = () => {
-        const g = groupe();
-        bloc(g, 0.6, 2.0, 2.0, T.gris, 0, 0, 0, { rayon: 0.04 });
-        bloc(g, 0.02, 1.8, 0.92, 0xd5dade, 0.31, 0.1, -0.48, { vif: true });
-        bloc(g, 0.02, 1.8, 0.92, 0xd5dade, 0.31, 0.1, 0.48, { vif: true });
-        bloc(g, 0.03, 0.3, 0.3, T.jaune, 0.33, 1.4, -0.48, { vif: true });
-        return g;
-    };
-    M.etabli = () => {
-        const g = groupe();
-        bloc(g, 3.0, 0.08, 0.9, T.bois, 0, 0.85, 0, { rayon: 0.02 });
-        for (const x of [-1.4, 1.4]) {
-            bloc(g, 0.08, 0.85, 0.85, T.grisFonce, x, 0, 0, { vif: true });
-        }
-        bloc(g, 3.0, 1.0, 0.05, T.gris, 0, 0.93, -0.43, { vif: true });
-        bloc(g, 0.3, 0.2, 0.25, T.bleuRoi, -1.0, 0.93, 0.1, { rayon: 0.03 });
-        cyl(g, 0.06, 0.06, 0.6, T.gris, 0.5, 0.98, 0.05, "x", { m: 0.6 });
         return g;
     };
     M.bac = () => {
@@ -1025,50 +720,6 @@ export function bibliotheque(THREE) {
         bloc(g, 0.5, 0.45, 0.4, T.rouge, 1.6, 0, 0.2, { rayon: 0.05 });
         return g;
     };
-    M.prefa = () => {
-        // une station de tête en préfabrication : collecteur, vannes à volant rouge, filtre, compteur
-        const g = groupe();
-        bloc(g, 4.2, 0.15, 2.0, T.grisFonce, 0, 0, 0, { rayon: 0.03, m: 0.3 });
-        cyl(g, 0.16, 0.16, 3.8, T.bleuRoi, 0, 0.6, -0.4, "x", { m: 0.3, r: 0.4 });
-        for (const x of [-1.2, 0, 1.2]) {
-            cyl(g, 0.1, 0.1, 0.8, T.bleuRoi, x, 0.6, 0.0, "z", { m: 0.3, r: 0.4 });
-            cyl(g, 0.12, 0.12, 0.25, T.grisFonce, x, 0.6, 0.35, "z", { m: 0.5 });
-            tore(g, 0.14, 0.025, T.rouge, x, 0.9, 0.35, [Math.PI / 2, 0, 0]);
-            cyl(g, 0.02, 0.02, 0.25, T.grisFonce, x, 0.78, 0.35, "y");
-        }
-        cyl(g, 0.32, 0.32, 1.0, T.vert, 1.6, 0.65, 0.5, "y", { r: 0.5 });
-        cyl(g, 0.34, 0.3, 0.12, T.grisFonce, 1.6, 1.2, 0.5, "y");
-        return g;
-    };
-    M.bobines = () => {
-        // les couronnes de tube PE, à plat et empilées
-        const g = groupe();
-        for (let k = 0; k < 4; k++) {
-            for (let n = 0; n < (k % 2 ? 3 : 4); n++) {
-                tore(g, 0.62, 0.2, T.noir, -2.4 + k * 1.6, 0.2 + n * 0.38, 0, [Math.PI / 2, 0, 0], { r: 0.55 });
-                tore(g, 0.62, 0.035, T.bleu, -2.4 + k * 1.6, 0.39 + n * 0.38, 0, [Math.PI / 2, 0, 0], { r: 0.5, ombre: false });
-            }
-        }
-        return g;
-    };
-    M.cantilever = (o = {}) => {
-        // un rack cantilever sous auvent : colonnes, bras, fagots de tubes PVC gris et PE noirs à bandes bleues
-        const g = groupe();
-        const L = o.l ?? 8;
-        for (const x of [-L / 2 + 0.3, 0, L / 2 - 0.3]) {
-            bloc(g, 0.2, 2.6, 0.25, T.bleuRoi, x, 0, -0.6, { vif: true, m: 0.3 });
-            bloc(g, 0.6, 0.1, 1.6, T.bleuRoi, x, 0, 0, { vif: true });
-            for (const y of [0.5, 1.2, 1.9]) {
-                bloc(g, 0.12, 0.1, 1.3, T.bleuRoi, x, y, 0.05, { vif: true });
-            }
-        }
-        for (const [y, couleur] of [[0.6, o.couleur ?? 0x9aa3ab], [1.3, T.noir], [2.0, o.couleur ?? 0x9aa3ab]]) {
-            for (let k = 0; k < 5; k++) {
-                cyl(g, 0.08, 0.08, L, couleur, 0, y + 0.08 + (k % 2) * 0.12, -0.4 + k * 0.22, "x", { r: 0.45, seg: 10, ombre: k === 0 });
-            }
-        }
-        return g;
-    };
     M.benne = (o = {}) => {
         const g = groupe();
         const forme = new THREE.Shape([new THREE.Vector2(-1.1, 0), new THREE.Vector2(1.1, 0), new THREE.Vector2(1.5, 1.1), new THREE.Vector2(-1.5, 1.1)]);
@@ -1076,13 +727,6 @@ export function bibliotheque(THREE) {
                                        mat(o.couleur ?? T.vert)));
         m.position.z = -0.75;
         g.add(m);
-        return g;
-    };
-    M.palette = (o = {}) => {
-        const g = groupe();
-        bloc(g, 1.2, 0.14, 1.0, T.boisClair, 0, 0, 0, { rayon: 0.02 });
-        bloc(g, 1.1, 0.5 + (o.h ?? 0.3), 0.9, T.carton, 0, 0.14, 0, { rayon: 0.04 });
-        bloc(g, 0.6, 0.02, 0.4, T.blanc, 0.1, 0.64 + (o.h ?? 0.3), 0, { vif: true, ombre: false });
         return g;
     };
     M.liasse = (o = {}) => {
@@ -1150,11 +794,6 @@ export function bibliotheque(THREE) {
         pieces.forEach((q) => q.g.dispose());
         return f;
     };
-    M.haie = (o = {}) => {
-        const g = groupe();
-        bloc(g, o.l ?? 6, 0.9, 0.8, T.feuillageFonce, 0, 0, 0, { rayon: 0.35 });
-        return g;
-    };
     M.panneau = (o = {}) => {
         // le panneau de chantier ou de parcelle
         const g = groupe();
@@ -1194,18 +833,9 @@ export function bibliotheque(THREE) {
         cyl(g, 0.02, 0.02, 1.2, T.noir, 0.4, 0.4, 0.2, "x");
         return g;
     };
-    M.machineCafe = () => {
-        const g = groupe();
-        bloc(g, 0.6, 1.8, 0.6, T.anthracite, 0, 0, 0, { rayon: 0.05 });
-        bloc(g, 0.02, 0.6, 0.45, T.bleu, 0.31, 1.0, 0, { e: 0.5 });
-        return g;
-    };
-    M.plante = () => {
-        const g = groupe();
-        cyl(g, 0.22, 0.17, 0.42, 0xd9d2c4, 0, 0.21, 0);
-        boule(g, 0.36, T.feuillage, 0, 0.75, 0, { seg: 10 });
-        return g;
-    };
 
-    return { M, mat, geoRonde, bloc, cyl, boule, barre };
+    // le lot 2 du dessin fin : rayonnages, mobilier, irrigation, engins
+    modelesFins(THREE, { T, M, mat, geo, geoRonde, bloc, cyl, boule, tore, barre, capsule, matiere, peinture, verre, verreClair, teintes, fusion, pose, profil, arc, roue, groupe, ombre, feuillage });
+
+    return { M, mat, geo, geoRonde, bloc, cyl, boule, barre, capsule };
 }
