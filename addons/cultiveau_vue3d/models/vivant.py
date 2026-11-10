@@ -49,20 +49,15 @@ class Map(models.AbstractModel):
         # la démonstration concessionnaire : le même moteur et les mêmes données vivantes, mais le plan re-thématisé.
         # Réservée à contact@cultiveau.fr : demandée par un autre compte, on retombe sur le dépôt normal.
         concessionnaire = variante == "concessionnaire" and self._peut_concessionnaire()
-        # l'atelier de câblage électrique : une salle dédiée, ouverte à tous les adhérents, d'où l'on lance le schéma.
-        cablage = variante == "cablage"
         if concessionnaire:
             plan_layout, plan_version = self.env["cultiveau.plan"].layout_concessionnaire(company), 0
-        elif cablage:
-            plan_layout, plan_version = self.env["cultiveau.plan"].layout_cablage(company), 0
         else:
             plan = self.env["cultiveau.plan"].courant(company)
             plan_layout, plan_version = plan.layout, plan.version
         return {
-            "societe": {"id": company.id,
-                        "nom": "Concession agricole (démonstration)" if concessionnaire else "Atelier câblage" if cablage else company.name,
+            "societe": {"id": company.id, "nom": "Concession agricole (démonstration)" if concessionnaire else company.name,
                         "accent": self._accent(company), "demo": bool(company.cultiveau_map_demo),
-                        "variante": "concessionnaire" if concessionnaire else "cablage" if cablage else None,
+                        "variante": "concessionnaire" if concessionnaire else None,
                         "adherent": company.cultiveau_adherent, "logo": bool(company.logo)},
             "utilisateur": {"id": self.env.user.id, "nom": self.env.user.name, "role": self._role(self.env.user),
                             "editeur": self.env.user.has_group("base.group_system") or self.env.user.has_group("sales_team.group_sale_manager"),

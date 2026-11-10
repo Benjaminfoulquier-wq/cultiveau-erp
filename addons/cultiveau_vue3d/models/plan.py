@@ -144,6 +144,11 @@ class Plan(models.Model):
         obj("armoire", 33, 25, 90, "atelier"); obj("armoire", 33, 26.5, 90, "atelier")
         place("poste-atelier", "poste", 35, 16, 0, "atelier")
         obj("panneau", 36, 8.6, 0, "atelier", {"texte": "ATELIER · SAV"})
+        # le poste de câblage électrique, dans l'atelier : une armoire électrique ouverte d'où l'on dessine le schéma
+        obj("armoire_elec", 39.3, 24.3, 180, "atelier")
+        obj("coffret", 39.3, 21.6, 180, "atelier")
+        obj("touret", 37.4, 26.4, 0, "atelier", {"couleur": 0x2c2f33})
+        obj("panneau", 38.5, 22.8, -90, "atelier", {"texte": "CÂBLAGE"})
         # --- l'aile des bureaux (x 40..54, z 8..20) : le bureau d'étude, la salle de réunion, l'administratif, la pause
         obj("bureau", 42.3, 10.2, 0, "bureau", {"ecran": "cao"}); place("poste-bureau-1", "poste", 42.3, 11.2, 180, "bureau")
         obj("bureau", 45.3, 10.2, 0, "bureau", {"ecran": "tableur"}); place("poste-bureau-2", "poste", 45.3, 11.2, 180, "bureau")
@@ -295,59 +300,6 @@ class Plan(models.Model):
         base["objets"] = o
         base["places"] = places
         return base
-
-    # ---------------------------------------------------------------- l'atelier de câblage électrique
-
-    @api.model
-    def layout_cablage(self, company=None):
-        """Une salle dédiée au câblage électrique : une armoire électrique grande ouverte au centre (le cœur, où l'on
-        ouvre le schéma de câblage), un établi, des tourets de câble, un coffret de commande et, dans un coin, le poste
-        où se dessine le schéma. Rien n'est enregistré : le plan est calculé et rendu tel quel, pour tous les adhérents."""
-        o, n, places = [], [0], []
-
-        def obj(type_, x, z, rot=0, zone=None, params=None):
-            n[0] += 1
-            o.append({"id": f"{type_}-{n[0]}", "type": type_, "x": round(x, 2), "z": round(z, 2), "rot": rot, "zone": zone, "params": params or {}, "entite": None})
-
-        def place(cle, usage, x, z, rot=0, zone=None):
-            places.append({"cle": cle, "usage": usage, "x": round(x, 2), "z": round(z, 2), "rot": rot, "zone": zone})
-
-        # --- l'armoire électrique ouverte, au centre, face à la salle : l'objet que l'on clique pour le schéma
-        obj("armoire_elec", 9, 2.0, -90, "cablage")
-        obj("coffret", 12.5, 2.2, -90, "cablage")
-        obj("panneau", 9, 0.8, 0, "cablage", {"texte": "CÂBLAGE ÉLECTRIQUE"})
-        place("poste-cablage", "poste", 9, 3.6, 0, "cablage")
-        # --- l'établi de câblage et son mur d'outils, à gauche
-        obj("etabli", 2.6, 4.0, 90, "cablage"); obj("etabli", 2.6, 7.2, 90, "cablage")
-        obj("armoire", 2.0, 10.0, 90, "cablage")
-        obj("ecran_mural", 0.3, 5.6, 90, "cablage", {"contenu": "bienvenue"})
-        # --- les tourets de câble et les bobines, à droite
-        obj("touret", 15.3, 4.2, 0, "cablage", {"couleur": 0x2c2f33})
-        obj("touret", 15.3, 6.0, 0, "cablage", {"couleur": 0x35506b, "flasque": 0xbfa06a})
-        obj("touret", 15.6, 7.9, 0, "cablage", {"couleur": 0x4a2c2c})
-        obj("palette", 13.6, 9.6, 0, "cablage", {"h": 0.5})
-        # --- le coin bureau où l'on dessine le schéma
-        obj("bureau", 5.5, 9.6, 180, "bureau", {"ecran": "cao"}); place("poste-schema", "poste", 5.5, 8.6, 0, "bureau")
-        obj("plans", 7.6, 9.9, 0, "bureau"); obj("imprimante", 8.8, 9.9, 0, "bureau")
-        obj("plante", 0.8, 1.0, 0, "cablage"); obj("plante", 17.0, 10.8, 0, "cablage")
-        obj("totem", 16.8, 1.2, 0, "cablage", {"logo": True})
-
-        return {
-            "unite": "m", "site": {"nom": "Atelier câblage", "largeur": 18, "profondeur": 12, "variante": "cablage"},
-            "contour": [[0, 0], [18, 0], [18, 12], [0, 12]],
-            "murs": [{"a": [0, 0], "b": [18, 0]}, {"a": [18, 0], "b": [18, 12]}, {"a": [18, 12], "b": [0, 12]}, {"a": [0, 12], "b": [0, 0]}],
-            "portes": [{"a": [8, 12], "b": [10.5, 12], "nom": "entree", "grande": True}],
-            "cloisons": [{"a": [11, 7.5], "b": [18, 7.5], "ouvertures": [[0.0, 0.18]], "basse": True}],
-            "zones": [
-                {"cle": "cablage", "nom": "Atelier câblage", "type": "atelier", "polygone": [[0, 0], [18, 0], [18, 7.5], [0, 7.5]], "sol": "beton_marque"},
-                {"cle": "bureau", "nom": "Poste schéma", "type": "bureau", "polygone": [[0, 7.5], [11, 7.5], [11, 12], [0, 12]], "sol": "parquet"},
-            ],
-            "objets": o, "places": places,
-            "exterieur": {"route": None, "clotures": [], "arbres": [[-2, -2, 1], [20, -2, 1], [-2, 14, 1], [20, 14, 1]], "haies": [], "sol": [[-6, -6], [24, 18]]},
-            "couloirs": [[9, 11], [9, 6], [5.5, 10]],
-            "camera": {"azimut": 0.0, "polaire": 0.92, "cible": [9, 0, 5], "distance": 26},
-            "secteur": SECTEUR["nom"],
-        }
 
     def layout_json(self):
         self.ensure_one()

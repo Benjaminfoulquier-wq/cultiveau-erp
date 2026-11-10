@@ -214,12 +214,6 @@ export class MapVivante extends Component {
     quitterConcessionnaire() {
         this.action.doAction("cultiveau_vue3d.action_vue3d", { clearBreadcrumbs: true });
     }
-    ouvrirSchema() {
-        this.action.doAction("cultiveau_vue3d.action_vue3d_schema", { clearBreadcrumbs: true });
-    }
-    quitterCablage() {
-        this.action.doAction("cultiveau_vue3d.action_vue3d", { clearBreadcrumbs: true });
-    }
     demonter() {
         try {
             if (this.moteur && this.state.v) {

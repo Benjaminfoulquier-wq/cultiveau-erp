@@ -29,7 +29,7 @@ export class SchemaCablage extends Component {
     }
 
     retour() {
-        this.action.doAction("cultiveau_vue3d.action_vue3d_cablage", { clearBreadcrumbs: true });
+        this.action.doAction("cultiveau_vue3d.action_vue3d", { clearBreadcrumbs: true });
     }
 }
 
