@@ -280,6 +280,18 @@ class Newsletter(models.TransientModel):
             "sur Canva (glissez-la, ou utilisez le bloc Image de l'éditeur à droite). Le bandeau à votre logo et le pied "
             "du réseau restent en place.</p></div>")
 
+    # ------------------------------------------------------------------ la galerie de modèles de l'éditeur (10/11/2026)
+    @api.model
+    def cultiveau_modele_galerie(self, cle):
+        """Le corps d'un modèle de la galerie « Corps de l'e-mail » : les newsletters du réseau, à la marque de la société
+        de la personne connectée, à la place des modèles d'origine (logo et textes de l'éditeur, en anglais)."""
+        company = self.env.company
+        if cle == "vierge":
+            titre, (sous_titre, contenu) = "Votre titre ici", self._contenu_vierge()
+        else:
+            titre, (sous_titre, contenu) = dict(THEMES).get(cle, cle), self._contenu_saison(cle)
+        return self._corps(company, titre, sous_titre, contenu)
+
     # ------------------------------------------------------------------ créer le brouillon
     def _domaine(self):
         """Les destinataires : par culture, par famille, ou tous les clients de l'adhérent."""

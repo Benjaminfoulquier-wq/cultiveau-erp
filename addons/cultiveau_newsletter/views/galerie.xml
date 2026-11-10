@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- La galerie « Corps de l'e-mail » : les newsletters du réseau à la place des modèles d'origine de l'éditeur.
+         « Texte simple » et « Partir de zéro » restent. Chaque modèle sort à la marque de la société connectée. -->
+    <template id="galerie_reseau" inherit_id="mass_mailing.email_designer_themes" priority="99">
+        <xpath expr="//div[@data-name='default']" position="replace"/>
+        <xpath expr="//div[@data-name='event']" position="replace"/>
+        <xpath expr="//div[@data-name='newsletter']" position="replace"/>
+        <xpath expr="//div[@data-name='training']" position="replace"/>
+        <xpath expr="//div[@data-name='coupon']" position="replace"/>
+        <xpath expr="//div[@data-name='coffeebreak']" position="replace"/>
+        <xpath expr="//div[@data-name='blogging']" position="replace"/>
+        <xpath expr="//div[@data-name='magazine']" position="replace"/>
+        <xpath expr="//div[@data-name='bignews']" position="replace"/>
+        <xpath expr="//div[@data-name='promotion']" position="replace"/>
+        <xpath expr="//div[@data-name='roadshow1']" position="replace"/>
+        <xpath expr="//div[@data-name='roadshow2']" position="replace"/>
+        <xpath expr="." position="inside">
+            <div data-name="cultiveau_vierge" title="À ma marque (vierge)" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/vierge_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('vierge')"/>
+            </div>
+            <div data-name="cultiveau_hivernage" title="Hivernage" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/hivernage_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('hivernage')"/>
+            </div>
+            <div data-name="cultiveau_remise_route" title="Remise en route" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/remise_route_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('remise_route')"/>
+            </div>
+            <div data-name="cultiveau_pleine_saison" title="Pleine saison" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/pleine_saison_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('pleine_saison')"/>
+            </div>
+            <div data-name="cultiveau_contrat" title="Contrat d'entretien" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/contrat_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('contrat')"/>
+            </div>
+            <div data-name="cultiveau_filtration" title="Filtration" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/filtration_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('filtration')"/>
+            </div>
+            <div data-name="cultiveau_aides" title="Aides du moment" data-nowrap="1" data-img="/cultiveau_newsletter/static/src/img/galerie/aides_thumb">
+                <t t-out="env['cultiveau.newsletter'].cultiveau_modele_galerie('aides')"/>
+            </div>
+        </xpath>
+    </template>
+</odoo>
