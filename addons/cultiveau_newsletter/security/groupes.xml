@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="0">
+    <!-- L'adhérent envoie ses propres newsletters : il lui faut l'accès à l'app Email Marketing. On l'ajoute au
+         groupe adhérent (non destructif), ce qui le propage à tous les comptes adhérents, existants compris. -->
+    <record id="cultiveau_base.group_adherent" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('mass_mailing.group_mass_mailing_user'))]"/>
+    </record>
+</odoo>
