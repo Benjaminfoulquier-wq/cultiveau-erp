@@ -242,9 +242,11 @@ export function analyser(schema) {
     const lignes = {};
     schema.composants.filter((c) => c.type !== "alimentation").forEach((c) => {
         const d = designation(c);
-        lignes[d] = lignes[d] || { designation: d, quantite: 0, reperes: [] };
-        lignes[d].quantite++;
-        if (c.repere) lignes[d].reperes.push(c.repere);
+        // deux appareils pareils ne font qu'une ligne, sauf s'ils n'ont pas le même article du catalogue
+        const cle = d + "|" + (c.article ? c.article.id : "");
+        lignes[cle] = lignes[cle] || { cle, designation: d, quantite: 0, unite: "u", reperes: [], article: c.article || null };
+        lignes[cle].quantite++;
+        if (c.repere) lignes[cle].reperes.push(c.repere);
     });
     const materiel = Object.values(lignes).sort((a, b) => a.designation.localeCompare(b.designation, "fr"));
 
@@ -257,7 +259,7 @@ export function analyser(schema) {
         const cle = `${{ puissance: "Câble de puissance", commande: "Fil de commande", terre: "Conducteur de terre" }[genres[f.id]]} ${f.section ? f.section + " mm²" : "(section à préciser)"}`;
         metres[cle] = (metres[cle] || 0) + nombre(f.longueur);
     });
-    const cables = Object.entries(metres).map(([designation, longueur]) => ({ designation, longueur })).sort((a, b) => a.designation.localeCompare(b.designation, "fr"));
+    const cables = Object.entries(metres).map(([designation, longueur]) => ({ designation, longueur, quantite: longueur, unite: "m", reperes: [] })).sort((a, b) => a.designation.localeCompare(b.designation, "fr"));
 
     // les contrôles
     const controles = [];

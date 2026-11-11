@@ -6,6 +6,9 @@
                 <button class="o_cv_bouton" t-on-click="retour" title="Revenir à la Map vivante"><i class="fa fa-arrow-left me-1"/>Atelier</button>
                 <i class="fa fa-sitemap o_cv_schema_logo"/>
                 <input class="o_cv_schema_nom" type="text" t-att-value="state.nom" t-on-change="renommer" placeholder="Nom du schéma"/>
+                <button class="o_cv_bouton o_cv_schema_client" t-on-click="() => this.ouvrirRecherche('client')" title="Le client du schéma et du devis">
+                    <i class="fa fa-user-o me-1"/><t t-if="state.client" t-esc="state.client.nom"/><t t-else="">Client</t>
+                </button>
                 <span class="o_cv_schema_etat" t-att-class="{ modifie: state.modifie }">
                     <t t-if="state.modifie">Non enregistré</t><t t-elif="state.id">Enregistré</t><t t-else="">Brouillon</t>
                 </span>
@@ -18,7 +21,9 @@
                     <button class="o_cv_bouton" t-on-click="telecharger" t-att-disabled="!state.composants.length" title="Télécharger l'image du schéma"><i class="fa fa-download"/></button>
                     <button class="o_cv_bouton" t-on-click="nouveau"><i class="fa fa-file-o me-1"/>Nouveau</button>
                     <button class="o_cv_bouton" t-on-click="listerSchemas"><i class="fa fa-folder-open-o me-1"/>Ouvrir</button>
-                    <button class="o_cv_bouton principal" t-on-click="enregistrer"><i class="fa fa-save me-1"/>Enregistrer</button>
+                    <button class="o_cv_bouton" t-on-click="enregistrer"><i class="fa fa-save me-1"/>Enregistrer</button>
+                    <button class="o_cv_bouton" t-if="state.devis" t-on-click="voirDevis" t-att-title="'Ouvrir ' + state.devis.nom"><i class="fa fa-external-link me-1"/>Devis</button>
+                    <button class="o_cv_bouton principal" t-on-click="creerDevis" title="Le matériel du schéma devient un devis"><i class="fa fa-file-text-o me-1"/><t t-if="state.devis">Mettre à jour le devis</t><t t-else="">Créer le devis</t></button>
                 </div>
             </div>
             <div class="o_cv_schema_corps">
@@ -116,6 +121,20 @@
                                     </select>
                                     <input t-else="" type="text" inputmode="decimal" t-att-value="(s.valeurs || {})[ch.cle] || ''" t-on-change="(ev) => this.changerValeur(s, ch.cle, ev)"/>
                                 </label>
+                                <div class="article" t-if="s.type !== 'alimentation'">
+                                    <span class="titre">Article du catalogue</span>
+                                    <t t-if="s.article">
+                                        <b t-esc="s.article.nom"/>
+                                        <div class="deux">
+                                            <button class="o_cv_bouton" t-on-click="() => this.ouvrirRecherche('article', s.article.nom)">Changer</button>
+                                            <button class="o_cv_bouton" t-on-click="() => this.retirerArticle(s)">Retirer</button>
+                                        </div>
+                                    </t>
+                                    <t t-else="">
+                                        <span class="sans">Aucun : la ligne du devis sera « à préciser ».</span>
+                                        <button class="o_cv_bouton" t-on-click="() => this.ouvrirRecherche('article', s.nom || def(s).nom)"><i class="fa fa-search me-1"/>Chercher dans le catalogue</button>
+                                    </t>
+                                </div>
                                 <button class="o_cv_bouton danger" t-on-click="supprimer"><i class="fa fa-trash-o me-1"/>Retirer l'appareil et ses fils</button>
                             </t>
                             <t t-else="">
@@ -143,9 +162,16 @@
                             <table t-if="a.materiel.length">
                                 <thead><tr><th>Appareil</th><th>Repères</th><th class="n">Qté</th></tr></thead>
                                 <tbody>
-                                    <tr t-foreach="a.materiel" t-as="l" t-key="l.designation"><td t-esc="l.designation"/><td t-esc="l.reperes.join(', ')"/><td class="n" t-esc="l.quantite"/></tr>
+                                    <tr t-foreach="a.materiel" t-as="l" t-key="l.cle">
+                                        <td><t t-esc="l.designation"/><span class="art" t-if="l.article" t-esc="l.article.nom"/><span class="art manque" t-else="">à préciser</span></td>
+                                        <td t-esc="l.reperes.join(', ')"/><td class="n" t-esc="l.quantite"/>
+                                    </tr>
                                 </tbody>
                             </table>
+                            <div class="reserve" t-if="a.materiel.length">
+                                <t t-if="aPreciser"><t t-esc="aPreciser"/> ligne(s) sans article : elles partiront au devis « à préciser », à zéro. </t>
+                                Cliquez un appareil pour lui donner son article du catalogue ; ce que l'ERP ne connaît pas est cherché sur la logistique.
+                            </div>
                             <table t-if="a.cables.length">
                                 <thead><tr><th>Câbles et fils</th><th class="n">Longueur</th></tr></thead>
                                 <tbody>
@@ -176,6 +202,22 @@
                                 Schéma de principe. La conformité à la réglementation électrique reste un préalable (référentiel § 1.1.1) : faites valider le schéma et les calibres par un électricien habilité avant de câbler.
                             </div>
                         </t>
+                    </div>
+                </div>
+            </div>
+
+            <div class="o_cv_schema_voile" t-if="state.recherche" t-on-click.self="fermerRecherche">
+                <div class="o_cv_schema_liste">
+                    <div class="tete"><b><t t-if="state.recherche.pour === 'client'">Le client du schéma</t><t t-else="">Article du catalogue</t></b><button class="o_cv_bouton" t-on-click="fermerRecherche"><i class="fa fa-times"/></button></div>
+                    <div class="chercher">
+                        <input type="text" t-att-value="state.recherche.texte" t-on-input="saisirRecherche" t-on-keydown="toucheRecherche"
+                               t-att-placeholder="state.recherche.pour === 'client' ? 'Nom du client' : 'Nom ou référence de l\'article'"/>
+                        <button class="o_cv_bouton principal" t-on-click="chercher" t-att-disabled="state.recherche.enCours"><i class="fa fa-search me-1"/>Chercher</button>
+                    </div>
+                    <div class="rien" t-if="state.recherche.enCours">Recherche en cours…</div>
+                    <div class="rien" t-elif="state.recherche.vide">Rien trouvé sous ce nom.</div>
+                    <div class="ligne" t-foreach="state.recherche.resultats" t-as="r" t-key="r.id">
+                        <div class="qui" t-on-click="() => this.retenir(r)"><b t-esc="r.nom"/></div>
                     </div>
                 </div>
             </div>

@@ -87,3 +87,30 @@ class TestSchemaCablage(TransactionCase):
         self.assertEqual(schema.company_id, self.env.company)
         with self.assertRaises(ValidationError):
             schema.donnees = "pas du json"
+
+    def test_schema_vers_devis(self):
+        from odoo.exceptions import UserError
+        client = self.env["res.partner"].create({"name": "Client Câblage"})
+        article = self.env["product.product"].create({"name": "Contacteur 18 A essai", "list_price": 42.0, "sale_ok": True})
+        schema = self.env["cultiveau.schema.cablage"].create({"name": "Armoire du Mas"})
+        lignes = [{"designation": "Contacteur, 18 A", "quantite": 1, "unite": "u", "reperes": ["KM1"], "article_id": article.id},
+                  {"designation": "Disjoncteur moteur, 11 A", "quantite": 2, "unite": "u", "reperes": ["Q3", "Q4"]},
+                  {"designation": "Câble de puissance 2,5 mm²", "quantite": 62, "unite": "m"}]
+        with self.assertRaises(UserError):
+            schema.creer_devis(lignes)
+        schema.partner_id = client
+        action = schema.creer_devis(lignes)
+        devis = schema.devis_id
+        self.assertEqual(action["res_id"], devis.id)
+        produits = devis.order_line.filtered("product_id")
+        self.assertEqual(len(produits), 3)
+        self.assertEqual(produits[0].product_id, article)
+        self.assertEqual(produits[0].price_unit, 42.0)
+        self.assertEqual(produits[1].product_id.default_code, "A-PRECISER")
+        self.assertEqual(produits[1].product_uom_qty, 2)
+        self.assertIn("Q3, Q4", produits[1].name)
+        self.assertEqual(produits[2].product_uom_qty, 62)
+        # un devis en brouillon est remis à jour, pas doublé
+        schema.creer_devis(lignes[:1])
+        self.assertEqual(schema.devis_id, devis)
+        self.assertEqual(len(devis.order_line.filtered("product_id")), 1)

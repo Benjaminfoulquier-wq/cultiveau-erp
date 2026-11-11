@@ -37,6 +37,9 @@ export class SchemaCablage extends Component {
             vue: { x: 40, y: 20, z: 1 },
             onglet: "proprietes",
             modifie: false, message: "", liste: null, aSupprimer: false, peutAnnuler: false,
+            client: null,         // { id, nom }
+            devis: null,          // { id, nom } : le devis déjà tiré de ce schéma
+            recherche: null,      // { pour: "client" | "article", texte, resultats, vide }
         });
         this.historique = [];
         this.geste = null;
@@ -44,10 +47,15 @@ export class SchemaCablage extends Component {
         useExternalListener(window, "keydown", (ev) => this.clavier(ev));
         onWillStart(async () => {
             const params = (this.props.action && this.props.action.params) || {};
-            if (params.schema_id) await this.ouvrir(params.schema_id);
+            // on revient sur le schéma qu'on avait à l'écran (retour du devis, rechargement de la page)
+            const id = params.schema_id || this.souvenir();
+            if (id) { try { await this.ouvrir(id); } catch { this.retenirSchema(false); } }
         });
         onMounted(() => this.cadrer());
     }
+
+    souvenir() { try { return parseInt(window.sessionStorage.getItem("cultiveau_schema_id")) || false; } catch { return false; } }
+    retenirSchema(id) { try { id ? window.sessionStorage.setItem("cultiveau_schema_id", id) : window.sessionStorage.removeItem("cultiveau_schema_id"); } catch { /* sans mémoire, on repart d'une toile vide */ } }
 
     // ---------------------------------------------------------------- le dessin
 
@@ -271,14 +279,70 @@ export class SchemaCablage extends Component {
     }
     renommer(ev) { this.state.nom = ev.target.value; this.state.modifie = true; }
 
+    // ---------------------------------------------------------------- le client, le catalogue, le devis
+
+    ouvrirRecherche(pour, texte = "") { this.state.recherche = { pour, texte, resultats: [], vide: false, enCours: false }; }
+    fermerRecherche() { this.state.recherche = null; }
+    saisirRecherche(ev) { this.state.recherche.texte = ev.target.value; }
+    toucheRecherche(ev) { if (ev.key === "Enter") this.chercher(); }
+    // Le client se cherche dans les contacts ; l'article dans le catalogue, qui interroge la logistique quand l'ERP ne le connaît pas.
+    async chercher() {
+        const r = this.state.recherche;
+        const texte = (r.texte || "").trim();
+        if (texte.length < 2) return;
+        r.enCours = true;
+        try {
+            const trouves = r.pour === "client"
+                ? await this.orm.call("res.partner", "name_search", [], { name: texte, limit: 12 })
+                : await this.orm.call("product.product", "name_search", [], { name: texte, args: [["sale_ok", "=", true]], limit: 12 });
+            r.resultats = trouves.map(([id, nom]) => ({ id, nom: nom.split("\n")[0] }));
+            r.vide = !trouves.length;
+        } catch {
+            r.resultats = [];
+            r.vide = true;
+        }
+        r.enCours = false;
+    }
+    retenir(choix) {
+        const r = this.state.recherche;
+        if (r.pour === "client") {
+            this.state.client = choix;
+            this.state.modifie = true;
+        } else if (this.selectionne && this.state.selection.genre === "c") {
+            this.memoriser();
+            this.selectionne.article = choix;
+        }
+        this.state.recherche = null;
+    }
+    retirerArticle(c) { this.memoriser(); c.article = null; }
+    get aPreciser() { return this.analyse.materiel.filter((l) => !l.article).length; }
+    async creerDevis() {
+        if (!this.state.client) { this.ouvrirRecherche("client"); this.state.message = "Choisissez le client du devis."; return; }
+        const a = this.analyse;
+        if (!a.materiel.length) { this.state.message = "Posez d'abord des appareils : le devis reprend le matériel du schéma."; return; }
+        await this.enregistrer();
+        if (!this.state.id || this.state.modifie) return;
+        const lignes = [...a.materiel, ...a.cables].map((l) => ({ designation: l.designation, quantite: l.quantite, unite: l.unite, reperes: l.reperes, article_id: l.article ? l.article.id : false }));
+        try {
+            const action = await this.orm.call(MODELE, "creer_devis", [[this.state.id], lignes]);
+            this.action.doAction(action);
+        } catch (e) {
+            this.state.message = (e && e.data && e.data.message) || "Le devis n'a pas pu être créé.";
+        }
+    }
+    voirDevis() {
+        this.action.doAction({ type: "ir.actions.act_window", res_model: "sale.order", res_id: this.state.devis.id, views: [[false, "form"]], target: "current" });
+    }
+
     // ---------------------------------------------------------------- l'enregistrement
 
     async enregistrer() {
-        const valeurs = { name: (this.state.nom || "").trim() || "Schéma sans nom", donnees: JSON.stringify(this.schema) };
+        const valeurs = { name: (this.state.nom || "").trim() || "Schéma sans nom", donnees: JSON.stringify(this.schema), partner_id: this.state.client ? this.state.client.id : false };
         try {
             if (this.state.id) await this.orm.write(MODELE, [this.state.id], valeurs);
             else this.state.id = (await this.orm.create(MODELE, [valeurs]))[0];
             this.state.nom = valeurs.name;
+            this.retenirSchema(this.state.id);
             this.state.modifie = false;
             this.state.message = "Schéma enregistré.";
         } catch {
@@ -301,12 +365,15 @@ export class SchemaCablage extends Component {
         if (this.toile.el) this.cadrer();
     }
     async ouvrir(id) {
-        const [s] = await this.orm.read(MODELE, [id], ["name", "donnees"]);
-        if (!s) return;
+        const [s] = await this.orm.searchRead(MODELE, [["id", "=", id]], ["name", "donnees", "partner_id", "devis_id"]);
+        if (!s) { this.retenirSchema(false); return; }
         let dessin = {};
         try { dessin = JSON.parse(s.donnees || "{}"); } catch { dessin = {}; }
         this.state.id = s.id;
+        this.retenirSchema(s.id);
         this.state.nom = s.name;
+        this.state.client = s.partner_id ? { id: s.partner_id[0], nom: s.partner_id[1].split("\n")[0] } : null;
+        this.state.devis = s.devis_id ? { id: s.devis_id[0], nom: s.devis_id[1] } : null;
         this.charger(dessin);
         this.state.modifie = false;
         this.state.liste = null;
@@ -314,7 +381,10 @@ export class SchemaCablage extends Component {
     }
     nouveau() {
         this.state.id = false;
+        this.retenirSchema(false);
         this.state.nom = "Nouveau schéma";
+        this.state.client = null;
+        this.state.devis = null;
         this.charger({});
         this.state.modifie = false;
         this.state.liste = null;
