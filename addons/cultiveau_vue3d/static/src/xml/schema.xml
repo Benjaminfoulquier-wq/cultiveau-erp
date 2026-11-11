@@ -3,23 +3,197 @@
     <t t-name="cultiveau_vue3d.Schema">
         <div class="o_cv_schema">
             <div class="o_cv_schema_barre">
-                <button class="o_cv_bouton" t-on-click="retour"><i class="fa fa-arrow-left me-1"/>Retour à l'atelier</button>
-                <div class="o_cv_schema_titre"><i class="fa fa-sitemap me-2"/>Schéma de câblage</div>
-                <span class="o_cv_schema_etat">Brouillon</span>
+                <button class="o_cv_bouton" t-on-click="retour" title="Revenir à la Map vivante"><i class="fa fa-arrow-left me-1"/>Atelier</button>
+                <i class="fa fa-sitemap o_cv_schema_logo"/>
+                <input class="o_cv_schema_nom" type="text" t-att-value="state.nom" t-on-change="renommer" placeholder="Nom du schéma"/>
+                <span class="o_cv_schema_etat" t-att-class="{ modifie: state.modifie }">
+                    <t t-if="state.modifie">Non enregistré</t><t t-elif="state.id">Enregistré</t><t t-else="">Brouillon</t>
+                </span>
+                <span class="o_cv_schema_message" t-if="state.message" t-esc="state.message"/>
+                <div class="o_cv_schema_outils">
+                    <button class="o_cv_bouton" t-on-click="annuler" t-att-disabled="!state.peutAnnuler" title="Annuler le dernier geste (Ctrl+Z)"><i class="fa fa-undo"/></button>
+                    <button class="o_cv_bouton" t-on-click="() => this.zoom(-1)" title="Reculer"><i class="fa fa-search-minus"/></button>
+                    <button class="o_cv_bouton" t-on-click="() => this.zoom(1)" title="Approcher"><i class="fa fa-search-plus"/></button>
+                    <button class="o_cv_bouton" t-on-click="cadrer" title="Voir tout le schéma"><i class="fa fa-arrows-alt"/></button>
+                    <button class="o_cv_bouton" t-on-click="telecharger" t-att-disabled="!state.composants.length" title="Télécharger l'image du schéma"><i class="fa fa-download"/></button>
+                    <button class="o_cv_bouton" t-on-click="nouveau"><i class="fa fa-file-o me-1"/>Nouveau</button>
+                    <button class="o_cv_bouton" t-on-click="listerSchemas"><i class="fa fa-folder-open-o me-1"/>Ouvrir</button>
+                    <button class="o_cv_bouton principal" t-on-click="enregistrer"><i class="fa fa-save me-1"/>Enregistrer</button>
+                </div>
             </div>
             <div class="o_cv_schema_corps">
                 <div class="o_cv_schema_palette">
-                    <div class="o_cv_schema_palette_titre">Composants</div>
-                    <button t-foreach="state.composants" t-as="c" t-key="c.cle" class="o_cv_schema_comp" t-att-data-cle="c.cle">
-                        <i t-att-class="'fa fa-fw me-2 ' + c.icone"/><t t-esc="c.nom"/>
-                    </button>
+                    <t t-foreach="palette" t-as="groupe" t-key="groupe.famille">
+                        <div class="o_cv_schema_palette_titre" t-esc="groupe.famille"/>
+                        <button t-foreach="groupe.appareils" t-as="a" t-key="a.cle" class="o_cv_schema_comp" draggable="true"
+                                t-on-click="() => this.poser(a.cle)" t-on-dragstart="(ev) => this.glisserPalette(ev, a.cle)" title="Cliquer ou glisser sur la toile">
+                            <svg width="26" height="26" t-att-viewBox="(APPAREILS[a.cle].l === 2 ? '-22 -4 84 88' : APPAREILS[a.cle].l === 6 ? '-4 -4 128 128' : '-4 -4 88 88')">
+                                <path t-att-d="APPAREILS[a.cle].trait" fill="none" stroke="#0b7fa3" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span t-esc="a.nom"/>
+                        </button>
+                    </t>
+                    <div class="o_cv_schema_aide">
+                        Cliquez un appareil pour le poser, déplacez-le à la souris.<br/>
+                        Cliquez une borne, puis une autre : le fil est tiré.<br/>
+                        Suppr efface la sélection, Échap abandonne un fil.
+                    </div>
                 </div>
-                <div class="o_cv_schema_toile">
-                    <div class="o_cv_schema_grille"/>
-                    <div class="o_cv_schema_vide">
+
+                <div class="o_cv_schema_toile" t-ref="toile" t-att-class="{ fil: state.depart }"
+                     t-on-dragover.prevent="" t-on-drop.prevent="deposer" t-on-wheel="molette">
+                    <svg width="100%" height="100%" t-on-pointerdown="prendreFond" t-on-pointermove="bouger" t-on-pointerup="lacher" t-on-pointerleave="lacher"
+                         font-family="Inter, Helvetica, Arial, sans-serif">
+                        <defs>
+                            <pattern id="cv_grille" t-att-width="PAS" t-att-height="PAS" patternUnits="userSpaceOnUse">
+                                <circle cx="0.8" cy="0.8" r="0.8" fill="#c3ccd2"/>
+                            </pattern>
+                        </defs>
+                        <g class="o_cv_schema_monde" t-att-transform="transform">
+                            <rect class="o_cv_schema_hors_image" x="-6000" y="-6000" width="12000" height="12000" fill="url(#cv_grille)"/>
+                            <!-- les fils, sous les appareils -->
+                            <g t-foreach="filsTraces" t-as="f" t-key="f.id" t-on-pointerdown="(ev) => this.choisirFil(ev, f.id)" style="cursor: pointer">
+                                <path t-att-d="f.d" fill="none" stroke="transparent" stroke-width="14"/>
+                                <path t-if="estChoisi('f', f.id)" t-att-d="f.d" fill="none" stroke="#ffb300" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity="0.55"/>
+                                <path t-att-d="f.d" fill="none" t-att-stroke="f.couleur" t-att-stroke-width="f.epaisseur" t-att-stroke-dasharray="f.tirets" stroke-linejoin="round"/>
+                                <g t-att-transform="'translate(' + f.mx + ',' + f.my + ')'">
+                                    <rect x="-11" y="-8" width="22" height="16" rx="4" fill="#fff" t-att-stroke="estChoisi('f', f.id) ? '#ffb300' : f.couleur" stroke-width="1"/>
+                                    <text y="4" text-anchor="middle" font-size="10" font-weight="600" t-att-fill="f.couleur" t-esc="f.num"/>
+                                </g>
+                            </g>
+                            <!-- les appareils -->
+                            <g t-foreach="state.composants" t-as="c" t-key="c.id" t-att-transform="'translate(' + c.x + ',' + c.y + ')'">
+                                <g t-on-pointerdown="(ev) => this.prendre(ev, c)" style="cursor: move">
+                                    <rect x="-4" y="-2" t-att-width="def(c).l * PAS + 8" t-att-height="def(c).h * PAS + 4" rx="8"
+                                          t-att-fill="estChoisi('c', c.id) ? '#fff7df' : '#ffffff'" t-att-stroke="estChoisi('c', c.id) ? '#ffb300' : '#d5dce1'" t-att-stroke-width="estChoisi('c', c.id) ? 2 : 1"/>
+                                    <path t-att-d="def(c).trait" fill="none" stroke="#1d2f38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <text t-foreach="def(c).textes || []" t-as="t" t-key="t_index" t-att-x="t.x" t-att-y="t.y" text-anchor="middle" font-size="11" font-weight="600" fill="#1d2f38" t-esc="t.t"/>
+                                    <text t-att-x="def(c).l * PAS + 10" y="14" font-size="13" font-weight="700" fill="#0b5c78" t-esc="c.repere"/>
+                                    <text t-att-x="def(c).l * PAS + 10" y="29" font-size="10" fill="#5d6b78" t-esc="c.nom || def(c).nom"/>
+                                    <text t-att-x="def(c).l * PAS + 10" y="42" font-size="10" fill="#5d6b78" t-esc="valeur(c)"/>
+                                </g>
+                                <g t-foreach="bornes(c)" t-as="b" t-key="b.id" t-on-pointerdown="(ev) => this.cliquerBorne(ev, c, b)" style="cursor: crosshair">
+                                    <circle t-att-cx="b.px" t-att-cy="b.py" r="10" fill="transparent"/>
+                                    <circle t-att-cx="b.px" t-att-cy="b.py" t-att-r="state.depart and state.depart.c === c.id and state.depart.b === b.id ? 6 : 4"
+                                            t-att-fill="state.depart and state.depart.c === c.id and state.depart.b === b.id ? '#ffb300' : '#ffffff'"
+                                            t-att-stroke="b.genre === 't' ? '#3f9b3a' : b.genre === 'p' ? '#1d2f38' : '#0b7fa3'" stroke-width="2"/>
+                                    <text t-if="b.nom" t-att-x="b.tx" t-att-y="b.ty" t-att-text-anchor="b.ancre" font-size="9" fill="#7a8791" t-esc="b.nom"/>
+                                </g>
+                            </g>
+                            <path t-if="state.depart" class="o_cv_schema_hors_image" t-att-d="filEnCours" fill="none" stroke="#ffb300" stroke-width="2" stroke-dasharray="6 4" style="pointer-events: none"/>
+                        </g>
+                    </svg>
+                    <div class="o_cv_schema_vide" t-if="!state.composants.length">
                         <i class="fa fa-sitemap"/>
-                        <div class="t">La toile du schéma</div>
-                        <div class="s">Les composants se poseront ici et se relieront par des fils. Prochaine étape : rendre la toile active.</div>
+                        <div class="t">La toile est vide</div>
+                        <div class="s">Posez une arrivée réseau, les protections, puis le moteur, et reliez-les de borne à borne.</div>
+                        <button class="o_cv_bouton principal" t-on-click="partirExemple"><i class="fa fa-magic me-1"/>Partir d'un exemple : pompe avec pressostat</button>
+                    </div>
+                    <div class="o_cv_schema_bandeau" t-if="state.depart">Cliquez la borne d'arrivée du fil. Échap pour abandonner.</div>
+                </div>
+
+                <div class="o_cv_schema_panneau">
+                    <div class="o_cv_schema_onglets">
+                        <button t-att-class="{ actif: state.onglet === 'proprietes' }" t-on-click="() => state.onglet = 'proprietes'">Sélection</button>
+                        <button t-att-class="{ actif: state.onglet === 'materiel' }" t-on-click="() => state.onglet = 'materiel'">Matériel</button>
+                        <button t-att-class="{ actif: state.onglet === 'fils' }" t-on-click="() => state.onglet = 'fils'">Fils</button>
+                        <button t-att-class="{ actif: state.onglet === 'controles' }" t-on-click="() => state.onglet = 'controles'">
+                            Contrôles<span class="pastille" t-if="alertes" t-esc="alertes"/>
+                        </button>
+                    </div>
+                    <div class="o_cv_schema_contenu">
+                        <t t-if="state.onglet === 'proprietes'">
+                            <t t-set="s" t-value="selectionne"/>
+                            <div class="rien" t-if="!s">Cliquez un appareil ou un fil pour le régler ici.</div>
+                            <t t-elif="state.selection.genre === 'c'">
+                                <h4 t-esc="def(s).nom"/>
+                                <label>Repère<input type="text" t-att-value="s.repere" t-on-change="(ev) => this.changer(s, 'repere', ev)"/></label>
+                                <label>Désignation<input type="text" t-att-value="s.nom" t-att-placeholder="def(s).nom" t-on-change="(ev) => this.changer(s, 'nom', ev)"/></label>
+                                <label t-foreach="def(s).champs" t-as="ch" t-key="ch.cle">
+                                    <t t-esc="ch.nom"/><t t-if="ch.unite"> (<t t-esc="ch.unite"/>)</t>
+                                    <select t-if="ch.choix" t-on-change="(ev) => this.changerValeur(s, ch.cle, ev)">
+                                        <option t-foreach="ch.choix" t-as="o" t-key="o" t-att-value="o" t-att-selected="(s.valeurs || {})[ch.cle] === o" t-esc="o"/>
+                                    </select>
+                                    <input t-else="" type="text" inputmode="decimal" t-att-value="(s.valeurs || {})[ch.cle] || ''" t-on-change="(ev) => this.changerValeur(s, ch.cle, ev)"/>
+                                </label>
+                                <button class="o_cv_bouton danger" t-on-click="supprimer"><i class="fa fa-trash-o me-1"/>Retirer l'appareil et ses fils</button>
+                            </t>
+                            <t t-else="">
+                                <h4>Fil <t t-esc="s.num"/></h4>
+                                <div class="trajet">Part de <b t-esc="extremite(s.de)"/><br/>Arrive à <b t-esc="extremite(s.a)"/></div>
+                                <label>Numéro<input type="text" t-att-value="s.num" t-on-change="(ev) => this.changer(s, 'num', ev)"/></label>
+                                <label>Section (mm²)
+                                    <select t-on-change="(ev) => this.changer(s, 'section', ev)">
+                                        <option value="" t-att-selected="!s.section">À préciser</option>
+                                        <option t-foreach="SECTIONS" t-as="o" t-key="o" t-att-value="o" t-att-selected="s.section === o" t-esc="o"/>
+                                    </select>
+                                </label>
+                                <label>Longueur (m)<input type="text" inputmode="decimal" t-att-value="s.longueur" t-on-change="(ev) => this.changer(s, 'longueur', ev)"/></label>
+                                <div class="deux">
+                                    <button class="o_cv_bouton" t-on-click="() => this.decaler(s, -1)" title="Décaler le tracé"><i class="fa fa-arrow-left me-1"/>Décaler</button>
+                                    <button class="o_cv_bouton" t-on-click="() => this.decaler(s, 1)" title="Décaler le tracé">Décaler<i class="fa fa-arrow-right ms-1"/></button>
+                                </div>
+                                <button class="o_cv_bouton danger" t-on-click="supprimer"><i class="fa fa-trash-o me-1"/>Retirer le fil</button>
+                            </t>
+                        </t>
+
+                        <t t-if="state.onglet === 'materiel'">
+                            <t t-set="a" t-value="analyse"/>
+                            <div class="rien" t-if="!a.materiel.length">La liste se remplit au fur et à mesure que vous posez des appareils.</div>
+                            <table t-if="a.materiel.length">
+                                <thead><tr><th>Appareil</th><th>Repères</th><th class="n">Qté</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="a.materiel" t-as="l" t-key="l.designation"><td t-esc="l.designation"/><td t-esc="l.reperes.join(', ')"/><td class="n" t-esc="l.quantite"/></tr>
+                                </tbody>
+                            </table>
+                            <table t-if="a.cables.length">
+                                <thead><tr><th>Câbles et fils</th><th class="n">Longueur</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="a.cables" t-as="l" t-key="l.designation"><td t-esc="l.designation"/><td class="n"><t t-esc="fr(l.longueur, 0)"/> m</td></tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <t t-if="state.onglet === 'fils'">
+                            <t t-set="a" t-value="analyse"/>
+                            <div class="rien" t-if="!a.fils.length">Aucun fil pour l'instant. Cliquez une borne, puis une autre.</div>
+                            <table t-if="a.fils.length" class="cliquable">
+                                <thead><tr><th>N°</th><th>Part de</th><th>Arrive à</th><th class="n">mm²</th><th class="n">m</th></tr></thead>
+                                <tbody>
+                                    <tr t-foreach="a.fils" t-as="f" t-key="f.id" t-att-class="{ choisi: estChoisi('f', f.id) }" t-on-click="() => state.selection = { genre: 'f', id: f.id }">
+                                        <td><b t-esc="f.num"/></td><td t-esc="f.de"/><td t-esc="f.a"/><td class="n" t-esc="f.section"/><td class="n" t-esc="f.longueur"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </t>
+
+                        <t t-if="state.onglet === 'controles'">
+                            <div t-foreach="analyse.controles" t-as="k" t-key="k_index" class="controle" t-att-class="k.etat">
+                                <i t-att-class="'fa fa-fw ' + (k.etat === 'ok' ? 'fa-check-circle' : k.etat === 'alerte' ? 'fa-exclamation-triangle' : 'fa-info-circle')"/>
+                                <div><t t-esc="k.texte"/><span class="source" t-if="k.source">Référentiel <t t-esc="k.source"/></span></div>
+                            </div>
+                            <div class="reserve">
+                                Schéma de principe. La conformité à la réglementation électrique reste un préalable (référentiel § 1.1.1) : faites valider le schéma et les calibres par un électricien habilité avant de câbler.
+                            </div>
+                        </t>
+                    </div>
+                </div>
+            </div>
+
+            <div class="o_cv_schema_voile" t-if="state.liste" t-on-click.self="fermerListe">
+                <div class="o_cv_schema_liste">
+                    <div class="tete"><b>Schémas enregistrés</b><button class="o_cv_bouton" t-on-click="fermerListe"><i class="fa fa-times"/></button></div>
+                    <div class="rien" t-if="!state.liste.length">Aucun schéma enregistré pour l'instant.</div>
+                    <div class="ligne" t-foreach="state.liste" t-as="s" t-key="s.id">
+                        <div class="qui" t-on-click="() => this.ouvrir(s.id)">
+                            <b t-esc="s.name"/>
+                            <span><t t-esc="s.nb_composants"/> appareil(s), modifié le <t t-esc="date(s.write_date)"/></span>
+                        </div>
+                        <t t-if="state.aSupprimer === s.id">
+                            <button class="o_cv_bouton danger" t-on-click="() => this.archiver(s.id)">Supprimer</button>
+                            <button class="o_cv_bouton" t-on-click="() => this.demanderSuppression(false)">Garder</button>
+                        </t>
+                        <button t-else="" class="o_cv_bouton" t-on-click="() => this.demanderSuppression(s.id)" title="Supprimer ce schéma"><i class="fa fa-trash-o"/></button>
                     </div>
                 </div>
             </div>

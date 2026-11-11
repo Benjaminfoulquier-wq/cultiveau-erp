@@ -15,4 +15,9 @@
         <field name="model_id" ref="model_cultiveau_evenement"/>
         <field name="domain_force">[('company_id', 'in', company_ids)]</field>
     </record>
+    <record id="regle_schema_cablage_societe" model="ir.rule">
+        <field name="name">Schéma de câblage : sa société</field>
+        <field name="model_id" ref="model_cultiveau_schema_cablage"/>
+        <field name="domain_force">[('company_id', 'in', company_ids)]</field>
+    </record>
 </odoo>

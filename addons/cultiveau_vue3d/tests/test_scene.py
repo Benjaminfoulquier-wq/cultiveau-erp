@@ -75,3 +75,15 @@ class TestScene(TransactionCase):
             action = Scene.action(cle, famille.id)
             self.assertIn("child_of", [c[1] for c in action["domain"] if isinstance(c, (list, tuple))], cle)
             self.assertTrue(action["name"].startswith("Famille du plan"))
+
+
+@tagged("post_install", "-at_install", "cultiveau")
+class TestSchemaCablage(TransactionCase):
+    def test_schema_garde_son_dessin(self):
+        from odoo.exceptions import ValidationError
+        Schema = self.env["cultiveau.schema.cablage"]
+        schema = Schema.create({"name": "Station du Mas", "donnees": '{"composants": [{"id": "c1", "type": "moteur"}, {"id": "c2", "type": "disjoncteur"}], "fils": []}'})
+        self.assertEqual(schema.nb_composants, 2)
+        self.assertEqual(schema.company_id, self.env.company)
+        with self.assertRaises(ValidationError):
+            schema.donnees = "pas du json"

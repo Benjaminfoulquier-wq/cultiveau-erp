@@ -6,3 +6,5 @@ access_pointage_user,cultiveau.pointage,model_cultiveau_pointage,base.group_user
 access_pointage_manager,cultiveau.pointage gestion,model_cultiveau_pointage,sales_team.group_sale_manager,1,1,1,1
 access_evenement_user,cultiveau.evenement,model_cultiveau_evenement,base.group_user,1,0,0,0
 access_evenement_manager,cultiveau.evenement gestion,model_cultiveau_evenement,sales_team.group_sale_manager,1,1,1,1
+access_schema_cablage_user,cultiveau.schema.cablage,model_cultiveau_schema_cablage,base.group_user,1,1,1,0
+access_schema_cablage_manager,cultiveau.schema.cablage gestion,model_cultiveau_schema_cablage,sales_team.group_sale_manager,1,1,1,1
