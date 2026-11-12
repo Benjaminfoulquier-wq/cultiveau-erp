@@ -1,9 +1,12 @@
+import base64
+import hashlib
+import hmac
 import json
 from unittest import mock
 
 from odoo import Command
 from odoo.exceptions import UserError
-from odoo.tests import TransactionCase, tagged
+from odoo.tests import HttpCase, TransactionCase, tagged
 
 from ..models import armoire as module_armoire, regles
 
@@ -179,3 +182,41 @@ class TestCablage(TransactionCase):
             res2, action = M._executer("concevoir_cablage", {"installation_id": self.inst.id, "description": "idem"})
         self.assertEqual(action["modele"], "cultiveau.armoire")
         self.assertEqual(a.indice, "B", "la seconde conception recompile en indice suivant")
+
+
+@tagged("post_install", "-at_install")
+class TestOutilCablage(HttpCase):
+    """L'outil de câblage du réseau s'ouvre depuis l'ERP avec un laissez-passer signé."""
+
+    def _charge(self, adresse):
+        from urllib.parse import parse_qs, unquote, urlparse
+        u = urlparse(adresse)
+        corps, signature = unquote(parse_qs(u.query)["t"][0]).split(".")
+        attendu = base64.urlsafe_b64encode(hmac.new(b"secret-de-test-pour-le-cablage-0123", corps.encode(), hashlib.sha256).digest()).rstrip(b"=").decode()
+        self.assertEqual(signature, attendu)
+        return u, json.loads(base64.urlsafe_b64decode(corps + "=" * (-len(corps) % 4)))
+
+    def test_ouvrir(self):
+        parametres = self.env["ir.config_parameter"].sudo()
+        self.authenticate("admin", "admin")
+        parametres.set_param("cultiveau.cablage_secret", "")
+        r = self.url_open("/cultiveau/cablage/ouvrir", allow_redirects=False)
+        self.assertEqual(r.status_code, 200)
+        self.assertIn("pas encore relié", r.text)
+        parametres.set_param("cultiveau.cablage_secret", "secret-de-test-pour-le-cablage-0123")
+        parametres.set_param("cultiveau.url_cablage", "https://outil.test/")
+        r = self.url_open("/cultiveau/cablage/ouvrir", allow_redirects=False)
+        self.assertIn(r.status_code, (302, 303))
+        u, charge = self._charge(r.headers["Location"])
+        self.assertEqual(u.scheme + "://" + u.netloc + u.path, "https://outil.test/sso/erp/")
+        self.assertEqual((charge["v"], charge["outil"], charge["source"]), (1, "cablage", "erp"))
+        self.assertTrue(charge["email"])
+        self.assertNotIn("texte", charge)
+        # depuis un dossier : sa description voyage avec
+        client = self.env["res.partner"].create({"name": "GAEC de l'Outil"})
+        inst = self.env["cultiveau.installation"].create({"name": "Forage des Essais", "partner_id": client.id, "type_systeme": "couverture_integrale", "company_id": self.env.company.id})
+        dossier = self.env["cultiveau.armoire"].create({"installation_id": inst.id, "cahier_des_charges": "Deux pompes de 11 kW, une en secours."})
+        self.assertEqual(dossier.action_outil()["params"], {"armoire": dossier.id})
+        r = self.url_open(f"/cultiveau/cablage/ouvrir?armoire={dossier.id}", allow_redirects=False)
+        _u, charge = self._charge(r.headers["Location"])
+        self.assertEqual((charge["ref"], charge["texte"]), (dossier.name, "Deux pompes de 11 kW, une en secours."))

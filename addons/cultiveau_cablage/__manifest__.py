@@ -14,14 +14,25 @@ Vous décrivez l'armoire (ou l'ERP la reprend de l'étude : la pompe du dimensio
 Les courants, calibres, sections et chutes de tension suivent les règles usuelles (NF C 15-100) : un pré-dimensionnement que
 l'électricien qui réalise l'armoire vérifie et valide. La nomenclature s'ajoute au devis en un lot ; le PDF se joint au dossier
 technique de l'installation ; Mathis répond et compile.
+
+« Composer une armoire » ouvre l'outil de câblage du réseau (cablage.cultiveau.fr) dans l'ERP, sans nouvelle connexion : on décrit
+l'armoire, on répond aux questions, le dossier de câblage sort (folios, borniers, carnet de fils, essais). Ouvert depuis un dossier,
+il en reprend la description.
 """,
-    "version": "18.0.1.0.0",
+    "version": "18.0.1.1.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "website": "https://cultiveau.fr",
     "license": "LGPL-3",
     "depends": ["cultiveau_dimensionnement", "cultiveau_vue3d", "cultiveau_mathis", "sale_management"],
     "data": ["security/ir.model.access.csv", "security/regles.xml", "data/cablage_data.xml", "report/armoire_report.xml", "views/armoire_views.xml"],
+    "assets": {
+        "web.assets_backend": [
+            "cultiveau_cablage/static/src/js/outil.js",
+            "cultiveau_cablage/static/src/xml/outil.xml",
+            "cultiveau_cablage/static/src/scss/outil.scss",
+        ],
+    },
     "installable": True,
     "auto_install": False,
 }

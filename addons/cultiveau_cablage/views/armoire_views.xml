@@ -12,6 +12,7 @@
                     <button name="action_joindre_au_dossier" type="object" string="Joindre au dossier technique" icon="fa-paperclip" invisible="etat == 'brouillon'"/>
                     <button name="action_ajouter_au_devis" type="object" string="Ajouter au devis" icon="fa-file-text-o" invisible="etat == 'brouillon'"/>
                     <button name="action_valider" type="object" string="Validé par l'électricien" icon="fa-check" invisible="etat != 'compile'"/>
+                    <button name="action_outil" type="object" string="Composer avec l'outil de câblage" icon="fa-plug" help="Ouvre l'outil de câblage du réseau avec la description de ce dossier : questions, folios, borniers, carnet de fils, essais."/>
                     <button name="action_reprendre_etude" type="object" string="Reprendre l'étude" icon="fa-download" confirm="Remplacer les départs et électrovannes par ceux de l'étude ?"/>
                     <field name="etat" widget="statusbar"/>
                 </header>
@@ -176,6 +177,13 @@
         </field>
     </record>
     <menuitem id="menu_armoires" name="Câblage des armoires" parent="cultiveau_installation.menu_parc" action="action_armoires" sequence="15"/>
+
+    <!-- L'outil de câblage du réseau, affiché tel quel dans l'ERP : une évolution de l'outil s'y voit tout de suite. -->
+    <record id="action_outil_cablage" model="ir.actions.client">
+        <field name="name">Composer une armoire</field>
+        <field name="tag">cultiveau_cablage.outil</field>
+    </record>
+    <menuitem id="menu_outil_cablage" name="Composer une armoire" parent="cultiveau_installation.menu_parc" action="action_outil_cablage" sequence="16"/>
 
     <record id="view_installation_form_cablage" model="ir.ui.view">
         <field name="name">cultiveau.installation.form.cablage</field>

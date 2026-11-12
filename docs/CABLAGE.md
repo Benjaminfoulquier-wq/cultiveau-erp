@@ -73,6 +73,21 @@ Les folios se lisent dans l'onglet **Folios** du dossier et s'impriment en PDF (
 range le PDF dans les pièces de l'installation. Une modification (départ, électrovanne, réglage) repasse le dossier « à compiler » ;
 recompiler passe l'indice à B, C… « Validé par l'électricien » fige l'indice.
 
+## Composer une armoire avec l'outil de câblage du réseau
+
+Menu **Parc → Composer une armoire**, ou bouton **Composer avec l'outil de câblage** sur un dossier : l'outil du réseau
+(cablage.cultiveau.fr) s'affiche dans l'ERP, sans nouvelle connexion. On décrit l'armoire, on répond aux questions, le dossier
+sort : folios, borniers, carnet de fils, réglages, essais simulés, PDF et archive. Ouvert depuis un dossier, il reprend sa
+description (« Décrivez l'armoire ») ; la société de l'ERP est proposée pour retrouver les habitudes d'atelier.
+
+Comment ça marche : le cadre ouvre `/cultiveau/cablage/ouvrir` (`controllers/outil.py`), qui signe un laissez-passer pour
+l'utilisateur connecté (e-mail, société, deux minutes, usage unique) et renvoie vers `<outil>/sso/erp/?t=…`. Paramètres système :
+`cultiveau.cablage_secret` (le même que `SSO_ERP` de l'outil) et `cultiveau.url_cablage` (par défaut https://cablage.cultiveau.fr).
+Qui a l'ERP a l'outil : il n'y a pas de liste à tenir côté outil. Une évolution de l'outil se voit tout de suite dans l'ERP.
+
+Pas encore fait : le dossier composé dans l'outil ne revient pas tout seul dans le dossier de l'ERP (pièce jointe, nomenclature
+au devis). Les deux compilateurs (celui de l'ERP, celui de l'outil) vivent côte à côte.
+
 ## Le devis et le reste
 
 - **Ajouter au devis** : la nomenclature devient le lot 7 « Armoire électrique et câblage » du dernier devis ouvert de l'installation

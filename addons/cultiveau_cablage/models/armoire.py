@@ -540,6 +540,11 @@ jusqu'à 2,2 kW). « notes » : 3 à 8 phrases qui expliquent tes choix à l'él
 
     # ---------------------------------------------------------------- les suites
 
+    def action_outil(self):
+        """L'outil de câblage du réseau, dans le cadre de l'ERP, avec la description de ce dossier."""
+        self.ensure_one()
+        return {"type": "ir.actions.client", "tag": "cultiveau_cablage.outil", "name": f"Composer l'armoire · {self.name}", "params": {"armoire": self.id}}
+
     def action_valider(self):
         for a in self:
             if a.etat != "compile":

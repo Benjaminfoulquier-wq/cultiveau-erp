@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="cultiveau_cablage.Outil">
+        <div class="o_cultiveau_cablage_outil">
+            <iframe t-att-src="adresse" t-att-title="props.action.name" allow="clipboard-write"/>
+        </div>
+    </t>
+</templates>
