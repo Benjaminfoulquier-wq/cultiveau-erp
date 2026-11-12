@@ -1,8 +1,8 @@
 """Mathis dans l'ERP : il lit les données avec les droits de la personne connectée, propose des actions, les fait une fois confirmées.
 
-Le cerveau est le modèle de langue du réseau (clé Mistral des réglages). Les outils sont ceux de l'API de l'ERP (resume, lister,
-lire, chercher, créer…) plus ceux de la map (qui est où, le stock d'un article, ouvrir un écran, un brouillon de courriel,
-badger). Une action qui écrit n'est jamais faite sans un clic de confirmation.
+Le cerveau est le modèle de langue du réseau, appelé par sa clé (Réglages → Cultiveau → Mathis, l'assistant). Les outils sont
+ceux de l'API de l'ERP (resume, lister, lire, chercher, créer…) plus ceux de la map (qui est où, le stock d'un article, ouvrir
+un écran, un brouillon de courriel, badger). Une action qui écrit n'est jamais faite sans un clic de confirmation.
 """
 import base64
 import json
@@ -16,14 +16,18 @@ from odoo.addons.cultiveau_api.controllers.api_v1 import _appeler, _outils
 from odoo.addons.cultiveau_vue3d.models.secteur import SECTEUR
 
 _logger = logging.getLogger(__name__)
-MISTRAL = "https://api.mistral.ai/v1"
+MISTRAL = "https://api.mistral.ai/v1"  # la dictée seulement
+MODELE_API = "https://api.anthropic.com/v1/messages"
+MODELE_VERSION = "2026-10-21"
+MODELE_DEFAUT = "claude-opus-5-5"
+REPLI = "server-side-fallback-2026-07-01"  # si le modèle décline une demande, l'API la confie à un autre dans le même appel
 ECRITURE = {"creer_client", "creer_intervention", "creer_opportunite", "ajouter_note", "badger", "brouillon_courriel"}
 TITRES = {"creer_client": "Créer le client", "creer_intervention": "Créer l'intervention", "creer_opportunite": "Créer l'opportunité", "ajouter_note": "Ajouter la note",
           "badger": "Enregistrer le pointage", "brouillon_courriel": "Préparer le courriel"}
 TOURS_MAX = 10
 
 SYSTEME = """Tu es {prenom}, l'assistant du réseau Cultiveau (installateurs d'irrigation agricole), ici dans l'ERP de {societe}.
-Tu parles à {utilisateur} ({role}). Nous sommes le {date}, il est {heure}.
+Tu parles à {utilisateur} ({role}).
 Tu réponds en français, court et concret, comme un collègue efficace : une à quatre phrases, des listes quand il y a plusieurs éléments.
 Tu t'appuies TOUJOURS sur les outils pour répondre sur les données (clients, interventions, chantiers, installations, devis, factures,
 articles et stock, équipe) : ne devine jamais un chiffre, un nom ou un état. Si l'outil ne trouve rien, dis-le.
@@ -31,8 +35,11 @@ Quand tu cites une fiche, écris-la ainsi pour qu'elle devienne cliquable : [[re
 interventions, chantiers, installations, devis, factures, articles, opportunites).
 Pour agir (créer un client, une intervention, une opportunité, une note, un courriel, un pointage), appelle l'outil : l'ERP
 demandera confirmation à la personne avant de faire quoi que ce soit ; ne prétends jamais qu'une action est faite avant son résultat.
-Si une demande dépasse tes outils, dis ce que tu sais faire. Ne mentionne jamais l'éditeur du logiciel : c'est « l'ERP Cultiveau ».
-{contexte}"""
+Si une demande dépasse tes outils, dis ce que tu sais faire.
+Tu es {prenom}, et rien d'autre : ne nomme jamais le modèle de langue qui te fait fonctionner, ni son éditeur, ni celui du logiciel ;
+c'est « l'ERP Cultiveau » et « {prenom}, l'assistant du réseau ». N'écris pas de tiret long."""
+
+MOMENT = "Nous sommes le {date}, il est {heure}.\n{contexte}"
 
 
 class Conversation(models.Model):
@@ -64,11 +71,16 @@ class Mathis(models.AbstractModel):
 
     @api.model
     def _cle(self):
+        return (self.env["ir.config_parameter"].sudo().get_param("cultiveau.mathis_cle") or "").strip()
+
+    @api.model
+    def _cle_dictee(self):
         return (self.env["ir.config_parameter"].sudo().get_param("cultiveau.mistral_cle") or "").strip()
 
     @api.model
     def _modele(self):
-        return (self.env["ir.config_parameter"].sudo().get_param("cultiveau.mathis_modele") or "mistral-small-latest").strip()
+        modele = (self.env["ir.config_parameter"].sudo().get_param("cultiveau.mathis_modele") or "").strip()
+        return modele if modele.startswith("claude-") else MODELE_DEFAUT
 
     @api.model
     def pret(self):
@@ -77,9 +89,9 @@ class Mathis(models.AbstractModel):
     @api.model
     def transcrire(self, audio_b64, mimetype="audio/webm"):
         """La dictée : l'enregistrement du micro → le texte (Voxtral de Mistral, comme l'assistant téléphonique)."""
-        cle = self._cle()
+        cle = self._cle_dictee()
         if not cle:
-            raise UserError("La dictée a besoin de la clé Mistral (Réglages → Cultiveau → Fiches techniques et IA).")
+            raise UserError("La dictée n'est pas branchée : écrivez votre demande.")
         audio = base64.b64decode(audio_b64 or "")
         if not audio:
             raise UserError("Aucun son enregistré.")
@@ -167,22 +179,100 @@ class Mathis(models.AbstractModel):
 
     # ---------------------------------------------------------------- le modèle
 
+    def _pour_le_modele(self, messages):
+        """L'historique au format de l'API : blocs de texte, d'appel d'outil et de résultat, les rôles alternés."""
+        sortie = []
+
+        def ajouter(role, blocs):
+            if sortie and sortie[-1]["role"] == role:
+                sortie[-1]["content"] += blocs
+            else:
+                sortie.append({"role": role, "content": list(blocs)})
+
+        for m in messages:
+            role = m.get("role")
+            if role == "user" and m.get("content"):
+                ajouter("user", [{"type": "text", "text": m["content"]}])
+            elif role == "assistant":
+                blocs = [{"type": "text", "text": m["content"]}] if m.get("content") else []
+                for a in m.get("tool_calls") or []:
+                    arguments = a["function"]["arguments"]
+                    if isinstance(arguments, str):
+                        try:
+                            arguments = json.loads(arguments or "{}")
+                        except ValueError:
+                            arguments = {}
+                    blocs.append({"type": "tool_use", "id": a["id"], "name": a["function"]["name"], "input": arguments or {}})
+                if blocs:
+                    ajouter("assistant", blocs)
+            elif role == "tool":
+                ajouter("user", [{"type": "tool_result", "tool_use_id": m.get("tool_call_id"), "content": m.get("content") or ""}])
+        # un résultat d'outil ne reste pas sans son appel, ni un appel sans son résultat (l'historique est une fenêtre)
+        for i, m in enumerate(sortie):
+            if m["role"] == "user":
+                appels = {b["id"] for b in sortie[i - 1]["content"] if b["type"] == "tool_use"} if i else set()
+                m["content"] = [b for b in m["content"] if b["type"] != "tool_result" or b["tool_use_id"] in appels]
+                # les résultats d'outil d'abord, puis ce que la personne a écrit
+                m["content"].sort(key=lambda b: b["type"] != "tool_result")
+            else:
+                rendus = {b["tool_use_id"] for b in sortie[i + 1]["content"] if b["type"] == "tool_result"} if i + 1 < len(sortie) else set()
+                m["content"] = [b for b in m["content"] if b["type"] != "tool_use" or b["id"] in rendus]
+        sortie = [m for m in sortie if m["content"]]
+        # la conversation commence par la personne
+        while sortie and sortie[0]["role"] != "user":
+            sortie.pop(0)
+        return sortie
+
     def _appel_modele(self, messages, outils):
+        """Un tour du modèle. Renvoie {"content": texte, "tool_calls": [{"id", "function": {"name", "arguments"}}]}."""
         cle = self._cle()
         if not cle:
-            raise UserError("La clé Mistral manque : Réglages → Cultiveau → Fiches techniques et IA.")
-        r = requests.post(f"{MISTRAL}/chat/completions", headers={"Authorization": f"Bearer {cle}"}, timeout=90, json={
-            "model": self._modele(), "temperature": 0.2, "messages": messages, "tools": outils, "tool_choice": "auto"})
+            raise UserError(f"La clé de {self.prenom()} manque : Réglages → Cultiveau → {self.prenom()}, l'assistant.")
+        corps = {
+            "model": self._modele(), "max_tokens": 16000, "output_config": {"effort": "medium"},
+            # la partie stable (outils puis consignes) est gardée en cache d'un message à l'autre ; le moment vient après
+            "system": [{"type": "text", "text": self._systeme(), "cache_control": {"type": "ephemeral"}}, {"type": "text", "text": self._moment()}],
+            "tools": [{"name": o["function"]["name"], "description": o["function"]["description"], "input_schema": o["function"]["parameters"]} for o in outils],
+            "messages": self._pour_le_modele(messages), "fallbacks": "default"}
+        entetes = {"x-api-key": cle, "anthropic-version": MODELE_VERSION, "content-type": "application/json", "anthropic-beta": REPLI}
+        try:
+            r = requests.post(MODELE_API, headers=entetes, json=corps, timeout=100)
+            if r.status_code == 400 and "fallback" in r.text:
+                # le repli n'est pas ouvert à ce modèle ou à ce compte : on s'en passe
+                corps.pop("fallbacks")
+                entetes.pop("anthropic-beta")
+                r = requests.post(MODELE_API, headers=entetes, json=corps, timeout=100)
+        except requests.RequestException as e:
+            raise UserError(f"{self.prenom()} n'a pas pu être joint : réessayez dans un instant.") from e
+        if r.status_code in (401, 403):
+            raise UserError(f"La clé de {self.prenom()} est refusée : vérifiez-la dans Réglages → Cultiveau → {self.prenom()}, l'assistant.")
+        if r.status_code in (429, 529) or r.status_code >= 500:
+            raise UserError(f"{self.prenom()} est très demandé en ce moment : réessayez dans un instant.")
         if r.status_code >= 400:
-            raise UserError(f"{self.prenom()} ne répond pas (HTTP {r.status_code}) : {r.text[:200]}")
-        return r.json()["choices"][0]["message"]
+            try:
+                detail = r.json()["error"]["message"]
+            except Exception:  # noqa: BLE001
+                detail = r.text
+            _logger.warning("Mathis : HTTP %s : %s", r.status_code, detail[:500])
+            raise UserError(f"{self.prenom()} ne répond pas (erreur {r.status_code}) : {detail[:200]}")
+        reponse = r.json()
+        if reponse.get("stop_reason") == "refusal":
+            return {"content": "Je ne peux pas vous aider sur cette demande.", "tool_calls": []}
+        blocs = reponse.get("content") or []
+        return {"content": "\n".join(b["text"] for b in blocs if b.get("type") == "text" and b.get("text")).strip(),
+                "tool_calls": [{"id": b["id"], "type": "function", "function": {"name": b["name"], "arguments": b.get("input") or {}}} for b in blocs if b.get("type") == "tool_use"]}
 
     def _systeme(self):
-        company = self.env.company
-        user = self.env.user
-        local = fields.Datetime.context_timestamp(self.with_context(tz=company.partner_id.tz or "Europe/Paris"), fields.Datetime.now())
+        """Les consignes, stables d'un message à l'autre pour une même personne."""
         Map = self.env["cultiveau.map"]
         roles = {r["cle"]: r["nom"] for r in SECTEUR["roles"]}
+        user = self.env.user
+        return SYSTEME.format(prenom=self.prenom(), societe=self.env.company.name, utilisateur=user.name, role=roles.get(Map._role(user), Map._role(user)))
+
+    def _moment(self):
+        """Ce qui change à chaque message : la date, l'heure, les repères de la société."""
+        company = self.env.company
+        local = fields.Datetime.context_timestamp(self.with_context(tz=company.partner_id.tz or "Europe/Paris"), fields.Datetime.now())
         try:
             resume = self.env["cultiveau.api.moteur"].resume(None)
             ligne = next((a for a in resume.get("adherents", []) if a["adherent"].get("id") == company.id), None)
@@ -193,8 +283,7 @@ class Mathis(models.AbstractModel):
             contexte = (f"Repères du moment pour {company.name} : {ligne.get('interventions_ouvertes', 0)} interventions ouvertes dont {ligne.get('urgences', 0)} urgentes, "
                         f"{ligne.get('devis_en_cours', 0)} devis en cours ({ligne.get('devis_montant', 0):,.0f} €), {ligne.get('factures_a_encaisser', 0)} factures à encaisser "
                         f"({ligne.get('reste_a_encaisser', 0):,.0f} €), {ligne.get('chantiers_actifs', 0)} chantiers actifs.").replace(",", " ")
-        return SYSTEME.format(prenom=self.prenom(), societe=company.name, utilisateur=user.name, role=roles.get(Map._role(user), Map._role(user)),
-                              date=Map._date_fr(local), heure=local.strftime("%H:%M"), contexte=contexte)
+        return MOMENT.format(date=self.env["cultiveau.map"]._date_fr(local), heure=local.strftime("%H:%M"), contexte=contexte)
 
     @api.model
     def conversation(self, conversation_id=None):
@@ -212,7 +301,7 @@ class Mathis(models.AbstractModel):
         """Ce que le panneau montre : les messages de la personne et de Mathis, et les propositions en attente."""
         msgs = [{"role": m["role"], "texte": m.get("content") or "", "action": m.get("action")} for m in (conv.messages or [])
                 if m.get("role") in ("user", "assistant") and (m.get("content") or m.get("action"))]
-        return {"conversation_id": conv.id, "messages": msgs, "propositions": conv.attente or [], "prenom": self.prenom(), "pret": self.pret()}
+        return {"conversation_id": conv.id, "messages": msgs, "propositions": conv.attente or [], "prenom": self.prenom(), "pret": self.pret(), "dictee": bool(self._cle_dictee())}
 
     @api.model
     def ouvrir(self, conversation_id=None):
@@ -243,7 +332,7 @@ class Mathis(models.AbstractModel):
         attente = []
         outils = self._outils()
         for _tour in range(TOURS_MAX):
-            reponse = self._appel_modele([{"role": "system", "content": self._systeme()}] + self._fenetre(messages), outils)
+            reponse = self._appel_modele(self._fenetre(messages), outils)
             appels = reponse.get("tool_calls") or []
             assistant = {"role": "assistant", "content": reponse.get("content") or ""}
             if appels:
@@ -361,4 +450,5 @@ class Settings(models.TransientModel):
     _inherit = "res.config.settings"
 
     cultiveau_mathis_prenom = fields.Char("Prénom de l'assistant", config_parameter="cultiveau.mathis_prenom", default="Mathis")
-    cultiveau_mathis_modele = fields.Char("Modèle", config_parameter="cultiveau.mathis_modele", default="mistral-small-latest")
+    cultiveau_mathis_cle = fields.Char("Clé de l'assistant", config_parameter="cultiveau.mathis_cle")
+    cultiveau_mathis_modele = fields.Char("Modèle", config_parameter="cultiveau.mathis_modele", default=MODELE_DEFAUT)

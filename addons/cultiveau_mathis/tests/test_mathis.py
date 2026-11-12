@@ -8,7 +8,13 @@ from ..models import mathis
 
 
 def _reponse(message):
-    return mock.Mock(status_code=200, json=lambda: {"choices": [{"message": message}]})
+    """La réponse du modèle, au format de son API : des blocs de texte et d'appel d'outil (avec un bloc de réflexion, ignoré)."""
+    blocs = [{"type": "thinking", "thinking": "", "signature": "sig"}]
+    if message.get("content"):
+        blocs.append({"type": "text", "text": message["content"]})
+    for a in message.get("tool_calls") or []:
+        blocs.append({"type": "tool_use", "id": a["id"], "name": a["function"]["name"], "input": json.loads(a["function"]["arguments"])})
+    return mock.Mock(status_code=200, text="", json=lambda: {"role": "assistant", "content": blocs, "stop_reason": "tool_use" if message.get("tool_calls") else "end_turn"})
 
 
 @tagged("post_install", "-at_install", "cultiveau")
@@ -16,11 +22,11 @@ class TestMathis(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env["ir.config_parameter"].sudo().set_param("cultiveau.mistral_cle", "cle-test")
+        cls.env["ir.config_parameter"].sudo().set_param("cultiveau.mathis_cle", "cle-test")
         cls.agri = cls.env["res.partner"].create({"name": "Agriculteur Mathis", "cultiveau_type": "agriculteur", "company_id": cls.env.company.id, "phone": "0600000000"})
 
     def test_sans_cle(self):
-        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mistral_cle", "")
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mathis_cle", "")
         self.assertFalse(self.env["cultiveau.mathis"].pret())
         with self.assertRaises(UserError):
             self.env["cultiveau.mathis"].repondre(None, "Bonjour")
@@ -36,9 +42,19 @@ class TestMathis(TransactionCase):
         self.assertEqual(post.call_count, 2)
         envoi = post.call_args_list[1].kwargs["json"]
         roles = [m["role"] for m in envoi["messages"]]
-        self.assertEqual(roles[-3:], ["user", "assistant", "tool"])
-        self.assertIn("Agriculteur Mathis", envoi["messages"][-1]["content"])
-        self.assertTrue(any(o["function"]["name"] == "equipe" for o in envoi["tools"]))
+        self.assertEqual(roles, ["user", "assistant", "user"])
+        self.assertEqual(envoi["messages"][1]["content"][-1]["type"], "tool_use")
+        resultat = envoi["messages"][-1]["content"][0]
+        self.assertEqual((resultat["type"], resultat["tool_use_id"]), ("tool_result", "abc123def"))
+        self.assertIn("Agriculteur Mathis", resultat["content"])
+        self.assertTrue(any(o["name"] == "equipe" and "input_schema" in o for o in envoi["tools"]))
+        self.assertEqual(envoi["model"], "claude-opus-5-5")
+        self.assertNotIn("thinking", json.dumps(envoi["messages"]))
+        self.assertEqual(post.call_args_list[1].args[0], "https://api.anthropic.com/v1/messages")
+        self.assertEqual(post.call_args_list[1].kwargs["headers"]["x-api-key"], "cle-test")
+        self.assertIn("cache_control", envoi["system"][0])
+        self.assertNotIn("il est", envoi["system"][0]["text"])
+        self.assertIn("il est", envoi["system"][1]["text"])
         self.assertEqual(r["messages"][-1]["role"], "assistant")
         self.assertIn("[[clients:", r["messages"][-1]["texte"])
         self.assertEqual(r["propositions"], [])
@@ -93,7 +109,7 @@ class TestMathisTout(TransactionCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.env["ir.config_parameter"].sudo().set_param("cultiveau.mistral_cle", "cle-test")
+        cls.env["ir.config_parameter"].sudo().set_param("cultiveau.mathis_cle", "cle-test")
         cls.client = cls.env["res.partner"].create({"name": "GAEC du Test Mathis", "company_id": cls.env.company.id})
         cls.article = cls.env["product.product"].create({"name": "Vanne de test Mathis", "list_price": 42.0, "sale_ok": True})
         cls.M = cls.env["cultiveau.mathis"]
@@ -103,6 +119,24 @@ class TestMathisTout(TransactionCase):
         self.assertTrue({"types_de_fiche", "champs_et_boutons", "trouver_fiches", "compter_fiches", "creer_fiche", "modifier_fiche", "appuyer_bouton"} <= noms)
         self.assertTrue({"creer_fiche", "modifier_fiche", "appuyer_bouton"} <= self.M._ecritures())
         self.assertIn("types_de_fiche", self.M._systeme())
+
+    def test_refus_et_cle_refusee(self):
+        refus = mock.Mock(status_code=200, text="", json=lambda: {"content": [], "stop_reason": "refusal"})
+        with mock.patch.object(mathis.requests, "post", side_effect=[refus]):
+            r = self.M.repondre(None, "Une demande déclinée")
+        self.assertIn("ne peux pas", r["messages"][-1]["texte"])
+        with mock.patch.object(mathis.requests, "post", side_effect=[mock.Mock(status_code=401, text="invalid x-api-key")]):
+            with self.assertRaises(UserError) as e:
+                self.M.repondre(None, "Bonjour")
+        self.assertIn("refusée", str(e.exception))
+        self.assertNotIn("nthropic", str(e.exception))
+
+    def test_repli_non_ouvert(self):
+        sans = mock.Mock(status_code=400, text='{"error": {"message": "fallbacks: Extra inputs are not permitted"}}')
+        with mock.patch.object(mathis.requests, "post", side_effect=[sans, _reponse({"role": "assistant", "content": "Bonjour."})]) as post:
+            r = self.M.repondre(None, "Bonjour")
+        self.assertEqual(r["messages"][-1]["texte"], "Bonjour.")
+        self.assertNotIn("fallbacks", post.call_args_list[1].kwargs["json"])
 
     def test_lecture(self):
         types, _a = self.M._executer("types_de_fiche", {"texte": "devis"})
@@ -165,7 +199,7 @@ class TestMathisTout(TransactionCase):
         with mock.patch.object(mathis.requests, "post", side_effect=reponses) as post:
             r = self.M.repondre(None, "Crée un utilisateur Intrus")
         self.assertEqual(r["propositions"], [])
-        self.assertIn("erreur", post.call_args_list[1].kwargs["json"]["messages"][-1]["content"])
+        self.assertIn("erreur", post.call_args_list[1].kwargs["json"]["messages"][-1]["content"][0]["content"])
 
     def test_modifier_et_archiver(self):
         self.M._executer("modifier_fiche", {"modele": "res.partner", "ids": [self.client.id], "valeurs": {"city": "Gaillac", "active": False}})

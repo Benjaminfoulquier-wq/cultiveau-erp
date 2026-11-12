@@ -50,7 +50,7 @@ export class MathisPanneau extends Component {
         this.action = useService("action");
         this.notification = useService("notification");
         this.etat = useState(this.mathis.etat);
-        this.state = useState({ conversation: null, messages: [], propositions: [], suggestions: [], prenom: "Mathis", pret: true, saisie: "", occupe: false, charge: false, enregistre: false, transcrit: false });
+        this.state = useState({ conversation: null, messages: [], propositions: [], suggestions: [], prenom: "Mathis", pret: true, dictee: false, saisie: "", occupe: false, charge: false, enregistre: false, transcrit: false });
         this.fil = useRef("fil");
         this.champ = useRef("champ");
         onWillStart(() => this.charger());
@@ -72,6 +72,7 @@ export class MathisPanneau extends Component {
         }
         this.state.prenom = r.prenom;
         this.state.pret = r.pret;
+        this.state.dictee = !!r.dictee;
         for (const m of r.messages) {
             if (m.action && m.action.type === "action" && !m._joue) {
                 m._joue = true;
@@ -84,7 +85,7 @@ export class MathisPanneau extends Component {
     }
     // ---------------------------------------------------------------- la dictée
     get dicteePossible() {
-        return Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
+        return this.state.dictee && Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
     }
     async dicter() {
         if (this.state.enregistre) {

@@ -39,21 +39,23 @@ d'un clic. Le fil d'activité le garde.
 
 ## Réglages
 
-- Réglages → Cultiveau → **Fiches techniques et IA** : la clé Mistral. Sans elle, Mathis n'a pas de voix dans l'ERP (le panneau le dit).
-- Réglages → Cultiveau → **Mathis, l'assistant** : son prénom (celui du standard, « Mathis »), le modèle (`mistral-small-latest` par
-  défaut ; `mistral-medium-latest` pour des réponses plus fines, un peu plus chères).
-- Coût : une question coûte une fraction de centime à quelques centimes selon les outils appelés.
+- Réglages → Cultiveau → **Mathis, l'assistant** : la clé de l'assistant (sans elle, le panneau le dit et Mathis ne répond pas),
+  son prénom (celui du standard, « Mathis ») et le modèle (`claude-opus-5-5` par défaut ; un autre nom de modèle `claude-…` peut être
+  saisi, toute autre valeur revient au modèle par défaut).
+- La clé se crée sur la console de l'éditeur du modèle (console.anthropic.com → API keys) ; elle est payée à l'usage.
+  Dans l'ERP, on ne nomme ni le modèle ni son éditeur : c'est « Mathis ».
+- Coût : les outils et les consignes sont gardés en cache d'un message à l'autre ; une question simple coûte de l'ordre du centime,
+  une demande en plusieurs étapes quelques centimes.
+- Si le modèle décline une demande, l'API la confie à un autre modèle dans le même appel ; si tous déclinent, Mathis le dit.
 
 ## Limites
 
-- Pour les demandes en plusieurs étapes (créer puis confirmer, chercher dans un type de fiche peu courant), le modèle
-  `mistral-medium-latest` est plus sûr que `mistral-small-latest` ; dix allers-retours avec ses outils au plus par message.
+- Dix allers-retours avec ses outils au plus par message.
 - Mathis parle de ce que l'ERP sait ; pas d'accès à Internet ni à des documents extérieurs.
 - Les écritures passent par les mêmes règles que l'ERP : une personne sans droit d'écriture obtient un refus clair.
-- La voix (dictée, lecture) reste au téléphone ; dans l'ERP, il écrit.
+- La lecture à voix haute reste au téléphone ; dans l'ERP, il écrit.
 
 ## La dictée
 
-Le bouton micro du panneau de Mathis enregistre la question (une minute au plus) ; elle est transcrite par Voxtral, le modèle
-de transcription de Mistral déjà utilisé par l'assistant téléphonique (même clé), puis envoyée à Mathis. Un second appui
-arrête l'enregistrement. Le navigateur demande l'autorisation du micro la première fois.
+Le bouton micro n'apparaît que si la clé de transcription est réglée (Réglages → Cultiveau → Fiches techniques et IA) : la
+dictée passe par Voxtral, le modèle de transcription déjà utilisé par l'assistant téléphonique. Sans cette clé, on écrit.

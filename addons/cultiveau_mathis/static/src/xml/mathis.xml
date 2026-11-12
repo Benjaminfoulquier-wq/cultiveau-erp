@@ -18,7 +18,7 @@
                 <button class="o_mathis_btn" title="Fermer" t-on-click="() => this.mathis.fermer()"><i class="fa fa-times"/></button>
             </div>
             <div class="o_mathis_fil" t-ref="fil" t-on-click="onClicFil">
-                <div class="alert alert-warning small m-2" t-if="state.charge and !state.pret">La clé Mistral manque : Réglages → Cultiveau → Fiches techniques et IA. Sans elle, Mathis n'a pas de voix dans l'ERP.</div>
+                <div class="alert alert-warning small m-2" t-if="state.charge and !state.pret">La clé de l'assistant manque : Réglages → Cultiveau → Mathis, l'assistant. Sans elle, Mathis ne peut pas répondre.</div>
                 <div class="o_mathis_accueil" t-if="!state.messages.length">
                     <p>Bonjour, je suis <b t-esc="state.prenom"/>. Je réponds sur vos clients, interventions, chantiers, devis, factures, stock et équipe, et je peux créer une intervention, un client, une note ou un courriel avec votre accord.</p>
                 </div>

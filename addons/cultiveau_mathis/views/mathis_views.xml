@@ -18,8 +18,9 @@
         <field name="arch" type="xml">
             <xpath expr="//block[@name='cultiveau_outils']" position="before">
                 <block title="Mathis, l'assistant" name="cultiveau_mathis">
-                    <setting string="Mathis dans l'ERP" help="L'assistant du réseau répond sur vos données (dans les droits de chacun) et agit avec votre accord. Il utilise la clé Mistral du bloc « Fiches techniques et IA ». Au téléphone, il reste le standard IA.">
+                    <setting string="Mathis dans l'ERP" help="L'assistant du réseau répond sur vos données (dans les droits de chacun) et agit à votre place avec votre accord. Il a besoin de sa clé pour répondre. Au téléphone, il reste le standard.">
                         <div class="row mt8"><label for="cultiveau_mathis_prenom" class="col-lg-4 o_light_label"/><field name="cultiveau_mathis_prenom"/></div>
+                        <div class="row mt8"><label for="cultiveau_mathis_cle" class="col-lg-4 o_light_label"/><field name="cultiveau_mathis_cle" password="True"/></div>
                         <div class="row mt8"><label for="cultiveau_mathis_modele" class="col-lg-4 o_light_label"/><field name="cultiveau_mathis_modele"/></div>
                     </setting>
                 </block>
