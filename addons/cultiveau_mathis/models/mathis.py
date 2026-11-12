@@ -301,13 +301,18 @@ class Mathis(models.AbstractModel):
         """Ce que le panneau montre : les messages de la personne et de Mathis, et les propositions en attente."""
         msgs = [{"role": m["role"], "texte": m.get("content") or "", "action": m.get("action")} for m in (conv.messages or [])
                 if m.get("role") in ("user", "assistant") and (m.get("content") or m.get("action"))]
-        return {"conversation_id": conv.id, "messages": msgs, "propositions": conv.attente or [], "prenom": self.prenom(), "pret": self.pret(), "dictee": bool(self._cle_dictee()), "admin": self.env.user.has_group("base.group_system")}
+        return {"conversation_id": conv.id, "messages": msgs, "propositions": conv.attente or [], "prenom": self.prenom(), "pret": self.pret(), "dictee": bool(self._cle_dictee()), "admin": self._peut_regler_cle()}
+
+    def _peut_regler_cle(self):
+        """Un administrateur, toujours ; un gérant, tant qu'aucune clé n'est posée (il ne peut pas remplacer celle du réseau)."""
+        user = self.env.user
+        return user.has_group("base.group_system") or (not self._cle() and self.env["cultiveau.map"]._role(user) == "gerant")
 
     @api.model
     def regler_cle(self, cle):
         """La clé de l'assistant, posée depuis le panneau par un administrateur (elle n'est jamais relue ni renvoyée)."""
-        if not self.env.user.has_group("base.group_system"):
-            raise UserError("Seul un administrateur peut régler la clé de l'assistant.")
+        if not self._peut_regler_cle():
+            raise UserError("Seul un gérant peut poser la clé de l'assistant, et seul un administrateur peut la remplacer.")
         cle = (cle or "").strip()
         if len(cle) < 20 or " " in cle:
             raise UserError("Cette clé ne ressemble pas à une clé : collez-la en entier, sans espace.")

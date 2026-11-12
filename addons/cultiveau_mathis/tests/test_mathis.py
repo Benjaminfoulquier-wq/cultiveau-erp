@@ -131,6 +131,17 @@ class TestMathisTout(TransactionCase):
         simple = self.env["res.users"].create({"name": "Salarié sans droit", "login": "salarie.mathis@test.fr", "groups_id": [(6, 0, [self.env.ref("base.group_user").id])]})
         with self.assertRaises(UserError):
             self.M.with_user(simple).regler_cle("cle-de-test-assez-longue-0123456789")
+        # un gérant pose la première clé, mais ne remplace pas une clé déjà là
+        gerant = self.env["res.users"].create({"name": "Gérant Mathis", "login": "gerant.mathis@test.fr",
+                                               "groups_id": [(6, 0, [self.env.ref("base.group_user").id, self.env.ref("sales_team.group_sale_manager").id])]})
+        self.assertFalse(self.M.with_user(gerant).ouvrir()["admin"])
+        with self.assertRaises(UserError):
+            self.M.with_user(gerant).regler_cle("une-autre-cle-assez-longue-0123456789")
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mathis_cle", "")
+        self.assertTrue(self.M.with_user(gerant).ouvrir()["admin"])
+        with self.assertRaises(UserError):
+            self.M.with_user(simple).regler_cle("cle-de-test-assez-longue-0123456789")
+        self.assertTrue(self.M.with_user(gerant).regler_cle("cle-du-gerant-assez-longue-0123456789")["pret"])
 
     def test_refus_et_cle_refusee(self):
         refus = mock.Mock(status_code=200, text="", json=lambda: {"content": [], "stop_reason": "refusal"})
