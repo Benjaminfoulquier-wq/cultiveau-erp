@@ -120,6 +120,18 @@ class TestMathisTout(TransactionCase):
         self.assertTrue({"creer_fiche", "modifier_fiche", "appuyer_bouton"} <= self.M._ecritures())
         self.assertIn("types_de_fiche", self.M._systeme())
 
+    def test_cle_depuis_le_panneau(self):
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mathis_cle", "")
+        self.assertFalse(self.M.ouvrir()["pret"])
+        with self.assertRaises(UserError):
+            self.M.regler_cle("trop court")
+        r = self.M.regler_cle("  cle-de-test-assez-longue-0123456789  ")
+        self.assertTrue(r["pret"])
+        self.assertNotIn("cle-de-test", json.dumps(r))
+        simple = self.env["res.users"].create({"name": "Salarié sans droit", "login": "salarie.mathis@test.fr", "groups_id": [(6, 0, [self.env.ref("base.group_user").id])]})
+        with self.assertRaises(UserError):
+            self.M.with_user(simple).regler_cle("cle-de-test-assez-longue-0123456789")
+
     def test_refus_et_cle_refusee(self):
         refus = mock.Mock(status_code=200, text="", json=lambda: {"content": [], "stop_reason": "refusal"})
         with mock.patch.object(mathis.requests, "post", side_effect=[refus]):

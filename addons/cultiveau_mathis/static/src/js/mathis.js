@@ -50,9 +50,10 @@ export class MathisPanneau extends Component {
         this.action = useService("action");
         this.notification = useService("notification");
         this.etat = useState(this.mathis.etat);
-        this.state = useState({ conversation: null, messages: [], propositions: [], suggestions: [], prenom: "Mathis", pret: true, dictee: false, saisie: "", occupe: false, charge: false, enregistre: false, transcrit: false });
+        this.state = useState({ conversation: null, messages: [], propositions: [], suggestions: [], prenom: "Mathis", pret: true, dictee: false, admin: false, saisie: "", occupe: false, charge: false, enregistre: false, transcrit: false });
         this.fil = useRef("fil");
         this.champ = useRef("champ");
+        this.cle = useRef("cle");
         onWillStart(() => this.charger());
     }
     async charger() {
@@ -73,6 +74,7 @@ export class MathisPanneau extends Component {
         this.state.prenom = r.prenom;
         this.state.pret = r.pret;
         this.state.dictee = !!r.dictee;
+        this.state.admin = !!r.admin;
         for (const m of r.messages) {
             if (m.action && m.action.type === "action" && !m._joue) {
                 m._joue = true;
@@ -178,6 +180,18 @@ export class MathisPanneau extends Component {
             this.notification.add(e.data?.message || e.message, { type: "danger" });
         } finally {
             this.state.occupe = false;
+        }
+    }
+    async reglerCle() {
+        const cle = (this.cle.el?.value || "").trim();
+        if (!cle) {
+            return;
+        }
+        try {
+            this.appliquer(await this.orm.call("cultiveau.mathis", "regler_cle", [cle]));
+            this.notification.add("La clé est enregistrée : posez votre question.", { type: "success" });
+        } catch (e) {
+            this.notification.add(e.data?.message || e.message, { type: "danger" });
         }
     }
     async nouvelle() {

@@ -11,7 +11,7 @@ Mathis répond déjà au téléphone pour les adhérents (le standard IA). Ici i
   chaque action est proposée puis confirmée d'un clic ;
 - ses appels téléphoniques arrivent sur la map en direct : notification, Mathis décroche à l'accueil, la fiche de l'appel.
 """,
-    "version": "18.0.2.0.0",
+    "version": "18.0.2.1.0",
     "category": "Cultiveau",
     "author": "Cultiveau",
     "website": "https://cultiveau.fr",

@@ -18,7 +18,17 @@
                 <button class="o_mathis_btn" title="Fermer" t-on-click="() => this.mathis.fermer()"><i class="fa fa-times"/></button>
             </div>
             <div class="o_mathis_fil" t-ref="fil" t-on-click="onClicFil">
-                <div class="alert alert-warning small m-2" t-if="state.charge and !state.pret">La clé de l'assistant manque : Réglages → Cultiveau → Mathis, l'assistant. Sans elle, Mathis ne peut pas répondre.</div>
+                <div class="alert alert-warning small m-2" t-if="state.charge and !state.pret">
+                    <t t-if="state.admin">
+                        <div class="fw-bold mb-1">Il manque la clé de l'assistant.</div>
+                        <div class="mb-2">Collez-la ici, puis Enregistrer. Elle se règle aussi dans Réglages → Cultiveau → Mathis, l'assistant.</div>
+                        <div class="d-flex gap-1">
+                            <input type="password" class="form-control form-control-sm" placeholder="Collez la clé" autocomplete="off" t-ref="cle" t-on-keydown="(ev) => ev.key === 'Enter' and this.reglerCle()"/>
+                            <button class="btn btn-primary btn-sm" t-on-click="reglerCle">Enregistrer</button>
+                        </div>
+                    </t>
+                    <t t-else="">La clé de l'assistant manque : demandez à votre administrateur de la régler. Sans elle, Mathis ne peut pas répondre.</t>
+                </div>
                 <div class="o_mathis_accueil" t-if="!state.messages.length">
                     <p>Bonjour, je suis <b t-esc="state.prenom"/>. Je réponds sur vos clients, interventions, chantiers, devis, factures, stock et équipe, et je peux créer une intervention, un client, une note ou un courriel avec votre accord.</p>
                 </div>

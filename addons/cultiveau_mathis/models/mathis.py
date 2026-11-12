@@ -301,7 +301,18 @@ class Mathis(models.AbstractModel):
         """Ce que le panneau montre : les messages de la personne et de Mathis, et les propositions en attente."""
         msgs = [{"role": m["role"], "texte": m.get("content") or "", "action": m.get("action")} for m in (conv.messages or [])
                 if m.get("role") in ("user", "assistant") and (m.get("content") or m.get("action"))]
-        return {"conversation_id": conv.id, "messages": msgs, "propositions": conv.attente or [], "prenom": self.prenom(), "pret": self.pret(), "dictee": bool(self._cle_dictee())}
+        return {"conversation_id": conv.id, "messages": msgs, "propositions": conv.attente or [], "prenom": self.prenom(), "pret": self.pret(), "dictee": bool(self._cle_dictee()), "admin": self.env.user.has_group("base.group_system")}
+
+    @api.model
+    def regler_cle(self, cle):
+        """La clé de l'assistant, posée depuis le panneau par un administrateur (elle n'est jamais relue ni renvoyée)."""
+        if not self.env.user.has_group("base.group_system"):
+            raise UserError("Seul un administrateur peut régler la clé de l'assistant.")
+        cle = (cle or "").strip()
+        if len(cle) < 20 or " " in cle:
+            raise UserError("Cette clé ne ressemble pas à une clé : collez-la en entier, sans espace.")
+        self.env["ir.config_parameter"].sudo().set_param("cultiveau.mathis_cle", cle)
+        return self.ouvrir()
 
     @api.model
     def ouvrir(self, conversation_id=None):
