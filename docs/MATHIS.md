@@ -13,6 +13,17 @@ interventions et opportunités dans l'ERP par l'API. Le module `cultiveau_mathis
   ouvrir un écran). Il ne devine jamais un chiffre : il appelle l'outil, et dit quand il ne trouve rien.
 - **Il agit avec votre accord** : créer un client, une intervention, une opportunité, ajouter une note, préparer un courriel à un client,
   enregistrer un pointage. Chaque action est d'abord une proposition dans le panneau ; rien n'est écrit avant le clic « Confirmer ».
+- **Il fait tout ce que vous pouvez faire** : au-delà de ces gestes, Mathis sait trouver n'importe quel type de fiche (devis, facture,
+  commande fournisseur, livraison, rendez-vous, article, congé…), lire ses champs et ses boutons, chercher, compter, puis créer, modifier
+  ou appuyer sur un bouton (confirmer un devis, valider une facture, annuler). Exemple : « fais un devis de 3 vannes pour le GAEC Durand
+  et confirme-le » : il propose le devis, vous confirmez, il propose de le confirmer, vous confirmez. Les garde-fous :
+  - vos droits, pas plus : ce que l'ERP vous refuse dans les écrans, il le refuse à Mathis, avec le même message ;
+  - rien sans votre clic : chaque écriture est une proposition lisible (le client par son nom, les lignes, le bouton par son libellé) ;
+  - rien n'est supprimé : pour retirer une fiche, il l'archive ;
+  - seuls les boutons de la fiche sont permis : Mathis appuie là où vous pourriez cliquer, rien d'autre ;
+  - un bouton qui ouvre un écran (un courriel à relire, un assistant) l'ouvre devant vous : c'est vous qui terminez et qui envoyez ;
+  - hors de portée, même pour un administrateur : les comptes d'utilisateur, les droits, les réglages techniques, les clés et mots de
+    passe, les modèles de courriel, le site.
 - **Il planifie les réunions** (module Réunions) : il cherche les créneaux libres de chacun et crée la réunion avec sa visio après
   confirmation.
 - **Ses réponses sont cliquables** : une fiche citée ouvre l'écran correspondant. Une action peut ouvrir un écran (le tableau de bord,
@@ -35,6 +46,8 @@ d'un clic. Le fil d'activité le garde.
 
 ## Limites
 
+- Pour les demandes en plusieurs étapes (créer puis confirmer, chercher dans un type de fiche peu courant), le modèle
+  `mistral-medium-latest` est plus sûr que `mistral-small-latest` ; dix allers-retours avec ses outils au plus par message.
 - Mathis parle de ce que l'ERP sait ; pas d'accès à Internet ni à des documents extérieurs.
 - Les écritures passent par les mêmes règles que l'ERP : une personne sans droit d'écriture obtient un refus clair.
 - La voix (dictée, lecture) reste au téléphone ; dans l'ERP, il écrit.

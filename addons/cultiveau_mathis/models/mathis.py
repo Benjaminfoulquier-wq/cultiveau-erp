@@ -20,7 +20,7 @@ MISTRAL = "https://api.mistral.ai/v1"
 ECRITURE = {"creer_client", "creer_intervention", "creer_opportunite", "ajouter_note", "badger", "brouillon_courriel"}
 TITRES = {"creer_client": "Créer le client", "creer_intervention": "Créer l'intervention", "creer_opportunite": "Créer l'opportunité", "ajouter_note": "Ajouter la note",
           "badger": "Enregistrer le pointage", "brouillon_courriel": "Préparer le courriel"}
-TOURS_MAX = 5
+TOURS_MAX = 10
 
 SYSTEME = """Tu es {prenom}, l'assistant du réseau Cultiveau (installateurs d'irrigation agricole), ici dans l'ERP de {societe}.
 Tu parles à {utilisateur} ({role}). Nous sommes le {date}, il est {heure}.
@@ -155,6 +155,9 @@ class Mathis(models.AbstractModel):
             self.env["cultiveau.pointage"].badger(args.get("genre"), user=self.env.user, source="erp", note="par Mathis")
             return {"pointage": args.get("genre")}, None
         moteur = self.env["cultiveau.api.moteur"]
+        if nom == "ajouter_note":
+            # la note porte le prénom de l'assistant du réseau
+            return moteur.noter(args.get("ressource"), args.get("id"), args.get("texte"), None, self.prenom()), None
         resultat = _appeler(moteur, None, nom, args)
         action = None
         if nom in ("creer_client", "creer_intervention", "creer_opportunite") and isinstance(resultat, dict) and resultat.get("id"):
@@ -231,15 +234,12 @@ class Mathis(models.AbstractModel):
                     "comptoir": ["Il reste combien d'asperseurs ?", "Trouve le client Durand", "Crée un dépannage"]}
         return base + par_role.get(role, [])
 
-    @api.model
-    def repondre(self, conversation_id, texte):
-        """Un message de la personne : Mathis répond, en appelant ses outils ; une écriture s'arrête en proposition à confirmer."""
-        texte = (texte or "").strip()
-        if not texte:
-            raise UserError("Dites-moi quelque chose.")
-        conv = self.conversation(conversation_id)
-        messages = list(conv.messages or [])
-        messages.append({"role": "user", "content": texte})
+    def _verifier(self, nom, args):
+        """Avant de proposer une écriture à la personne : lève une erreur si elle ne tient pas debout (le modèle la corrige)."""
+        return None
+
+    def _derouler(self, messages):
+        """Le modèle parle et appelle ses outils jusqu'à sa réponse ; une écriture s'arrête en proposition à confirmer."""
         attente = []
         outils = self._outils()
         for _tour in range(TOURS_MAX):
@@ -259,6 +259,11 @@ class Mathis(models.AbstractModel):
                 except ValueError:
                     args = {}
                 if nom in self._ecritures():
+                    try:
+                        self._verifier(nom, args)
+                    except Exception as e:  # noqa: BLE001 — proposition impossible : le modèle la corrige
+                        messages.append({"role": "tool", "name": nom, "tool_call_id": a["id"], "content": json.dumps({"erreur": str(e.args[0] if e.args else e)}, ensure_ascii=False)})
+                        continue
                     attente.append({"id": a["id"], "nom": nom, "titre": self._titres().get(nom, nom), "arguments": args, "resume": self._resumer(nom, args)})
                     messages.append({"role": "tool", "name": nom, "tool_call_id": a["id"], "content": json.dumps({"statut": "en attente de la confirmation de la personne"}, ensure_ascii=False)})
                     arret = True
@@ -277,12 +282,24 @@ class Mathis(models.AbstractModel):
                 if not assistant["content"]:
                     assistant["content"] = "Je peux le faire : confirmez ci-dessous."
                 break
+        return attente
+
+    @api.model
+    def repondre(self, conversation_id, texte):
+        """Un message de la personne : Mathis répond, en appelant ses outils ; une écriture s'arrête en proposition à confirmer."""
+        texte = (texte or "").strip()
+        if not texte:
+            raise UserError("Dites-moi quelque chose.")
+        conv = self.conversation(conversation_id)
+        messages = list(conv.messages or [])
+        messages.append({"role": "user", "content": texte})
+        attente = self._derouler(messages)
         conv.write({"messages": messages, "attente": attente, "name": conv.name if conv.name != "Conversation" else texte[:60]})
         return self._affichage(conv)
 
     @api.model
     def confirmer(self, conversation_id, proposition_id, oui=True):
-        """La personne confirme (ou refuse) une proposition : l'action est faite, Mathis conclut."""
+        """La personne confirme (ou refuse) une proposition : l'action est faite, puis Mathis conclut ou enchaîne sur l'étape suivante."""
         conv = self.conversation(conversation_id)
         attente = list(conv.attente or [])
         prop = next((p for p in attente if p["id"] == proposition_id), None)
@@ -306,8 +323,10 @@ class Mathis(models.AbstractModel):
         attente = [p for p in attente if p["id"] != proposition_id]
         if not attente:
             try:
-                reponse = self._appel_modele([{"role": "system", "content": self._systeme()}] + self._fenetre(messages), self._outils())
-                messages.append({"role": "assistant", "content": reponse.get("content") or ("C'est fait." if oui else "D'accord, je ne le fais pas.")})
+                avant = len(messages)
+                attente = self._derouler(messages)
+                if not any(m.get("content") for m in messages[avant:] if m.get("role") == "assistant"):
+                    messages.append({"role": "assistant", "content": "C'est fait." if oui else "D'accord, je ne le fais pas."})
             except Exception as e:  # noqa: BLE001
                 messages.append({"role": "assistant", "content": ("C'est fait." if oui else "D'accord, je ne le fais pas.") + f" ({e})"})
         if action:

@@ -11,7 +11,7 @@ const echapper = (t) => (t || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").r
 /** Le texte de Mathis : les liens [[ressource:id|Libellé]] deviennent cliquables, **gras** et retours à la ligne respectés. */
 function rendre(texte) {
     let h = echapper(texte);
-    h = h.replace(/\[\[(\w+):(\d+)\|([^\]]+)\]\]/g, (m, r, id, lib) => `<a href="#" class="o_mathis_lien" data-modele="${RESSOURCES[r] || r}" data-id="${id}">${lib}</a>`);
+    h = h.replace(/\[\[([\w.]+):(\d+)\|([^\]]+)\]\]/g, (m, r, id, lib) => `<a href="#" class="o_mathis_lien" data-modele="${RESSOURCES[r] || r}" data-id="${id}">${lib}</a>`);
     h = h.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
     h = h.replace(/^\s*[-•]\s+(.*)$/gm, "<li>$1</li>").replace(/(<li>[\s\S]*?<\/li>)(\n(?!<li>)|$)/g, "<ul>$1</ul>$2");
     return markup(h.replace(/\n/g, "<br/>"));
